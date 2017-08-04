@@ -7,6 +7,8 @@
 # between each restart, exiting with a return code of 1 if any of the
 # restarts fail.
 
+LOG=/tmp/hari_buildboard_restart.log
+
 while getopts ":d" opt; do
     case $opt in
         d)
@@ -19,22 +21,26 @@ while getopts ":d" opt; do
     esac
 done
 
+echo $(/bin/date) > ${LOG}
+echo "Starting container restart" >> ${LOG}
+
 if [[ "${RESTART_DB}" == "true" ]]; then
-    echo "Restarting DB"
-    /usr/bin/docker restart temp-bbdb-database || exit 1
+    echo "Restarting DB" >> ${LOG}
+    /usr/bin/docker restart temp-bbdb-database
     sleep 20   # Give DB a bit of time to restart
 fi
 
-echo "Restarting DB loader"
-/usr/bin/docker restart temp-bbdb-loader || exit 1
+echo "Restarting DB loader" >> ${LOG}
+/usr/bin/docker restart temp-bbdb-loader
 /bin/sleep 5
 
-echo "Restarting REST API interface"
-/usr/bin/docker restart temp-restapis || exit 1
+echo "Restarting REST API interface" >> ${LOG}
+/usr/bin/docker restart temp-restapis
 /bin/sleep 5
 
-echo "Restarting changelog interface"
-/usr/bin/docker restart temp-changelog || exit 1
+echo "Restarting changelog interface" >> ${LOG}
+/usr/bin/docker restart temp-changelog
 /bin/sleep 5
 
+echo "Finished container restart" >> ${LOG}
 exit 0
