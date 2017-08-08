@@ -21,7 +21,7 @@ while getopts ":d" opt; do
     esac
 done
 
-echo $(/bin/date) > ${LOG}
+echo $(/bin/date) >> ${LOG}
 echo "Starting container restart" >> ${LOG}
 
 if [[ "${RESTART_DB}" == "true" ]]; then
@@ -42,5 +42,9 @@ echo "Restarting changelog interface" >> ${LOG}
 /usr/bin/docker restart temp-changelog
 /bin/sleep 5
 
+echo "----------" >> ${LOG}
+(/usr/bin/docker ps | grep temp) >> ${LOG}
+echo "" >> ${LOG}
 echo "Finished container restart" >> ${LOG}
+echo "==========" >> ${LOG}
 exit 0
