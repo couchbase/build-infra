@@ -26,14 +26,14 @@ class ManifestWalker:
         of each commit
         """
 
-        commits = [
+        branches = [
             self.repo.get_object(self.repo.refs[ref])
             for ref in self.repo.refs.keys()
             if ref.startswith(b'refs/remotes')
         ]
 
         walker = self.repo.get_walker(
-            include=[commit.id for commit in commits],
+            include=[branch.id for branch in branches],
             exclude=self.exclude_commits, reverse=True
         )
 

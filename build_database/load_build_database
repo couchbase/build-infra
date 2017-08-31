@@ -46,7 +46,7 @@ class BuildDBLoader:
         Parse the manifest XML and create a dictionary with the data
         """
 
-        manifest_info = manifest.parse.Manifest(manifest_xml, is_string=True)
+        manifest_info = manifest.parse.Manifest(manifest_xml, is_bytes=True)
         manifest_data = manifest_info.parse_data()
 
         return manifest.info.ManifestInfo(manifest_data)

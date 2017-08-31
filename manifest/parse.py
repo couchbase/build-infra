@@ -19,11 +19,11 @@ class Manifest:
     within one
     """
 
-    def __init__(self, manifest, is_string=False, fail_on_invalid=True):
+    def __init__(self, manifest, is_bytes=False, fail_on_invalid=True):
         """Basic initialization"""
 
         self.manifest = manifest
-        self.is_string = is_string
+        self.is_bytes = is_bytes
         self.fail_on_invalid = fail_on_invalid
 
         self.data = None
@@ -239,11 +239,11 @@ class Manifest:
         format
         """
 
-        if self.is_string:
+        if self.is_bytes:
             self.data = etree.XML(self.manifest)
         else:
             with open(self.manifest) as fh:
-                self.data = etree.XML(fh.read().encode('utf-8'))
+                self.data = etree.XML(fh.read().encode())
 
         self.tree = etree.ElementTree(self.data)
 

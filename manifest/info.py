@@ -123,11 +123,3 @@ class ManifestInfo:
                 annotations.get('RELEASE', 'unknown'),
                 annotations.get('VERSION', '0.0.0'),
                 annotations.get('BLD_NUM', '9999'))
-
-
-def get_previous_build_num(build_num):
-    """CURRENTLY NOT USED, DO NOT USE"""
-
-    # NOTE: This is *so* not right, but will do for testing
-    # purposes
-    return build_num - 1
