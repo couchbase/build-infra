@@ -1,0 +1,4 @@
+[build_db]
+db_uri = couchbase://localhost/build_info
+username = root
+password = couchbase

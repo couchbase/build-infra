@@ -1,0 +1,164 @@
+#!/usr/bin/env python3.6
+
+"""
+Program to do initial data load for the build database.
+
+Keep document with all branches for build-team-manifests and latest-seen
+commit for each branch
+
+Start with a manifest from build-team-manifests, extract build entry
+from this
+
+Next, step through Git history of build-team-manifests, and use each
+commit to generate a new build entry
+
+(For update, use first mentioned document to do incremental updates;
+don't redo commits already done.)
+"""
+
+import argparse
+import configparser
+import pathlib
+import sys
+
+import couchbase.bucket
+import couchbase.exceptions
+
+import manifest.info
+import manifest.parse
+import util.git
+
+
+class BuildDBLoader:
+    """
+    Used for loading initial build and Git data into the build database
+    """
+
+    def __init__(self, db_info):
+        """Basic initialization"""
+
+        self.db_info = db_info
+        self.initial_data = None
+
+    @staticmethod
+    def get_manifest_data(manifest_xml):
+        """
+        Parse the manifest XML and create a dictionary with the data
+        """
+
+        manifest_info = manifest.parse.Manifest(manifest_xml, is_string=True)
+        manifest_data = manifest_info.parse_data()
+
+        return manifest.info.ManifestInfo(manifest_data)
+
+    def generate_build_document(self, commit_info, manifest_xml):
+        """
+        Generate a build entry from manifest and related commits
+        """
+
+        manifest_path, commit = commit_info
+        manifest_info = self.get_manifest_data(manifest_xml)
+        build_name = manifest_info.name
+
+        build_data = dict(type='build', key_=build_name)
+
+        projects = dict()
+        for project_name in manifest_info.get_projects():
+            project_shas = manifest_info.get_project_shas(
+                project_name
+            )
+            projects[project_name] = [
+                f'{project_name}-{sha}' for sha in project_shas
+            ]
+        build_data['manifest'] = projects
+
+        release_keys = ('product', 'release', 'version', 'build_num')
+        release_data = manifest_info.get_release_info()
+        build_data.update(dict(zip(release_keys, release_data)))
+
+        # NOTE: Currently don't try to populate this immediately;
+        # will have a separate document for <product>-<version>
+        # entries with latest build number
+        # build_data['prev_build_num'] = manifest.info.get_previous_build_num(
+        #     build_num
+        # )
+
+        build_data['commits'] = 'Need to create function for this'
+        build_data['manifest_sha'] = commit.id.decode()
+        build_data['manifest_path'] = manifest_path.decode()
+        build_data['timestamp'] = commit.commit_time
+        build_data['download_url'] = (
+            f'http://latestbuilds.service.couchbase.com/builds/latestbuilds/'
+            f'{release_data[0]}/{release_data[1]}/{release_data[3]}'
+        )
+
+        return build_name, build_data
+
+    def insert_build_documents(self):
+        """Do bulk insert of all build and commit documents"""
+
+        bucket = couchbase.bucket.Bucket(
+            self.db_info['db_uri'], username=self.db_info['usernname'],
+            password=self.db_info['password']
+        )
+
+        try:
+            bucket.upsert_multi(self.initial_data)
+        except couchbase.exceptions.CouchbaseError as exc:
+            print(f'Unable to insert/update data: {exc.message}')
+
+
+def main():
+    """
+    Parse the command line arguments, handle configuration setup,
+    initialize loader, then walk all manifests and generate data
+    which is then put into the database
+    """
+
+    parser = argparse.ArgumentParser(
+        description='Perform initial loading of build database from manifests'
+    )
+    parser.add_argument('-c', '--config', dest='db_config',
+                        help='Configuration file for build database',
+                        default='build_db_conf.ini')
+    parser.add_argument('-m', '--manifest_repo',
+                        help='Path to build-team-manifests repository',
+                        required=True)
+
+    args = parser.parse_args()
+
+    db_config = configparser.ConfigParser()
+    db_config.read(args.db_config)
+
+    if 'build_db' not in db_config:
+        print(f'Unable to read config file {args.db_config}')
+        sys.exit(1)
+
+    db_info = db_config['build_db']
+    required_keys = ['db_uri', 'username', 'password']
+
+    if any(key not in db_info for key in required_keys):
+        print(f'One of the following keys is missing in the config file:\n'
+              f'    "db_uri", "username", "password"')
+        sys.exit(1)
+
+    build_db_loader = BuildDBLoader(db_info)
+    manifest_repo = pathlib.Path(args.manifest_repo)
+    walker = util.git.ManifestWalker(manifest_repo)
+
+    for commit_info, manifest_xml in walker.walk():
+        build_name, build_data = build_db_loader.generate_build_document(
+            commit_info, manifest_xml
+        )
+
+        if build_name.startswith('unknown'):
+            continue
+
+        print(f'Build key: {build_name}\nBuild data:')
+        from pprint import pprint
+        pprint(build_data)
+        break
+
+
+if __name__ == '__main__':
+    main()
