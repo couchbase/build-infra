@@ -31,6 +31,7 @@ class Manifest:
 
         self.remotes = None
         self.projects = None
+        self.defaults = None
 
     @staticmethod
     def generate_data_dict(element_dict):
@@ -88,9 +89,6 @@ class Manifest:
             <remote name="rem" fetch="<git or ssh URL>" \
                 [review="<review URL>"] />
 
-        with an optional default entry of the form:
-            <default remote="<existing remote name>" [revision="<branch>"] />
-
         Remotes may not be duplicated (based on name)
         """
 
@@ -117,20 +115,41 @@ class Manifest:
 
             remotes[remote_name] = self.generate_data_dict(remote_dict)
 
-        for remote in self.tree.findall('default'):
-            remote_name = remote.get('remote')
-
-            if remote_name is not None:
-                remote_revision = remote.get('revision', 'master')
-                remotes['default'] = {
-                    'remote': remote_name,
-                    'revision': remote_revision
-                }
-                break
-        else:
-            remotes['default'] = None
-
         self.remotes = remotes
+
+    def find_defaults(self):
+        """
+        Determine the defaults to be used by the projects defined
+        within the manifest
+
+        The default entry is of the form:
+            <default [remote="<existing remote name>"]
+                     [revision="<branch>"]
+                     [...]
+            />
+
+        We currently only are concerned with the 'remote' and 'revision'
+        entries.  There should be only one 'default' element.
+        """
+
+        defaults = self.tree.findall('default')
+        default_remote = None
+        default_revision = None
+
+        if len(defaults) > 1 and self.fail_on_invalid:
+            raise InvalidManifest(
+                'More than one default entry, must be unique'
+            )
+
+        try:
+            default_remote = defaults[-1].get('remote')
+            default_revision = defaults[-1].get('revision', 'master')
+        except IndexError:
+            pass   # Leave defaults to None
+
+        self.defaults = {
+            'remote': default_remote, 'revision': default_revision
+        }
 
     def find_projects(self):
         """
@@ -228,6 +247,7 @@ class Manifest:
         return {
             manifest_name: {
                 'remotes': self.remotes,
+                'defaults': self.defaults,
                 'projects': self.projects
             }
         }
@@ -248,6 +268,7 @@ class Manifest:
         self.tree = etree.ElementTree(self.data)
 
         self.find_remotes()
+        self.find_defaults()
         self.find_projects()
 
         return self.generate_manifest_dict()

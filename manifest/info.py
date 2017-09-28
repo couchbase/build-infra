@@ -15,36 +15,42 @@ class ManifestInfo:
 
         self.name = list(manifest_data)[0]
         self.manifest_data = manifest_data[self.name]
-        self.remotes, self.default_remote = self.store_remotes()
+        self.remotes = self.store_remotes()
+        self.defaults = self.store_defaults()
         self.projects = self.store_projects()
 
     def store_remotes(self):
         """
-        Organize remotes information, creating a special entry
-        for the default remote. Uses namedtuples for easy access
+        Organize remotes information. Uses namedtuples for easy access
         """
 
         remotes = dict()
-        default_remote = None
 
         RemoteEntry = namedtuple('RemoteEntry', ['name', 'fetch', 'review'])
-        DefaultRemoteEntry = namedtuple(
-            'DefaultRemoteEntry', ['remote', 'revision']
-        )
-
         remote_info = self.manifest_data['remotes']
 
         for remote, remote_data in remote_info.items():
-            if remote == 'default':
-                default_remote = DefaultRemoteEntry(
-                    remote_data['remote'], remote_data['revision']
-                )
-            else:
-                remotes[remote] = RemoteEntry(
-                    remote, remote_data['fetch'], remote_data.get('review')
-                )
+            remotes[remote] = RemoteEntry(
+                remote, remote_data['fetch'], remote_data.get('review')
+            )
 
-        return remotes, default_remote
+        return remotes
+
+    def store_defaults(self):
+        """
+        Organize defaults information.  Uses a namedtuple for easy access
+        """
+
+        DefaultEntry = namedtuple(
+            'DefaultEntry', ['remote', 'revision']
+        )
+        default_info = self.manifest_data['defaults']
+
+        defaults = DefaultEntry(
+            default_info['remote'], default_info['revision']
+        )
+
+        return defaults
 
     def store_projects(self):
         """
