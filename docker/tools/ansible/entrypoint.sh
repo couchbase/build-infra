@@ -6,7 +6,7 @@
 if [ -d /ssh ] && [ "$(ls -A /ssh)" ]
 then
     mkdir $HOME/.ssh
-    cp -a /ssh/* $HOME/.ssh
+    cp /ssh/* $HOME/.ssh
     chmod 600 $HOME/.ssh/*
 fi
 
