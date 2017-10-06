@@ -1,7 +1,7 @@
 # PREREQUISITES
 
-This playbook likely requires at least Ansible 2.3.0. However it currently
-fails with Ansible 2.4.0 due to win_get_url.
+This playbook likely requires at least Ansible 2.3.0. However it does currently
+fail with Ansible 2.4.0 due to win_get_url not working.
 
 The remote Windows server needs to be ready for Ansible remote
 control; see README.txt in the parent directory.
@@ -16,11 +16,7 @@ for more details.
 
 # PLAYBOOKS
 
-prep-for-installer.yml prepares a VM for MSI installer testing, meaning
-it ensures the MS Universal CRT (UCRT) is installed and that remote desktop
-is appropriately set up. That's all it does.
-
-playbook.yml installs everything necessary for creating a Couchbase Server
+playbook.yml installs everything necessary for creating a Couchbase SDK
 build slave. The rest of this document refers only to this playbook.
 
 # LOCAL FILE MODIFICATIONS NECESSARY BEFORE RUNNING PLAYBOOK
@@ -32,29 +28,24 @@ that a default key file such as `id_rsa` exists that can pull all private
 GitHub repositories.
 
 The `inventory` file here is a stub to show the required format. Replace at
-least the IP address(es) of the server(s) to configure.
+least the IP address(es).
 
 # RUNNING THE PLAYBOOK
 
-The primary playbook here is `playbook.yml`. It will install all toolchain
-requirements for building Couchbase Server (spock release or later).
+The primary playbook here is `playbook.yml`.
 
     ansible-playbook -v -i inventory playbook.yml \
-      -e vskey=ABCDEFGHIJKLMNOPQRSTUVWYZ \
       -e ansible_password=ADMINISTRATOR_PASSWORD
-
-`vskey` is the license key for Visual Studio Professional 2015 (omit any
-dashes in the license key).
 
 # THINGS THAT COULD GO WRONG
 
-This playbook worked on October 3, 2017. It does not specify explicit versions
+This playbook worked on October 4, 2017. It does not specify explicit versions
 of any of the toolchain requirements, because many of the packages (notably
 Visual Studio 2015 itself) are specifically designed to install only the
 latest version. That being the case, things could change over time to make
 this playbook fail.
 
-One likely issue is JAVA_HOME in ssh/environment, which is version- and build-
+One likely issue is JAVA_HOME in ssh/environment, which version- and build-
 specific and will need to be changed as newer JREs are released.
 
 Another somewhat likely problem is the file `vs-unattended.xml`, which is
