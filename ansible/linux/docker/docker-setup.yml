@@ -15,12 +15,6 @@
         update_cache: yes
         upgrade: dist
 
-    - name: Clean unused packages
-      apt:
-        update_cache: yes
-        autoremove: yes
-        purge: yes
-
     - name: Disable automatic updates
       apt:
         name: unattended-upgrades
@@ -42,6 +36,12 @@
         delay: 30
         timeout: 300
 
+    - name: Clean unused packages
+      apt:
+        update_cache: yes
+        autoremove: yes
+        purge: yes
+
     - name: Get kernel version
       shell: uname -r
       register: uname
@@ -52,7 +52,7 @@
       tags: core
       changed_when: true
 
-    - name: Install additional packages for Docker
+    - name: Install additional packages for Docker and NFS
       apt:
         name: "{{ item }}"
       with_items:
@@ -60,6 +60,25 @@
         - ca-certificates
         - python-pip
         - curl
+        - nfs-common
+        - zsh
+
+    - name: Mount NAS directories
+      mount:
+        path: "{{ item.mountpoint }}"
+        src: latestbuilds.service.couchbase.com:{{ item.naspath }}
+        fstype: nfs
+        opts: rw,soft
+        dump: 0
+        passno: 0
+        state: mounted
+      with_items:
+        - mountpoint: /latestbuilds
+          naspath: /data/builds/latestbuilds
+        - mountpoint: /releases
+          naspath: /data/builds/releases
+        - mountpoint: /buildstuff
+          naspath: /data/builds
 
     - name: Add docker key
       shell: >
