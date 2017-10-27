@@ -2,3 +2,7 @@
 db_uri = couchbase://localhost/build_info
 username = root
 password = couchbase
+
+[repos]
+manifest_dir = /home/couchbase/build-manifests
+repo_basedir = /tmp/builddb

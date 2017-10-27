@@ -240,7 +240,7 @@ class Manifest:
                 annotations[annotation['name']] = annotation['value']
 
         product = annotations.get('PRODUCT', 'unknown')
-        version = annotations.get('VERSION', '0.0.0')
+        version = annotations.get('VERSION', 'unknown')
         bld_num = annotations.get('BLD_NUM', '9999')
         manifest_name = '{}-{}-{}'.format(product, version, bld_num)
 

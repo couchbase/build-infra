@@ -21,11 +21,11 @@ import configparser
 import pathlib
 import sys
 
-import couchbase.bucket
-import couchbase.exceptions
+from collections import defaultdict
 
 import manifest.info
 import manifest.parse
+import util.db
 import util.git
 
 
@@ -34,14 +34,19 @@ class BuildDBLoader:
     Used for loading initial build and Git data into the build database
     """
 
-    def __init__(self, db_info):
+    def __init__(self, db_info, repo_info):
         """Basic initialization"""
 
-        self.db_info = db_info
         self.initial_data = None
+        self.db = util.db.CouchbaseDB(db_info)
+        self.prod_ver_index = self.db.get_product_version_index()
+        self.first_prod_ver_build = False
+        self.project = None
+        self.repo_base_path = pathlib.Path(repo_info['repo_basedir'])
+        self.repo_cache = util.git.RepoCache()
 
     @staticmethod
-    def get_manifest_data(manifest_xml):
+    def get_manifest_info(manifest_xml):
         """
         Parse the manifest XML and create a dictionary with the data
         """
@@ -51,18 +56,115 @@ class BuildDBLoader:
 
         return manifest.info.ManifestInfo(manifest_data)
 
-    def generate_build_document(self, commit_info, manifest_xml):
+    def get_last_manifest(self):
         """
-        Generate a build entry from manifest and related commits
+        Retrieve the commit SHA for the last build manifest fully
+        processed; if the document or key doesn't exist, assume
+        we're starting from the beginning
+        """
+
+        try:
+            doc = self.db.get_document('last-manifest')
+        except util.db.NotFoundError:
+            return []
+        else:
+            return [doc['latest_sha']] if 'latest_sha' in doc else []
+
+    def update_last_manifest(self, manifest_sha):
+        """
+        Update the last build manifest document in the database
+        with the new commit SHA
+        """
+
+        self.db.upsert_documents(
+            {'last-manifest': {'latest_sha': manifest_sha}}
+        )
+
+    def is_new_commit(self, commit, cache):
+        """
+        Check a given commit is being seen for the first time by seeing
+        if it's already in the local cache or in the build database
+        """
+
+        return (commit.id not in cache and not self.db.key_in_db(
+            f'{self.project}-{commit.id.decode()}'
+        ))
+
+    @staticmethod
+    def update_commit_cache(commit, cache):
+        """Add given commit to the local cache"""
+
+        cache.append(commit.id)
+
+    def find_commits(self, project, shas, manifest_info):
+        """
+        Find all new commits for a given project from a given list of
+        commit SHAs.  This does a custom walk through the Git repo for
+        the project and compares to a local cache of commits along
+        with checking the database.
+
+        Returns a list of the new commits (potentially empty), along
+        with any invalid commit SHAs that had been passed in.
+
+        TODO: This doesn't quite handle when there are multiple commit
+              SHAs for the project and one of them is invalid, due to
+              an unknown ordering issue.  This should be fixed, if at
+              all possible.
+        """
+
+        # Temporarily set for other methods to access
+        self.project = project
+
+        new_commits = list()
+        invalid_shas = list()
+        commit_cache = list()
+
+        remote, project_url = manifest_info.get_project_remote_info(project)
+        project_shas = [sha.replace(f'{project}-', '') for sha in shas]
+        commit_walker = util.git.CommitWalker(
+            project, self.repo_base_path / project, remote, project_url,
+            self.repo_cache
+        )
+
+        for project_sha in project_shas:
+            try:
+                new_commits.extend(commit_walker.walk(
+                    project_sha.encode('utf-8'), commit_cache,
+                    self.is_new_commit, self.update_commit_cache
+                ))
+            except util.git.MissingCommitError:
+                invalid_shas.append(f'{project}-{project_sha}')
+
+        # Reset to ensure not accidentally re-used by another run
+        # of the method or other methods
+        self.project = None
+
+        return new_commits, invalid_shas
+
+    def generate_build_document(self, commit_info, manifest_info):
+        """
+        Generate a build entry from the given build manifest.
+
+        Most of the information for the document is determined here,
+        except the 'invalid_shas' and 'commits' keys which are
+        populated later by other methods.  Returns the collected
+        build document data for further use by the program.
         """
 
         manifest_path, commit = commit_info
-        manifest_info = self.get_manifest_data(manifest_xml)
         build_name = manifest_info.name
+        print(f'Working on manifest {build_name}...')
 
-        build_data = dict(type='build', key_=build_name)
+        # See if build document already is in the database and extract
+        # for updating if so, otherwise create a new dictionary for
+        # population
+        try:
+            build_data = self.db.get_document(build_name)
+        except util.db.NotFoundError:
+            build_data = dict(type='build', key_=build_name)
 
         projects = dict()
+
         for project_name in manifest_info.get_projects():
             project_shas = manifest_info.get_project_shas(
                 project_name
@@ -71,41 +173,159 @@ class BuildDBLoader:
                 f'{project_name}-{sha}' for sha in project_shas
             ]
         build_data['manifest'] = projects
+        build_data['invalid_shas'] = list()  # Populated (potentially) later
 
         release_keys = ('product', 'release', 'version', 'build_num')
         release_data = manifest_info.get_release_info()
+        product, release, version, build_num = release_data
         build_data.update(dict(zip(release_keys, release_data)))
 
-        # NOTE: Currently don't try to populate this immediately;
-        # will have a separate document for <product>-<version>
-        # entries with latest build number
-        # build_data['prev_build_num'] = manifest.info.get_previous_build_num(
-        #     build_num
-        # )
+        index_key = f'{product}-{version}'
+        build_data['prev_build_num'] = (
+            self.prod_ver_index.get(index_key, None)
+        )
 
-        build_data['commits'] = 'Need to create function for this'
+        build_data['commits'] = list()   # Populated (potentially) later
         build_data['manifest_sha'] = commit.id.decode()
         build_data['manifest_path'] = manifest_path.decode()
         build_data['timestamp'] = commit.commit_time
         build_data['download_url'] = (
             f'http://latestbuilds.service.couchbase.com/builds/latestbuilds/'
-            f'{release_data[0]}/{release_data[1]}/{release_data[3]}'
+            f'{product}/{release}/{build_num}'
         )
 
-        return build_name, build_data
+        self.db.upsert_documents({build_name: build_data})
 
-    def insert_build_documents(self):
-        """Do bulk insert of all build and commit documents"""
+        self.first_prod_ver_build = (
+            True if build_data['prev_build_num'] is None else False
+        )
+        self.prod_ver_index[index_key] = build_num
+        self.db.update_product_version_index(self.prod_ver_index)
 
-        bucket = couchbase.bucket.Bucket(
-            self.db_info['db_uri'], username=self.db_info['usernname'],
-            password=self.db_info['password']
+        return build_data
+
+    def generate_commit_documents(self, build_data, manifest_info):
+        """
+        From the given build manifest data, determine all new commits
+        for said build manifest and generate commit documents for
+        the build database for them.
+
+        Done on a per-project basis, if any invalid commit SHAs are
+        found, the entries are removed from the relevant 'manifest' key
+        in the build document and added to the 'invalid_shas' key for
+        future reference, and commit history is ignored.
+        """
+
+        projects = build_data['manifest']
+        invalid_project_shas = defaultdict(list)
+
+        for project in projects:
+            commits = dict()
+
+            commit_info, invalid_shas = self.find_commits(
+                project, projects[project], manifest_info
+            )
+
+            if invalid_shas:
+                # We hit a bad SHA, so pop the project and SHA onto
+                # a dictionary and rebuild the build_data without
+                # that specific project SHA
+                invalid_project_shas[project].extend(invalid_shas)
+                shas = build_data['manifest'][project]
+                build_data['manifest'][project] = [
+                    sha for sha in shas if sha not in invalid_shas
+                ]
+                continue
+
+            for commit in commit_info:
+                commit_name = f'{project}-{commit.id.decode()}'
+
+                commit_data = dict(type='commit', key_=commit_name)
+
+                commit_data['in_build'] = list()  # Populated later
+                commit_data['summary'] = \
+                    commit.message.decode(errors='replace')
+                commit_data['timestamp'] = commit.commit_time
+                commit_data['remote'] = manifest_info.get_project_remote_info(
+                    project
+                )[1]
+                commits[commit_name] = commit_data
+
+            if commits:
+                self.db.upsert_documents(commits)
+
+        if invalid_project_shas:
+            # We had bad project SHAs, so we need to clean up build_data
+            # a bit - in particular, if we have a project in the 'manifest'
+            # key with a now empty SHA list, we need to remove it entirely
+            # from the key - then add the list of invalid SHAs and write
+            # the build document back out with the updated information
+            build_name = build_data['key_']
+            build_data['manifest'] = {
+                project: sha for project, sha
+                in build_data['manifest'].items() if sha
+            }
+            build_data['invalid_shas'] = invalid_project_shas
+            self.db.upsert_documents({build_name: build_data})
+
+    def update_build_commit_documents(self, build_data):
+        """
+        For the given build manifest data, determine build and commit
+        associations and update the relevant documents.
+
+        This handles both existing and new projects for a given build,
+        and only inserts the last commit document ID for the build
+        document's manifest if it's a new project (either entirely new,
+        or re-added after having been removed previously), otherwise
+        it inserts all the relevant commit document IDs.
+
+        Reciprocally, all relevant commit documents have their key
+        'in_build' updated with the build document ID.
+        """
+
+        product, version, prev_build_num = (
+            build_data[key] for key
+            in ['product', 'version', 'prev_build_num']
+        )
+        prev_build_data = self.db.get_document(
+            f'{product}-{version}-{prev_build_num}'
         )
 
-        try:
-            bucket.upsert_multi(self.initial_data)
-        except couchbase.exceptions.CouchbaseError as exc:
-            print(f'Unable to insert/update data: {exc.message}')
+        for project, shas in build_data['manifest'].items():
+            new_shas = [sha.replace(f'{project}-', '').encode('utf-8')
+                        for sha in shas]
+            old_shas = [sha.replace(f'{project}-', '').encode('utf-8')
+                        for sha in prev_build_data['manifest'].get(
+                            project, []
+                        )]
+
+            diff_walker = util.git.DiffWalker(self.repo_base_path / project)
+            diff_commits = diff_walker.walk(old_shas, new_shas)
+
+            if not diff_commits:
+                continue
+
+            if old_shas:
+                commit_ids = [f'{project}-{commit.id.decode()}'
+                              for commit in diff_commits]
+            else:
+                # Only keep most recent commit for new projects
+                commit_ids = [f'{project}-{diff_commits[0].id.decode()}']
+
+            build_name = build_data['key_']
+            build_document = self.db.get_document(build_name)
+            build_document['commits'].extend(commit_ids)
+            self.db.upsert_documents({build_name: build_document})
+
+            for commit_id in commit_ids:
+                commit_document = self.db.get_document(commit_id)
+
+                # The check protects from duplicate build document IDs
+                # for a commit (potentially due to a loading failure)
+                if build_name not in commit_document['in_build']:
+                    commit_document['in_build'].append(build_name)
+
+                self.db.upsert_documents({commit_id: commit_document})
 
 
 def main():
@@ -118,46 +338,57 @@ def main():
     parser = argparse.ArgumentParser(
         description='Perform initial loading of build database from manifests'
     )
-    parser.add_argument('-c', '--config', dest='db_config',
-                        help='Configuration file for build database',
-                        default='build_db_conf.ini')
-    parser.add_argument('-m', '--manifest_repo',
-                        help='Path to build-team-manifests repository',
-                        required=True)
+    parser.add_argument('-c', '--config', dest='db_repo_config',
+                        help='Configuration file for build database loader',
+                        default='build_db_loader_conf.ini')
 
     args = parser.parse_args()
 
-    db_config = configparser.ConfigParser()
-    db_config.read(args.db_config)
+    # Check configuration file information
+    db_repo_config = configparser.ConfigParser()
+    db_repo_config.read(args.db_repo_config)
 
-    if 'build_db' not in db_config:
-        print(f'Unable to read config file {args.db_config}')
+    if any(key not in db_repo_config for key in ['build_db', 'repos']):
+        print(f'Invalid or unable to read config file {args.db_repo_config}')
         sys.exit(1)
 
-    db_info = db_config['build_db']
-    required_keys = ['db_uri', 'username', 'password']
+    db_info = db_repo_config['build_db']
+    db_required_keys = ['db_uri', 'username', 'password']
 
-    if any(key not in db_info for key in required_keys):
-        print(f'One of the following keys is missing in the config file:\n'
-              f'    "db_uri", "username", "password"')
+    if any(key not in db_info for key in db_required_keys):
+        print(f'One of the following DB keys is missing in the config file:\n'
+              f'    {", ".join(db_required_keys)}')
         sys.exit(1)
 
-    build_db_loader = BuildDBLoader(db_info)
-    manifest_repo = pathlib.Path(args.manifest_repo)
-    walker = util.git.ManifestWalker(manifest_repo)
+    repo_info = db_repo_config['repos']
+    repo_required_keys = ['manifest_dir', 'repo_basedir']
 
-    for commit_info, manifest_xml in walker.walk():
-        build_name, build_data = build_db_loader.generate_build_document(
-            commit_info, manifest_xml
-        )
+    if any(key not in repo_info for key in repo_required_keys):
+        print(f'One of the following repo keys is missing in the '
+              f'config file:\n    {", ".join(repo_required_keys)}')
+        sys.exit(1)
 
-        if build_name.startswith('unknown'):
-            continue
+    # Setup loader, read in latest manifest processed, get build manifest
+    # information and walk repo, generating the build documents, then the
+    # new commits for the build, and then linking the build and commit
+    # entries to each other as needed, finishing with updating the last
+    # manifest document (needed to do incremental updates or restart an
+    # interrupted loading run)
+    build_db_loader = BuildDBLoader(db_info, repo_info)
+    last_manifest = build_db_loader.get_last_manifest()
+    manifest_repo = pathlib.Path(repo_info['manifest_dir'])
+    manifest_walker = util.git.ManifestWalker(manifest_repo, last_manifest)
 
-        print(f'Build key: {build_name}\nBuild data:')
-        from pprint import pprint
-        pprint(build_data)
-        break
+    for commit_info, manifest_xml in manifest_walker.walk():
+        manifest_info = build_db_loader.get_manifest_info(manifest_xml)
+        build_data = build_db_loader.generate_build_document(commit_info,
+                                                             manifest_info)
+        build_db_loader.generate_commit_documents(build_data, manifest_info)
+
+        if not build_db_loader.first_prod_ver_build:
+            build_db_loader.update_build_commit_documents(build_data)
+
+        build_db_loader.update_last_manifest(build_data['manifest_sha'])
 
 
 if __name__ == '__main__':

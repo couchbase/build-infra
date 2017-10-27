@@ -62,7 +62,7 @@ class ManifestInfo:
 
         ProjectEntry = namedtuple(
             'ProjectEntry', ['name', 'path', 'remote', 'revision', 'group',
-                             'upstream','annotation', 'copyfile']
+                             'upstream', 'annotation', 'copyfile']
         )
         AnnotationEntry = namedtuple(
             'AnnotationEntry', ['name', 'value', 'keep']
@@ -103,6 +103,22 @@ class ManifestInfo:
         """Retrieve the name of all projects for the manifest"""
 
         return self.projects.keys()
+
+    def get_project_remote_info(self, project):
+        """
+        Retrieve the Git remote name and URL for a given project
+        in the manifest
+        """
+
+        remote = self.projects[project][0].remote or self.defaults.remote
+        remote_url = self.remotes[remote].fetch
+
+        if remote_url.endswith('/'):
+            repo_url = f'{remote_url}{project}.git'
+        else:
+            repo_url = f'{remote_url}/{project}.git'
+
+        return remote, repo_url
 
     def get_project_shas(self, project):
         """Retrieve the SHA values for a given project in the manifest"""
