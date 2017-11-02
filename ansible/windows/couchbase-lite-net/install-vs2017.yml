@@ -1,0 +1,27 @@
+---
+  - name: "Install msvc2017 and tools"
+    win_chocolatey:
+        name: "{{ item }}"
+        allow_empty_checksums: "yes"
+    with_items:
+        - visualstudio2017community
+        - visualstudio2017buildtools
+        - visualstudio2017-workload-visualstudioextension
+        - visualstudio2017-workload-manageddesktop  # .NET Desktop Development workload for Visual Studio 2017 1.1.0
+        - visualstudio2017-workload-netcoretools
+        - visualstudio2017-workload-netcrossplat # mobile development
+        - visualstudio2017-workload-nativemobile # Mobile Development with C++, plus Android NDK latest from this pkg as well
+        - visualstudio2017-workload-universal
+        - xamarin-visualstudio
+    register: install_output
+
+  - name: Reboot Windows if necessary
+    win_reboot:
+      shutdown_timeout_sec: 3600
+      reboot_timeout_sec: 3600
+    when: install_output.changed
+
+# After install, esure "Mobile Development with C++", "android NDK R13" check as well.
+# Go to control panel, open msvc2017, click "Change", "Modify"
+# The items listed above should have the check mark, then click "Modify" on the lower right corner,
+# this will ensure it will re-install anything if Ansible might not have installed it correctly previously.
