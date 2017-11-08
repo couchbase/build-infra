@@ -1,0 +1,1 @@
+git+https://github.com/couchbase/python-couchbase-commons@v0.1.0#egg=cbbuild-0.1.0&subdirectory=cbbuild

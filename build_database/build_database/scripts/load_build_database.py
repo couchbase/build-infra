@@ -1,5 +1,3 @@
-#!/usr/bin/env python3.6
-
 """
 Program to do initial data load for the build database.
 
@@ -23,10 +21,10 @@ import sys
 
 from collections import defaultdict
 
-import manifest.info
-import manifest.parse
-import util.db
-import util.git
+import cbbuild.manifest.info as mf_info
+import cbbuild.manifest.parse as mf_parse
+import cbbuild.cbutil.db as cbutil_db
+import cbbuild.cbutil.git as cbutil_git
 
 
 class BuildDBLoader:
@@ -38,12 +36,12 @@ class BuildDBLoader:
         """Basic initialization"""
 
         self.initial_data = None
-        self.db = util.db.CouchbaseDB(db_info)
+        self.db = cbutil_db.CouchbaseDB(db_info)
         self.prod_ver_index = self.db.get_product_version_index()
         self.first_prod_ver_build = False
         self.project = None
         self.repo_base_path = pathlib.Path(repo_info['repo_basedir'])
-        self.repo_cache = util.git.RepoCache()
+        self.repo_cache = cbutil_git.RepoCache()
 
     @staticmethod
     def get_manifest_info(manifest_xml):
@@ -51,10 +49,10 @@ class BuildDBLoader:
         Parse the manifest XML and create a dictionary with the data
         """
 
-        manifest_info = manifest.parse.Manifest(manifest_xml, is_bytes=True)
+        manifest_info = mf_parse.Manifest(manifest_xml, is_bytes=True)
         manifest_data = manifest_info.parse_data()
 
-        return manifest.info.ManifestInfo(manifest_data)
+        return mf_info.ManifestInfo(manifest_data)
 
     def get_last_manifest(self):
         """
@@ -65,7 +63,7 @@ class BuildDBLoader:
 
         try:
             doc = self.db.get_document('last-manifest')
-        except util.db.NotFoundError:
+        except cbutil_db.NotFoundError:
             return []
         else:
             return [doc['latest_sha']] if 'latest_sha' in doc else []
@@ -121,7 +119,7 @@ class BuildDBLoader:
 
         remote, project_url = manifest_info.get_project_remote_info(project)
         project_shas = [sha.replace(f'{project}-', '') for sha in shas]
-        commit_walker = util.git.CommitWalker(
+        commit_walker = cbutil_git.CommitWalker(
             project, self.repo_base_path / project, remote, project_url,
             self.repo_cache
         )
@@ -132,7 +130,7 @@ class BuildDBLoader:
                     project_sha.encode('utf-8'), commit_cache,
                     self.is_new_commit, self.update_commit_cache
                 ))
-            except util.git.MissingCommitError:
+            except cbutil_git.MissingCommitError:
                 invalid_shas.append(f'{project}-{project_sha}')
 
         # Reset to ensure not accidentally re-used by another run
@@ -160,7 +158,7 @@ class BuildDBLoader:
         # population
         try:
             build_data = self.db.get_document(build_name)
-        except util.db.NotFoundError:
+        except cbutil_db.NotFoundError:
             build_data = dict(type='build', key_=build_name)
 
         projects = dict()
@@ -299,7 +297,7 @@ class BuildDBLoader:
                             project, []
                         )]
 
-            diff_walker = util.git.DiffWalker(self.repo_base_path / project)
+            diff_walker = cbutil_git.DiffWalker(self.repo_base_path / project)
             diff_commits = diff_walker.walk(old_shas, new_shas)
 
             if not diff_commits:
@@ -377,7 +375,7 @@ def main():
     build_db_loader = BuildDBLoader(db_info, repo_info)
     last_manifest = build_db_loader.get_last_manifest()
     manifest_repo = pathlib.Path(repo_info['manifest_dir'])
-    manifest_walker = util.git.ManifestWalker(manifest_repo, last_manifest)
+    manifest_walker = cbutil_git.ManifestWalker(manifest_repo, last_manifest)
 
     for commit_info, manifest_xml in manifest_walker.walk():
         manifest_info = build_db_loader.get_manifest_info(manifest_xml)
