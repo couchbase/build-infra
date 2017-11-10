@@ -1,0 +1,8 @@
+---
+- name: window av slave provision
+  hosts: all
+  gather_facts: true
+
+- include: prep-for-installer.yml
+
+- include: win-av-install.yml
