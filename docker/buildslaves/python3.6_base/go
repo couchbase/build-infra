@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 TAG=$(date "+%Y%m%d")
-IMAGE="ceejatec/ubuntu-1604-python3.6-base"
+IMAGE="couchbasebuild/ubuntu-1604-python3.6-base"
 
 docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
