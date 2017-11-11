@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-TAG=`date +%Y%m%d`
+TAG=2.4.1
 IMAGE=couchbasebuild/ansible-playbook
 
 docker build -t $IMAGE:$TAG .
