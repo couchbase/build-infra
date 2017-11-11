@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+# Bump this when rebuilding with changes
+TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/ansible-slave
+
+docker build -t couchbasebuild/ansible-slave:$TAG .
+docker tag couchbasebuild/ansible-slave:$TAG couchbasebuild/ansible-slave:latest
+if [ "$1" = "--publish" ]
+then
+  docker push couchbasebuild/ansible-slave:$TAG
+  docker push couchbasebuild/ansible-slave:latest
+fi
