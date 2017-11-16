@@ -8,6 +8,16 @@ MAINTAINER build-team@couchbase.com
 
 USER root
 
+# Install sudo
+RUN apt-get update && \
+    apt-get install -y sudo && \
+    apt-get clean
+
+# Create couchbase user with password-less sudo privs
+RUN useradd couchbase -G sudo -m -s /bin/bash && \
+    echo 'couchbase:couchbase' | chpasswd && \
+    sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
+
 # Install Python 3.6 and useful base tools; note that Python 3.6 requires
 # the fkrull/deadsnakes repository, which requires the software-properties-
 # common package
