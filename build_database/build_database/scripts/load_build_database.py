@@ -378,7 +378,13 @@ def main():
     manifest_walker = cbutil_git.ManifestWalker(manifest_repo, last_manifest)
 
     for commit_info, manifest_xml in manifest_walker.walk():
-        manifest_info = build_db_loader.get_manifest_info(manifest_xml)
+        try:
+            manifest_info = build_db_loader.get_manifest_info(manifest_xml)
+        except mf_parse.InvalidManifest as exc:
+            # If the file is not an XML file, simply move to next one
+            print(f'{commit_info[0]}: {exc}, skipping...')
+            continue
+
         build_data = build_db_loader.generate_build_document(commit_info,
                                                              manifest_info)
         build_db_loader.generate_commit_documents(build_data, manifest_info)
