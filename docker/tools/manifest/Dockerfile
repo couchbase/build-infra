@@ -17,4 +17,4 @@ RUN git clone https://github.com/couchbase/build-tools $BUILD_TOOLS_GITDIR && \
     cd $HOME && \
     rm -rf $BUILD_TOOLS_GITDIR
 
-CMD ['/usr/bin/recreate_build_manifest']
+CMD ["/usr/bin/recreate_build_manifest"]

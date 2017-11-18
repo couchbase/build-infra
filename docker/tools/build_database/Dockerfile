@@ -32,4 +32,4 @@ RUN git clone https://github.com/couchbase/build-infra $BUILD_INFRA_GITDIR && \
     cd $HOME && \
     rm -rf $BUILD_INFRA_GITDIR
 
-CMD ['load_build_database', '-c', '/etc/build_db_loader_conf.ini']
+CMD ["load_build_database", "-c", "/etc/build_db_loader_conf.ini"]
