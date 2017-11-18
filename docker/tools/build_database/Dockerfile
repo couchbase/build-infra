@@ -27,8 +27,8 @@ ARG BUILD_INFRA_GITDIR=/var/tmp/build-infra
 # then delete repository
 RUN git clone https://github.com/couchbase/build-infra $BUILD_INFRA_GITDIR && \
     cd $BUILD_INFRA_GITDIR/build_database && \
-    pip install -r requirements.txt && \
-    pip install . && \
+    pip3.6 install -r requirements.txt && \
+    pip3.6 install . && \
     cd $HOME && \
     rm -rf $BUILD_INFRA_GITDIR
 
