@@ -359,7 +359,7 @@ def main():
         sys.exit(1)
 
     repo_info = db_repo_config['repos']
-    repo_required_keys = ['manifest_dir', 'repo_basedir']
+    repo_required_keys = ['manifest_dir', 'manifest_url', 'repo_basedir']
 
     if any(key not in repo_info for key in repo_required_keys):
         print(f'One of the following repo keys is missing in the '
@@ -367,14 +367,17 @@ def main():
         sys.exit(1)
 
     # Setup loader, read in latest manifest processed, get build manifest
-    # information and walk repo, generating the build documents, then the
-    # new commits for the build, and then linking the build and commit
-    # entries to each other as needed, finishing with updating the last
-    # manifest document (needed to do incremental updates or restart an
-    # interrupted loading run)
+    # information, checkout/update build manifest repo and walk it,
+    # generating the build documents, then the new commits for the build,
+    # and then linking the build and commit entries to each other as needed,
+    # finishing with updating the last manifest document (needed to do
+    # incremental updates or restart an interrupted loading run)
     build_db_loader = BuildDBLoader(db_info, repo_info)
     last_manifest = build_db_loader.get_last_manifest()
     manifest_repo = pathlib.Path(repo_info['manifest_dir'])
+    cbutil_git.checkout_repo(
+        manifest_repo, repo_info['manifest_url'], bare=False
+    )
     manifest_walker = cbutil_git.ManifestWalker(manifest_repo, last_manifest)
 
     for commit_info, manifest_xml in manifest_walker.walk():

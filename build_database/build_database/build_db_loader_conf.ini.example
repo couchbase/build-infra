@@ -5,4 +5,5 @@ password = couchbase
 
 [repos]
 manifest_dir = /home/couchbase/build-manifests
+manifest_url = https://github.com/couchbase/build-manifests.git
 repo_basedir = /tmp/builddb
