@@ -16,6 +16,7 @@ don't redo commits already done.)
 
 import argparse
 import configparser
+import logging
 import pathlib
 import sys
 
@@ -25,6 +26,14 @@ import cbbuild.manifest.info as mf_info
 import cbbuild.manifest.parse as mf_parse
 import cbbuild.cbutil.db as cbutil_db
 import cbbuild.cbutil.git as cbutil_git
+
+
+# Set up logging and handler
+logger = logging.getLogger('load_build_database')
+logger.setLevel(logging.INFO)
+
+ch = logging.StreamHandler()
+logger.addHandler(ch)
 
 
 class BuildDBLoader:
@@ -151,7 +160,7 @@ class BuildDBLoader:
 
         manifest_path, commit = commit_info
         build_name = manifest_info.name
-        print(f'Working on manifest {build_name}...')
+        logger.info(f'Generating build document for manifest {build_name}...')
 
         # See if build document already is in the database and extract
         # for updating if so, otherwise create a new dictionary for
@@ -237,6 +246,8 @@ class BuildDBLoader:
 
             for commit in commit_info:
                 commit_name = f'{project}-{commit.id.decode()}'
+                logger.debug(f'Generating commit document for '
+                             f'commit {commit_name}')
 
                 commit_data = dict(type='commit', key_=commit_name)
 
@@ -258,6 +269,8 @@ class BuildDBLoader:
             # key with a now empty SHA list, we need to remove it entirely
             # from the key - then add the list of invalid SHAs and write
             # the build document back out with the updated information
+            logging.debug(f'Invalid SHAs found: '
+                          f'{", ".join(invalid_project_shas)}')
             build_name = build_data['key_']
             build_data['manifest'] = {
                 project: sha for project, sha
@@ -311,6 +324,8 @@ class BuildDBLoader:
                 commit_ids = [f'{project}-{diff_commits[0].id.decode()}']
 
             build_name = build_data['key_']
+            logger.debug(f'Updating {build_name} build document for '
+                         f'the following commits: {", ".join(commit_ids)}')
             build_document = self.db.get_document(build_name)
             build_document['commits'].extend(commit_ids)
             self.db.upsert_documents({build_name: build_document})
@@ -336,34 +351,46 @@ def main():
     parser = argparse.ArgumentParser(
         description='Perform initial loading of build database from manifests'
     )
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Enable debugging output')
     parser.add_argument('-c', '--config', dest='db_repo_config',
                         help='Configuration file for build database loader',
                         default='build_db_loader_conf.ini')
 
     args = parser.parse_args()
 
+    # Set logging to debug level on stream handler if --debug was set
+    if args.debug:
+        ch.setLevel(logging.DEBUG)
+
     # Check configuration file information
     db_repo_config = configparser.ConfigParser()
     db_repo_config.read(args.db_repo_config)
 
     if any(key not in db_repo_config for key in ['build_db', 'repos']):
-        print(f'Invalid or unable to read config file {args.db_repo_config}')
+        logger.error(
+            f'Invalid or unable to read config file {args.db_repo_config}'
+        )
         sys.exit(1)
 
     db_info = db_repo_config['build_db']
     db_required_keys = ['db_uri', 'username', 'password']
 
     if any(key not in db_info for key in db_required_keys):
-        print(f'One of the following DB keys is missing in the config file:\n'
-              f'    {", ".join(db_required_keys)}')
+        logger.error(
+            f'One of the following DB keys is missing in the config file:\n'
+            f'    {", ".join(db_required_keys)}'
+        )
         sys.exit(1)
 
     repo_info = db_repo_config['repos']
     repo_required_keys = ['manifest_dir', 'manifest_url', 'repo_basedir']
 
     if any(key not in repo_info for key in repo_required_keys):
-        print(f'One of the following repo keys is missing in the '
-              f'config file:\n    {", ".join(repo_required_keys)}')
+        logger.error(
+            f'One of the following repo keys is missing in the '
+            f'config file:\n    {", ".join(repo_required_keys)}'
+        )
         sys.exit(1)
 
     # Setup loader, read in latest manifest processed, get build manifest
@@ -374,10 +401,13 @@ def main():
     # incremental updates or restart an interrupted loading run)
     build_db_loader = BuildDBLoader(db_info, repo_info)
     last_manifest = build_db_loader.get_last_manifest()
-    manifest_repo = pathlib.Path(repo_info['manifest_dir'])
-    cbutil_git.checkout_repo(
-        manifest_repo, repo_info['manifest_url'], bare=False
-    )
+    manifest_repo = repo_info['manifest_dir']
+
+    logger.info('Checking out/updating the build-manifests repo...')
+    cbutil_git.checkout_repo(manifest_repo, repo_info['manifest_url'])
+
+    logger.info(f'Creating manifest walker and walking it, '
+                f'starting after commit {last_manifest[0]}...')
     manifest_walker = cbutil_git.ManifestWalker(manifest_repo, last_manifest)
 
     for commit_info, manifest_xml in manifest_walker.walk():
@@ -385,7 +415,7 @@ def main():
             manifest_info = build_db_loader.get_manifest_info(manifest_xml)
         except mf_parse.InvalidManifest as exc:
             # If the file is not an XML file, simply move to next one
-            print(f'{commit_info[0]}: {exc}, skipping...')
+            logger.info(f'{commit_info[0]}: {exc}, skipping...')
             continue
 
         build_data = build_db_loader.generate_build_document(commit_info,
@@ -395,6 +425,7 @@ def main():
         if not build_db_loader.first_prod_ver_build:
             build_db_loader.update_build_commit_documents(build_data)
 
+        logger.debug('Updating last manifest document...')
         build_db_loader.update_last_manifest(build_data['manifest_sha'])
 
 
