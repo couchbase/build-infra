@@ -37,6 +37,7 @@
       with_items:
         - git
         - cmake
+        - curl
         - ninja
         - MinGW
         - python2
@@ -50,6 +51,15 @@
         - googlechrome
         - insted
         - pandoc
+
+    - name: "Download get_pip.py file"
+      win_command: C:\ProgramData\chocolatey\bin\curl.exe -k https://bootstrap.pypa.io/get-pip.py -o C:\Users\Administrator\Downloads\get-pip.py
+
+    - name: "Install pip"
+      win_command: C:\Python27\python.exe C:\Users\Administrator\Downloads\get-pip.py
+
+    - name: "Install python paramiko module"
+      win_command: C:\Python27\Scripts\pip.exe install paramiko
 
     # Code depends on .NET Framework 4.5.2 (chocolatey package "dotnet4.5.2"),
     # but that package fails to install via Ansible due to silly limitations
