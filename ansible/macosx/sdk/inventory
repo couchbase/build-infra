@@ -1,0 +1,7 @@
+[all]
+xxx.xx.xx.xx
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=couchbase
+ansible_ssh_pass=JENKINS_USER_PASSWORD
