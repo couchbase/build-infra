@@ -1,7 +1,7 @@
 #!/bin/sh
 
 GCC_VER=7.2.0
-IMAGE=couchbasebuild/suse-12-gcc
+IMAGE=localonly/suse-12-gcc
 
 docker build --build-arg GCC_VER=${GCC_VER} --build-arg REGCODE=$(cat $HOME/jenkinsdocker-ssh/suse_regcode.txt) -t ${IMAGE}:${GCC_VER} .
 docker tag ${IMAGE}:${GCC_VER} ${IMAGE}:latest
