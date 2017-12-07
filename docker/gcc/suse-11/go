@@ -1,0 +1,12 @@
+#!/bin/sh
+
+GCC_VER=7.2.0
+IMAGE=couchbasebuild/suse-11-gcc
+
+docker build --build-arg GCC_VER=${GCC_VER} -t ${IMAGE}:${GCC_VER} .
+docker tag ${IMAGE}:${GCC_VER} ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+    docker push ${IMAGE}:${GCC_VER}
+    docker push ${IMAGE}:latest
+fi
