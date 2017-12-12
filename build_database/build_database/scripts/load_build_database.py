@@ -255,9 +255,12 @@ class BuildDBLoader:
                 commit_data['summary'] = \
                     commit.message.decode(errors='replace')
                 commit_data['timestamp'] = commit.commit_time
-                commit_data['remote'] = manifest_info.get_project_remote_info(
-                    project
-                )[1]
+                commit_data['parents'] = [
+                    f'{project}-{commit_id.decode()}'
+                    for commit_id in commit.parents
+                ]
+                commit_data['remote'] = \
+                    manifest_info.get_project_remote_info(project)[1]
                 commits[commit_name] = commit_data
 
             if commits:
@@ -406,8 +409,10 @@ def main():
     logger.info('Checking out/updating the build-manifests repo...')
     cbutil_git.checkout_repo(manifest_repo, repo_info['manifest_url'])
 
-    logger.info(f'Creating manifest walker and walking it, '
-                f'starting after commit {last_manifest[0]}...')
+    logger.info(f'Creating manifest walker and walking it...')
+    if last_manifest:
+        logger.info(f'    starting after commit {last_manifest[0]}...')
+
     manifest_walker = cbutil_git.ManifestWalker(manifest_repo, last_manifest)
 
     for commit_info, manifest_xml in manifest_walker.walk():
