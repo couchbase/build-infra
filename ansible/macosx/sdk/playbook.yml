@@ -11,3 +11,7 @@
   tasks:
     - name: Install java
       homebrew_cask: name=java state=present
+
+    - name: set energy saving to zero
+      shell: systemsetup -setcomputersleep Never
+      become: true

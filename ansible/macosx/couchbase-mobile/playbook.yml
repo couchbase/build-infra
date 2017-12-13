@@ -18,6 +18,10 @@
       homebrew_cask: name=java state=present
       when: not java_state.stat.exists
 
+    - name: set energy saving to zero
+      shell: systemsetup -setcomputersleep Never
+      become: true
+
     - name: Copy SSH config files
       copy:
         src=./ssh/{{ item }} dest=/Users/jenkins/.ssh/{{ item }} owner=jenkins group=staff mode=0644
