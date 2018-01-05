@@ -1,0 +1,10 @@
+---
+
+- name: pip | "Download get_pip.py file"
+  win_command: C:\ProgramData\chocolatey\bin\curl.exe -k https://bootstrap.pypa.io/get-pip.py -o C:\Users\Administrator\Downloads\get-pip.py
+
+- name: pip | "Install pip"
+  win_command: C:\Python27\python.exe C:\Users\Administrator\Downloads\get-pip.py
+
+- name: pip | "Install python pyinstaller module"
+  win_command: C:\Python27\Scripts\pip.exe install pyinstaller

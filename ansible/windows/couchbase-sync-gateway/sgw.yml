@@ -1,0 +1,77 @@
+---
+
+  - name: sync-gateway | "Enable .NET Framework 3.5"
+   # Needed for WiX Toolset
+    win_feature:
+      name: "NET-Framework-Core"
+      state: present
+
+  - name: sync-gateway | Install tools
+    win_chocolatey:
+      name: "{{ item }}"
+      allow_empty_checksums: "yes"
+    with_items:
+      - git
+      - cmake
+      - curl
+      - wget
+      - ninja
+      - MinGW
+      - python2
+      - ruby
+      - wixtoolset
+      - 7zip.commandline
+      - jdk8
+      - maven
+      - googlechrome
+      - insted
+      - pandoc
+      - cmder
+
+  - name: "Install repo"
+    win_copy:
+      src: "repo.exe"
+      dest: "C:\\bin\\repo.exe"
+
+  - name: Add tools to PATH.
+    include: extend-path.yml
+    with_items:
+      - C:\bin
+      - C:\Program Files\CMake\bin
+      - C:\Program Files\git\cmd
+      - C:\Program Files (x86)\WiX Toolset v3.11\bin
+
+  - name: sync-gateway | Install OpenSSH (for Jenkins)
+    script: openssh.ps1
+
+  - name: sync-gateway | Copy SSH config files
+    win_copy:
+      src: "./ssh/{{ item }}"
+      dest: C:\Users\Administrator\.ssh\{{ item }}
+    with_items:
+      - authorized_keys
+      - buildbot_id_dsa
+      - config
+      - environment
+      - id_rsa
+      - known_hosts
+
+  - name: sync-gateway | Enable Remote Desktop
+    win_regedit:
+      key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+      name: fDenyTSConnections
+      data: 0
+      type: dword
+      state: present
+
+  - name: sync-gateway | Open Remote Desktop in firewall
+    win_firewall_rule:
+      name: "remote desktop"
+      enable: yes
+      state: present
+      localport: 3389
+      action: allow
+      direction: in
+      protocol: TCP
+      force: true
+

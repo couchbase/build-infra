@@ -1,0 +1,8 @@
+---
+- name: SGW window slave provision
+  hosts: all
+
+  tasks:
+  - include: sgw.yml
+  - include: pip.yml
+  - include: go.yml
