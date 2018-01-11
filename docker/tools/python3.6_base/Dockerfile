@@ -31,7 +31,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 # common package
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
-    add-apt-repository ppa:fkrull/deadsnakes && \
+    add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y python3.6-dev python3.6-venv tar && \
     apt-get clean && \
@@ -42,4 +42,20 @@ RUN apt-get update && \
     apt-get install -y locales && \
     apt-get clean && \
     locale-gen en_US.UTF-8
+
+# Install libcouchbase (needed for Python Couchbase SDK)
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -O http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb && \
+    dpkg -i couchbase-release-1.0-4-amd64.deb && \
+    apt-get update && \
+    apt-get install -y libcouchbase-dev libcouchbase2-bin && \
+    cd /tmp && \
+    rm -rf deploy && \
+    rm -f /var/cache/apt/archives/*.deb
+
+# Go ahead and install the Python Couchbase SDK, since many sub-images will
+# use it
+RUN pip3.6 install couchbase
+
 ENV LANG=en_US.UTF-8

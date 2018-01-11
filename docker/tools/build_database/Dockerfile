@@ -9,17 +9,6 @@ MAINTAINER build-team@couchbase.com
 
 USER root
 
-# Install libcouchbase (needed for Python Couchbase SDK)
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -O http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb && \
-    dpkg -i couchbase-release-1.0-4-amd64.deb && \
-    apt-get update && \
-    apt-get install -y libcouchbase-dev libcouchbase2-bin build-essential git && \
-    cd /tmp && \
-    rm -rf deploy && \
-    rm -f /var/cache/apt/archives/*.deb
-
 # Checkout directory for build-infra repository
 ARG BUILD_INFRA_GITDIR=/var/tmp/build-infra
 
