@@ -46,11 +46,14 @@ class JiraCommenter:
 
         try:
             jticket = self.jira.issue(ticket)
+
         except JIRAError as e:
             if e.status_code == 404:
                 logger.info(f"commit references non-existent ticket {ticket}")
+
             else:
                 logger.warning(f"error loading JIRA issue ticket {ticket}: {e.text}")
+
             return
 
         org = commit.remote.split('/')[3]
@@ -61,6 +64,7 @@ class JiraCommenter:
             f"commit {commit.sha} with commit message:\n"
             f"{topic}\n{url}"
         )
+
         if self.dryrun:
             logger.info(f'(Not) posting Jira comment on {ticket}:\n{message}')
         else:
@@ -81,18 +85,18 @@ class JiraCommenter:
             # Exception: Don't comment on 0.0.0 builds
             if build.version == '0.0.0':
                 logger.debug(f'Skipping master build {build.key}')
-                continue
 
-            for commit_key in build.commits:
-                commit = self.db.get_commit(commit_key)
+            else:
+                for commit_key in build.commits:
+                    commit = self.db.get_commit(commit_key)
 
-                # Exception: Don't commit on testrunner commits
-                if commit.project == 'testrunner':
-                    logger.debug (f"Skipping testrunner commit {commit.sha}")
-                    continue
+                    # Exception: Don't commit on testrunner commits
+                    if commit.project == 'testrunner':
+                        logger.debug (f"Skipping testrunner commit {commit.sha}")
+                        continue
 
-                for ticket in self.get_tickets(commit):
-                    self.make_comment(ticket, commit, build)
+                    for ticket in self.get_tickets(commit):
+                        self.make_comment(ticket, commit, build)
 
             if not self.dryrun:
                 build.set_metadata('jira_comments', True)
