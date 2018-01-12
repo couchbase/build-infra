@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 TAG=$(date "+%Y%m%d")
-IMAGE="couchbasebuild/ubuntu-1604-load-build-database"
+IMAGE="couchbasebuild/load-build-database"
 
 docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest

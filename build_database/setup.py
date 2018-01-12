@@ -68,6 +68,7 @@ setup_args = dict(
     entry_points={
         'console_scripts': [
             'load_build_database = build_database.scripts.load_build_database:main',
+            'jira_commenter = build_database.scripts.jira_commenter:main',
         ]
     },
     classifiers=[

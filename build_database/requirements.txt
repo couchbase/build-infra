@@ -1,1 +1,2 @@
-git+https://github.com/couchbase/python-couchbase-commons@v0.2.0#egg=cbbuild-0.2.0&subdirectory=cbbuild
+git+https://github.com/couchbase/python-couchbase-commons@v0.3.1#egg=cbbuild-0.3.1&subdirectory=cbbuild
+jira
