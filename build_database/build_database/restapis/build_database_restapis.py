@@ -42,7 +42,7 @@ def main():
     db_repo_config.read(args.db_repo_configfile)
 
     if 'build_db' not in db_repo_config:
-        logger.error(
+        app.logger.error(
             f'Invalid or unable to read config file {args.db_repo_configfile}'
         )
         sys.exit(1)
