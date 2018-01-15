@@ -69,6 +69,9 @@ setup_args = dict(
         'console_scripts': [
             'load_build_database = build_database.scripts.load_build_database:main',
             'jira_commenter = build_database.scripts.jira_commenter:main',
+            'add_commit_history = build_database.scripts.add_commit_history:main',
+            'build_diff = build_database.tools.build_diff:main',
+            'build_database_restapis = build_database.restapis.build_database_restapis:main'
         ]
     },
     classifiers=[

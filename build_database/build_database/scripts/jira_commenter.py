@@ -11,8 +11,6 @@ import sys
 
 import cbbuild.cbutil.db as cbutil_db
 
-from couchbase.n1ql import N1QLQuery
-
 from jira import JIRA
 from jira.exceptions import JIRAError
 
