@@ -15,7 +15,7 @@ chmod 600 /home/couchbase/.aws/* /home/couchbase/.ssh/*
 
 # Run repo_upload program with 'yum' option
 [[ "$1" == "default" ]] && {
-    exec /usr/bin/repo_upload -c /etc/repo_upload.ini -r yum -e $EDITION
+    exec /usr/local/bin/repo_upload -c /etc/repo_upload.ini -r yum -e $EDITION
 }
 
 exec "$@"
