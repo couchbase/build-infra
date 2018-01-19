@@ -250,9 +250,20 @@ class BuildDBLoader:
                 logger.debug(f'Generating commit document for '
                              f'commit {commit_name}')
 
-                commit_data = dict(type='commit', key_=commit_name)
+                # See if commit document already is in the database
+                # and extract for updating if so, otherwise create
+                # a new dictionary for population
+                try:
+                    commit_data = self.db.get_document(commit_name)
+                except cbutil_db.NotFoundError:
+                    commit_data = dict(type='commit', key_=commit_name)
 
+                commit_data['project'] = project
+                commit_data['sha'] = commit.id.decode()
                 commit_data['in_build'] = list()  # Populated later
+                commit_data['author'] = commit.author.decode(errors='replace')
+                commit_data['committer'] = \
+                    commit.committer.decode(errors='replace')
                 commit_data['summary'] = \
                     commit.message.decode(errors='replace')
                 commit_data['timestamp'] = commit.commit_time
