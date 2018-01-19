@@ -200,7 +200,9 @@ class BuildDBLoader:
             f'http://latestbuilds.service.couchbase.com/builds/latestbuilds/'
             f'{product}/{release}/{build_num}'
         )
-        build_data['metadata'] = dict()  # Used for related (external) data
+
+        # Used for related (external) data; preserve any existing data
+        build_data['metadata'] = build_data.get('metadata', dict())
 
         self.db.upsert_documents({build_name: build_data})
 
