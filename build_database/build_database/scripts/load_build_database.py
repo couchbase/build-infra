@@ -148,6 +148,39 @@ class BuildDBLoader:
 
         return new_commits, invalid_shas
 
+    def update_project_documents(self, manifest_info):
+        """
+        Add or update a set of given project documents from a given
+        manifest
+        """
+
+        for proj_name, proj_info in manifest_info.projects.items():
+            # See if project document already is in the database and extract
+            # for updating if so, otherwise create a new dictionary for
+            # population
+            key_name = f'project:{proj_name}'
+
+            try:
+                project_data = self.db.get_document(key_name)
+            except cbutil_db.NotFoundError:
+                project_data = dict(
+                    type='project', key_=key_name, name=proj_name
+                )
+
+            remote, repo_url = \
+                manifest_info.get_project_remote_info(proj_name)
+
+            if 'remotes' in project_data:
+                if remote in project_data['remotes']:
+                    if repo_url not in project_data['remotes'][remote]:
+                        project_data['remotes'][remote].append(repo_url)
+                else:
+                    project_data['remotes'][remote] = [repo_url]
+            else:
+                project_data['remotes'] = {remote: [repo_url]}
+
+            self.db.upsert_documents({key_name: project_data})
+
     def generate_build_document(self, commit_info, manifest_info):
         """
         Generate a build entry from the given build manifest.
@@ -412,7 +445,8 @@ def main():
 
     # Setup loader, read in latest manifest processed, get build manifest
     # information, checkout/update build manifest repo and walk it,
-    # generating the build documents, then the new commits for the build,
+    # generating or update the project documents, then generating or
+    # updating the build documents, then the new commits for the build,
     # and then linking the build and commit entries to each other as needed,
     # finishing with updating the last manifest document (needed to do
     # incremental updates or restart an interrupted loading run)
@@ -436,6 +470,8 @@ def main():
             # If the file is not an XML file, simply move to next one
             logger.info(f'{commit_info[0]}: {exc}, skipping...')
             continue
+
+        build_db_loader.update_project_documents(manifest_info)
 
         build_data = build_db_loader.generate_build_document(commit_info,
                                                              manifest_info)
