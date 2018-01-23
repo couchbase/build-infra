@@ -75,13 +75,13 @@
         - C:\Program Files\git\cmd
         - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
-
 # Next steps are all about installing Visual Studio
 
     - name: Install pre-req Windows updates
       include: install-kb.yml
       with_items: "{{ kbs }}"
       tags: kbs
+      when: ansible_distribution  != 'windowserver2016'
 
     - name: Install various Visual Studio versions
       include: install-vs.yml
@@ -91,15 +91,15 @@
       tags: vs
 
 # install Visual Studio 2012WDX, and 2017 Community version
-    - name: "Install msvc2012wdx, msvc2017 community"
+    - name: "Install msvc2012, msvc2017"
       win_chocolatey:
         name: "{{ item }}"
         allow_empty_checksums: "yes"
         state: latest
       with_items:
-        - visualstudio2012WDX
+        - visualstudio2012professional
         - visualstudio2012-update
-        - visualstudio2017community
+        - visualstudio2017professional
         - visualstudio2017buildtools
         - visualstudio2017-workload-nativedesktop
       tags: msvc

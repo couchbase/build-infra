@@ -37,6 +37,9 @@ The primary playbook here is `playbook.yml`.
     ansible-playbook -v -i inventory playbook.yml \
       -e ansible_password=ADMINISTRATOR_PASSWORD
 
+    Note: optional ansible-playbook param to install on window server 2016:  --extra-vars "ansible_distribution=windowserver2016"
+    this is to skip kb.yml install for window server 2016
+
 # THINGS THAT COULD GO WRONG
 
 This playbook worked on October 4, 2017. It does not specify explicit versions
