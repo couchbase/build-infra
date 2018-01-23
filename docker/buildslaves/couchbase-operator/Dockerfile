@@ -31,3 +31,6 @@ RUN mkdir /tmp/deploy && \
     mv -i linux-amd64/glide /usr/local/bin && \
     cd /tmp && \
     rm -rf deploy
+
+# Local hook (necessary for Docker configuration)
+COPY couchhook.sh /usr/sbin
