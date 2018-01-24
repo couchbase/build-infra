@@ -74,7 +74,7 @@ class JiraCommenter:
         Main entrypoint function - does all work
         """
 
-        builds = self.db.query_builds(
+        builds = self.db.query_documents(
             'build',
             where_clause="(`metadata/jira_comments` IS MISSING OR "
             "`metadata/jira_comments` = False)"
