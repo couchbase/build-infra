@@ -75,7 +75,8 @@ class JiraCommenter:
         """
 
         builds = self.db.query_builds(
-            "(`metadata/jira_comments` IS MISSING OR "
+            'build',
+            where_clause="(`metadata/jira_comments` IS MISSING OR "
             "`metadata/jira_comments` = False)"
         )
 
