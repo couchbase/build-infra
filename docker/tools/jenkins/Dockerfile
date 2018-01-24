@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.73.2
+FROM jenkins/jenkins:2.103
 MAINTAINER Couchbase Build Team <build-team@couchbase.com>
 
 # Just need to ensure the static 'docker' binary is available on master,
@@ -7,7 +7,7 @@ USER root
 RUN groupadd -g 999 docker && adduser jenkins docker
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
-    curl https://download.docker.com/linux/static/stable/x86_64/docker-17.09.0-ce.tgz -o docker.tgz && \
+    curl https://download.docker.com/linux/static/stable/x86_64/docker-17.12.0-ce.tgz -o docker.tgz && \
     tar xf docker.tgz && \
     cp -a docker/docker /usr/local/bin && \
     cd /tmp && \

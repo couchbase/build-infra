@@ -1,0 +1,6 @@
+Host github.com
+  Hostname ssh.github.com
+  User git
+  IdentityFile /home/couchbase/.ssh/ns-buildbot.rsa
+  StrictHostKeyChecking no
+
