@@ -24,7 +24,7 @@ logger.addHandler(ch)
 class JiraCommenter:
     def __init__(self, db_info, dryrun):
         self.db = cbutil_db.CouchbaseDB(db_info)
-        self.jira = JIRA({ 'server': 'https://issues.couchbase.com/' })
+        self.jira = JIRA({'server': 'https://issues.couchbase.com/'})
         self.dryrun = dryrun
         self.ticket_re = re.compile(r'(\b[A-Z]+-\d+\b)')
 
@@ -50,7 +50,9 @@ class JiraCommenter:
                 logger.info(f"commit references non-existent ticket {ticket}")
 
             else:
-                logger.warning(f"error loading JIRA issue ticket {ticket}: {e.text}")
+                logger.warning(
+                    f"error loading JIRA issue ticket {ticket}: {e.text}"
+                )
 
             return
 
@@ -91,7 +93,9 @@ class JiraCommenter:
 
                     # Exception: Don't commit on testrunner commits
                     if commit.project == 'testrunner':
-                        logger.debug (f"Skipping testrunner commit {commit.sha}")
+                        logger.debug(
+                            f"Skipping testrunner commit {commit.sha}"
+                        )
                         continue
 
                     for ticket in self.get_tickets(commit):
@@ -99,6 +103,7 @@ class JiraCommenter:
 
             if not self.dryrun:
                 build.set_metadata('jira_comments', True)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -110,7 +115,8 @@ def main():
                         help='Configuration file for build database loader',
                         default='build_db_conf.ini')
     parser.add_argument('-n', '--dryrun', action='store_true',
-                        help="Don't change JIRA or Database, just log what would be done")
+                        help="Don't change JIRA or Database, just log what "
+                             "would be done")
     args = parser.parse_args()
 
     # Set logging to debug level on stream handler if --debug was set
