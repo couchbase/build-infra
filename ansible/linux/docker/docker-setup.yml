@@ -21,6 +21,19 @@
         state: absent
         purge: yes
 
+    - name: Disable apport
+      systemd:
+        name: apport
+        enabled: no
+
+    - name: Enable coredumps in /tmp
+      sysctl:
+        name: kernel.core_pattern
+        value: "/tmp/core.%e.%p.%h.%t"
+        reload: yes
+      tags: core
+      changed_when: true
+
     - name: Reboot to get new kernel
       shell: sleep 2 && shutdown -r now "Ansible updates triggered"
       async: 5
@@ -46,11 +59,6 @@
       shell: uname -r
       register: uname
       changed_when: false
-
-    - name: Enable coredumps in /tmp
-      shell: echo "/tmp/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
-      tags: core
-      changed_when: true
 
     - name: Install additional packages for Docker and NFS
       apt:
