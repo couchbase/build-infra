@@ -1,0 +1,25 @@
+# Docker container for check_builds program on Ubuntu 16.04
+#
+# Contains the following:
+#  - cbbuild package from python-couchbase-commons
+#  - check_build programs
+
+FROM couchbasebuild/ubuntu-1604-python3.6-base:latest
+MAINTAINER build-team@couchbase.com
+
+USER root
+
+# Checkout directory for build-infra repository
+ARG BUILD_TOOLS_GITDIR=/var/tmp/build-tools
+
+# Clone repository, install software in build_database directory,
+# then delete repository
+RUN git clone https://github.com/couchbase/build-tools $BUILD_TOOLS_GITDIR && \
+    cd $BUILD_TOOLS_GITDIR/check_builds && \
+    git log -1 && \
+    pip3.6 install -r requirements.txt && \
+    pip3.6 install . && \
+    cd $HOME && \
+    rm -rf $BUILD_TOOLS_GITDIR
+
+CMD ["check_builds", "-c", "/etc/check_builds.ini"]
