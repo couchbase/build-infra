@@ -45,7 +45,7 @@ RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
     chmod a+x /usr/local/bin/repo
 
 # Jenkins Swarm client jar
-RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.6/swarm-client-3.6.jar -o /usr/local/lib/swarm-client.jar
+RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/

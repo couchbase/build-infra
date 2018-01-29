@@ -31,7 +31,7 @@ services:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
 
   centos6:
-    image: couchbasebuild/sdk-centos6-build:20180123
+    image: couchbasebuild/sdk-centos6-build:20180129
     deploy:
       replicas: 1
     networks:
@@ -62,7 +62,7 @@ services:
         mode: 0644
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20180123
+    image: couchbasebuild/sdk-centos7-build:20180129
     deploy:
       replicas: 1
     networks:
@@ -87,7 +87,7 @@ services:
         mode: 0644
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20180123
+    image: couchbasebuild/sdk-ubuntu14-build:20180129
     deploy:
       replicas: 1
     networks:
@@ -112,7 +112,7 @@ services:
         mode: 0644
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu14-build:20180123
+    image: couchbasebuild/sdk-ubuntu16-build:20180129
     deploy:
       replicas: 1
     networks:
