@@ -7,7 +7,7 @@ USER root
 
 # Install SSH server and sudo
 RUN apt-get update && \
-    apt-get install -y openssh-server sudo curl && \
+    apt-get install -y openssh-server sudo curl git && \
     apt-get clean && \
     mkdir /var/run/sshd
 
