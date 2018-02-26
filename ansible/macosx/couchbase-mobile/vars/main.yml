@@ -16,3 +16,7 @@ homebrew_installed_packages:
   - ssh-copy-id
   - pass
   - wget
+
+#SGW require pkg
+pip_packages:
+  - name: pyinstaller
