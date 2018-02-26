@@ -88,7 +88,7 @@
         name: "{{ item }}"
         allow_empty_checksums: "yes"
       with_items:
-        - visualstudio2017community
+        - visualstudio2017professional
         - visualstudio2017buildtools
         - visualstudio2017-workload-visualstudioextension
         - visualstudio2017-workload-manageddesktop  # .NET Desktop Development workload for Visual Studio 2017 1.1.0
