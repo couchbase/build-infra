@@ -14,10 +14,11 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y make binutils software-properties-common python-setuptools \
-                       python-dev python-pip git npm \
-                       ccache g++ git-core tar ruby rake ed man curl && \
-    apt-get install -y cmake pkg-config autoconf automake libtool &&\
+    apt-get install -y make binutils software-properties-common \
+                       python-setuptools python-dev python-pip \
+                       python-virtualenv git npm ccache g++ git-core tar \
+                       ruby rake ed man curl && \
+    apt-get install -y cmake pkg-config autoconf automake libtool && \
     apt-get clean
 
 # Update locale

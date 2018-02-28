@@ -6,7 +6,7 @@ IMAGE=couchbasebuild/sdk-centos7-build
 
 mkdir -p build
 INFRADIR=$(git rev-parse --show-toplevel)
-cp -a -u ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
+cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
 
 docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest

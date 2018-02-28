@@ -22,12 +22,15 @@ RUN groupadd -g1000 couchbase && \
 RUN yum install --setopt=keepcache=0 -y \
                 ed \
                 glibc.i686 \
+                libxml2-devel \
                 make \
                 man \
                 ncurses-devel \
                 numactl-devel \
                 openssh-clients openssl-devel \
                 python-devel \
+                python-pip \
+                python-virtualenv \
                 redhat-lsb-core \
                 rpm-build \
                 ruby rubygems rubygem-rake \

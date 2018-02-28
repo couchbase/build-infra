@@ -7,10 +7,8 @@ USER root
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y binutils make software-properties-common python-setuptools \
-                       python-dev python-pip git npm openjdk-8-jdk \
-                       ccache g++ git-core tar ruby rake ed man curl && \
-    apt-get install -y cmake pkg-config autoconf automake libtool sudo &&\
+    apt-get install -y build-essential curl git openjdk-8-jdk sudo tar && \
+    apt-get install -y groff-base python-dev python-pip python-virtualenv && \
     apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give
@@ -26,18 +24,6 @@ RUN apt-get update && \
     apt-get clean && \
     locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8
-
-# Oracle JDK (want JDK 8, not available in apt).
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-        http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
-ENV JAVA_HOME=/usr/local/java
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
