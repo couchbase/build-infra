@@ -99,6 +99,14 @@
         - xamarin-visualstudio
       tags: msvc
 
+      # StorePID takes 2 args: productKey and MPC.  MPC code 08862 for MSVC Professional 2017 version
+      # Detail Reference: https://docs.microsoft.com/en-us/visualstudio/install/automatically-apply-product-keys-when-deploying-visual-studio
+    - name: Apply Visual Studio Professional 2017 License Key
+      win_command: '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\StorePID.exe" "{{ vskey }}" 08862'
+      register: output
+
+    - debug: var=output.stdout_lines
+
     - name: Create Merge Modules  directory
       win_file:
         path: "C:\\Program Files (x86)\\Common Files\\Merge Modules"
