@@ -1,6 +1,6 @@
 # Docker container recreate_build_manifest program on Ubuntu 16.04
 
-FROM couchbasebuild/ubuntu-1604-python3.6-base:latest
+FROM couchbasebuild/ubuntu-1604-python3.6-base:20180306
 MAINTAINER build-team@couchbase.com
 
 USER root

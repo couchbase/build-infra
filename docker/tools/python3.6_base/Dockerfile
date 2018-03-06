@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get install -y build-essential curl git-core sudo && \
     apt-get clean
 
-# Install CMake and repo
+# Install CMake and repo (used by a number of tool images)
 RUN mkdir /tmp/deploy && \
     curl https://cmake.org/files/v3.6/cmake-3.6.1-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
@@ -27,13 +27,16 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # Install Python 3.6 and useful base tools; note that Python 3.6 requires
-# the fkrull/deadsnakes repository, which requires the software-properties-
-# common package
+# the deadsnakes PPA repository, which requires the software-properties-
+# common package.
+# Also include Python 2.7, required by 'repo'. This needs to be available
+# as "python" on PATH.
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get install -y python3.6-dev python3.6-venv tar && \
+    apt-get install -y python3.6-dev python3.6-venv tar python2.7 && \
+    ln -s /usr/bin/python2.7 /usr/local/bin/python && \
     apt-get clean && \
     curl https://bootstrap.pypa.io/get-pip.py | sudo python3.6
 
