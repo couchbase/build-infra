@@ -27,48 +27,56 @@
 
   tasks:
 
+    - name: Install pre-req Windows updates
+      include: install-kb.yml
+      with_items: "{{ kbs }}"
+      tags: kbs
+
     # Needed for WiX Toolset
-    - name: "Enable .NET Framework 3.5"
+    - name: Enable .NET Framework 3.5
       win_feature:
         name: "NET-Framework-Core"
         state: present
 
-    - name: "Install tools"
+    - name: Install tools
       win_chocolatey:
         name: "{{ item }}"
         allow_empty_checksums: "yes"
       with_items:
         - git
         - cmake
+        - curl
+        - wget
         - ninja
-        - MinGW
         - python2
-        - vcpython27
         - wixtoolset
         - 7zip.commandline
         - jdk8
+        - kb2919355
+        - kb2999226
+        - kb2919442
 
     # Code depends on .NET Framework 4.5.2 (chocolatey package "dotnet4.5.2"),
     # but that package fails to install via Ansible due to silly limitations
     # in WinRM (see also: all the nonsense in install-kb.yml). However, the
     # framework is actually installed by default on Server 2012R2, so there's
     # no need to install it. So we just tell chocolatey to skip dependencies.
-    - name: "Install Visual Studio Code"
+    - name: Install Visual Studio Code
       win_chocolatey:
         name: "visualstudiocode"
         ignore_dependencies: yes
 
-    - name: "Create bin directory"
+    - name: Create directory structure
       win_file:
-        path: "C:\\bin"
+        path: C:\bin
         state: directory
 
-    - name: "Install repo"
+    - name: Install repo
       win_copy:
         src: "repo.exe"
         dest: "C:\\bin\\repo.exe"
 
-    - name: "Add tools to PATH."
+    - name: Add tools to PATH.
       include: extend-path.yml
       with_items:
         - C:\bin
@@ -76,59 +84,8 @@
         - C:\Program Files\git\cmd
         - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
-# Next steps are all about installing Visual Studio
-
-    - name: Install pre-req Windows updates
-      include: install-kb.yml
-      with_items: "{{ kbs }}"
-      tags: kbs
-
-    - name: Install Visual Studio Community 2017 and tools
-      win_chocolatey:
-        name: "{{ item }}"
-        allow_empty_checksums: "yes"
-      with_items:
-        - visualstudio2017professional
-        - visualstudio2017buildtools
-        - visualstudio2017-workload-visualstudioextension
-        - visualstudio2017-workload-manageddesktop  # .NET Desktop Development workload for Visual Studio 2017 1.1.0
-        - visualstudio2017-workload-netcoretools
-        - visualstudio2017-workload-netcrossplat # mobile development
-        - visualstudio2017-workload-nativemobile # Mobile Development with C++, plus Android NDK latest from this pkg as well
-        - visualstudio2017-workload-universal
-        - xamarin-visualstudio
-      tags: msvc
-
-      # StorePID takes 2 args: productKey and MPC.  MPC code 08862 for MSVC Professional 2017 version
-      # Detail Reference: https://docs.microsoft.com/en-us/visualstudio/install/automatically-apply-product-keys-when-deploying-visual-studio
-    - name: Apply Visual Studio Professional 2017 License Key
-      win_command: '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\StorePID.exe" "{{ vskey }}" 08862'
-      register: output
-
-    - debug: var=output.stdout_lines
-
-    - name: Create Merge Modules  directory
-      win_file:
-        path: "C:\\Program Files (x86)\\Common Files\\Merge Modules"
-        state: directory
-
-    - name: Download older VS CRT Merge Modules
-      win_get_url:
-        url: "{{ item.url }}"
-        dest: "C:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
-        force: no
-      with_items:
-        - url: http://172.23.120.24/builds/latestbuilds/winbits/Microsoft_VC100_CRT_x64.msm
-          filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://172.23.120.24/builds/latestbuilds/winbits/Microsoft_VC120_CRT_x64.msm
-          filename: Microsoft_VC120_CRT_x64.msm
-
-# Do OpenSSH last so the service has the latest version of the path
-
     - name: Install OpenSSH (for Jenkins)
       script: openssh.ps1
-
-# Some of these files contain private information, so they're not all in git.
 
     - name: Copy SSH config files
       win_copy:
@@ -142,7 +99,7 @@
         - id_rsa
         - known_hosts
 
-    - name: "Enable Remote Desktop"
+    - name: Enable Remote Desktop
       win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
         name: fDenyTSConnections
@@ -150,7 +107,7 @@
         type: dword
         state: present
 
-    - name: "Open Remote Desktop in firewall"
+    - name: Open Remote Desktop in firewall
       win_firewall_rule:
         name: "remote desktop"
         enable: yes
@@ -160,3 +117,34 @@
         direction: in
         protocol: TCP
         force: true
+
+    # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
+    - name: Download vs_professional.exe installer
+      win_get_url:
+        url: "https://aka.ms/vs/15/release/vs_professional.exe"
+        dest: C:\bin\vs_professional.exe
+
+    - name: Check if MSVC2017 install
+      win_stat:
+        path: C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe
+      register: msvc2017_installcleanup
+
+    - debug: var=msvc2017_installcleanup.stdout_lines
+
+    - name: "Run MSVC2017 install cleanup"
+      win_command: '"C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe" -full'
+      when: msvc2017_installcleanup.stat.exists == True
+
+    - name: Install Visual Studio Professional 2017 and dotnet tools
+      win_command: C:\bin\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R11C --quiet --productKey "{{ vskey }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+      register: install_output
+      failed_when: ( install_output.rc not in [ 3010, 0 ] )
+
+    - debug: var=install_output.stdout_lines
+
+    - name: Reboot Windows if necessary
+      win_reboot:
+        shutdown_timeout_sec: 3600
+        reboot_timeout_sec: 3600
+      when: install_output.rc == "3010"
+
