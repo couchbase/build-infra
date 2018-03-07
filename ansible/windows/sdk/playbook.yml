@@ -46,6 +46,7 @@
         - jdk8
         - googlechrome
         - insted
+        - python2
 
     # Code depends on .NET Framework 4.5.2 (chocolatey package "dotnet4.5.2"),
     # but that package fails to install via Ansible due to silly limitations
@@ -107,14 +108,22 @@
 # Do OpenSSH last so the service has the latest version of the path
 
     - name: Install OpenSSH (for Jenkins)
-      script: openssh.ps1
+      win_chocolatey:
+        name: openssh
+        params: /SSHServerFeature
+        state: latest
+
+    - name: "Install true.bat"
+      win_copy:
+        src: "true.bat"
+        dest: C:\Windows\System32\
 
 # Some of these files contain private information, so they're not all in git.
 
     - name: Copy SSH config files
       win_copy:
         src: "./ssh/{{ item }}"
-        dest: C:\Users\Administrator\.ssh\{{ item }}
+        dest: C:\Users\Administrator\.ssh\
       with_items:
         - authorized_keys
         - buildbot_id_dsa

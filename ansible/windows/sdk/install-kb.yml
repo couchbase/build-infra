@@ -28,12 +28,14 @@
 
 # Explanation of random return code checks:
 # https://msdn.microsoft.com/en-us/library/windows/desktop/aa368542(v=vs.85).aspx
+# (return code "1" is undocumented, but evidently that also means
+# "completed successfully")
 - name: Install KB cab {{ item.filename }}.
   raw: "dism /online /add-package /norestart /PackagePath:C:\\extract\\{{ item.filename | regex_replace('.msu', '.cab') }}"
   register: dism_output
   when: "item.filename.endswith('.msu') and item.filename[11:20] not in kbs_list.stdout"
   changed_when: "true"
-  failed_when: "dism_output.rc != 0 and dism_output.rc != 3010 and dism_output.rc != 1641"
+  failed_when: "dism_output.rc != 0 and dism_output.rc != 1 and dism_output.rc != 3010 and dism_output.rc != 1641"
 
 - name: Execute KB exe {{ item.filename }}.
   raw: "C:\\kbs\\{{ item.filename }}"

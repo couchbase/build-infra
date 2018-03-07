@@ -40,6 +40,30 @@ The primary playbook here is `playbook.yml`.
     Note: optional ansible-playbook param to install on window server 2016:  --extra-vars "ansible_distribution=windowserver2016"
     this is to skip kb.yml install for window server 2016
 
+You can use our Docker image (recommended):
+
+    docker run -it --rm -v `pwd`:/mnt \
+       -v /home/couchbase/jenkinsdocker-ssh/:/ssh \
+       couchbasebuild/ansible-playbook \
+       -i inventory playbook.yml -e ansible_password=PASSWORD
+
+# USE AS JENKINS SLAVE
+
+The version of OpenSSH in this image trips a bug in the Jenkins
+ssh-slaves plugin. There's a workaround, documented here:
+
+https://issues.jenkins-ci.org/browse/JENKINS-42856?focusedCommentId=319018&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-319018
+
+Namely, put the following text into the "Prefix Start Slave Command" (which
+is under "Advanced" in the "Launch method" block:
+
+    powershell -Command "cd C:\jenkins ; java -jar slave.jar" ; exit 0 ; rem '
+
+and then put the following (a single apostrophe) into "Suffix Start Slave
+Command" in the same location:
+
+    '
+
 # THINGS THAT COULD GO WRONG
 
 This playbook worked on October 4, 2017. It does not specify explicit versions
