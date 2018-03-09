@@ -1,6 +1,6 @@
 #!/bin/sh
 
-GCC_VER=7.2.0
+GCC_VER=7.3.0
 IMAGE=couchbasebuild/centos-6-gcc
 
 docker build --build-arg GCC_VER=${GCC_VER} -t ${IMAGE}:${GCC_VER} .

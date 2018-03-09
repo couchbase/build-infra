@@ -4,12 +4,15 @@ FROM ceejatec/naked-opensuse:11.2
 MAINTAINER build-team@couchbase.com
 
 USER root
-ARG GCC_VER=7.2.0
+ARG GCC_VER=7.3.0
 
 # Install the older gcc so we can bootstrap up to the newer, then
 # build and install newer, cleaning up afterwards. This is all
 # in one step to minimize the final image size, since we really
 # only care about the contents of /usr/local anyway
+# We use install-strip for size reasons, but copy the non-stripped
+# libstdc++.so.6.0.24 afterward (because we ship that file in Server)
+# so that we can get debug stack traces in production.
 RUN zypper ref -s && \
     zypper -n install curl gcc gcc-c++ make tar xz && \
     rm -rf /usr/local/* && \
@@ -24,6 +27,7 @@ RUN zypper ref -s && \
     make -j8 && \
     make install-strip && \
     ln -s gcc /usr/local/bin/cc && \
+    cp -a x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6.0.24 /usr/local/lib64 && \
     cd /tmp && rm -rf deploy && \
     zypper -n rm curl gcc gcc-c++ make tar xz && \
     zypper clean

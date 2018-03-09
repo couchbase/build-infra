@@ -3,12 +3,15 @@
 FROM centos:7.4.1708
 MAINTAINER build-team@couchbase.com
 
-ARG GCC_VER=7.2.0
+ARG GCC_VER=7.3.0
 
 # Install the older gcc so we can bootstrap up to the newer, then
 # build and install newer, cleaning up afterwards. This is all
 # in one step to minimize the final image size, since we really
-# only care about the contents of /usr/local anyway
+# only care about the contents of /usr/local anyway.
+# We use install-strip for size reasons, but copy the non-stripped
+# libstdc++.so.6.0.24 afterward (because we ship that file in Server)
+# so that we can get debug stack traces in production.
 RUN yum install --setopt=keepcache=0 -y bzip2 gcc gcc-c++ make file && \
     rm -rf /usr/local/* && \
     mkdir /tmp/deploy && cd /tmp/deploy && \
@@ -22,6 +25,7 @@ RUN yum install --setopt=keepcache=0 -y bzip2 gcc gcc-c++ make file && \
     make -j8 && \
     make install-strip && \
     ln -s gcc /usr/local/bin/cc && \
+    cp -a x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6.0.24 /usr/local/lib64 && \
     cd /tmp && rm -rf deploy && \
     yum remove -y bzip2 gcc gcc-c++ make file && \
     yum clean all && \
