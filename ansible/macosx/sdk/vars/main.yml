@@ -7,15 +7,15 @@ homebrew_taps:
   - homebrew/php
 
 homebrew_installed_packages:
-  - ccache
-  - coreutils
-  - cmake
-  - git
-  - bash-completion
-  - python
-  - openssl
-  - ssh-copy-id
-  - pass
-  - wget
-  - node
-  - npm
+  - { name: ccache, state: linked }
+  - { name: coreutils, state: linked }
+  - { name: cmake, state: linked }
+  - { name: git, state: linked }
+  - { name: bash-completion, state: linked }
+  - { name: python, state: linked }
+  - { name: openssl, state: linked }
+  - { name: ssh-copy-id, state: linked }
+  - { name: pass, state: linked }
+  - { name: wget, state: linked }
+  - { name: node, state: linked }
+  - { name: npm, state: linked }
