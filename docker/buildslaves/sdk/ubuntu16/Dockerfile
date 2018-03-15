@@ -7,7 +7,7 @@ USER root
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential curl git openjdk-8-jdk sudo tar && \
+    apt-get install -y build-essential curl git lsb-release openjdk-8-jdk sudo tar && \
     apt-get install -y groff-base python-dev python-pip python-virtualenv && \
     apt-get clean
 
@@ -29,6 +29,13 @@ ENV LANG=en_US.UTF-8
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
     -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
+
+# CMake
+RUN mkdir /tmp/deploy && \
+    curl -L https://cmake.org/files/v3.9/cmake-3.9.4-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
+    rm /usr/local/bin/cmake-gui && \
+    rm -rf /tmp/deploy
 
 # Jenkins Swarm client jar
 RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar

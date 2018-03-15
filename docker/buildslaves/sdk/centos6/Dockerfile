@@ -28,6 +28,7 @@ RUN yum install --setopt=keepcache=0 -y \
     numactl-devel \
     openssl-devel \
     openssh-clients \
+    redhat-lsb-core \
     rpm-build \
     tar \
     unzip \
