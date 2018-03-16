@@ -1,4 +1,4 @@
-# Docker container for Ubuntu 16.04
+# Docker container for Debian 8
 
 FROM debian:8.2
 MAINTAINER build-team@couchbase.com
@@ -6,10 +6,8 @@ MAINTAINER build-team@couchbase.com
 USER root
 
 # Install Couchbase build dependencies (jessie-backports needed for OpenJDK)
-RUN echo "deb http://ftp.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/backports.list && \
-    apt-get update && \
-    apt-get -t jessie-backports install -y openjdk-8-jdk && \
-    apt-get install -y build-essential curl git lsb-release sudo tar && \
+RUN apt-get update && \
+    apt-get install -y build-essential curl git libssl-dev lsb-release sudo tar && \
     apt-get install -y groff-base python-dev python-pip python-virtualenv && \
     apt-get clean
 
@@ -38,6 +36,18 @@ RUN mkdir /tmp/deploy && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy
+
+# Oracle JDK (for Jenkins).
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
+    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/jdk.tgz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
+ENV JAVA_HOME=/usr/local/java
 
 # Jenkins Swarm client jar
 RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar

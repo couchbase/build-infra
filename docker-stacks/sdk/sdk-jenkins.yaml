@@ -137,7 +137,7 @@ services:
         mode: 0644
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu16-build:20180314
+    image: couchbasebuild/sdk-ubuntu16-build:20180315
     deploy:
       replicas: 1
     networks:
