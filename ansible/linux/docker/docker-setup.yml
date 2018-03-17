@@ -74,7 +74,7 @@
     - name: Mount NAS directories
       mount:
         path: "{{ item.mountpoint }}"
-        src: latestbuilds.service.couchbase.com:{{ item.naspath }}
+        src: "{{ item.nasserver }}:{{ item.naspath }}"
         fstype: nfs
         opts: rw,soft
         dump: 0
@@ -82,10 +82,13 @@
         state: mounted
       with_items:
         - mountpoint: /latestbuilds
+          nasserver: latestbuilds.service.couchbase.com
           naspath: /data/builds/latestbuilds
         - mountpoint: /releases
+          nasserver: latestbuilds.service.couchbase.com
           naspath: /data/builds/releases
-        - mountpoint: /buildstuff
+        - mountpoint: /builds
+          nasserver: nas-n.mgt.couchbase.com
           naspath: /data/builds
 
     - name: Add docker key
