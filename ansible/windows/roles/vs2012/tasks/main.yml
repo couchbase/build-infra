@@ -1,0 +1,33 @@
+---
+- name: Create directory structure
+  win_file:
+    path: C:\vs2012
+    state: directory
+
+- name: Add bin to PATH.
+  include: extend-path.yml
+  with_items:
+    - C:\vs2012
+
+# Download URL retrieved from https://chocolatey.org/packages/VisualStudio2012Professional
+# (in the install Powershell script)
+- name: Download vs_professional.exe installer
+  win_get_url:
+    url: "http://go.microsoft.com/?linkid=9810233"
+    dest: C:\vs2012\vs_professional.exe
+
+- name: Copy unattended.xml
+  win_copy:
+    src: "vs-unattended.xml"
+    dest: "C:\\vs2012\\vs-unattended.xml"
+
+- name: Install Visual Studio Professional 2012
+  win_command: C:\vs2012\vs_professional.exe /Quiet /NoRestart /AdminFile C:\vs2012\vs-unattended.xml /ProductKey PLEASE_FILL_IN
+  register: install_output
+  failed_when: ( install_output.rc not in [ 3010, 0 ] )
+
+- name: Reboot Windows if necessary
+  win_reboot:
+    shutdown_timeout_sec: 3600
+    reboot_timeout_sec: 3600
+  when: install_output.rc == "3010"
