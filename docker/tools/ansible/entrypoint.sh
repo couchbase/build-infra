@@ -18,5 +18,4 @@ fi
 
 export ANSIBLE_HOST_KEY_CHECKING=false
 
-exec ansible-playbook "$@"
-
+exec ${ANSIBLE_COMMAND} "$@"

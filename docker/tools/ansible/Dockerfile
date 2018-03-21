@@ -18,5 +18,9 @@ RUN pip install --upgrade ansible==2.4.1       && \
     pip install --upgrade pywinrm
 
 ADD entrypoint.sh /
+ARG ANSIBLE_COMMAND
+# Need to save this arg in an environment variable, because ENTRYPOINT
+# arguments are evaluated at container run-time
+ENV ANSIBLE_COMMAND="${ANSIBLE_COMMAND}"
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "--version" ]
