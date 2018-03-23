@@ -1,0 +1,33 @@
+---
+- name: Create directory structure
+  win_file:
+    path: C:\vs2013
+    state: directory
+
+- name: Add bin to PATH.
+  include: extend-path.yml
+  with_items:
+    - C:\vs2013
+
+# Download URL retrieved from https://chocolatey.org/packages/VisualStudio2013Professional
+# (in the install Powershell script)
+- name: Download vs_professional.exe installer
+  win_get_url:
+    url: "http://download.microsoft.com/download/F/2/E/F2EFF589-F7D7-478E-B3AB-15F412DA7DEB/vs_professional_download.exe"
+    dest: C:\vs2013\vs_professional.exe
+
+- name: Copy unattended.xml
+  win_copy:
+    src: "vs-unattended.xml"
+    dest: "C:\\vs2013\\vs-unattended.xml"
+
+- name: Install Visual Studio Professional 2013
+  win_command: C:\vs2013\vs_professional.exe /Quiet /NoRestart /AdminFile C:\vs2013\vs-unattended.xml /ProductKey {{ vs2013_key }}
+  register: install_output
+  failed_when: ( install_output.rc not in [ 3010, 0 ] )
+
+- name: Reboot Windows if necessary
+  win_reboot:
+    shutdown_timeout_sec: 3600
+    reboot_timeout_sec: 3600
+  when: install_output.rc == "3010"

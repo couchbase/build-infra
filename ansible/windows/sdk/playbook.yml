@@ -27,6 +27,7 @@
 
   roles:
     - vs2012
+    - vs2013
     - vs2015
 
   tasks:
