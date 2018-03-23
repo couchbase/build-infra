@@ -27,6 +27,7 @@
 
   roles:
     - vs2012
+    - vs2015
 
   tasks:
     # Needed for WiX Toolset
@@ -77,21 +78,6 @@
         - C:\Program Files\CMake\bin
         - C:\Program Files\git\cmd
         - C:\Program Files (x86)\WiX Toolset v3.11\bin
-
-# Next steps are all about installing Visual Studio
-
-    - name: Install pre-req Windows updates
-      include: install-kb.yml
-      with_items: "{{ kbs }}"
-      tags: kbs
-      when: ansible_distribution  != 'windowserver2016'
-
-    - name: Install various Visual Studio versions
-      include: install-vs.yml
-      with_items:
-        - chocopackage: visualstudio2015professional
-          unattended: vs2015-unattended.xml
-      tags: vs
 
 # install Visual Studio 2017 Community version
 

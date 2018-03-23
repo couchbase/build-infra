@@ -1,0 +1,40 @@
+---
+- name: Create directory structure
+  win_file:
+    path: C:\vs2015
+    state: directory
+
+- name: Add bin to PATH.
+  include: extend-path.yml
+  with_items:
+    - C:\vs2015
+
+- name: "Install chocolatey"
+  win_chocolatey:
+    name: "{{ item }}"
+    allow_empty_checksums: "yes"
+  with_items:
+    - chocolatey
+
+- name: Install pre-req Windows updates
+  include: install-kb.yml
+  with_items: "{{ kbs }}"
+  tags: kbs
+  when: ansible_distribution  != 'windowserver2016'
+
+- name: Copy unattended.xml
+  win_copy:
+    src: "vs-unattended.xml"
+    dest: "C:\\vs2015\\vs-unattended.xml"
+
+- name: Install Visual Studio Professional 2015 (takes a long time)
+  script: install-vs2015.ps1 -vskey {{ vs2015_key }}
+  register: choco_output
+  changed_when: not "already installed" in choco_output.stdout
+  failed_when: not "install of visualstudio2015professional was successful" in choco_output.stdout
+
+- name: Reboot Windows if necessary
+  win_reboot:
+    shutdown_timeout_sec: 3600
+    reboot_timeout_sec: 3600
+  when: '"reboot is necessary" in choco_output.stdout'
