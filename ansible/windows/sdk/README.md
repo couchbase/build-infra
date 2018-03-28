@@ -35,17 +35,22 @@ least the IP address(es).
 The primary playbook here is `playbook.yml`.
 
     ansible-playbook -v -i inventory playbook.yml \
-      -e ansible_password=ADMINISTRATOR_PASSWORD
+      -e ansible_password=ADMINISTRATOR_PASSWORD \
+      -e vs2012_key=KEY -e vs2013_key=KEY -e vs2015_key=KEY \
+      -e vs2017_key=KEY
 
     Note: optional ansible-playbook param to install on window server 2016:  --extra-vars "ansible_distribution=windowserver2016"
-    this is to skip kb.yml install for window server 2016
+    this is to skip kb.yml install for window server 2016.
+    Also note that the Visual Studio keys should have no dashes in them.
 
 You can use our Docker image (recommended):
 
     docker run -it --rm -v `pwd`:/mnt \
        -v /home/couchbase/jenkinsdocker-ssh/:/ssh \
        couchbasebuild/ansible-playbook \
-       -i inventory playbook.yml -e ansible_password=PASSWORD
+       -i inventory playbook.yml -e ansible_password=PASSWORD \
+       -e vs2012_key=KEY -e vs2013_key=KEY -e vs2015_key=KEY \
+       -e vs2017_key=KEY
 
 # USE AS JENKINS SLAVE
 
