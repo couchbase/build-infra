@@ -17,10 +17,11 @@ fi
 chown -R couchbase:couchbase /home/couchbase/.aws /home/couchbase/.ssh
 chmod 600 /home/couchbase/.aws/* /home/couchbase/.ssh/*
 
-# Run repo_upload program with 'apt' option
-[[ "$1" == "default" ]] && {
-    cd /home/couchbase
-    exec /usr/local/bin/repo_upload -c /etc/repo_upload.ini -r apt "$@"
+[[ "$1" == "debug" ]] && {
+    shift
+    exec "$@"
 }
 
-exec "$@"
+# Run repo_upload program with 'apt' option
+cd /home/couchbase
+exec /usr/local/bin/repo_upload -c /etc/repo_upload.ini -r apt "$@"
