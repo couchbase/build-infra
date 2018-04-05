@@ -13,5 +13,8 @@ Deploy tools via ansible
 3. run % ansible-galaxy install -r requirements.yml
 4. Ensure a copy of the following file in ssh directory
     id_rsa_factory_macosx-x64-ios-builder
-5. Run the playbook
+5. Ensure a copy of jenkins-appledeveloper.developerprofile in files directory
+    info is in team's lastpass database
+6. Run the playbook
     % ansible-playbook -v -i inventory playbook.yml  -e ansible_ssh_pass=<jenkins_password>
+7. Follow and run instructions from the ansible-playbook's post-install output message

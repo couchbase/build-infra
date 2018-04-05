@@ -7,6 +7,7 @@
 
   roles:
     - geerlingguy.homebrew
+      tags: ['homebrew']
 
   tasks:
     - name: Check if /usr/bin/java is already installed
@@ -22,10 +23,36 @@
       shell: systemsetup -setcomputersleep Never
       become: true
 
+    # SGW require pkg
+    - name: Install pyinstaller's pip package
+      pip:
+        name: pyinstaller
+        state: present
+
+    # Required for CBL iOS doc generation
+    - name: Install jazzy gem package
+      gem:
+        name: jazzy
+        state: latest
+
     - name: Copy SSH config files
       copy:
         src=./ssh/{{ item }} dest=/Users/jenkins/.ssh/{{ item }} owner=jenkins group=staff mode=0644
       with_items:
         - authorized_keys
         - id_rsa_factory_macosx-x64-ios-builder
-        - known_hosts
+
+    - name: Copy Mobile jenkins's CB developer profile
+      copy:
+          src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/jenkins/Download/jenkins-appledeveloper.developerprofile  owner=jenkins group=staff mode=0644
+
+    # Open xcode to import profile, need a fix for this
+    - debug: msg="Open xcode app -> preferences -> import /Users/jenkins/Download/jenkins-appledeveloper.developerprofile"
+
+    - debug: msg="Password for /Users/jenkins/Download/jenkins-appledeveloper.developerprofile, should be the same as VM's password"
+
+    - debug: msg="Also sign-in to developer account; required for xcode signing during the build"
+
+    # Run command to enable xcode codesign to access keychain
+    - debug:
+        msg: "Run on command line: security set-key-partition-list -S apple-tool:,apple: -s -k KEYCHAIN_PASS  ~/Library/Keychains/login.keychain-db"
