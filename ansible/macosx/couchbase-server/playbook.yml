@@ -1,0 +1,38 @@
+---
+- hosts: all
+  user: jenkins
+
+  vars_files:
+    - vars/main.yml
+
+  roles:
+    - geerlingguy.homebrew
+
+  tasks:
+    - name: Check if /usr/bin/java is already installed
+      stat:
+        path: /usr/bin/java
+      register: java_state
+
+    - name: Install java
+      homebrew_cask: name=java state=present
+      when: not java_state.stat.exists
+
+    - name: set energy saving to zero
+      shell: systemsetup -setcomputersleep Never
+      become: true
+
+    - name: Copy SSH config files
+      copy:
+        src=./ssh/{{ item }} dest=/Users/jenkins/.ssh/{{ item }} owner=jenkins group=staff mode=0644
+      with_items:
+        - authorized_keys
+
+    - name: Add default paths
+      copy:
+        src=./files/jenkins dest=/etc/paths.d/jenkins owner=root group=wheel mode=0644
+      become: true
+
+    - name: Create required /opt/couchbase directory
+      file: path=/opt/couchbase state=directory owner=jenkins group=staff mode=0755
+      become: true

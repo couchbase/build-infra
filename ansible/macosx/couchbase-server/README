@@ -1,0 +1,15 @@
+Setup Mobile MACOS
+# Credit: https://github.com/geerlingguy/mac-dev-playbook
+# Used role geerlingguy.homebrew
+
+Prereq
+1. Ceate new MAC VM on Mac clusters (MacOSX10.11)
+2. Download Xcode-7.1 on the Mac, use the cb developer account
+3. Run on command line: sudo xcodebuild -license accept
+
+Deploy tools via ansible
+1. git clone https://github.com/couchbase/build-infra.git
+2. cd build-infra/ansible/macosx/couchbase-mobile
+3. run % ansible-galaxy install -r requirements.yml
+4. Run the playbook
+    % ansible-playbook -i inventory playbook.yml  -e ansible_ssh_pass=<jenkins_password>
