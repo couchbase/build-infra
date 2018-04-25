@@ -64,7 +64,7 @@ DUMP=jenkins_backup.${DAYOFWEEK}.tar.gz
 
 SCRIPT_DIR=$(dirname $0)
 echo "Starting minimal backup at $(/bin/date)"
-nice -n 19 tar --exclude-from ${SCRIPT_DIR}/jenkins_backup_exclusions -zcf ${DUMP} ${JENKINS_DATA} ${JENKINS_JOBS}
+nice -n 19 tar --ignored-failed-read --exclude-from ${SCRIPT_DIR}/jenkins_backup_exclusions -zcf ${DUMP} ${JENKINS_DATA} ${JENKINS_JOBS}
 echo "Minimal backup finished at $(/bin/date)"
 
 echo "ftp to NAS started at $(/bin/date)"
