@@ -7,7 +7,6 @@
 
   roles:
     - geerlingguy.homebrew
-      tags: ['homebrew']
 
   tasks:
     - name: Check if /usr/bin/java is already installed
@@ -22,6 +21,9 @@
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
+
+    - name: Upgrade pip
+      command: "pip install --upgrade pip"
 
     # SGW require pkg
     - name: Install pyinstaller's pip package

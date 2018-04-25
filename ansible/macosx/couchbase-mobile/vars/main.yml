@@ -8,6 +8,7 @@ homebrew_taps:
 homebrew_installed_packages:
   - { name: ccache, state: linked }
   - { name: coreutils, state: linked }
+  - { name: doxygen, state: linked }
   - { name: cmake, state: linked }
   - { name: git, state: linked }
   - { name: bash-completion, state: linked }
