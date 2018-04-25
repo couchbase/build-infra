@@ -1,0 +1,6 @@
+backup/*
+fingerprints/*
+jobs/*/workspace*
+jobs/*/builds/*/log
+jobs/*/builds/*/archive
+
