@@ -62,18 +62,17 @@ fi
 DAYOFWEEK=$(/bin/date +%a)
 DUMP=jenkins_backup.${DAYOFWEEK}.tar.gz
 
+# Temporarily turn off error mode as tar will nearly always return
+# a non-zero failure since the Jenkins must remain live during the
+# backup (since it's the one running this script)
+set +e
 SCRIPT_DIR=$(dirname $0)
 echo "Starting minimal backup at $(/bin/date)"
 nice -n 19 tar --exclude-from ${SCRIPT_DIR}/jenkins_backup_exclusions -zcf ${DUMP} ${JENKINS_DATA} ${JENKINS_JOBS}
+echo "Return code was $?"
+echo "File size is $(du -sk ${DUMP} | awk '{print $1}')K"
 echo "Minimal backup finished at $(/bin/date)"
-
-echo "ftp to NAS started at $(/bin/date)"
-ftp 172.23.120.24 << END_CMDS
-cd Jenkins_backup/${INSTANCE_NAME}
-bin
-put ${DUMP}
-END_CMDS
-echo "ftp to NAS ended at $(/bin/date)"
+set -e
 
 if [[ "$DAYOFWEEK" == "Sun" && -n "$FULL_BACKUP_DIR" ]]; then
    echo "Starting full backup at $(/bin/date)"
