@@ -24,10 +24,12 @@ while getopts :d:j:b:i:h ARG; do
         i) INSTANCE_NAME="$OPTARG"
            ;;
         h) show_help
+           exit 0
            ;;
         \?) # Unrecognized option; show help
             echo -e \\n"Option -${OPTARG} not allowed."
             show_help
+            exit 1
     esac
 done
 
