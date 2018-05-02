@@ -56,11 +56,12 @@ echo @@@@@@@@@
 cd ${LATESTBUILDS}/sync_gateway
 
 # All tar.gz packages older than 30/60 days
-remove_glob "couchbase-sg-accel*.tar.gz" 60
-remove_glob "couchbase-sync-gateway*.tar.gz" 60
+remove_glob "couchbase-sg-accel*.tar.gz*" 60
+remove_glob "couchbase-sync-gateway*.tar.gz*" 60
 
 # older than 30/60 days
 remove_glob "*.zip*" 60
+remove_glob "*.rpm*" 60
 remove_glob "*.exe*" 60
 remove_glob "*.msi*" 60
 remove_glob "*.deb*" 60
@@ -74,6 +75,7 @@ cd ${LATESTBUILDS}/couchbase-lite-android
 remove_glob "*.jar*" 60
 remove_glob "*.aar*" 60
 remove_glob "*.apk*" 60
+remove_glob "*.zip*" 60
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-ios
