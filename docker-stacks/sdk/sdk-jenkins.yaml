@@ -5,6 +5,39 @@ version: '3.5'
 # All services, networks, etc. will then get an "sdk_" prefix,
 # eg. "sdk_jenkins"
 
+# Default slave configuration. This is written using a YAML anchor so
+# it can be substituted into all the slave declarations later. See
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+x-default-jenkins-slave: &default-jenkins-slave
+  deploy:
+    replicas: 1
+  networks:
+    - jenkins
+  secrets:
+    - source: ns-buildbot.rsa
+      target: /home/couchbase/.ssh/ns-buildbot.rsa
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: jenkins_master_username
+    - source: jenkins_master_password
+  configs:
+    - source: jenkins_slave_ssh_config
+      target: /home/couchbase/.ssh/config
+      uid: '1000'
+      gid: '1000'
+      mode: 0644
+
+
+x-default-jenkins-slave-environment:
+# Due to https://github.com/docker/compose/issues/229, the Jenkins container is
+# created with a container name "sdk_jenkins", which is not a valid DNS entry.
+# "dig" will actually resolve it OK inside another container, but Java will
+# not, so we can't reference eg. "http://sdk_jenkins:8080/" as you would expect.
+# However, fortunately the "short" service name (the name from here in this
+# compose file) also works, so we use that here for the master URL.
+ - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://jenkins:8080/"
+
 services:
 
   # sdk.jenkins.couchbase.com
@@ -32,159 +65,51 @@ services:
 
   centos6:
     image: couchbasebuild/sdk-centos6-build:20180314
-    deploy:
-      replicas: 1
-    networks:
-      - jenkins
     environment:
-# Due to https://github.com/docker/compose/issues/229, the Jenkins container is
-# created with a container name "sdk_jenkins", which is not a valid DNS entry.
-# "dig" will actually resolve it OK inside another container, but Java will
-# not, so we can't reference eg. "http://sdk_jenkins:8080/" as you would expect.
-# However, fortunately the "short" service name (the name from here in this
-# compose file) also works, so we use that here for the master URL.
-      - "JENKINS_MASTER=http://jenkins:8080/"
       - "JENKINS_SLAVE_NAME=centos6"
       - "JENKINS_SLAVE_LABELS=centos6"
-    secrets:
-      - source: ns-buildbot.rsa
-        target: /home/couchbase/.ssh/ns-buildbot.rsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
-      - source: jenkins_master_username
-      - source: jenkins_master_password
-    configs:
-      - source: jenkins_slave_ssh_config
-        target: /home/couchbase/.ssh/config
-        uid: '1000'
-        gid: '1000'
-        mode: 0644
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
 
   centos7:
     image: couchbasebuild/sdk-centos7-build:20180314
-    deploy:
-      replicas: 1
-    networks:
-      - jenkins
     environment:
-      - "JENKINS_MASTER=http://jenkins:8080/"
       - "JENKINS_SLAVE_NAME=centos7"
       - "JENKINS_SLAVE_LABELS=centos7"
-    secrets:
-      - source: ns-buildbot.rsa
-        target: /home/couchbase/.ssh/ns-buildbot.rsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
-      - source: jenkins_master_username
-      - source: jenkins_master_password
-    configs:
-      - source: jenkins_slave_ssh_config
-        target: /home/couchbase/.ssh/config
-        uid: '1000'
-        gid: '1000'
-        mode: 0644
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
 
   debian8:
     image: couchbasebuild/sdk-debian8-build:20180315
-    deploy:
-      replicas: 1
-    networks:
-      - jenkins
     environment:
-      - "JENKINS_MASTER=http://jenkins:8080/"
       - "JENKINS_SLAVE_NAME=debian8"
       - "JENKINS_SLAVE_LABELS=debian8"
-    secrets:
-      - source: ns-buildbot.rsa
-        target: /home/couchbase/.ssh/ns-buildbot.rsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
-      - source: jenkins_master_username
-      - source: jenkins_master_password
-    configs:
-      - source: jenkins_slave_ssh_config
-        target: /home/couchbase/.ssh/config
-        uid: '1000'
-        gid: '1000'
-        mode: 0644
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
 
   debian9:
     image: couchbasebuild/sdk-debian9-build:20180316
-    deploy:
-      replicas: 1
-    networks:
-      - jenkins
     environment:
-      - "JENKINS_MASTER=http://jenkins:8080/"
       - "JENKINS_SLAVE_NAME=debian9"
       - "JENKINS_SLAVE_LABELS=debian9"
-    secrets:
-      - source: ns-buildbot.rsa
-        target: /home/couchbase/.ssh/ns-buildbot.rsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
-      - source: jenkins_master_username
-      - source: jenkins_master_password
-    configs:
-      - source: jenkins_slave_ssh_config
-        target: /home/couchbase/.ssh/config
-        uid: '1000'
-        gid: '1000'
-        mode: 0644
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
 
   ubuntu14:
     image: couchbasebuild/sdk-ubuntu14-build:20180314
-    deploy:
-      replicas: 1
-    networks:
-      - jenkins
     environment:
-      - "JENKINS_MASTER=http://jenkins:8080/"
       - "JENKINS_SLAVE_NAME=ubuntu14"
       - "JENKINS_SLAVE_LABELS=ubuntu14"
-    secrets:
-      - source: ns-buildbot.rsa
-        target: /home/couchbase/.ssh/ns-buildbot.rsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
-      - source: jenkins_master_username
-      - source: jenkins_master_password
-    configs:
-      - source: jenkins_slave_ssh_config
-        target: /home/couchbase/.ssh/config
-        uid: '1000'
-        gid: '1000'
-        mode: 0644
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
 
   ubuntu16:
     image: couchbasebuild/sdk-ubuntu16-build:20180315
-    deploy:
-      replicas: 1
-    networks:
-      - jenkins
     environment:
-      - "JENKINS_MASTER=http://jenkins:8080/"
       - "JENKINS_SLAVE_NAME=ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16"
-    secrets:
-      - source: ns-buildbot.rsa
-        target: /home/couchbase/.ssh/ns-buildbot.rsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
-      - source: jenkins_master_username
-      - source: jenkins_master_password
-    configs:
-      - source: jenkins_slave_ssh_config
-        target: /home/couchbase/.ssh/config
-        uid: '1000'
-        gid: '1000'
-        mode: 0644
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
 
 secrets:
   # SSH key which can read private GitHub repos
