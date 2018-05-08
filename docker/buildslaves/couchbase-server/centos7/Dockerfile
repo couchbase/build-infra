@@ -50,7 +50,16 @@ RUN groupadd -g1000 couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
-    chmod 440 /etc/sudoers.d/wheel_group
+    chmod 440 /etc/sudoers.d/wheel_group && \
+    usermod -G wheel root
+
+# Jenkins Swarm jar
+RUN yum install -y java-1.8.0-openjdk-headless && \
+    yum clean packages
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
+    -o /usr/local/lib/swarm-client.jar
+COPY build/swarm*.properties /
 
 # GCC (from couchbasebuild/centos-7-gcc)
 COPY build/local /usr/local
@@ -101,5 +110,5 @@ EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
-CMD [ "default" ]
+CMD [ "swarm" ]
 

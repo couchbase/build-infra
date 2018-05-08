@@ -80,22 +80,26 @@ RUN mkdir /tmp/deploy && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
-# Oracle JDK (for Jenkins and Analytics).
+# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
-    curl -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-        http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
+    curl -L \
+    https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz -o jdk.tgz && \
     cd /usr/local && \
     tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s jdk* java && \
+    ln -s java* java && \
     for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
     rm -rf /tmp/deploy
 ENV JAVA_HOME=/usr/local/java
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
+    -o /usr/local/lib/swarm-client.jar
+COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
-CMD [ "default" ]
+CMD [ "swarm" ]
 

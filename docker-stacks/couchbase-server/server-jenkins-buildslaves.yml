@@ -1,0 +1,93 @@
+version: '3.5'
+
+# Suggested deployment command:
+#  docker stack deploy -c serer-jenkins-buildslaves.yaml serverbuild
+# All services, networks, etc. will then get an "serverbuild_" prefix,
+# eg. "serverbuild_centos6"
+
+# Default slave configuration. This is written using a YAML anchor so
+# it can be substituted into all the slave declarations later. See
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+x-default-jenkins-slave: &default-jenkins-slave
+  deploy:
+    replicas: 1
+  networks:
+    - jenkins
+  secrets:
+    - source: jenkins_master_username
+    - source: jenkins_master_password
+  volumes:
+    - type: bind
+      source: /home/couchbase/jenkinsdocker-ssh
+      target: /ssh
+
+x-default-jenkins-slave-environment:
+ - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
+
+services:
+
+  centos6:
+    image: couchbasebuild/server-centos6-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-centos6"
+      - "JENKINS_SLAVE_LABELS=centos6 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+      - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
+    <<: *default-jenkins-slave
+
+  centos7:
+    image: couchbasebuild/server-centos7-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-centos7"
+      - "JENKINS_SLAVE_LABELS=centos7 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  debian8:
+    image: couchbasebuild/server-debian8-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-debian8"
+      - "JENKINS_SLAVE_LABELS=debian8 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  debian9:
+    image: couchbasebuild/server-debian9-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-debian9"
+      - "JENKINS_SLAVE_LABELS=debian9 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  suse11:
+    image: couchbasebuild/server-suse11-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-suse11"
+      - "JENKINS_SLAVE_LABELS=suse11 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  ubuntu14:
+    image: couchbasebuild/server-ubuntu14-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-ubuntu14"
+      - "JENKINS_SLAVE_LABELS=ubuntu14.04 ubuntu14 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  ubuntu16:
+    image: couchbasebuild/server-ubuntu16-build:20180507
+    environment:
+      - "JENKINS_SLAVE_NAME=server-ubuntu16"
+      - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+secrets:
+  jenkins_master_username:
+    external: true
+  jenkins_master_password:
+    external: true
+
+networks:
+  jenkins:

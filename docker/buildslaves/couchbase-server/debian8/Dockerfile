@@ -49,11 +49,13 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 #paramiko for testrunner
-RUN apt-get update && apt-get install -y python-paramiko
+RUN apt-get update && apt-get install -y python-paramiko && apt-get clean
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.
-RUN apt-get update && apt-get install -y m4 autoconf automake libtool
+RUN apt-get update && \
+    apt-get install -y m4 autoconf automake libtool && \
+    apt-get clean
 
 RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
 RUN mkdir /tmp/deploy && \
@@ -63,22 +65,21 @@ RUN mkdir /tmp/deploy && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
-# Oracle JDK (for Jenkins and Analytics).
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
-ENV JAVA_HOME=/usr/local/java
+# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
+# https://unix.stackexchange.com/questions/342403/openjdk-8-jre-headless-depends-ca-certificates-java-but-it-is-not-going-to-be
+RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -t jessie-backports -y openjdk-8-jre-headless ca-certificates-java && \
+    apt-get clean
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
+    -o /usr/local/lib/swarm-client.jar
+COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
-CMD [ "default" ]
+CMD [ "swarm" ]
 
