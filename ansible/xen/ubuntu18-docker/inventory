@@ -1,0 +1,6 @@
+[xenservers]
+172.23.96.155 sr_name=VMStore
+
+[xenservers:vars]
+ansible_user=root
+ansible_password=xxxx

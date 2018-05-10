@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker run --rm -it -v `pwd`:/mnt -v ~/jenkinsdocker-ssh:/ssh \
+docker run --rm -it -v `pwd`:/mnt \
   couchbasebuild/ansible-playbook -i inventory swarm-facts.yml
 

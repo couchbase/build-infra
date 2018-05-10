@@ -1,0 +1,201 @@
+---
+- name: Deploy new Ubuntu VM
+  gather_facts: False
+  hosts: xenservers
+  vars_files:
+    - xenserver_vars.yml
+
+  tasks:
+    - name: Get UUID of share SR
+      command: xe sr-list name-label="{{ sr_name }}" --minimal
+      register: sruuid
+      changed_when: False
+
+    - name: Get the UUID of the VM template
+      command: xe template-list name-label="{{ vm_template }}" --minimal
+      register: templateuuid
+      changed_when: False
+
+    - name: Get the UUID of the network
+      command: xe network-list name-label="{{ network_name }}" --minimal
+      register: networkuuid
+      changed_when: False
+
+    - name: Deploy new VM
+      command: xe vm-install template={{ templateuuid.stdout }} new-name-label="{{ vm_name }}" sr-uuid={{ sruuid.stdout }}
+      register: vmuuid
+
+    - name: Set vcpu count
+      command: xe vm-param-set VCPUs-max={{ vcpus }} VCPUs-at-startup={{ vcpus }} uuid={{ vmuuid.stdout }}
+
+    - name: Get the UUID of the disk
+      command: xe vm-disk-list vbd-params=device=xvda uuid={{ vmuuid.stdout }} --minimal
+      register: vdiuuid
+
+    - name: Set disk size
+      command: xe vdi-resize disk-size="{{ disksize }}" uuid={{ vdiuuid.stdout }}
+
+    - name: Set memory
+      command: xe vm-memory-limits-set uuid={{ vmuuid.stdout }} dynamic-min="{{ memory }}" dynamic-max="{{ memory }}" static-max="{{ memory }}" static-min="{{ memory }}"
+
+    - name: Attach VM to {{ network_name }}
+      command: xe vif-create vm-uuid={{ vmuuid.stdout }} network-uuid={{ networkuuid.stdout }} mac=random device=0
+
+    - name: Create and attach CDROM drive
+      command: xe vbd-create type=CD device=xvdd vm-uuid={{ vmuuid.stdout }} mode=ro
+
+    - name: Insert Installation CD in CDROM drive
+      command: xe vm-cd-insert cd-name={{ install_iso }} vm={{ vmuuid.stdout }}
+
+    - name: Boot VM and start installation
+      command: xe vm-start uuid={{ vmuuid.stdout }}
+
+    - name: Get the boot time for the VM
+      command: xe vm-param-get param-name=start-time uuid={{ vmuuid.stdout }}
+      register: boottime
+
+    - name: Watch for the first reboot (will take several minutes)
+      shell: export starttime={{ boottime.stdout }}; while [[ ${starttime} == {{ boottime.stdout }} ]]; do sleep 5; starttime=`xe vm-param-get param-name=start-time uuid={{ vmuuid.stdout }}`; done
+      async: 1800
+      poll: 15
+
+    - name: Wait for IP address of new VM
+      shell: export ip=""; while [[ $ip != 172* ]]; do sleep 2; ip=`xe vm-param-get uuid={{ vmuuid.stdout }} param-name=networks param-key=0/ip`; done; echo $ip
+      register: vmip
+
+    - name: Add new VM to Ansible group
+      add_host:
+        name: "{{ vmip.stdout }}"
+        groups: newvms
+
+- name: Do stuff on new VMs
+  gather_facts: False
+  hosts: newvms
+
+  vars:
+    ansible_user: couchbase
+    ansible_password: couchbase
+    ansible_become: true
+    ansible_sudo_password: couchbase
+
+  tasks:
+
+    - name: Apt Update
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Disable automatic updates
+      apt:
+        name: unattended-upgrades
+        state: absent
+        purge: yes
+
+    - name: Enable coredumps in /tmp
+      sysctl:
+        name: kernel.core_pattern
+        value: "/tmp/core.%e.%p.%h.%t"
+        reload: yes
+      tags: core
+      changed_when: true
+
+    - name: Reboot to get new kernel
+      shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+      async: 5
+      poll: 0
+
+    - name: Wait for server to finish rebooting
+      become: no
+      connection: local
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        state: started
+        delay: 30
+        timeout: 300
+
+    - name: Clean unused packages
+      apt:
+        update_cache: yes
+        autoremove: yes
+        purge: yes
+
+    - name: Get kernel version
+      shell: uname -r
+      register: uname
+      changed_when: false
+
+    - name: Install additional packages for Docker and NFS
+      apt:
+        name: "{{ item }}"
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - software-properties-common
+        - python-pip
+        - curl
+        - nfs-common
+        - zsh
+
+    - name: Mount NAS directories
+      mount:
+        path: "{{ item.mountpoint }}"
+        src: "{{ item.nasserver }}:{{ item.naspath }}"
+        fstype: nfs
+        opts: rw,soft
+        dump: 0
+        passno: 0
+        state: mounted
+      with_items:
+        - mountpoint: /latestbuilds
+          nasserver: latestbuilds.service.couchbase.com
+          naspath: /data/builds/latestbuilds
+        - mountpoint: /releases
+          nasserver: latestbuilds.service.couchbase.com
+          naspath: /data/builds/releases
+        - mountpoint: /builds
+          nasserver: nas-n.mgt.couchbase.com
+          naspath: /data/builds
+
+    - name: Add docker key
+      shell: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+    - name: Add docker apt repository
+      shell: >
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        update_cache: yes
+
+    - name: Install docker-py
+      pip:
+        name: docker-py
+        version: 1.9.0
+
+    - name: Add couchbase user to docker group
+      user:
+        name: couchbase
+        group: docker
+        append: yes
+
+    - name: Create docker systemd drop-in directory
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: 0755
+
+    - name: Create docker systemd drop-in config file
+      copy:
+        src: docker-service.conf
+        dest: /etc/systemd/system/docker.service.d/docker-service.conf
+        backup: yes
+
+    - name: Restart docker systemd service
+      systemd:
+        daemon_reload: yes
+        name: docker
+        state: restarted
+
