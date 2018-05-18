@@ -61,8 +61,8 @@ class JiraCommenter:
         topic = commit.summary.split('\n', 1)[0]
         message = (
             f"Build {build.key} contains {commit.project} "
-            f"commit {commit.sha} with commit message:\n"
-            f"{topic}\n{url}"
+            f"commit [{commit.sha[0:7]}|{url}] with commit message:\n"
+            f"{topic}"
         )
 
         if self.dryrun:
