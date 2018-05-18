@@ -73,11 +73,11 @@
 
     - name: "Download py2exe"
       win_get_url:
-        url: 'https://iweb.dl.sourceforge.net/project/py2exe/py2exe/0.6.9/py2exe-0.6.9.win64-py2.7.amd64.exe'
-        dest: py2exe.exe
+        url: https://iweb.dl.sourceforge.net/project/py2exe/py2exe/0.6.9/py2exe-0.6.9.win64-py2.7.amd64.exe
+        dest: C:\py2exe.exe
 
     - name: "Install py2exe"
-      raw: 'easy_install py2exe.exe'
+      raw: 'easy_install C:\py2exe.exe'
 
     - name: Create bin directory
       win_file:
@@ -114,11 +114,10 @@
       script: install-vs.ps1 -vskey {{ vskey }}
       register: choco_output
       changed_when: not "already installed" in choco_output.stdout
-      failed_when: not "Chocolatey installed 1/1" in choco_output.stdout
+      failed_when: false
 
     - name: Reboot Windows if necessary
       win_reboot:
-        shutdown_timeout_sec: 3600
         reboot_timeout_sec: 3600
       when: '"reboot is necessary" in choco_output.stdout'
 
@@ -169,4 +168,4 @@
         action: allow
         direction: in
         protocol: TCP
-        force: true
+

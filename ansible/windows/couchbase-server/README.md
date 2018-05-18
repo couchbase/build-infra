@@ -1,7 +1,7 @@
 # PREREQUISITES
 
-This playbook likely requires at least Ansible 2.3.0. However it currently
-fails with Ansible 2.4.0 due to win_get_url.
+This playbook seems to work with Ansible 2.5.0. It may not work with
+earlier versions.
 
 The remote Windows server needs to be ready for Ansible remote
 control; see README.txt in the parent directory.
@@ -43,12 +43,36 @@ requirements for building Couchbase Server (spock release or later).
       -e vskey=ABCDEFGHIJKLMNOPQRSTUVWYZ \
       -e ansible_password=ADMINISTRATOR_PASSWORD
 
+or
+
+    docker run --rm -it -v $(pwd):/mnt couchbasebuild/ansible-playbook:2.5.0 \
+      -v -i inventory playbook.yml \
+      -e vskey=ABCDEFGHIJKLMNOPQRSTUVWYZ \
+      -e ansible_password=ADMINISTRATOR_PASSWORD
+
 `vskey` is the license key for Visual Studio Professional 2015 (omit any
 dashes in the license key).
 
+# HACKS
+
+The biggest step in the playbook, "Install Visual Studio 2015", currently
+has
+
+    failed_when: false
+
+which means it will never fail. I simply could not find a consistent way
+to detect success, as the output seems to be highly variable. It might be
+possible to get the return value from the call to "choco" in install-vs.ps1
+and propogate that up to actual Ansible play, but my PowerShell abilities
+aren't good enough for that. As it is, you'll have to watch the verbose
+output from that step and see if it looks OK.
+
 # THINGS THAT COULD GO WRONG
 
-This playbook worked on October 3, 2017. It does not specify explicit versions
+Installing the "vcpython27" package, for whatevr reason, seems to fail with
+a download error fairly regularly. Re-running the playbook usually succeeds.
+
+This playbook worked on May 15, 2018. It does not specify explicit versions
 of any of the toolchain requirements, because many of the packages (notably
 Visual Studio 2015 itself) are specifically designed to install only the
 latest version. That being the case, things could change over time to make
@@ -89,4 +113,3 @@ If this happens, you can create a new file by:
    * Silverlight5_DRTHidden
    * StoryboardingHidden
    * WebToolsV1
-

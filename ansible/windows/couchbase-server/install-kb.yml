@@ -33,7 +33,7 @@
   register: dism_output
   when: "item.filename.endswith('.msu') and item.filename[11:20] not in kbs_list.stdout"
   changed_when: "true"
-  failed_when: "dism_output.rc != 0 and dism_output.rc != 3010 and dism_output.rc != 1641"
+  failed_when: "dism_output.rc != 0 and dism_output.rc != 1 and dism_output.rc != 3010 and dism_output.rc != 1641"
 
 - name: Execute KB exe {{ item.filename }}.
   raw: "C:\\kbs\\{{ item.filename }}"
@@ -52,7 +52,6 @@
 
 - name: Reboot Windows if necessary
   win_reboot:
-    shutdown_timeout_sec: 3600
     reboot_timeout_sec: 3600
   when: "'Install Pending' in package_output.stdout"
 
