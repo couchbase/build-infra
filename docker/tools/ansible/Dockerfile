@@ -11,14 +11,16 @@ FROM ubuntu:16.04
 
 MAINTAINER Couchbase Build Team <build-team@couchbase.com>
 
-RUN apt-get update                             && \
+ARG ANSIBLE_COMMAND
+ARG ANSIBLE_VERSION
+
+RUN apt-get update                                       && \
     apt-get install -y python-pip sshpass openssh-client && \
     apt-get clean
-RUN pip install --upgrade ansible==2.4.1       && \
+RUN pip install --upgrade ansible==${ANSIBLE_VERSION}   && \
     pip install --upgrade pywinrm
 
 ADD entrypoint.sh /
-ARG ANSIBLE_COMMAND
 # Need to save this arg in an environment variable, because ENTRYPOINT
 # arguments are evaluated at container run-time
 ENV ANSIBLE_COMMAND="${ANSIBLE_COMMAND}"
