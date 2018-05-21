@@ -7,11 +7,13 @@ homebrew_taps:
 
 homebrew_installed_packages:
    - { name: autoconf, version: 2.69, state: linked }
+   - { name: automake, version: 1.16.1, state: linked }
    - { name: ccache, version: 3.11.0, state: linked }
    - { name: coreutils, version: 8.29, state: linked }
    - { name: cmake, version: 3.11.0, state: linked }
+   - { name: libtool, version: 2.4.6_1, state: linked }
    - { name: maven, version: 3.5.3, state: linked }
    - { name: sha2, version: 1.0.1, state: linked }
 
 homebrew_cask_uninstalled_apps:
-  - firefox
+   - firefox
