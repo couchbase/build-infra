@@ -52,6 +52,7 @@
         - wixtoolset
         - 7zip.commandline
         - jdk8
+        - awstools.powershell
         - kb2919355
         - kb2999226
         - kb2919442
