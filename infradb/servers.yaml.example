@@ -1,0 +1,16 @@
+---
+build_db:
+  - db_uri: couchbase://localhost/infrastructure
+    username: Administrator
+    password: passwd
+platforms:
+  - host_type: xen
+    hosts:
+      - name: xcp-s834
+        ip_addr: 172.23.96.155
+        user: root
+        password: passwd
+      - name: xcp-s828
+        ip_addr: 172.23.123.45
+        user: root
+        password: passwd
