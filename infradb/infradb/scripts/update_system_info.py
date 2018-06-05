@@ -78,7 +78,7 @@ class FindSystems:
         self.db.upsert_documents(self.system_info)
 
 
-if __name__ == '__main__':
+def main():
     """
     Read configuration, do basic sanity check, then acquire information
     from given hosts
@@ -117,3 +117,7 @@ if __name__ == '__main__':
     systems = FindSystems(sys_config['build_db'][0], sys_config['platforms'])
     systems.determine_systems()
     systems.update_db()
+
+
+if __name__ == '__main__':
+    main()
