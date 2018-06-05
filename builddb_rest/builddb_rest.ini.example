@@ -11,7 +11,7 @@ pyramid.default_locale_name = en
 # Specific entries for build database access
 builddb_uri = couchbase://build-db.build.couchbase.com/build_info
 builddb_user = Administrator
-builddb_pass = couchbase
+builddb_pass = passwd
 
 [server:main]
 use = egg:waitress#main
