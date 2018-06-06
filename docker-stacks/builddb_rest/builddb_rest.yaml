@@ -1,0 +1,29 @@
+version: '3.5'
+
+# Suggested deployment command:
+#  docker stack deploy -c builddb_rest.yaml builddb_rest
+# All services, networks, etc. will then get an "builddb_rest" prefix,
+# eg. "builddb_rest_server"
+
+services:
+
+  server:
+    image: couchbasebuild/builddb_rest:20180604
+    deploy:
+      replicas: 3
+    ports:
+      - "8000:6543"
+    configs:
+      - source: builddb_rest.ini
+        target: /etc/builddb_rest.ini
+        uid: '1000'
+        gid: '1000'
+    networks:
+      - builddb_rest
+
+configs:
+  builddb_rest.ini:
+    file: conf/builddb_rest.ini
+
+networks:
+  builddb_rest:
