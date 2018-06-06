@@ -4,6 +4,7 @@ Module for build endpoints
 
 from cornice.resource import resource
 
+from .cors import CORS_POLICY
 from .urls import ALL_URLS
 from .util.db import BuildInfo
 
@@ -100,7 +101,8 @@ class BuildBase:
 
 
 @resource(collection_path=ALL_URLS['build_collection'],
-          path=ALL_URLS['build'])
+          path=ALL_URLS['build'],
+          cors_policy=CORS_POLICY)
 class Build(BuildBase):
     """
     Handle the 'builds' endpoints (fully qualified REST path)
@@ -141,7 +143,8 @@ class Build(BuildBase):
 
 
 @resource(collection_path=ALL_URLS['build_alt_collection'],
-          path=ALL_URLS['build_alt'])
+          path=ALL_URLS['build_alt'],
+          cors_policy=CORS_POLICY)
 class BuildAlt(BuildBase):
     """
     Handle the 'builds' endpoints (concise REST path)

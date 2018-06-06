@@ -4,6 +4,7 @@ Module for commit endpoints
 
 from cornice.resource import resource
 
+from .cors import CORS_POLICY
 from .urls import ALL_URLS
 from .util.db import BuildInfo
 
@@ -83,7 +84,8 @@ class CommitBase:
 
 
 @resource(collection_path=ALL_URLS['commit_collection'],
-          path=ALL_URLS['commit'])
+          path=ALL_URLS['commit'],
+          cors_policy=CORS_POLICY)
 class Commit(CommitBase):
     """
     Handle the 'commits' endpoints (fully qualified REST path)
@@ -119,7 +121,8 @@ class Commit(CommitBase):
 
 
 @resource(collection_path=ALL_URLS['commit_alt_collection'],
-          path=ALL_URLS['commit_alt'])
+          path=ALL_URLS['commit_alt'],
+          cors_policy=CORS_POLICY)
 class CommitAlt(CommitBase):
     """
     Handle the 'commits' endpoints (concise REST path)

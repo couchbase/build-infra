@@ -4,12 +4,14 @@ Module for product endpoints
 
 from cornice.resource import resource
 
+from .cors import CORS_POLICY
 from .urls import ALL_URLS
 from .util.db import BuildInfo
 
 
 @resource(collection_path=ALL_URLS['product_collection'],
-          path=ALL_URLS['product'])
+          path=ALL_URLS['product'],
+          cors_policy=CORS_POLICY)
 class Products:
     """
     Handle the 'products' endpoints

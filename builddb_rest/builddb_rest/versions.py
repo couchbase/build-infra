@@ -4,12 +4,14 @@ Module for version endpoints
 
 from cornice.resource import resource
 
+from .cors import CORS_POLICY
 from .urls import ALL_URLS
 from .util.db import BuildInfo
 
 
 @resource(collection_path=ALL_URLS['version_collection'],
-          path=ALL_URLS['version'])
+          path=ALL_URLS['version'],
+          cors_policy=CORS_POLICY)
 class Version:
     """
     Handle the 'versions' endpoints

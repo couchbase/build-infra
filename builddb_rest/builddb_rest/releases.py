@@ -4,12 +4,14 @@ Module for release endpoints
 
 from cornice.resource import resource
 
+from .cors import CORS_POLICY
 from .urls import ALL_URLS
 from .util.db import BuildInfo
 
 
 @resource(collection_path=ALL_URLS['release_collection'],
-          path=ALL_URLS['release'])
+          path=ALL_URLS['release'],
+          cors_policy=CORS_POLICY)
 class Releases:
     """
     Handle the 'releases' endpoints

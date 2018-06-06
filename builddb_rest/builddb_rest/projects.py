@@ -4,12 +4,14 @@ Module for project endpoints
 
 from cornice.resource import resource
 
+from .cors import CORS_POLICY
 from .urls import ALL_URLS
 from .util.db import BuildInfo
 
 
 @resource(collection_path=ALL_URLS['project_collection'],
-          path=ALL_URLS['project'])
+          path=ALL_URLS['project'],
+          cors_policy=CORS_POLICY)
 class Projects:
     """
     Handle the 'projects' endpoints
