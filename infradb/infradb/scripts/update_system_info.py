@@ -23,8 +23,8 @@ logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
 logger.addHandler(ch)
 
-# Directory containing various supported platforms (e.g. Xen)
-platform_dir = 'platforms'
+# Module path containing various supported platforms (e.g. Xen)
+platform_mod = 'infradb.platforms'
 
 
 def import_class(module_path, classname):
@@ -63,7 +63,7 @@ class FindSystems:
             # Import appropriate class for given platform
             host_type = platform['host_type']
             cls = import_class(
-                '{}.{}'.format(platform_dir, host_type), 'System'
+                '{}.{}'.format(platform_mod, host_type), 'System'
             )
 
             # Run through set of hosts and gather information
