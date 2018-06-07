@@ -130,12 +130,18 @@ class System:
                     vm_info[vm_data['key_']] = vm_data
         except ConnectionError as exc:
             # If unable to connect to host, simply print reason
-            # and return an empty dictionary (no data)
+            # and return tuple of True (for failure) and an empty
+            # dictionary (no data)
             print(exc)
 
-            return dict()
+            return True, dict()
         else:
             # Get current date / time to keep track of host updates
             curr_ts = str(datetime.now()).split('.')[0]
 
-            return {xen_hostname: {'last_updated': curr_ts, 'vms': vm_info}}
+            # Tuple of False (no failure) and dictionary with data
+            return (
+                False, {xen_hostname: {
+                    'last_updated': curr_ts, 'vms': vm_info}
+                }
+            )

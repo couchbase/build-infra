@@ -52,6 +52,7 @@ class FindSystems:
         self.db = cbutil_db.CouchbaseDB(db_info)
         self.platforms = platforms
         self.system_info = {}
+        self.failures = False
 
     def determine_systems(self):
         """
@@ -67,10 +68,15 @@ class FindSystems:
             )
 
             # Run through set of hosts and gather information
-            # (instantiates the imported class)
+            # (instantiates the imported class); set failures
+            # attribute if a host was unable to connect
             for host_info in platform['hosts']:
                 host_system = cls(**host_info)
-                self.system_info.update(host_system.find_systems())
+                failed, data = host_system.find_systems()
+                self.system_info.update(data)
+
+                if failed:
+                    self.failures = True
 
     def update_db(self):
         """Update determined documents (keyed off host)"""
@@ -117,6 +123,8 @@ def main():
     systems = FindSystems(sys_config['build_db'][0], sys_config['platforms'])
     systems.determine_systems()
     systems.update_db()
+
+    sys.exit(systems.failures)
 
 
 if __name__ == '__main__':
