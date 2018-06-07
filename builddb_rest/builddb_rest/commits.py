@@ -3,6 +3,9 @@ Module for commit endpoints
 """
 
 from cornice.resource import resource
+from pyramid.httpexceptions import HTTPNotFound, HTTPMethodNotAllowed
+
+import cbbuild.cbutil.db as cbutil_db
 
 from .cors import CORS_POLICY
 from .urls import ALL_URLS
@@ -105,7 +108,9 @@ class Commit(CommitBase):
         isn't useful)
         """
 
-        return {'commits': 'Endpoint not supported'}
+        return HTTPMethodNotAllowed(
+            f'Endpoint {self.request.path} not supported'
+        )
 
     def get(self):
         """
@@ -115,7 +120,11 @@ class Commit(CommitBase):
 
         md = self.request.matchdict
         commit_doc = f"{md['project_name']}-{md['commit_sha']}"
-        result = self.request.db.get_document(commit_doc)
+
+        try:
+            result = self.request.db.get_document(commit_doc)
+        except cbutil_db.NotFoundError:
+            return HTTPNotFound(f'Document {commit_doc} not found')
 
         return self.filter_data(result)
 
@@ -134,15 +143,16 @@ class CommitAlt(CommitBase):
         self.request = request
         self.build_info = BuildInfo(self.request.db)
 
-    @staticmethod
-    def collection_get():
+    def collection_get(self):
         """
         Acquire all existing commits - currently NOT supported
         as it would return ALL commit information from the
         database (which isn't useful)
         """
 
-        return {'commits': 'Endpoint not supported'}
+        return HTTPMethodNotAllowed(
+            f'Endpoint {self.request.path} not supported'
+        )
 
     def get(self):
         """
@@ -151,6 +161,10 @@ class CommitAlt(CommitBase):
         """
 
         commit_doc = self.request.matchdict['commit_key']
-        result = self.request.db.get_document(commit_doc)
+
+        try:
+            result = self.request.db.get_document(commit_doc)
+        except cbutil_db.NotFoundError:
+            return HTTPNotFound(f'Document {build_doc} not found')
 
         return self.filter_data(result)

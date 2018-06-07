@@ -3,6 +3,9 @@ Module for build endpoints
 """
 
 from cornice.resource import resource
+from pyramid.httpexceptions import HTTPNotFound, HTTPMethodNotAllowed
+
+import cbbuild.cbutil.db as cbutil_db
 
 from .cors import CORS_POLICY
 from .urls import ALL_URLS
@@ -137,7 +140,11 @@ class Build(BuildBase):
         md = self.request.matchdict
         build_doc = \
             f"{md['product_name']}-{md['product_version']}-{md['build_num']}"
-        result = self.request.db.get_document(build_doc)
+
+        try:
+            result = self.request.db.get_document(build_doc)
+        except cbutil_db.NotFoundError:
+            return HTTPNotFound(f'Document {build_doc} not found')
 
         return self.filter_data(result)
 
@@ -156,15 +163,16 @@ class BuildAlt(BuildBase):
         self.request = request
         self.build_info = BuildInfo(self.request.db)
 
-    @staticmethod
-    def collection_get():
+    def collection_get(self):
         """
         Acquire all existing builds - currently NOT supported
         as it would return ALL build information from the
         database (which isn't useful)
         """
 
-        return {'builds': 'Endpoint not supported'}
+        return HTTPMethodNotAllowed(
+            f'Endpoint {self.request.path} not supported'
+        )
 
     def get(self):
         """
@@ -173,6 +181,10 @@ class BuildAlt(BuildBase):
         """
 
         build_doc = self.request.matchdict['build_key']
-        result = self.request.db.get_document(build_doc)
+
+        try:
+            result = self.request.db.get_document(build_doc)
+        except cbutil_db.NotFoundError:
+            return HTTPNotFound(f'Document {build_doc} not found')
 
         return self.filter_data(result)

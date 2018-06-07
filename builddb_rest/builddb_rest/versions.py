@@ -30,7 +30,7 @@ class Version:
         """
 
         return {
-            'releases': self.build_info.get_versions(
+            'versions': self.build_info.get_versions(
                 self.request.matchdict['product_name'],
                 self.request.matchdict['release_name']
             )
