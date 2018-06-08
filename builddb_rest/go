@@ -3,7 +3,7 @@
 TAG=$(date "+%Y%m%d")
 IMAGE="couchbasebuild/builddb_rest"
 
-docker build --no-cache -t ${IMAGE}:${TAG} .
+docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 
 if [ "$1" = "--publish" ]
