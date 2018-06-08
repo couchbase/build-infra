@@ -2,24 +2,25 @@
 - name: Deploy new Ubuntu VM
   gather_facts: False
   hosts: xenservers
-  vars_files:
-    - xenserver_vars.yml
 
   tasks:
     - name: Get UUID of share SR
       command: xe sr-list name-label="{{ sr_name }}" --minimal
       register: sruuid
       changed_when: False
+      failed_when: sruuid.stdout == ""
 
     - name: Get the UUID of the VM template
       command: xe template-list name-label="{{ vm_template }}" --minimal
       register: templateuuid
       changed_when: False
+      failed_when: templateuuid.stdout == ""
 
     - name: Get the UUID of the network
       command: xe network-list name-label="{{ network_name }}" --minimal
       register: networkuuid
       changed_when: False
+      failed_when: networkuuid.stdout == ""
 
     - name: Deploy new VM
       command: xe vm-install template={{ templateuuid.stdout }} new-name-label="{{ vm_name }}" sr-uuid={{ sruuid.stdout }}
@@ -85,12 +86,6 @@
         update_cache: yes
         upgrade: dist
 
-    - name: Disable automatic updates
-      apt:
-        name: unattended-upgrades
-        state: absent
-        purge: yes
-
     - name: Enable coredumps in /tmp
       sysctl:
         name: kernel.core_pattern
@@ -138,6 +133,7 @@
         - zsh
 
     - name: Mount NAS directories
+      tags: mount
       mount:
         path: "{{ item.mountpoint }}"
         src: "{{ item.nasserver }}:{{ item.naspath }}"
@@ -198,4 +194,10 @@
         daemon_reload: yes
         name: docker
         state: restarted
+
+    - name: Disable automatic updates
+      apt:
+        name: unattended-upgrades
+        state: absent
+        purge: yes
 

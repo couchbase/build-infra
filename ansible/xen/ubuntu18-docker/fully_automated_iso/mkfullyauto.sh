@@ -1,8 +1,9 @@
 #!/bin/bash -e
 
-UBUNTUCD=ubuntu-18.04-server-amd64.iso
+VERSION=${1-18.04}
+UBUNTUCD=ubuntu-${VERSION}-server-amd64.iso
 XEUTIL=xe-guest-utilities_7.4.0-1_amd64.deb
-AUTOISO=ubuntu-18.04-fully-automated.iso
+AUTOISO=ubuntu-${VERSION}-fully-automated.iso
 
 bigecho() {
   echo
@@ -17,11 +18,11 @@ if [ ! -e ${XEUTIL} ]; then
   exit 1
 fi
 if [ ! -e ${UBUNTUCD} ]; then
-  bigecho "Downloading Stock Ubuntu 18.04"
-  curl -LO http://cdimage.ubuntu.com/releases/18.04/release/${UBUNTUCD}
+  bigecho "Downloading Stock Ubuntu ${VERSION}"
+  curl -LO http://releases.ubuntu.com/${VERSION}/${UBUNTUCD}
 fi
 
-bigecho "Extracting Ubuntu 18.04 to 'iso' subdir"
+bigecho "Extracting Ubuntu ${VERSION} to 'iso' subdir"
 sudo rm -rf iso tmpmount
 sudo mkdir tmpmount
 sudo mount ${UBUNTUCD} $(pwd)/tmpmount
@@ -37,7 +38,7 @@ cd iso
 sudo mkisofs -o ../${AUTOISO} \
   -b isolinux/isolinux.bin -c isolinux/boot.cat \
   -no-emul-boot -boot-load-size 4 -boot-info-table \
-  -J -R -V "Ubuntu 18.04 Fully Automated" .
+  -J -R -V "Ubuntu ${VERSION} Fully Automated" .
 cd ..
 sudo chmod 644 ${AUTOISO}
 
