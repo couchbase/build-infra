@@ -8,7 +8,7 @@ version: '3.5'
 services:
 
   server:
-    image: couchbasebuild/builddb_rest:20180606
+    image: couchbasebuild/builddb_rest:latest
     deploy:
       replicas: 3
     ports:
