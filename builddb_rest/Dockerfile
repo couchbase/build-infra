@@ -10,16 +10,16 @@ MAINTAINER build-team@couchbase.com
 USER root
 
 # Checkout directory for build-infra repository
-ARG BUILD_INFRA_GITDIR=/var/tmp/build-infra
+ARG SRCDIR=/var/tmp/build-infra
+
+COPY . $SRCDIR
 
 # Clone repository, install software in build_database directory,
 # then delete repository
-RUN git clone https://github.com/couchbase/build-infra $BUILD_INFRA_GITDIR && \
-    cd $BUILD_INFRA_GITDIR/builddb_rest && \
-    git log -1 && \
+RUN cd $SRCDIR && \
     pip3.6 install -r requirements.txt && \
     pip3.6 install . && \
     cd $HOME && \
-    rm -rf $BUILD_INFRA_GITDIR
+    rm -rf $SRCDIR
 
 CMD ["pserve", "/etc/builddb_rest.ini"]
