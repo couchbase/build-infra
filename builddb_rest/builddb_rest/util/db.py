@@ -17,7 +17,7 @@ class BuildInfo:
         self.db = db_conn
 
     def query_documents(self, doctype, where_clause=None, doc_keys=None,
-                        distinct=False, **kwargs):
+                        distinct=False, limit=None, **kwargs):
         """
         Acquire all documents of a given type and create a generator
         to loop through them
@@ -43,6 +43,9 @@ class BuildInfo:
 
         if where_clause is not None:
             q_string += f' AND {where_clause}'
+
+        if limit is not None:
+            q_string += f' LIMIT {limit}'
 
         query = N1QLQuery(q_string, **kwargs)
 
@@ -109,3 +112,33 @@ class BuildInfo:
         )
 
         return [result['project'] for result in results]
+
+    def get_oses(self):
+        """Get a list of all OSes in use for VMs"""
+
+        results = self.query_documents(
+            'vm', where_clause=f'os IS NOT NULL',
+            doc_keys=['os'], distinct=True
+        )
+
+        return [result['os'] for result in results]
+
+    def get_reservable_vms(self, reserve_os, count):
+        """
+        Get a list of VMs available for reservation for a given OS and count
+        """
+
+        results = self.query_documents(
+            'vm', where_clause=f"os='{reserve_os}' AND (state='available' "
+                               f"OR expires < CLOCK_MILLIS())",
+            limit=count
+        )
+
+        return [result['build_info'] for result in results]
+
+    def get_vm_by_ip(self, ip):
+        """
+        Get a VM entry keyed by IP
+        """
+
+        return self.db.get_document(ip)

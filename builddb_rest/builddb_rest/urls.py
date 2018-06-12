@@ -26,4 +26,6 @@ ALL_URLS = dict(
                        '/versions',
     version='/products/{product_name}/releases/{release_name}'
             '/versions/{product_version}',
+    reservations_collection='/reservations',
+    reservations='/reservations/{vm_ipaddr}',
 )
