@@ -3,7 +3,9 @@ Module for build endpoints
 """
 
 from cornice.resource import resource
-from pyramid.httpexceptions import HTTPNotFound, HTTPMethodNotAllowed
+from pyramid.httpexceptions import (
+    HTTPBadRequest, HTTPNotFound, HTTPMethodNotAllowed
+)
 
 import cbbuild.cbutil.db as cbutil_db
 
@@ -119,17 +121,53 @@ class Build(BuildBase):
 
     def collection_get(self):
         """
-        Acquire all existing builds of a given version/release
-        of a product
+        If no query parameters passed, acquire all existing builds
+        of a given version/release of a product
+
+        If query parameters are present, handle as necessary, returning
+        an HTTP 400 response if parameters aren't currently supported
+        or have invalid values
         """
 
-        return {
-            'builds': self.build_info.get_builds(
-                self.request.matchdict['product_name'],
-                self.request.matchdict['release_name'],
-                self.request.matchdict['product_version']
-            )
-        }
+        md = self.request.matchdict
+
+        if self.request.params:
+            param_keys = list(self.request.params.keys())
+
+            if param_keys != ['filter']:
+                return HTTPBadRequest(
+                    f'Invalid set of parameters: {", ".join(param_keys)}'
+                )
+            else:
+                filter_name = self.request.params['filter']
+
+                if filter_name == 'last_unit_sanity':
+                    result = {
+                        'build_num': self.build_info.get_last_unit_sanity(
+                            md['product_name'], md['release_name'],
+                            md['product_version']
+                        )
+                    }
+                elif filter_name == 'last_qe':
+                    result = {
+                        'build_num': self.build_info.get_last_qe(
+                            md['product_name'], md['release_name'],
+                            md['product_version']
+                        )
+                    }
+                else:
+                    return HTTPBadRequest(
+                        f'Filter "{filter_name}" not supported for builds'
+                    )
+        else:
+            result = {
+                'builds': self.build_info.get_builds(
+                    md['product_name'], md['release_name'],
+                    md['product_version']
+                )
+            }
+
+        return result
 
     def get(self):
         """

@@ -17,7 +17,8 @@ class BuildInfo:
         self.db = db_conn
 
     def query_documents(self, doctype, where_clause=None, doc_keys=None,
-                        distinct=False, limit=None, **kwargs):
+                        distinct=False, order_by=None, desc=False, limit=None,
+                        **kwargs):
         """
         Acquire all documents of a given type and create a generator
         to loop through them
@@ -43,6 +44,12 @@ class BuildInfo:
 
         if where_clause is not None:
             q_string += f' AND {where_clause}'
+
+        if order_by is not None:
+            q_string += f' ORDER BY {order_by}'
+
+        if desc:
+            q_string += f' DESC'
 
         if limit is not None:
             q_string += f' LIMIT {limit}'
@@ -142,3 +149,53 @@ class BuildInfo:
         """
 
         return self.db.get_document(ip)
+
+    @staticmethod
+    def check_missing(param):
+        """Simple wrapper to check for a non-set parameter in database"""
+
+        return f"ifmissingornull({param}, 'n/a')"
+
+    def get_last_unit_sanity(self, product, release, version):
+        """
+        Find the most recent build from a given version of a product
+        that unit tests were run on (regardless of success or failure)
+        and where the sanity tests were successful
+        """
+
+        q_str = (f"product='{product}' and release='{release}' "
+                 f"and version='{version}' "
+                 f"and {self.check_missing('metadata.unit_test')}!='n/a' "
+                 f"and {self.check_missing('metadata.sanity')}='pass'")
+
+        results = self.query_documents(
+            'build', where_clause=q_str, doc_keys=['build_num'],
+            order_by='build_num', desc=True, limit=1
+        )
+
+        # Just return the build number, or 0 if none was found
+        try:
+            return list(results)[0]['build_num']
+        except IndexError:
+            return 0
+
+    def get_last_qe(self, product, release, version):
+        """
+        Find the most recent build from a given version of a product
+        that QE tests were run on (regardless of success or failure)
+        """
+
+        q_str = (f"product='{product}' and release='{release}' "
+                 f"and version='{version}' "
+                 f"and {self.check_missing('metadata.kickoff_qe')}!='n/a'")
+
+        results = self.query_documents(
+            'build', where_clause=q_str, doc_keys=['build_num'],
+            order_by='build_num', desc=True, limit=1
+        )
+
+        # Just return the build number, or 0 if none was found
+        try:
+            return list(results)[0]['build_num']
+        except IndexError:
+            return 0
