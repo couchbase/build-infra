@@ -30,6 +30,10 @@ ALL_URLS = dict(
     product='/products/{product_name}',
     release_collection='/products/{product_name}/releases',
     release='/products/{product_name}/releases/{release_name}',
+    release_build_collection='/products/{product_name}/releases'
+                             '/{release_name}/builds',
+    release_build='/products/{product_name}/releases/{release_name}'
+                  '/builds/{build_num}',
     reservations_collection='/reservations',
     reservations='/reservations/{vm_ipaddr}',
     version_collection='/products/{product_name}/releases/{release_name}'

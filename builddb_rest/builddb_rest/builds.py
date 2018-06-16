@@ -226,3 +226,69 @@ class BuildAlt(BuildBase):
             return HTTPNotFound(f'Document {build_doc} not found')
 
         return self.filter_data(result)
+
+
+@resource(collection_path=ALL_URLS['release_build_collection'],
+          path=ALL_URLS['release_build'],
+          cors_policy=CORS_POLICY)
+class ReleaseBuild(BuildBase):
+    """
+    Handle the 'release builds' endpoints (fully qualified REST path)
+    """
+
+    def __init__(self, request, context=None):
+        """Basic initialization"""
+
+        self.request = request
+        self.build_info = BuildInfo(self.request.db)
+
+    def collection_get(self):
+        """
+        Acquire all existing builds for a given release
+
+        Currently ONLY allow with a query string to find highest
+        build number, as there's no good definition or use for
+        the general case yet
+        """
+
+        md = self.request.matchdict
+
+        if self.request.params:
+            param_keys = list(self.request.params.keys())
+
+            if param_keys != ['filter']:
+                return HTTPBadRequest(
+                    f'Invalid set of parameters: {", ".join(param_keys)}'
+                )
+            else:
+                filter_name = self.request.params['filter']
+
+                if filter_name == 'highest_build_num':
+                    result = {
+                        'build_num':
+                            self.build_info.get_highest_release_build(
+                                md['product_name'], md['release_name']
+                            )
+                    }
+                else:
+                    return HTTPBadRequest(
+                        f'Filter "{filter_name}" not supported for builds'
+                    )
+        else:
+            return HTTPMethodNotAllowed(
+                f'Endpoint {self.request.path} without parameters '
+                f'not supported'
+            )
+
+        return result
+
+    def get(self):
+        """
+        Acquire specific build for a given release - currently
+        NOT supported as there's no good definition or use for
+        this yet
+        """
+
+        return HTTPMethodNotAllowed(
+            f'Endpoint {self.request.path} not supported'
+        )

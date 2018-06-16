@@ -110,6 +110,21 @@ class BuildInfo:
 
         return [result['build_num'] for result in results]
 
+    def get_highest_release_build(self, product, release):
+        """
+        Get the build with the highest build number for a given release
+        of a product
+        """
+
+        results = self.query_documents(
+            'build',
+            where_clause=f"product='{product}' and release='{release}' "
+                         f"and build_num IS NOT NULL",
+            doc_keys=['build_num'], order_by='build_num', desc=True, limit=1
+        )
+
+        return [result['build_num'] for result in results]
+
     def get_projects(self):
         """Get a list of all available projects"""
 
