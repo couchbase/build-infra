@@ -1,0 +1,20 @@
+This Ansible playbook will deploy Nexus2 on an Ubuntu 18.x system:
+
+Requirements:
+
+ - Required fresh installation of Ubuntu 18.x:
+    Follow this doc to create a VM on Xen server:
+    https://github.com/couchbase/build-infra/tree/master/ansible/xen/ubuntu18-docker
+ - Current Nexus2 system: Mem/Disk: 40GB/50GB
+ - Mount of existing Nexus data directory: /nexus/sonatype-work/nexus (lastestbuilds storage)
+ - Update inventory file with the correct IP and ssh user/passwd
+
+Run this command on any host with latest ansible installed:
+    % ansible-playbook  -i ./inventory  playbook.yml
+
+Output:
+
+- Check for nexus console: http://<sonatype_nexus_application_host>:8081/nexus/#welcome
+- nexus.service should be enabled
+    $ systemctl is-active  nexus.service
+      active

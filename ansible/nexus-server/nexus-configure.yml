@@ -1,0 +1,52 @@
+---
+  - name: nexus-configure | Set RUN_AS_USER
+    lineinfile: dest={{ sonatype_nexus_root_dir }}/{{ nexus_directory.stdout }}/bin/nexus
+                regexp='^RUN_AS_USER="'
+                insertafter="#RUN_AS_USER="
+                line='RUN_AS_USER="couchbase"'
+    notify:
+      - nexus-service-restart
+
+  - name: nexus-configure | Set application-port
+    lineinfile: dest={{ sonatype_nexus_root_dir }}/{{ nexus_directory.stdout }}/conf/nexus.properties
+                regexp='^application-port='
+                line='application-port={{ sonatype_nexus_application_port }}'
+    notify:
+      - nexus-service-restart
+
+  - name: nexus-configure | Set application-host
+    lineinfile: dest={{ sonatype_nexus_root_dir }}/{{ nexus_directory.stdout }}/conf/nexus.properties
+                regexp='^application-host='
+                line='application-host={{ sonatype_nexus_application_host }}'
+    notify:
+    - nexus-service-restart
+
+  - name: nexus-configure | Set nexus-webapp-context-path
+    sudo: yes
+    sudo_user: couchbase
+    lineinfile: dest={{ sonatype_nexus_root_dir }}/{{ nexus_directory.stdout }}/conf/nexus.properties
+                regexp='^nexus-webapp-context-path='
+                line='nexus-webapp-context-path={{ sonatype_nexus_webapp_context_path }}'
+    notify:
+      - nexus-service-restart
+
+  # Configure systemd nexus servive
+  - name: nexus-configure | Create systemd service configuration
+    template:
+      src: "nexus.service"
+      dest: "/etc/systemd/system"
+    notify:
+      - systemd-reload
+
+  - meta: flush_handlers
+
+  - name: nexus-configure | Enable nexus service and make sure it is started
+    systemd:
+     name: nexus.service
+     enabled: yes
+     state: started
+    notify:
+      - wait-for-nexus
+      - wait-for-nexus-port
+
+  - meta: flush_handlers

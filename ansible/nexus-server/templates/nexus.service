@@ -1,0 +1,14 @@
+[Unit]
+Description=nexus service
+After=network.target
+
+[Service]
+Type=forking
+LimitNOFILE={{ nexus_os_max_filedescriptors }}
+ExecStart={{ sonatype_nexus_root_dir }}/{{ nexus_directory.stdout }}/bin/nexus start
+ExecStop={{ sonatype_nexus_root_dir }}/{{ nexus_directory.stdout }}/bin/nexus stop
+User=couchbase
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

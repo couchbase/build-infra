@@ -1,0 +1,65 @@
+---
+- name: nexus | Install Nexus2
+  hosts: all
+  gather_facts: true
+  become: yes
+
+  vars:
+      sonatype_nexus_version: latest
+      #sonatype_nexus_version: "2.14.7-01"
+      sonatype_nexus_application_port: 8081
+      sonatype_nexus_application_host: 172.23.112.7
+      sonatype_nexus_root_dir: "/opt"
+      sonatype_nexus_webapp_context_path: /nexus
+      sonatype_nexus_datadir: "/nexus/sonatype-work"
+      sonatype_nexus_download_url: "https://sonatype-download.global.ssl.fastly.net/nexus/oss/nexus-{{ sonatype_nexus_version }}-bundle.tar.gz"
+      sonatype_nexus_download_dest: "{{ sonatype_nexus_root_dir }}/nexus-{{ sonatype_nexus_version }}-bundle.tar.gz"
+      nexus_os_max_filedescriptors: 65536
+
+  tasks:
+
+  - name: nexus-download | Check for required mounted nexus-data directory
+    stat: path={{ sonatype_nexus_datadir }}
+    register: check_nexus_datadir
+
+  - name: nexus-download | Bailed out if required mounted nexus-data does not exist
+    fail: msg="Error! Required {{ sonatype_nexus_datadir }} does not exist!"
+    when: check_nexus_datadir.stat.isdir is not defined
+
+  - name: nexus-download | Create and own working directories
+    file: dest={{ sonatype_nexus_root_dir }} owner=couchbase group=couchbase recurse=true state=directory
+
+  - name: nexus-download | Download nexus
+    get_url: url={{ sonatype_nexus_download_url }} dest={{ sonatype_nexus_download_dest }}
+
+  - name: nexus-extract | Get Nexus directory
+    shell: "tar -tf {{ sonatype_nexus_download_dest }} | egrep '^nexus-' | cut -d/ -f1 | uniq"
+    register: nexus_directory
+
+  - name: nexus-extract | Extract Nexus
+    unarchive: src={{ sonatype_nexus_download_dest }} dest={{ sonatype_nexus_root_dir }} copy=no
+
+  - name: nexus-extract | Create and own working directories
+    file: dest={{ sonatype_nexus_root_dir }} owner=couchbase group=couchbase recurse=true state=directory
+
+  - name: nexus-extract | Check if SystemD service is installed
+    stat: path=/etc/systemd/system/nexus.service
+    register: nexus_systemd_service_file
+
+  - name: nexus-extract | Stop systemd service
+    shell: 'systemctl stop nexus.service'
+    when: nexus_systemd_service_file.stat.exists
+
+  - name: nexus-extract | Remove {{ sonatype_nexus_root_dir }}/sonatype-work
+    file: dest={{ sonatype_nexus_root_dir }}/sonatype-work state=absent
+
+  - name: nexus-extract | Repoint symbolic link to mounted {{ sonatype_nexus_datadir }}
+    sudo_user: couchbase
+    file: src={{ sonatype_nexus_datadir }}
+          dest="{{ sonatype_nexus_root_dir }}/sonatype-work"
+          state=link
+
+  - include: "nexus-configure.yml"
+
+  handlers:
+  - include: "handlers/main.yml"
