@@ -1,7 +1,8 @@
 [xenservers]
-172.23.96.155 sr_name=VMStore
+#172.23.99.41 sr_name="Local Storage 01 - SSD" network_name="Pool-wide network associated with eth1"
+#172.23.96.155 sr_name=VMStore
 #172.23.104.32 network_name="vlan112"
-#172.23.113.115 sr_name=VMStore
+172.23.113.115 sr_name=VMStore
 
 [newvms]
 
@@ -13,7 +14,7 @@ sr_name="Local storage"
 vm_template="Ubuntu Xenial Xerus 16.04"
 install_iso="ubuntu-18.04-fully-automated.iso"
 vm_name="default_vm"
-vcpus=8
+vcpus=4
 memory=17179869184
 disksize=270000000000
 

@@ -42,30 +42,30 @@
         src: /home/couchbase/jenkinsdocker-ssh
         dest: /home/couchbase
 
-    - name: Pull latest CV container
-      shell: docker pull "{{ docker_image }}"
+    - name: Ensure cronscript exists
+      file:
+        path: /home/couchbase/cronscript
+        state: touch
 
-    - name: Restart CV container
-      shell: "{{ restart_cmd }}"
+    - include_tasks: add_docker_slave.yml
+      vars:
+        restart_cmd: >-
+          /home/couchbase/build/docker/scripts/restart_jenkinsdocker.py
+          {{ item.docker_image }}
+          {{ item.slave_name }}
+          {{ item.port | default('2222') }}
+          cv.jenkins.couchbase.com
+          --ccache-dir /home/couchbase/shared_ccache
+      loop: "{{ slaves }}"
 
-    - name: Remove unused docker images and data
+    - name: "{{ item.slave_name }} - Remove unused docker images and data"
       shell: "docker system prune --all --force"
-
-    - name: Remove unusued slave directories
-      shell: "ls | grep -v {{ slave_name }} | xargs rm -rf"
-      args:
-        chdir: /home/couchbase/slaves/
-
-    - name: Remove disk-check cron job
-      cron:
-        name: "check diskspace"
-        state: absent
 
     - name: Add disk-check cron job
       cron:
         name: "check diskspace"
         minute: "0"
-        job: "/home/couchbase/build/docker/scripts/run_if_disk_full.sh 90 {{ restart_cmd }}"
+        job: "/bin/bash /home/couchbase/cronscript"
 
     - name: Add public SSH keys for easy access
       copy:
