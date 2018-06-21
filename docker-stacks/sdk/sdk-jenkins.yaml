@@ -99,7 +99,7 @@ services:
     image: couchbasebuild/sdk-ubuntu14-build:20180314
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu14"
-      - "JENKINS_SLAVE_LABELS=ubuntu14"
+      - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -107,7 +107,7 @@ services:
     image: couchbasebuild/sdk-ubuntu16-build:20180315
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu16"
-      - "JENKINS_SLAVE_LABELS=ubuntu16"
+      - "JENKINS_SLAVE_LABELS=ubuntu16 ubuntu16.04"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
