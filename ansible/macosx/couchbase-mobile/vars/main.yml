@@ -6,14 +6,15 @@ homebrew_taps:
    - caskroom/cask
 
 homebrew_installed_packages:
-  - { name: ccache, state: linked }
-  - { name: coreutils, state: linked }
-  - { name: doxygen, state: linked }
-  - { name: cmake, state: linked }
-  - { name: git, state: linked }
-  - { name: bash-completion, state: linked }
-  - { name: python, state: linked }
-  - { name: openssl, state: linked }
-  - { name: ssh-copy-id, state: linked }
-  - { name: pass, state: linked }
-  - { name: wget, state: linked }
+  - { name: ccache, version: 3.4.1, state: linked }
+  - { name: coreutils, version: 8.29, state: linked }
+  - { name: cmake, version: 3.10.3, state: linked }
+  - { name: carthage, version: 0.29.0, state: linked }
+  - { name: doxygen, version: 1.8.14, state: linked }
+  - { name: git, version: 2.16.2, state: linked }
+  - { name: bash-completion, version:1.3_3, state: linked }
+  - { name: python, version:3.6.4_4, state: linked }
+  - { name: openssl, version:1.0.2n,  state: linked }
+  - { name: ssh-copy-id, version:7.6p1, state: linked }
+  - { name: pass, version:1.7.1_1, state: linked }
+  - { name: wget, version:1.19.4_1, state: linked }
