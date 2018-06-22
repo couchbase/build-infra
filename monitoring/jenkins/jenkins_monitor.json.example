@@ -1,0 +1,18 @@
+{
+  "email": {
+    "smtp_server": "itweb01.hq.northscale.net",
+    "receivers": ["build-team@couchbase.com"]
+  },
+  "servers": {
+    "Server": {
+      "name": "server.jenkins.couchbase.com",
+      "user": "foobar",
+      "passwd": "<passwd-or-token>"
+    },
+    "SDK": {
+      "name": "sdk.jenkins.couchbase.com",
+      "user": "foobar",
+      "passwd": "<passwd-or-token>"
+    }
+  }
+}
