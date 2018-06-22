@@ -30,6 +30,27 @@ ch = logging.StreamHandler()
 logger.addHandler(ch)
 
 
+def send_email(smtp_server, receivers, message):
+    """Simple method to send email"""
+
+    msg = MIMEText(message['body'])
+
+    msg['Subject'] = message['subject']
+    msg['From'] = 'build-team@couchbase.com'
+    msg['To'] = ', '.join(receivers)
+
+    smtp = smtplib.SMTP(smtp_server, 25)
+
+    try:
+        smtp.sendmail(
+            'build-team@couchbase.com', receivers, msg.as_string()
+        )
+    except smtplib.SMTPException as exc:
+        logger.error('Mail server failure: %s', exc)
+    finally:
+        smtp.quit()
+
+
 class JenkinsMonitor:
     """"""
 
@@ -48,28 +69,11 @@ class JenkinsMonitor:
         self.passwd = server_info['passwd']
 
         self.session = requests_xml.XMLSession()
-        self.builds, self.running = self.get_full_build_info()
-
-    @staticmethod
-    def send_email(smtp_server, receivers, message):
-        """Simple method to send email"""
-
-        msg = MIMEText(message['body'])
-
-        msg['Subject'] = message['subject']
-        msg['From'] = 'build-team@couchbase.com'
-        msg['To'] = ', '.join(receivers)
-
-        smtp = smtplib.SMTP(smtp_server, 25)
 
         try:
-            smtp.sendmail(
-                'build-team@couchbase.com', receivers, msg.as_string()
-            )
-        except smtplib.SMTPException as exc:
-            logger.error('Mail server failure: %s', exc)
-        finally:
-            smtp.quit()
+            self.builds, self.running = self.get_full_build_info()
+        except (ConnectionError, ValueError) as exc:
+            raise RuntimeError(exc)
 
     def get_jenkins_data(self, url_path):
         """
@@ -77,7 +81,9 @@ class JenkinsMonitor:
         returning data in JSON format
         """
 
-        req = self.session.get(f'{self.server_url}{url_path}')
+        req = self.session.get(
+            f'{self.server_url}{url_path}', auth=(self.user, self.passwd)
+        )
 
         if not req.ok:
             raise ConnectionError(
@@ -154,11 +160,15 @@ class JenkinsMonitor:
     def check_nodes(self):
         """Ensure all nodes are online, alert via email if any are down"""
 
-        results = self.get_jenkins_data(
-            f'/computer/api/xml?tree=computer[displayName,offline,'
-            f'temporarilyOffline]&xpath=//computer[offline=%22true'
-            f'%22%20and%20temporarilyOffline=%22false%22]&wrapper=computers'
-        )['computers']
+        try:
+            results = self.get_jenkins_data(
+                f'/computer/api/xml?tree=computer[displayName,offline,'
+                f'temporarilyOffline]&xpath=//computer[offline=%22true'
+                f'%22%20and%20temporarilyOffline=%22false%22]&wrapper='
+                f'computers'
+            )['computers']
+        except (ConnectionError, ValueError) as exc:
+            raise RuntimeError(exc)
 
         if not results:
             return
@@ -177,7 +187,7 @@ class JenkinsMonitor:
                                f'{self.server_name} is OFFLINE',
                     'body': f'Please investigate issue'
                 }
-                self.send_email(
+                send_email(
                     self.smtp_server, self.receivers, message
                 )
 
@@ -203,7 +213,7 @@ class JenkinsMonitor:
                         'body': f'Job has taken {curr_build_time} seconds '
                                 f'to run so far.\nPlease investigate issue'
                     }
-                    self.send_email(
+                    send_email(
                         self.smtp_server, self.receivers, message
                     )
 
@@ -239,8 +249,9 @@ def main():
         sys.exit(1)
 
     email_required_keys = ['smtp_server', 'receivers']
+    email_info = conf_data['email']
 
-    if any(key not in conf_data['email'] for key in email_required_keys):
+    if any(key not in email_info for key in email_required_keys):
         logger.error(
             f'One of the following email keys is missing in the config '
             f'file:\n    {", ".join(email_required_keys)}'
@@ -261,10 +272,22 @@ def main():
             )
             continue
 
-        monitor = JenkinsMonitor(conf_data['email'], server_info)
-
-        monitor.check_nodes()
-        monitor.check_running_builds()
+        try:
+            monitor = JenkinsMonitor(email_info, server_info)
+            monitor.check_nodes()
+            monitor.check_running_builds()
+        except RuntimeError as exc:
+            logger.error(f'Monitoring of server {server_info["name"]} '
+                         f'failed: {exc}\nContinuing..')
+            message = {
+                'subject': f'Monitoring of Jenkins server '
+                           f'{server_info["name"]} FAILED',
+                'body': f'Reason: {exc}\n\nPossibly due to server being down '
+                        f'or bad authentication, please investigate issue'
+            }
+            send_email(
+                email_info['smtp_server'], email_info['receivers'], message
+            )
 
 
 if __name__ == '__main__':
