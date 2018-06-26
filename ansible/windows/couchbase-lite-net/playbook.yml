@@ -43,19 +43,19 @@
         name: "{{ item }}"
         allow_empty_checksums: "yes"
       with_items:
-        - git
-        - cmake
-        - curl
-        - wget
-        - ninja
-        - python2
-        - wixtoolset
-        - 7zip.commandline
-        - jdk8
-        - awstools.powershell
         - kb2919355
         - kb2999226
         - kb2919442
+        - 7zip.commandline
+        - awstools.powershell
+        - cmake
+        - curl
+        - git
+        - jdk8
+        - ninja
+        - python2
+        - wget
+        - wixtoolset
 
     # Code depends on .NET Framework 4.5.2 (chocolatey package "dotnet4.5.2"),
     # but that package fails to install via Ansible due to silly limitations
@@ -137,7 +137,7 @@
       when: msvc2017_installcleanup.stat.exists == True
 
     - name: Install Visual Studio Professional 2017 and dotnet tools
-      win_command: C:\bin\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R11C --quiet --productKey "{{ vskey }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+      win_command: C:\bin\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R15C --add Component.Android.SDK27 --add Microsoft.VisualStudio.Component.Windows10SDK.16299.Desktop --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP.Native --quiet --productKey "{{ vskey }}" --addProductLang en-US --norestart --wait --nocache
       register: install_output
       failed_when: ( install_output.rc not in [ 3010, 0 ] )
 
@@ -147,5 +147,3 @@
       win_reboot:
         shutdown_timeout_sec: 3600
         reboot_timeout_sec: 3600
-      when: install_output.rc == "3010"
-
