@@ -12,9 +12,9 @@ homebrew_installed_packages:
   - { name: carthage, version: 0.29.0, state: linked }
   - { name: doxygen, version: 1.8.14, state: linked }
   - { name: git, version: 2.16.2, state: linked }
-  - { name: bash-completion, version:1.3_3, state: linked }
-  - { name: python, version:3.6.4_4, state: linked }
-  - { name: openssl, version:1.0.2n,  state: linked }
-  - { name: ssh-copy-id, version:7.6p1, state: linked }
-  - { name: pass, version:1.7.1_1, state: linked }
-  - { name: wget, version:1.19.4_1, state: linked }
+  - { name: bash-completion, version: 1.3_3, state: linked }
+  - { name: python, version: 3.6.4_4, state: linked }
+  - { name: openssl, version: 1.0.2n,  state: linked }
+  - { name: ssh-copy-id, version: 7.6p1, state: linked }
+  - { name: pass, version: 1.7.1_1, state: linked }
+  - { name: wget, version: 1.19.4_1, state: linked }

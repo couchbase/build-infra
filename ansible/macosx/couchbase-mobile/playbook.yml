@@ -24,18 +24,21 @@
 
     - name: Upgrade pip
       command: "pip install --upgrade pip"
+      ignore_errors: yes
 
     # SGW require pkg
     - name: Install pyinstaller's pip package
       pip:
         name: pyinstaller
         state: present
+      become: true
 
     # Required for CBL iOS doc generation
     - name: Install jazzy gem package
       gem:
         name: jazzy
         state: latest
+      become: true
 
     - name: Copy SSH config files
       copy:
