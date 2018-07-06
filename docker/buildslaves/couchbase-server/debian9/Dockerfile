@@ -40,6 +40,7 @@ RUN apt-get update && \
         ed \
         man \
         curl \
+        pixz \
         lsb-release && \
     apt-get clean
 

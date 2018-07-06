@@ -35,6 +35,7 @@ RUN apt-get update && \
         dh-systemd \
         ed \
         man \
+        pixz \
         curl && \
     apt-get clean
 

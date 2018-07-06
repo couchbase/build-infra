@@ -37,6 +37,7 @@ RUN apt-get update && \
         debhelper \
         ed \
         man \
+        pixz \
         curl && \
     apt-get clean
 

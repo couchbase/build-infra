@@ -40,7 +40,8 @@ RUN apt-get update && \
         ed \
         man \
         curl \
-    lsb-release && \
+        pixz \
+        lsb-release && \
     apt-get clean
 
 # GCC (from couchbasebuild/debian-8-gcc)
