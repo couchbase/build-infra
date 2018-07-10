@@ -78,7 +78,7 @@ class JenkinsMonitor:
         self.session = requests_xml.XMLSession()
 
         sqlite3.register_adapter(datetime.datetime, adapt_datetime)
-        db_file = pathlib.Path.home() / 'monitoring.db'
+        db_file = pathlib.Path.home() / 'db' / 'monitoring.db'
         self.conn = sqlite3.connect(str(db_file))
         self.cursor = self.conn.cursor()
         self.initialize_db()
