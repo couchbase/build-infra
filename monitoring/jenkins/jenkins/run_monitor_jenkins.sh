@@ -4,7 +4,8 @@
 docker pull couchbasebuild/jenkins_monitor:latest
 
 # Needed for SQLite database
-mkdir -p /var/lib/jenkins_monitor
+mkdir -p /home/couchbase/db
+chmod 755 /home/couchbase/db
 
 echo
 echo "Running basic monitoring across build-team-managed Jenkins servers..."
@@ -13,5 +14,5 @@ echo
 docker run --rm -u couchbase \
     -w /home/couchbase/jenkins_monitor \
     -v /home/couchbase/jenkins_monitor/jenkins_monitor.json:/etc/jenkins_monitor.json \
-    -v /var/lib/jenkins_monitor:/home/couchbase/db \
+    -v /home/couchbase/db:/home/couchbase/db \
     couchbasebuild/jenkins_monitor
