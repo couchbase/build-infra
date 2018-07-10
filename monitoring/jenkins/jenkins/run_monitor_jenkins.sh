@@ -13,5 +13,5 @@ echo
 docker run --rm -u couchbase \
     -w /home/couchbase/jenkins_monitor \
     -v /home/couchbase/jenkins_monitor/jenkins_monitor.json:/etc/jenkins_monitor.json \
-    -v /var/lib/jenkins_monitor:/home/couchbase/db
+    -v /var/lib/jenkins_monitor:/home/couchbase/db \
     couchbasebuild/jenkins_monitor
