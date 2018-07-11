@@ -101,13 +101,14 @@ class JenkinsMonitor:
 
         if 'slaves' not in tables:
             self.conn.execute(
-                "create table slaves "
-                "(name text, offline_since timestamp, checked int)"
+                "create table slaves (server text, name text, "
+                "offline_since timestamp, checked int)"
             )
 
         if 'jobs' not in tables:
             self.conn.execute(
-                "create table jobs (name text, num int, checked int)"
+                "create table jobs (server text, name text, "
+                "num int, checked int)"
             )
 
     def get_jenkins_data(self, url_path):
@@ -176,7 +177,8 @@ class JenkinsMonitor:
         """
 
         self.cursor.execute(
-            "select offline_since, checked from slaves where name=?", (node,)
+            "select offline_since, checked from slaves where name=? "
+            "and server=?", (node, self.server_name)
         )
         res = self.cursor.fetchone()
 
@@ -185,7 +187,7 @@ class JenkinsMonitor:
 
         now = datetime.datetime.now()
 
-        return time.mktime(now.timetuple()) - res[0], res[1]
+        return int(time.mktime(now.timetuple()) - res[0]), res[1]
 
     def add_offline_node(self, node):
         """
@@ -196,9 +198,10 @@ class JenkinsMonitor:
         now = datetime.datetime.now()
 
         try:
-            with self.cursor:
+            with self.conn:
                 self.cursor.execute(
-                    "insert into slaves values(?, ?, ?)", (node, now, 0)
+                    "insert into slaves values(?, ?, ?, ?)",
+                    (self.server_name, node, now, 0)
                 )
         except sqlite3.IntegrityError:
             raise RuntimeError(f'Node {node} already in slaves table')
@@ -209,10 +212,10 @@ class JenkinsMonitor:
         """
 
         try:
-            with self.cursor:
+            with self.conn:
                 self.cursor.execute(
-                    "update slaves set checked=? where name=?",
-                    (checked, node)
+                    "update slaves set checked=? where name=? and server=?",
+                    (checked, node, self.server_name)
                 )
         except sqlite3.IntegrityError as exc:
             raise RuntimeError(exc)
@@ -220,16 +223,22 @@ class JenkinsMonitor:
     def clear_offline_nodes(self, offline):
         """Remove any nodes that are no longer offline"""
 
-        self.cursor.execute("select name from slaves")
+        self.cursor.execute("select name from slaves where server=?",
+                            (self.server_name,))
 
         for row in self.cursor.fetchall():
             node = row[0]
 
             if node not in offline:
+                logger.debug(
+                    f'Node {node} back online, removing from database'
+                )
+
                 try:
-                    with self.cursor:
+                    with self.conn:
                         self.cursor.execute(
-                            "delete from slaves where name=?", (node,)
+                            "delete from slaves where name=? and server=?",
+                            (node, self.server_name)
                         )
                 except sqlite3.IntegrityError as exc:
                     raise RuntimeError(exc)
@@ -241,8 +250,8 @@ class JenkinsMonitor:
         """
 
         self.cursor.execute(
-            "select checked from jobs where name=? and num=?",
-            (name, build_num)
+            "select checked from jobs where name=? and num=? and server=?",
+            (name, build_num, self.server_name)
         )
         res = self.cursor.fetchone()
 
@@ -254,10 +263,13 @@ class JenkinsMonitor:
         checked to 0 (not checked yet)
         """
 
+        logger.debug(f'Adding stuck job {name}, build {build_num} '
+                     f'to database')
         try:
-            with self.cursor:
+            with self.conn:
                 self.cursor.execute(
-                    "insert into jobs values(?, ?, ?)", (name, build_num, 0)
+                    "insert into jobs values(?, ?, ?, ?)",
+                    (self.server_name, name, build_num, 0)
                 )
         except sqlite3.IntegrityError as exc:
             raise RuntimeError(exc)
@@ -268,10 +280,11 @@ class JenkinsMonitor:
         """
 
         try:
-            with self.cursor:
+            with self.conn:
                 self.cursor.execute(
-                    "update jobs set checked=? where name=? and num=?",
-                    (checked, name, build_num)
+                    "update jobs set checked=? where name=? and num=? "
+                    "and server=?",
+                    (checked, name, build_num, self.server_name)
                 )
         except sqlite3.IntegrityError as exc:
             raise RuntimeError(exc)
@@ -279,27 +292,32 @@ class JenkinsMonitor:
     def clear_stuck_jobs(self):
         """Remove any jobs no longer in the stuck state"""
 
-        self.cursor.execute("select name, num from jobs")
+        self.cursor.execute("select name, num from jobs where server=?",
+                            (self.server_name,))
 
         for row in self.cursor.fetchall():
             name, build_num = row
             builds = self.running.get(name)
+            logging.debug(f'{name}: {builds}')
             delete = False
 
             if builds is None:
                 delete = True
+            else:
+                job_nums = [build['number'] for build in builds]
 
-            job_nums = [build['number'] for build in builds]
-
-            if build_num in job_nums:
-                delete = True
+                if build_num not in job_nums:
+                    delete = True
 
             if delete:
+                logger.debug(f'Job {name}, build {build_num} completed, '
+                             f'removing from database')
                 try:
-                    with self.cursor:
+                    with self.conn:
                         self.cursor.execute(
-                            "delete from jobs where name=? and num=?",
-                            (name, build_num)
+                            "delete from jobs where name=? and num=? "
+                            "and server=?",
+                            (name, build_num, self.server_name)
                         )
                 except sqlite3.IntegrityError as exc:
                     raise RuntimeError(exc)
@@ -341,7 +359,13 @@ class JenkinsMonitor:
         except (ConnectionError, ValueError) as exc:
             raise RuntimeError(exc)
 
+        # If no results, clear all nodes for server from database
+        # (passing empty list to ensure this) and stop processing
         if not results:
+            logger.debug(f'No nodes offline, clearing all nodes for '
+                         f'{self.server_name} in database')
+            self.clear_offline_nodes(list())
+
             return
 
         systems = results['computer']
@@ -350,6 +374,8 @@ class JenkinsMonitor:
             systems = [systems]
 
         offline = [system['displayName']['$'] for system in systems]
+        logger.debug(f'Systems offline on {self.server_name}: '
+                     f'{", ".join(offline)}')
 
         # For each offline node, check to see if it's been offline
         # and for how long; if it wasn't already marked as offline,
@@ -359,11 +385,16 @@ class JenkinsMonitor:
         # email as necessary, then update node info in database (if
         # offline for more than 5 minutes)
         for node in offline:
-            off_time, checked = self.check_offline_time(node)
+            results = self.check_offline_time(node)
 
-            if off_time is None:
+            if results is None:
+                logger.debug(f'Adding offline node {node} to database')
                 self.add_offline_node(node)
+
                 continue
+
+            off_time, checked = results
+            logger.debug(f'Down time: {off_time}s, Checked: {checked}')
 
             if checked % 20 == 0 and off_time > 300:
                 message = {
@@ -388,6 +419,11 @@ class JenkinsMonitor:
         if any have exceeded acceptable maximum time
         """
 
+        running_jobs = [f'{name}/{data["number"]}'
+                        for name, info in self.running.items()
+                        for data in info]
+        logger.debug(f'Current running jobs: {", ".join(running_jobs)}')
+
         for job_name in self.running:
             max_time = self.get_max_time(job_name)
 
@@ -408,6 +444,10 @@ class JenkinsMonitor:
                     if checked is None:
                         self.add_stuck_job(job_name, build_num)
                         checked = 0
+                    else:
+                        self.update_stuck_job(
+                            job_name, build_num, checked + 1
+                        )
 
                     if checked % 20 == 0:
                         message = {
@@ -421,8 +461,6 @@ class JenkinsMonitor:
                         send_email(
                             self.smtp_server, self.receivers, message
                         )
-
-                    self.update_stuck_job(job_name, build_num, checked + 1)
 
         # Remove from database any jobs no longer stuck
         self.clear_stuck_jobs()
@@ -438,11 +476,17 @@ def main():
     parser = argparse.ArgumentParser(
         description='Basic monitoring for Jenkins servers'
     )
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Enable debugging output')
     parser.add_argument('-c', '--config', dest='jenkins_config',
                         help='Configuration file for Jenkins monitor',
                         default='jenkins_monitor.json')
 
     args = parser.parse_args()
+
+    # Set logging to debug level on stream handler if --debug was set
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
 
     # Load in configuration data
     conf_data = dict()
