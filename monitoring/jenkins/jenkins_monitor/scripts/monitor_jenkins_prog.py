@@ -397,10 +397,12 @@ class JenkinsMonitor:
             logger.debug(f'Down time: {off_time}s, Checked: {checked}')
 
             if checked % 20 == 0 and off_time > 300:
+                node_url = f'{self.server_url}/computer/{node}/'
                 message = {
                     'subject': f'Node {node} on Jenkins server '
                                f'{self.server_name} is OFFLINE',
-                    'body': f'Please investigate issue'
+                    'body': f'Node found at {node_url}\nPlease '
+                            f'investigate issue'
                 }
                 send_email(
                     self.smtp_server, self.receivers, message
@@ -454,9 +456,9 @@ class JenkinsMonitor:
                             'subject': f'Build {build_num} for job '
                                        f'{job_name} on Jenkins server '
                                        f'{self.server_name} is STALLED',
-                            'body': f'Job has taken {curr_build_time} '
-                                    f'seconds to run so far.\nPlease '
-                                    f'investigate issue'
+                            'body': f'Job {build["url"]} has taken '
+                                    f'{curr_build_time} seconds to run '
+                                    f'so far.\nPlease investigate issue'
                         }
                         send_email(
                             self.smtp_server, self.receivers, message
