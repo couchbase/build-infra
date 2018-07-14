@@ -10,7 +10,7 @@ USER root
 
 # Install SSH server
 RUN apt-get update && \
-    apt-get install -y openssh-server && \
+    apt-get install -y openssh-server curl && \
     rm -f /var/cache/apt/archives/*.deb && \
     mkdir /var/run/sshd # update 2
 
@@ -20,6 +20,26 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
+
+# Jenkins Swarm jar
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L \
+    https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz -o jdk.tgz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/jdk.tgz && \
+    ln -s java* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
+ENV JAVA_HOME=/usr/local/java
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    -o /usr/local/lib/swarm-client.jar
+
+# tini, to avoid zombie issues when running with Swarm jar
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
@@ -37,8 +57,7 @@ RUN apt-get update && \
         debhelper \
         ed \
         man \
-        pixz \
-        curl && \
+        pixz && \
     apt-get clean
 
 # GCC (from couchbasebuild/ubuntu-1404-gcc)
@@ -81,26 +100,13 @@ RUN mkdir /tmp/deploy && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
-# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L \
-    https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz -o jdk.tgz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s java* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
-ENV JAVA_HOME=/usr/local/java
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
-    -o /usr/local/lib/swarm-client.jar
+# Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
-ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
+ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 

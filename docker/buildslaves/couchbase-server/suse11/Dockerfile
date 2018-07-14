@@ -7,7 +7,7 @@ FROM ceejatec/naked-opensuse:11.2
 MAINTAINER ceej@couchbase.com
 
 USER root
-RUN zypper install -y openssh sudo && zypper clean
+RUN zypper install -y openssh sudo curl tar && zypper clean
 
 # Set up for SSH daemon
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
@@ -24,11 +24,32 @@ RUN groupadd -g1000 couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
+# Jenkins Swarm jar
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L \
+    https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz -o jdk.tgz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/jdk.tgz && \
+    ln -s java* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
+ENV JAVA_HOME=/usr/local/java
+# OpenSSL in SUSE11 has a bug which prevents accessing this site
+# via https:, so use http:
+RUN curl \
+    http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    -o /usr/local/lib/swarm-client.jar
+
+# tini, to avoid zombie issues when running with Swarm jar
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
 RUN zypper install -y \
                 binutils \
-                curl \
                 ed \
                 make \
                 man \
@@ -38,7 +59,6 @@ RUN zypper install -y \
                 python-devel \
                 lsb-release \
                 ruby rubygems rubygem-rake \
-                tar \
                 unzip && \
                 zypper clean
 
@@ -72,7 +92,7 @@ RUN zypper install -y perl && \
 # * git
 RUN mkdir /tmp/deploy && \
     zypper install -y curl-devel gettext-tools && \
-    curl https://www.kernel.org/pub/software/scm/git/git-1.9.4.tar.gz -o /tmp/deploy/git.tar.gz && \
+    curl -L https://www.kernel.org/pub/software/scm/git/git-1.9.4.tar.gz -o /tmp/deploy/git.tar.gz && \
     cd /tmp/deploy && tar xzf git.tar.gz && \
     cd git-1.9.4 && ./configure && make -j8 NO_PERL=YesPlease && make NO_PERL=YesPlease install && \
     cd /tmp && rm -rf /tmp/deploy && \
@@ -85,10 +105,10 @@ RUN mkdir /tmp/deploy && \
     ln -s /usr/local/bin/git /usr/bin/git
 
 # * ccache (from source)
+COPY build/ccache.tar.bz2 /tmp
 RUN mkdir /tmp/deploy && \
-    curl -L https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.bz2 -o /tmp/deploy/ccache.tar.bz2 && \
-    cd /tmp/deploy && tar -xjf ccache.tar.bz2 && \
-    cd ccache-3.1.9 && ./configure --prefix=/home/couchbase && make -j8 && \
+    cd /tmp/deploy && tar -xjf /tmp/ccache.tar.bz2 && \
+    cd ccache-* && ./configure --prefix=/home/couchbase && make -j8 && \
     make install && rm -rf /home/couchbase/share && \
     ln -s ccache /home/couchbase/bin/gcc && \
     ln -s ccache /home/couchbase/bin/g++ && \
@@ -109,27 +129,14 @@ RUN mkdir /tmp/deploy && cd /tmp/deploy && \
     make -j8 all && make install && \
     cd /tmp && rm -rf /tmp/deploy
 
-# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L \
-    https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz -o jdk.tgz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s java* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
-ENV JAVA_HOME=/usr/local/java
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
-    -o /usr/local/lib/swarm-client.jar
+# Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
-ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
+ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 
 

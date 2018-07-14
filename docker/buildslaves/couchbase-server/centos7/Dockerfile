@@ -13,6 +13,18 @@ RUN rm /etc/yum.repos.d/CentOS-Base.repo
 # Work around odd RPM database problems - some from https://github.com/moby/moby/issues/10180
 RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm
 
+# Jenkins Swarm jar
+RUN yum install -y java-1.8.0-openjdk-headless curl && \
+    yum clean packages
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    -o /usr/local/lib/swarm-client.jar
+
+# tini, to avoid zombie issues when running with Swarm jar
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repositories
 RUN yum install --setopt=keepcache=0 -y \
@@ -53,12 +65,6 @@ RUN groupadd -g1000 couchbase && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 
-# Jenkins Swarm jar
-RUN yum install -y java-1.8.0-openjdk-headless && \
-    yum clean packages
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
-    -o /usr/local/lib/swarm-client.jar
 COPY build/swarm*.properties /
 
 # GCC (from couchbasebuild/centos-7-gcc)
@@ -105,10 +111,13 @@ RUN mkdir /tmp/deploy && \
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
-ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
+ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 

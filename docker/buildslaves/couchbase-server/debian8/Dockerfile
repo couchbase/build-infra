@@ -7,7 +7,7 @@ USER root
 
 # Install SSH server
 RUN apt-get update && \
-    apt-get install -y openssh-server sudo && \
+    apt-get install -y openssh-server sudo curl && \
     rm -f /var/cache/apt/archives/*.deb && \
     mkdir /var/run/sshd # update 3
 
@@ -17,6 +17,21 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
+
+# Jenkins Swarm jar
+# https://unix.stackexchange.com/questions/342403/openjdk-8-jre-headless-depends-ca-certificates-java-but-it-is-not-going-to-be
+RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -t jessie-backports -y openjdk-8-jre-headless ca-certificates-java && \
+    apt-get clean
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    -o /usr/local/lib/swarm-client.jar
+
+# tini, to avoid zombie issues when running with Swarm jar
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
 
 # Install Couchbase build dependencies.
 # Note: lsb-release currently required for "cbdeps" third-party build
@@ -39,7 +54,6 @@ RUN apt-get update && \
         dh-systemd \
         ed \
         man \
-        curl \
         pixz \
         lsb-release && \
     apt-get clean
@@ -66,21 +80,13 @@ RUN mkdir /tmp/deploy && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
-# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
-# https://unix.stackexchange.com/questions/342403/openjdk-8-jre-headless-depends-ca-certificates-java-but-it-is-not-going-to-be
-RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -t jessie-backports -y openjdk-8-jre-headless ca-certificates-java && \
-    apt-get clean
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
-    -o /usr/local/lib/swarm-client.jar
+# Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
-ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
+ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 

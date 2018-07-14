@@ -4,7 +4,7 @@ FROM centos:6.9
 MAINTAINER build-team@couchbase.com
 
 USER root
-RUN yum install -y openssh-server sudo && yum clean packages
+RUN yum install -y openssh-server sudo curl && yum clean packages
 
 # Set up for SSH daemon
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
@@ -20,6 +20,18 @@ RUN groupadd -g1000 couchbase && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
     chmod 440 /etc/sudoers.d/wheel_group
+
+# Jenkins Swarm jar
+RUN yum install --setopt=keepcache=0 -y java-1.8.0-openjdk-headless && \
+    yum clean packages
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    -o /usr/local/lib/swarm-client.jar
+
+# tini, to avoid zombie issues when running with Swarm jar
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
@@ -94,20 +106,16 @@ RUN mkdir /tmp/deploy && \
 # paramiko for testrunner
 RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && \
     yum install -y python-pip libffi-devel && \
+    pip install -U setuptools==18.5 && \
     pip install cffi && \
     pip install paramiko
 
-# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
-RUN yum install -y java-1.8.0-openjdk-headless && \
-    yum clean packages
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
-    -o /usr/local/lib/swarm-client.jar
+# Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
-ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
+ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

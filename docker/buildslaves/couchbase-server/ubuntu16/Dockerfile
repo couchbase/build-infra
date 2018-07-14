@@ -7,7 +7,7 @@ USER root
 
 # Install SSH server and sudo
 RUN apt-get update && \
-    apt-get install -y openssh-server sudo && \
+    apt-get install -y openssh-server sudo curl && \
     apt-get clean && \
     mkdir /var/run/sshd
 
@@ -17,6 +17,19 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
+
+# Jenkins Swarm jar
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jre-headless && \
+    apt-get clean
+RUN curl \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    -o /usr/local/lib/swarm-client.jar
+
+# tini, to avoid zombie issues when running with Swarm jar
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
@@ -35,8 +48,7 @@ RUN apt-get update && \
         dh-systemd \
         ed \
         man \
-        pixz \
-        curl && \
+        pixz && \
     apt-get clean
 
 # GCC (from couchbasebuild/ubuntu-1604-gcc)
@@ -79,15 +91,6 @@ RUN mkdir /tmp/deploy && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
-# Jenkins Swarm jar (QQQ Move this higher in the Dockerfile later)
-RUN apt-get update && \
-    apt-get install -y openjdk-8-jre-headless && \
-    apt-get clean
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.12/swarm-client-3.12.jar \
-    -o /usr/local/lib/swarm-client.jar
-COPY build/swarm*.properties /
-
 # Python 3-specific stuff for build scripts, mostly for Jira.
 RUN apt-get update && \
     apt-get -y install python3-pip libffi-dev && \
@@ -123,9 +126,12 @@ ENV LANG=en_US.UTF-8
 # Set AWS credentials file environmental variable
 ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
-ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
+ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

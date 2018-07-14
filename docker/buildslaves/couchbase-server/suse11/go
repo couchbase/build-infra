@@ -18,6 +18,18 @@ then
         couchbasebuild/suse-11-gcc:7.3.0 \
         cp -a /usr/local /output
 fi
+
+# The OpenSSL in OpenSUSE 11 is so old that it can't contact some
+# websites anymore. So we have to download those files here and
+# COPY them into the image. This is annoying because COPY makes a
+# new image layer and hence the image will be larger than it needs
+# to be.
+if [ ! -d build/ccache.tar.gz ]
+then
+    curl -o build/ccache.tar.bz2 \
+        https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.bz2
+fi
+
 docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
