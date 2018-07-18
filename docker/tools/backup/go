@@ -1,0 +1,17 @@
+#!/bin/bash -e
+
+TAG=$(date "+%Y%m%d")
+IMAGE="couchbasebuild/xen-backup"
+
+# Check out required xenbackup src
+rm -rf xenbackup
+git clone https://github.com/couchbaselabs/xenbackup.git
+
+docker build -t ${IMAGE}:${TAG} .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:${TAG}
+  docker push ${IMAGE}:latest
+fi
