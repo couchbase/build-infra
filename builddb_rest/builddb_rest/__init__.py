@@ -12,6 +12,7 @@ def main(global_config, **settings):
     config.route_prefix = 'v1'
     config.include('cornice')
     config.include('builddb_rest.couch_db')
+    config.include('builddb_rest.proddata')
     config.scan()
 
     return config.make_wsgi_app()

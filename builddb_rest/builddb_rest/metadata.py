@@ -12,8 +12,39 @@ from .urls import ALL_URLS
 from .util.db import BuildInfo
 
 
+class InvalidRequestError(Exception):
+    """Custom exception for handling bad requests"""
+
+    pass
+
+
 class MetadataBase:
     """Core class with several common methods for use for build endpoints"""
+
+    @staticmethod
+    def validate_metadata(metadata, product, metadata_keys):
+        """Ensure list of keys for metadata update are allowed"""
+
+        valid_keys = set()
+
+        data = metadata.get('All-Products')
+        if data is not None:
+            valid_keys.update(
+                [d['key'] for d in data['whitelist'] if 'key' in d]
+            )
+
+        data = metadata.get(product)
+        if data is not None:
+            valid_keys.update(
+                [d['key'] for d in data['whitelist'] if 'key' in d]
+            )
+
+        for md_key in metadata_keys:
+            if md_key not in valid_keys:
+                raise InvalidRequestError(
+                    f'Key {md_key} not an allowed metadata key '
+                    f'for product {product}'
+                )
 
     @staticmethod
     def get_build_data(db_conn, build_doc):
@@ -128,6 +159,16 @@ class Metadata(MetadataBase):
         data = self.request.json_body
 
         md = self.request.matchdict
+
+        # Ensure only 'whitelisted' keys for the metadata
+        # are being used
+        try:
+            self.validate_metadata(
+                self.request.prod_metadata, md['product_name'], data.keys()
+            )
+        except InvalidRequestError as exc:
+            return HTTPNotFound(exc)
+
         build_doc = \
             f"{md['product_name']}-{md['product_version']}-{md['build_num']}"
 
@@ -236,6 +277,16 @@ class MetadataAlt(MetadataBase):
 
         md = self.request.matchdict
         build_doc = md['build_key']
+
+        # Ensure only 'whitelisted' keys for the metadata
+        # are being used
+        try:
+            self.validate_metadata(
+                self.request.prod_metadata, build_doc.rsplit('-', 2)[0],
+                data.keys()
+            )
+        except InvalidRequestError as exc:
+            return HTTPNotFound(exc)
 
         build_data = self.update_metadata(self.request.db, build_doc, data)
 
