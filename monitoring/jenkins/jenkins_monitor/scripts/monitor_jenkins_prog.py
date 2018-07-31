@@ -328,8 +328,8 @@ class JenkinsMonitor:
         for job to run, based on the standard deviation of previous
         run times
 
-        The value is calculated by adding an additional standard
-        deviation over the largest one from the historical values
+        The value is calculated by adding two additional standard
+        deviations over the largest one from the historical values
         to find the maximum time to allow; if this is not at least
         300 seconds, return that instead
         """
@@ -344,7 +344,7 @@ class JenkinsMonitor:
         std_dev = int(statistics.stdev(times))
         max_deviation = max(abs(t - t_mean) // std_dev + 1 for t in times)
 
-        return max((t_mean + (max_deviation + 1) * std_dev) / 1000, 300)
+        return max((t_mean + (max_deviation + 2) * std_dev) / 1000, 300)
 
     def check_nodes(self):
         """Ensure all nodes are online, alert via email if any are down"""
@@ -447,9 +447,8 @@ class JenkinsMonitor:
                         self.add_stuck_job(job_name, build_num)
                         checked = 0
                     else:
-                        self.update_stuck_job(
-                            job_name, build_num, checked + 1
-                        )
+                        checked += 1
+                        self.update_stuck_job(job_name, build_num, checked)
 
                     if checked % 20 == 0:
                         message = {
