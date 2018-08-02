@@ -42,7 +42,7 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: couchbasebuild/jenkins:20180123
+    image: jenkins/jenkins:2.121.2
     deploy:
       replicas: 1
     ports:
@@ -54,6 +54,12 @@ services:
       - type: bind
         source: /builds/jenkins/sdk-jenkins-home
         target: /var/jenkins_home
+    secrets:
+      - source: buildbot_id_dsa
+        target: /var/jenkins_home/.ssh/buildbot_id_dsa
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
     networks:
       - jenkins
 
@@ -118,6 +124,8 @@ secrets:
   jenkins_master_username:
     external: true
   jenkins_master_password:
+    external: true
+  buildbot_id_dsa:
     external: true
 
 configs:
