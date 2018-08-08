@@ -1,0 +1,9 @@
+#!/bin/sh -ex
+
+# Bump this when rebuilding with changes
+TAG=20180723
+
+mkdir -p build
+cp -a -u ../../util/couchbuilder_start.sh build
+docker build -t localonly/redhat-75-couchbase-build:${TAG} .
+docker tag localonly/redhat-75-couchbase-build:${TAG} localonly/redhat-75-couchbase-build:latest
