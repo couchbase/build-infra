@@ -22,4 +22,6 @@ RUN cd $SRCDIR && \
     cd $HOME && \
     rm -rf $SRCDIR
 
-CMD ["pserve", "/etc/builddb_rest.ini"]
+COPY scripts/builddb_rest_start.sh /usr/sbin/
+ENTRYPOINT [ "/usr/sbin/builddb_rest_start.sh" ]
+CMD [ "default" ]

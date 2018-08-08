@@ -13,6 +13,9 @@ builddb_uri = couchbase://build-db.build.couchbase.com/build_info
 builddb_user = Administrator
 builddb_pass = passwd
 
+# Location of product metadata (relative to couchbase user's home directory)
+prod_metadata = product-metadata
+
 [server:main]
 use = egg:waitress#main
 host = 0.0.0.0
