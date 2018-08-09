@@ -1,7 +1,8 @@
 #!/bin/bash
 # Wrapper script to run the backup
 # Required mount point: nas-n.mgt.couchbase.com:/data/builds /builds
-# Required VMs' UUID, BACKUP_NAME (name appended to .xva file for details description), and CLUSTER
+# Required VMs' UUID, BACKUP_NAME (name appended to .xva file for details
+# description), and CLUSTER (XEN)
 
 BACKUP_DIR="/builds/backups/xen/${CLUSTER}"
 
@@ -11,6 +12,10 @@ if [ ! -d /builds/backups/xen/ ]; then
 else
     mkdir ${BACKUP_DIR}
 fi
+
+# Ensure  S3_BUCKET_NAME bucket exist
+source /home/couchbase/.ssh/aws-credentials.sh
+s3cmd ls s3://${S3_BUCKET_NAME}/ || exit 1
 
 # Convert YAML to JSON Xen credentials
 # Required the same mount point of update_build_system_inventory's credential YAML file
@@ -26,4 +31,4 @@ python /xenbackup/xenbackup backup ${UUID} --cluster ${CLUSTER} --config-file /t
 
 # Publish .xva files to S3's xen-cluster bucket
 source /home/couchbase/.ssh/aws-credentials.sh
-s3cmd put /builds/backups/xen/${CLUSTER}/${UUID}/*.xva s3://xen-${CLUSTER}/ || exit 1
+s3cmd put /builds/backups/xen/${CLUSTER}/${UUID}/*.xva s3://${S3_BUCKET_NAME}/ || exit 1
