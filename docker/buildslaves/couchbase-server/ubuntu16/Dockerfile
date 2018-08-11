@@ -95,7 +95,6 @@ RUN mkdir /tmp/deploy && \
 RUN apt-get update && \
     apt-get -y install python3-pip libffi-dev && \
     pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
-    apt-get purge -y libffi-dev && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     ccache --clear

@@ -91,7 +91,7 @@ RUN mkdir /tmp/deploy && \
 
 # paramiko for testrunner
 RUN rpm -iUvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum install -y python-pip && \
+    yum install -y python-pip libffi-devel && \
     pip install paramiko
 
 # * CMake (from cmake.org)

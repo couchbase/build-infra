@@ -67,7 +67,7 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 
 # paramiko for testrunner
 RUN apt-get update && \
-    apt-get install -y python-paramiko
+    apt-get install -y python-paramiko libffi-dev
 
 # Install third-party build dependencies. Note: software-properties-common
 # is only required for add-apt-repository; add-apt-repository is only
