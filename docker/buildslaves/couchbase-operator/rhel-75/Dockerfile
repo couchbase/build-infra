@@ -16,9 +16,13 @@ RUN REPOLIST=rhel-7-server-rpms,rhel-7-server-optional-rpms,rhel-7-server-extras
         docker-1.13.1 && \
     yum clean all
 
+# Needed because RHEL is braindead when it comes to groups
+RUN echo 'docker:x:993:couchbase' >> /etc/group
+
 RUN yum clean all && yum install --setopt=keepcache=0 -y \
                 deltarpm \
                 git \
+                make \
                 openssh-server \
                 sudo \
                 which
@@ -31,7 +35,9 @@ RUN groupadd -g1000 couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
-    chmod 440 /etc/sudoers.d/wheel_group
+    chmod 440 /etc/sudoers.d/wheel_group && \
+    usermod -a -G docker couchbase
+
 
 # Go 1.10.1
 RUN mkdir -p /usr/local/go/1.10.1 && cd /usr/local/go/1.10.1 && \
