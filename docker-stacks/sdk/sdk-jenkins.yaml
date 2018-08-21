@@ -78,7 +78,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20180314
+    image: couchbasebuild/sdk-centos7-build:20180820
     environment:
       - "JENKINS_SLAVE_NAME=centos7"
       - "JENKINS_SLAVE_LABELS=centos7"
@@ -102,7 +102,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20180314
+    image: couchbasebuild/sdk-ubuntu14-build:20180820
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu14"
       - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"
