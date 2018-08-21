@@ -57,7 +57,12 @@
         - C:\Program Files\git\cmd
         - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
-# Do OpenSSH last so the service has the latest version of the path
+    - name: Install cbdep tool
+      win_get_url:
+        url: http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.windows.exe
+        dest: C:\Windows\cbdep.exe
+
+    # Do OpenSSH last so the service has the latest version of the path
 
     - name: Install OpenSSH (for Jenkins)
       win_chocolatey:

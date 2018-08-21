@@ -12,6 +12,21 @@
     - name: Install java
       homebrew_cask: name=java state=present
 
+    - name: Install cbdep tool
+      get_url:
+        url: http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.darwin
+        dest: /usr/local/bin/cbdep
+        mode: 0755
+      become: true
+
+    - name: Create cbdeps install directory
+      file:
+        path: /opt/cbdeps
+        state: directory
+        owner: couchbase
+        mode: 0755
+      become: true
+
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true

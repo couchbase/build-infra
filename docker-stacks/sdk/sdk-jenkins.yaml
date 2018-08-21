@@ -42,7 +42,7 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.121.2
+    image: jenkins/jenkins:2.121.3
     deploy:
       replicas: 1
     ports:
@@ -70,7 +70,7 @@ services:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
 
   centos6:
-    image: couchbasebuild/sdk-centos6-build:20180314
+    image: couchbasebuild/sdk-centos6-build:20180821
     environment:
       - "JENKINS_SLAVE_NAME=centos6"
       - "JENKINS_SLAVE_LABELS=centos6"
@@ -78,7 +78,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20180820
+    image: couchbasebuild/sdk-centos7-build:20180821
     environment:
       - "JENKINS_SLAVE_NAME=centos7"
       - "JENKINS_SLAVE_LABELS=centos7 mock"
@@ -86,7 +86,7 @@ services:
     <<: *default-jenkins-slave
 
   debian8:
-    image: couchbasebuild/sdk-debian8-build:20180315
+    image: couchbasebuild/sdk-debian8-build:20180821
     environment:
       - "JENKINS_SLAVE_NAME=debian8"
       - "JENKINS_SLAVE_LABELS=debian8"
@@ -94,7 +94,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/sdk-debian9-build:20180316
+    image: couchbasebuild/sdk-debian9-build:20180821
     environment:
       - "JENKINS_SLAVE_NAME=debian9"
       - "JENKINS_SLAVE_LABELS=debian9"
@@ -102,7 +102,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20180820
+    image: couchbasebuild/sdk-ubuntu14-build:20180821
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu14"
       - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04 cowbuilder"
@@ -110,7 +110,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu16-build:20180315
+    image: couchbasebuild/sdk-ubuntu16-build:20180821
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16 ubuntu16.04"
