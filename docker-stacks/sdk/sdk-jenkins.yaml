@@ -102,7 +102,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20180821
+    image: couchbasebuild/sdk-ubuntu14-build:20180822
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu14"
       - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04 cowbuilder"
@@ -110,7 +110,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu16-build:20180821
+    image: couchbasebuild/sdk-ubuntu16-build:20180822
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16 ubuntu16.04"
