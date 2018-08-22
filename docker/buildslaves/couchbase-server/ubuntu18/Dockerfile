@@ -48,6 +48,7 @@ RUN apt-get update && \
         dh-systemd \
         ed \
         man \
+        pkg-config \
         pixz && \
     apt-get clean
 
