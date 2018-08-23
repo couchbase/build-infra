@@ -7,6 +7,9 @@ It expects the Ansible host to have /home/couchbase/jenkinsdocker-ssh
 available, and will synchronize it to the host.
 
 inventory - this is an Ansible inventory which specifies the current
-set of VMs for these CV slaves, along with their cv.jenkins slave names.
+set of VMs for these CV slaves.
+
+host_vars - directory containing VM-specific configurations, such
+as the Docker image name(s) to run on the VM.
 
 The "go" script in this directory will run the playbook.

@@ -1,17 +1,23 @@
 ---
-- name: "{{ item.slave_name }} - Pull latest CV container"
-  shell: docker pull "{{ item.docker_image }}"
+- name: "{{ slave.slave_name }} - Create CCache directory"
+  file:
+    name: "{{ ccache_dir }}"
+    state: directory
 
-- name: "{{ item.slave_name }} - Restart CV container"
+- name: "{{ slave.slave_name }} - Copy CCache configuration"
+  copy:
+    src: ccache.conf
+    dest: "{{ ccache_dir }}/ccache.conf"
+    mode: 0644
+
+- name: "{{ slave.slave_name }} - Pull latest CV container"
+  shell: docker pull "{{ slave.docker_image }}"
+
+- name: "{{ slave.slave_name }} - Restart CV container"
   shell: "{{ restart_cmd }}"
 
-- name: "{{ item.slave_name }} - Remove unusued slave directories"
-  shell: "ls | grep -v {{ item.slave_name }} | xargs rm -rf"
-  args:
-    chdir: /home/couchbase/slaves/
-
-- name: "{{ item.slave_name }} - Append to disk-check cron script"
+- name: "{{ slave.slave_name }} - Append to disk-check cron script"
   lineinfile:
     path: /home/couchbase/cronscript
-    regexp: "{{ item.slave_name }}"
+    regexp: "{{ slave.slave_name }}"
     line: "/home/couchbase/build/docker/scripts/run_if_disk_full.sh 90 {{ restart_cmd }}"
