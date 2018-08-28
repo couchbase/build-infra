@@ -49,7 +49,8 @@ RUN apt-get update && \
         ed \
         man \
         pkg-config \
-        pixz && \
+        pixz \
+        zlib1g-dev && \
     apt-get clean
 
 # GCC (from couchbasebuild/ubuntu-1804-gcc)
