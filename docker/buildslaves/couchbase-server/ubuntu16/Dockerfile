@@ -60,6 +60,10 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 RUN apt-get update && \
     apt-get install -y python-paramiko
 
+# pygerrit (for toy builds)
+RUN apt-get install -y python-pip && \
+    pip install pygerrit2
+
 # Install third-party build dependencies. Note: software-properties-common
 # is only required for add-apt-repository; add-apt-repository is only
 # required to get python2.6; and python2.6 is only required for gyp, which

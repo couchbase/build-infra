@@ -64,6 +64,9 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 #paramiko for testrunner
 RUN apt-get update && apt-get install -y python-paramiko
 
+# pygerrit (for toy builds)
+RUN apt-get install -y python-pip && pip install pygerrit2
+
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.
 RUN apt-get update && apt-get install -y m4 autoconf automake libtool

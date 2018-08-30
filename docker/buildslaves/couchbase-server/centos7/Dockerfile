@@ -94,6 +94,9 @@ RUN rpm -iUvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch
     yum install -y python-pip libffi-devel && \
     pip install paramiko
 
+# pygerrit (for toy builds)
+RUN pip install pygerrit2
+
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
     curl https://cmake.org/files/v3.6/cmake-3.6.1-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
