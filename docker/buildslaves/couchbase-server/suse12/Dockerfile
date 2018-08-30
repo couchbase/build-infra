@@ -64,7 +64,7 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 #RUN zypper install -y python-paramiko && zypper clean
 RUN zypper addrepo -f obs://Cloud:OpenStack:Liberty/SLE_12 Liberty
 RUN zypper -n --gpg-auto-import-keys install python-pip
-RUN pip install -U pip && pip install paramiko
+RUN pip install -U pip && pip install paramiko pygerrit2
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase. (The "full" version of perl is also required
