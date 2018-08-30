@@ -16,6 +16,10 @@ x-default-jenkins-slave: &default-jenkins-slave
   secrets:
     - source: jenkins_master_username
     - source: jenkins_master_password
+    - source: patch_via_gerrit
+      target: /home/couchbase/.ssh/patch_via_gerrit.ini
+      mode: 0440
+      uid: 1000
   volumes:
     - type: bind
       source: /home/couchbase/jenkinsdocker-ssh
@@ -97,6 +101,8 @@ secrets:
   jenkins_master_username:
     external: true
   jenkins_master_password:
+    external: true
+  patch_via_gerrit:
     external: true
 
 networks:
