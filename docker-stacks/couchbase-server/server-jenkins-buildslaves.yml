@@ -18,8 +18,8 @@ x-default-jenkins-slave: &default-jenkins-slave
     - source: jenkins_master_password
     - source: patch_via_gerrit
       target: /home/couchbase/.ssh/patch_via_gerrit.ini
+      uid: '1000'
       mode: 0440
-      uid: 1000
   volumes:
     - type: bind
       source: /home/couchbase/jenkinsdocker-ssh
