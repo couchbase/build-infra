@@ -1,4 +1,4 @@
 ---
 slaves:
   - slave_name: ubuntu16-cv-06
-    docker_image: ceejatec/ubuntu-1604-couchbase-cv:20180312
+    docker_image: couchbasebuild/server-ubuntu16-cv:20180830

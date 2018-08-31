@@ -2,11 +2,12 @@
 
 # Bump this when rebuilding with changes
 TAG=$(date "+%Y%m%d")
+IMAGE=couchbasebuild/server-ubuntu16-cv
 
-docker build --build-arg CONTAINER_TAG_ARG=ceejatec/ubuntu-1604-couchbase-cv:$TAG -t ceejatec/ubuntu-1604-couchbase-cv:$TAG .
-docker tag ceejatec/ubuntu-1604-couchbase-cv:$TAG ceejatec/ubuntu-1604-couchbase-cv:latest
+docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} -t ${IMAGE}:${TAG} .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then
-  docker push ceejatec/ubuntu-1604-couchbase-cv:$TAG
-  docker push ceejatec/ubuntu-1604-couchbase-cv:latest
+  docker push ${IMAGE}:${TAG}
+  docker push ${IMAGE}:latest
 fi

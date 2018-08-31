@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 16.04
 
-FROM ceejatec/ubuntu-1604-couchbase-build:20180309
+FROM couchbasebuild/server-ubuntu16-build:20180829
 MAINTAINER build-team@couchbase.com
 
 USER root
@@ -27,20 +27,27 @@ RUN apt-get update && apt-get install -y python-setuptools && \
     rm -f /var/cache/apt/archives/*.deb && \
     easy_install paramiko
 
-# Install Clang 3.9 (current stable) - needed for building with ThreadSanitizer.
+# Install Clang 6.0 (current stable) - needed for building with ThreadSanitizer.
 # (Note: This doesn't change the default compiler; users must explicitly
-# select clang-3.9 / clang++-3.9).
+# select clang-6.0 / clang++-6.0).
 RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
-    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-3.9 main" > /etc/apt/sources.list.d/llvm.list && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-6.0 main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update && \
-    apt-get install --assume-yes clang-3.9 && \
+    apt-get install --assume-yes clang-6.0 && \
     rm -fr /var/cache/apt/archives/*.deb
 
-# Install clang-format from Clang 3.9 - needed for checking if formatting of patch is correct
+# Install clang-tools for scan-build
 RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
-    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-3.9 main" > /etc/apt/sources.list.d/llvm.list && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-6.0 main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update && \
-    apt-get install --assume-yes --force-yes clang-format-3.9 && \
+    apt-get install --assume-yes clang-tools-6.0 && \
+    rm -fr /var/cache/apt/archives/*.deb
+
+# Install clang-format from Clang 6.0 - needed for checking if formatting of patch is correct
+RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-6.0 main" > /etc/apt/sources.list.d/llvm.list && \
+    apt-get update && \
+    apt-get install --assume-yes --force-yes clang-format-6.0 && \
     rm -fr /var/cache/apt/archives/*.deb
 
 # Install GDB - needed for detecting what program created a core file
