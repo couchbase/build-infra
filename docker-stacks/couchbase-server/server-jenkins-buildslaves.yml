@@ -80,7 +80,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/server-ubuntu16-build:20180829
+    image: couchbasebuild/server-ubuntu16-build:20180905
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice mad-hatter master"

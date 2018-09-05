@@ -97,8 +97,12 @@ RUN mkdir /tmp/deploy && \
 
 # Python 3-specific stuff for build scripts, mostly for Jira.
 RUN apt-get update && \
-    apt-get -y install python3-pip libffi-dev && \
-    pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
+    apt-get -y install python3.6 python3.6-dev python3.6-venv libffi-dev && \
+    apt-get clean && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 && \
+    curl https://bootstrap.pypa.io/get-pip.py | python3
+
+RUN pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     ccache --clear
