@@ -25,6 +25,9 @@
         - wixtoolset
         - 7zip.commandline
         - jdk8
+        - maven
+        - gradle
+        - sbt
         - googlechrome
         - insted
         - python2

@@ -17,7 +17,7 @@ RUN apt-get update && \
     apt-get install -y make binutils software-properties-common \
                        python-setuptools python-dev python-pip \
                        python-virtualenv git npm ccache g++ git-core tar \
-                       ruby rake ed man curl cowbuilder libc6-dbg && \
+                       ruby rake ed man curl cowbuilder libc6-dbg gdb && \
     apt-get install -y cmake pkg-config autoconf automake libtool && \
     apt-get clean
 
@@ -62,6 +62,23 @@ RUN mkdir /opt/cbdeps && \
 
 # Temp install step for "cbdep" tool
 RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+
+# Build tools
+RUN apt-get update && \
+    apt-get install -y apt-transport-https && \
+    echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 && \
+    apt-get update && \
+    apt-get install -y sbt && \
+    apt-get clean
+RUN mkdir /tmp/deploy && \
+    curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
+    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
+    cd /usr/local && \
+    unzip /tmp/deploy/gradle.zip && \
+    unzip /tmp/deploy/maven.zip && \
+    ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin && \
+    rm -rf /tmp/deploy
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
