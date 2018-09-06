@@ -47,6 +47,7 @@ services:
       replicas: 1
     ports:
       - "8080:8080"
+      - "50000:50000"
     volumes:
       - type: bind
         source: /var/run/docker.sock
@@ -81,7 +82,7 @@ services:
     image: couchbasebuild/sdk-centos7-build:20180906
     environment:
       - "JENKINS_SLAVE_NAME=centos7"
-      - "JENKINS_SLAVE_LABELS=centos7 mock"
+      - "JENKINS_SLAVE_LABELS=centos7"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -105,7 +106,7 @@ services:
     image: couchbasebuild/sdk-ubuntu14-build:20180906
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu14"
-      - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04 cowbuilder"
+      - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
