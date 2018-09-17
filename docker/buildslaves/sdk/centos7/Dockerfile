@@ -19,9 +19,13 @@ RUN groupadd -g1000 couchbase && \
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
-RUN yum install --setopt=keepcache=0 -y \
+RUN yum install --setopt=keepcache=0 -y epel-release && \
+    yum install --setopt=keepcache=0 -y \
                 ed \
                 glibc.i686 \
+                libuv-devel \
+                libev-devel \
+                libevent-devel \
                 libxml2-devel \
                 make \
                 man \

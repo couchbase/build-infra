@@ -19,3 +19,6 @@ homebrew_installed_packages:
   - { name: wget, state: linked }
   - { name: node, state: linked }
   - { name: npm, state: linked }
+  - { name: libuv, state: linked }
+  - { name: libev, state: linked }
+  - { name: libevent, state: linked }

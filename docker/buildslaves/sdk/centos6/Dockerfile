@@ -18,12 +18,16 @@ RUN groupadd -g1000 couchbase && \
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
-RUN yum install --setopt=keepcache=0 -y \
+RUN yum install --setopt=keepcache=0 -y epel-release && \
+    yum install --setopt=keepcache=0 -y \
     sudo \
     bzip2-devel \
     centos-release-scl \
     http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm \
     glibc.i686 \
+    libuv-devel \
+    libev-devel \
+    libevent-devel \
     libxslt \
     numactl-devel \
     openssl-devel \
