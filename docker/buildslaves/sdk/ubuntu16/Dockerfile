@@ -47,7 +47,7 @@ RUN mkdir /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
 # Temp install step for "cbdep" tool
-RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep-new.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Build tools
 RUN apt-get update && \
