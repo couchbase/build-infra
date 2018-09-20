@@ -14,7 +14,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y make binutils software-properties-common \
+    apt-get install -y dpkg make binutils software-properties-common \
                        python-setuptools python-dev python-pip \
                        python-virtualenv git npm ccache g++ git-core tar \
                        ruby rake ed man curl cowbuilder libc6-dbg gdb && \
