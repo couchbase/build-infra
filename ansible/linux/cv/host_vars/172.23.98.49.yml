@@ -1,4 +1,4 @@
 ---
 slaves:
   - slave_name: ubuntu12-cv-10
-    docker_image: ceejatec/ubuntu-1204-couchbase-cv:20160304
+    docker_image: couchbasebuild/server-ubuntu12-cv:20180921
