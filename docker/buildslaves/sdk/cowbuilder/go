@@ -1,0 +1,17 @@
+#!/bin/sh -ex
+
+# Bump this when rebuilding with changes
+TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/sdk-cowbuilder
+
+mkdir -p build
+INFRADIR=$(git rev-parse --show-toplevel)
+cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
+
+docker build -t ${IMAGE}:${TAG} .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:$TAG
+  docker push ${IMAGE}:latest
+fi

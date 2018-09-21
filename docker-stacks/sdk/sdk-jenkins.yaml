@@ -103,7 +103,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20180917
+    image: couchbasebuild/sdk-ubuntu14-build:20180921
     environment:
       - "JENKINS_SLAVE_NAME=ubuntu14"
       - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"

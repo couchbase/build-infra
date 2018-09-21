@@ -17,6 +17,5 @@ start_special_slave() {
         swarm
 }
 
-start_special_slave cowbuilder cowbuilder couchbasebuild/sdk-ubuntu14-build:20180920
+start_special_slave cowbuilder cowbuilder couchbasebuild/sdk-cowbuilder:20180921
 start_special_slave mock mock couchbasebuild/sdk-centos7-build:20180906
-
