@@ -4,7 +4,7 @@
 
   vars:
     ansible_user: couchbase
-    ansible_pass: couchbase
+    ansible_password: couchbase
 
   tasks:
     - name: Update build repo

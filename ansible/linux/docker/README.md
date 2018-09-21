@@ -1,4 +1,5 @@
-Ansible playbook for configuring a base Ubuntu 16.04 server image with Docker.
+Ansible playbook for configuring a base Ubuntu 16.04/18.04 server image
+with Docker.
 
 Pre-requisites:
  - assumes a user "couchbase" with password "couchbase" and sudo privs
@@ -6,4 +7,7 @@ Pre-requisites:
    box, Ubuntu 16.04 server has only python3 installed)
 
 "go" is a convenience script to run this playbook.
+
+Update 2018-09-21: Confirmed that it is safe to re-run this playbook to
+update the system with the latest version of Docker.
 

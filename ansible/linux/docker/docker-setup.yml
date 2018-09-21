@@ -21,10 +21,17 @@
         state: absent
         purge: yes
 
+    - name: See if apport is installed
+      shell: dpkg-query -s apport
+      ignore_errors: true
+      register: apport_check
+      changed_when: false
+
     - name: Disable apport
       systemd:
         name: apport
         enabled: no
+      when: apport_check is succeeded
 
     - name: Enable coredumps in /tmp
       sysctl:
