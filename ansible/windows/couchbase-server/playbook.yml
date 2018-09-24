@@ -30,6 +30,31 @@
         name: "NET-Framework-Core"
         state: present
 
+    # Have to do this first so that the later python2 ends up
+    # earlier on PATH (ie, we want python2 to be default)
+    - name: "Install Python 3"
+      win_chocolatey:
+        name: python3
+        version: 3.6.6
+      tags: python3
+
+    - name: "Provide python3 alias"
+      win_shell: copy C:\Python36\python.exe C:\Python36\python3.exe
+      args:
+        creates: C:\Python36\python3.exe
+      tags: python3
+
+    - name: "Provide python3.6 alias"
+      win_shell: copy C:\Python36\python.exe C:\Python36\python3.6.exe
+      args:
+        creates: C:\Python36\python3.6.exe
+      tags: python3
+
+    - name: "Install Python 2"
+      win_chocolatey:
+        name: python2
+      tags: python2
+
     - name: "Install tools"
       win_chocolatey:
         name: "{{ item }}"
@@ -40,7 +65,6 @@
         - curl
         - ninja
         - MinGW
-        - python2
         - vcpython27
         - ruby
         - wixtoolset
@@ -52,14 +76,9 @@
         - insted
         - pandoc
 
-    - name: "Download get_pip.py file"
-      win_command: C:\ProgramData\chocolatey\bin\curl.exe -k https://bootstrap.pypa.io/get-pip.py -o C:\Users\Administrator\Downloads\get-pip.py
-
-    - name: "Install pip"
-      win_command: C:\Python27\python.exe C:\Users\Administrator\Downloads\get-pip.py
-
     - name: "Install python paramiko module"
       win_command: C:\Python27\Scripts\pip.exe install paramiko
+      tags: python2
 
     # Code depends on .NET Framework 4.5.2 (chocolatey package "dotnet4.5.2"),
     # but that package fails to install via Ansible due to silly limitations
