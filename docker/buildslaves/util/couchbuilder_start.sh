@@ -27,6 +27,10 @@ done
 [[ "$1" == "swarm" ]] && {
     shift
 
+    [[ ! -z "${CONTAINER_TAG}" ]] && {
+        export JENKINS_SLAVE_LABELS="${JENKINS_SLAVE_LABELS} ${CONTAINER_TAG}"
+    }
+
     exec java $JAVA_OPTS -jar /usr/local/lib/swarm-client.jar \
        -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
        -master "${JENKINS_MASTER}" \

@@ -69,3 +69,7 @@ CMD [ "swarm" ]
 # Ensure appropriate directories exist and are owned by 'couchbase'
 USER couchbase
 RUN mkdir /home/couchbase/.ssh
+
+# Keep this stuff at the end, because the ARG declaration breaks Docker build caching
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
