@@ -29,6 +29,8 @@ ENV LANG=en_US.UTF-8
 # Jenkins Swarm client jar
 RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar
 
+COPY pbuilderrc /etc/pbuilderrc
+
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
