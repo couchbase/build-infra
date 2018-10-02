@@ -1,6 +1,14 @@
 #!/bin/bash
 
 
+# NOTE: This script is no longer used as-is. However the same command here
+# is embedded in the Execute Shell step of
+#
+# http://sdk.jenkins.couchbase.com/job/recreate-special-slave/
+#
+# So I leave this script here for future reference.
+
+
 start_special_slave() {
     slave_name=$1
     slave_labels=$2
@@ -17,5 +25,5 @@ start_special_slave() {
         swarm
 }
 
-start_special_slave cowbuilder cowbuilder couchbasebuild/sdk-cowbuilder:20180921
-start_special_slave mock mock couchbasebuild/sdk-centos7-build:20180906
+start_special_slave cowbuilder cowbuilder couchbasebuild/sdk-cowbuilder:latest
+start_special_slave mock mock couchbasebuild/sdk-centos7-build:latest

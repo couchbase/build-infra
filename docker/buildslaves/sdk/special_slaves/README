@@ -1,12 +1,14 @@
-This script needs to be run manually on some host - currently on
-sdk-swarm-01.build.couchbase.com. That host must have files
+Two slaves need to be started outside of the swarm so that they can be
+run with --privileged. There is a job,
+
+http://sdk.jenkins.couchbase.com/job/recreate-special-slave/
+
+which handles starting these slaves from their :latest tags. They are
+currently launched on sdk-swarm-01.build.couchbase.com. That host must
+have files
 
     /home/couchbase/SPECIAL_SLAVES/jenkins_master_username
     /home/couchbase/SPECIAL_SLAVES/jenkins_master_password
 
 containing the same data as the like-named secrets on the SDK
 Docker swarm.
-
-This is sadly necessary because the "cowbuilder" and "mock" slaves
-must run with --privileged (or at least with some added capacities),
-and Docker Swarm does not support these features.
