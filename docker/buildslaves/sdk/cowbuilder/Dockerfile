@@ -12,6 +12,8 @@ RUN apt-get update && \
         sudo tar cowbuilder devscripts reprepro cmake ubuntu-archive-keyring && \
     apt-get clean
 
+COPY build/pbuilderrc /etc/pbuilderrc
+
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN useradd couchbase -G sudo -m -s /bin/bash && \
