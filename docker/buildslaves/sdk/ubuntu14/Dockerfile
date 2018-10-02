@@ -61,9 +61,6 @@ RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
-# Temp install step for "cbdep" tool
-RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
-
 # Build tools
 RUN apt-get update && \
     apt-get install -y apt-transport-https && \
@@ -80,6 +77,10 @@ RUN mkdir /tmp/deploy && \
     unzip /tmp/deploy/maven.zip && \
     ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin && \
     rm -rf /tmp/deploy
+
+# Temp install step for "cbdep" tool
+ARG CACHEBUST=1
+RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
