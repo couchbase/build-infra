@@ -29,7 +29,6 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
                 libxml2-devel \
                 make \
                 man \
-                mock \
                 ncurses-devel \
                 numactl-devel \
                 openssh-clients openssl-devel \

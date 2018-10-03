@@ -26,4 +26,4 @@ start_special_slave() {
 }
 
 start_special_slave cowbuilder cowbuilder couchbasebuild/sdk-cowbuilder:latest
-start_special_slave mock mock couchbasebuild/sdk-centos7-build:latest
+start_special_slave mock mock couchbasebuild/sdk-mock:latest
