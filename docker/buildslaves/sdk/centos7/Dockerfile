@@ -23,10 +23,13 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
     yum install --setopt=keepcache=0 -y \
                 ed \
                 glibc.i686 \
+                bzip2-devel \
                 libuv-devel \
                 libev-devel \
                 libevent-devel \
+                libffi-devel \
                 libxml2-devel \
+                openssl-devel \
                 make \
                 man \
                 ncurses-devel \
