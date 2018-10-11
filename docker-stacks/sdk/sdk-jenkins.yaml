@@ -19,6 +19,19 @@ x-default-jenkins-slave: &default-jenkins-slave
       uid: '1000'
       gid: '1000'
       mode: 0400
+    - source: buildbot_id_dsa
+      target: /home/couchbase/.ssh/buildbot_id_dsa
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_private_key.gpgkey
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_public_key.gpgkey
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
     - source: jenkins_master_username
     - source: jenkins_master_password
   configs:
@@ -127,6 +140,10 @@ secrets:
   jenkins_master_password:
     external: true
   buildbot_id_dsa:
+    external: true
+  sdk_private_key.gpgkey:
+    external: true
+  sdk_public_key.gpgkey:
     external: true
 
 configs:
