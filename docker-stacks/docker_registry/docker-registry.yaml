@@ -11,13 +11,14 @@ services:
       replicas: 1
     image: registry:2
     ports:
-      - 5000:5000
+      - 443:443
     secrets:
       - source: buildhub.crt
       - source: buildhub.key
     environment:
       REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/buildhub.crt
       REGISTRY_HTTP_TLS_KEY: /run/secrets/buildhub.key
+      REGISTRY_HTTP_ADDR: 0.0.0.0:443
     volumes:
       - type: bind
         source: /builds/docker/registry
