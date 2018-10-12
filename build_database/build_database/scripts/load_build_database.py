@@ -213,7 +213,7 @@ class BuildDBLoader:
                 f'{project_name}-{sha}' for sha in project_shas
             ]
         build_data['manifest'] = projects
-        build_data['invalid_shas'] = list()  # Populated (potentially) later
+        build_data['invalid_shas'] = dict()  # Populated (potentially) later
 
         release_keys = ('product', 'release', 'version', 'build_num')
         release_data = manifest_info.get_release_info()
