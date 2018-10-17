@@ -42,6 +42,7 @@ RUN apt-get update && \
     apt-get install -y \
         ccache \
         git-core \
+        pkg-config \
         tar \
         libssl-dev \
         libnuma-dev \

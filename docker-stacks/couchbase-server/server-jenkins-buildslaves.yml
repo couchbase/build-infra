@@ -48,7 +48,7 @@ services:
     <<: *default-jenkins-slave
 
   debian8:
-    image: couchbasebuild/server-debian8-build:20180829
+    image: couchbasebuild/server-debian8-build:20181017
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
       - "JENKINS_SLAVE_LABELS=debian8 vulcan alice mad-hatter master"
@@ -56,7 +56,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/server-debian9-build:20180829
+    image: couchbasebuild/server-debian9-build:20181017
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=debian9 vulcan alice mad-hatter master"
@@ -90,7 +90,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/server-ubuntu16-build:20180905
+    image: couchbasebuild/server-ubuntu16-build:20181017
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice mad-hatter master"
