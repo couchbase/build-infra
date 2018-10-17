@@ -9,7 +9,7 @@ USER root
 RUN apt-get update && \
     apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release openjdk-8-jdk sudo tar && \
     apt-get install -y groff-base python-dev python-pip python-virtualenv gdb && \
-    apt-get install -y libuv-dev libev-dev libevent-dev libbz2-dev && \
+    apt-get install -y libuv-dev libev-dev libevent-dev libbz2-dev libffi-dev && \
     apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give

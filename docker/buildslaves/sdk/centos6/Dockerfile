@@ -3,8 +3,6 @@
 FROM centos:6.9
 MAINTAINER build-team@couchbase.com
 
-ENV PYTHON_VERSION=2.7.14 LD_RUN_PATH=/usr/local/lib
-
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN groupadd -g1000 couchbase && \
@@ -28,6 +26,7 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
     libuv-devel \
     libev-devel \
     libevent-devel \
+    libffi-devel \
     libxslt \
     numactl-devel \
     openssl-devel \
@@ -53,23 +52,6 @@ RUN yum install --setopt=keepcache=0 -y \
     devtoolset-6-elfutils && \
     yum clean packages && \
     for file in /opt/rh/devtoolset-6/root/usr/bin/*; do ln -s $file /usr/local/bin; done
-
-# Build and install Python 2.7 and useful base tools
-RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
-    && tar xvf Python-${PYTHON_VERSION}.tgz \
-    && cd Python-${PYTHON_VERSION} \
-    && ./configure --enable-shared --prefix=/usr/local \
-    && make \
-    && make altinstall \
-    && cd / \
-    && rm -rf Python-${PYTHON_VERSION}*
-
-# Install pip and virtualenv for system Python
-RUN mkdir /tmp/deploy && \
-    curl -o get-pip.py https://bootstrap.pypa.io/get-pip.py && \
-    python2.7 get-pip.py && \
-    pip install virtualenv && \
-    rm -rf /tmp/deploy
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \

@@ -19,7 +19,7 @@ RUN apt-get update && \
                        python-virtualenv git npm ccache g++ git-core tar \
                        ruby rake ed man curl libc6-dbg gdb && \
     apt-get install -y cmake pkg-config autoconf automake libtool && \
-    apt-get install -y libuv-dev libev-dev libevent-dev libbz2-dev && \
+    apt-get install -y libuv-dev libev-dev libevent-dev libbz2-dev libffi-dev libssl-dev && \
     apt-get clean
 
 # Update locale
