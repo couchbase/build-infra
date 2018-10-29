@@ -14,7 +14,7 @@ services:
     ports:
       - "8000:6543"
     configs:
-      - source: builddb_rest.ini
+      - source: builddb_rest_20181029
         target: /etc/builddb_rest.ini
         uid: '1000'
         gid: '1000'
@@ -22,7 +22,7 @@ services:
       - builddb_rest
 
 configs:
-  builddb_rest.ini:
+  builddb_rest_20181029:
     file: conf/builddb_rest.ini
 
 networks:
