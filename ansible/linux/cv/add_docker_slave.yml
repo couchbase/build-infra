@@ -20,4 +20,4 @@
   lineinfile:
     path: /home/couchbase/cronscript
     regexp: "{{ slave.slave_name }}"
-    line: "/home/couchbase/build/docker/scripts/run_if_disk_full.sh 90 {{ restart_cmd }}"
+    line: "/home/couchbase/build/docker/scripts/run_if_disk_full.sh 85 {{ restart_cmd }}"
