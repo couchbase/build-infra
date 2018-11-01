@@ -19,13 +19,45 @@ services:
       REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/buildhub.crt
       REGISTRY_HTTP_TLS_KEY: /run/secrets/buildhub.key
       REGISTRY_HTTP_ADDR: 0.0.0.0:443
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
     volumes:
       - type: bind
         source: /builds/docker/registry
         target: /var/lib/registry
+    networks:
+      registry:
+
+  frontend:
+    deploy:
+      replicas: 1
+    image: konradkleine/docker-registry-frontend:v2
+    ports:
+      - 8010:80
+    environment:
+      ENV_DOCKER_REGISTRY_HOST: registry
+      ENV_DOCKER_REGISTRY_PORT: 443
+      ENV_DOCKER_REGISTRY_USE_SSL: 1
+    networks:
+      registry:
+
+  joxit:
+    deploy:
+      replicas: 1
+    image: joxit/docker-registry-ui:static
+    ports:
+      - 8020:80
+    environment:
+      REGISTRY_URL: https://registry:443
+      DELETE_IMAGES: "true"
+      REGISTRY_TITLE: "Couchbase Build Registry"
+    networks:
+      registry:
 
 secrets:
   buildhub.crt:
     external: true
   buildhub.key:
     external: true
+
+networks:
+  registry:
