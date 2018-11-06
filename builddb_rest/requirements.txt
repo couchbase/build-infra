@@ -1,3 +1,3 @@
-git+https://github.com/couchbase/python-couchbase-commons@v0.4.1#egg=cbbuild-0.4.1&subdirectory=cbbuild
+git+https://github.com/couchbase/python-couchbase-commons@v0.4.5#egg=cbbuild-0.4.5&subdirectory=cbbuild
 cornice==3.4.0
 waitress==1.1.0
