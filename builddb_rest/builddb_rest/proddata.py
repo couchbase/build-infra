@@ -85,5 +85,4 @@ def includeme(config):
 
         return prod_metadata
 
-    config.set_request_property(_get_prod_metadata, 'prod_metadata',
-                                reify=True)
+    config.add_request_method(_get_prod_metadata, 'prod_metadata', reify=True)

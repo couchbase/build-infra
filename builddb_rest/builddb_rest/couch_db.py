@@ -30,4 +30,4 @@ def includeme(config):
 
         return db
 
-    config.set_request_property(_get_db, 'db', reify=True)
+    config.add_request_method(_get_db, 'db', reify=True)
