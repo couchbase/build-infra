@@ -24,6 +24,8 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
                 ed \
                 glibc.i686 \
                 bzip2-devel \
+                libicu \
+                libunwind \
                 libuv-devel \
                 libev-devel \
                 libevent-devel \

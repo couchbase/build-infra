@@ -23,6 +23,12 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
     centos-release-scl \
     http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm \
     glibc.i686 \
+    krb5-libs \
+    libunwind \
+    libnghttp2-devel \
+    libidn-devel \
+    libuuid \
+    lttng-ust \
     libuv-devel \
     libev-devel \
     libevent-devel \
@@ -52,6 +58,48 @@ RUN yum install --setopt=keepcache=0 -y \
     devtoolset-6-elfutils && \
     yum clean packages && \
     for file in /opt/rh/devtoolset-6/root/usr/bin/*; do ln -s $file /usr/local/bin; done
+
+# Pre-compiled libicu for .NET Core
+# https://github.com/dotnet/core/blob/master/Documentation/build-and-install-rhel6-prerequisites.md
+RUN curl -o /tmp/icu.tgz http://download.icu-project.org/files/icu4c/57.1/icu4c-57_1-RHEL6-x64.tgz && \
+    tar -xf /tmp/icu.tgz -C / && \
+    rm /tmp/icu.tgz
+
+# Build Curl 7.45 for .NET Core
+# https://github.com/dotnet/core/blob/master/Documentation/build-and-install-rhel6-prerequisites.md
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    wget https://curl.haxx.se/download/curl-7.45.0.tar.gz && \
+    tar xf curl-7.45.0.tar.gz && \
+    cd curl-7.45.0 && \
+    ./configure \
+      --disable-dict \
+      --disable-file \
+      --disable-ftp \
+      --disable-gopher \
+      --disable-imap \
+      --disable-ldap \
+      --disable-ldaps \
+      --disable-libcurl-option \
+      --disable-manual \
+      --disable-pop3 \
+      --disable-rtsp \
+      --disable-smb \
+      --disable-smtp \
+      --disable-telnet \
+      --disable-tftp \
+      --enable-ipv6 \
+      --enable-optimize \
+      --enable-symbol-hiding \
+      --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt \
+      --with-nghttp2 \
+      --with-gssapi \
+      --with-ssl \
+      --without-librtmp \
+      --prefix=/usr/local && \
+    make -j4 && make install && \
+    cd /tmp && \
+    rm -rf deploy
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
