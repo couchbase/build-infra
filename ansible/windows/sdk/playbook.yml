@@ -73,11 +73,6 @@
         params: /SSHServerFeature
         state: latest
 
-    - name: "Install true.bat"
-      win_copy:
-        src: "true.bat"
-        dest: C:\Windows\System32\
-
 # Some of these files contain private information, so they're not all in git.
 
     - name: Copy SSH config files
