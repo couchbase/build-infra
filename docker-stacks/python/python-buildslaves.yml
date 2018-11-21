@@ -33,6 +33,15 @@ services:
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
     <<: *default-jenkins-slave
 
+  ubuntu16:
+    image: couchbasebuild/python-ubuntu16-build:20181120
+    environment:
+      - "JENKINS_SLAVE_NAME=python-ubuntu16"
+      - "JENKINS_SLAVE_LABELS=ubuntu16.04 python3"
+      - *default-jenkins-slave-environment-master
+      - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
+    <<: *default-jenkins-slave
+
 secrets:
   jenkins_master_username:
     external: true
