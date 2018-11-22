@@ -34,7 +34,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/python-ubuntu16-build:20181120
+    image: couchbasebuild/python-ubuntu16-build:20181121
     environment:
       - "JENKINS_SLAVE_NAME=python-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16.04 python3"

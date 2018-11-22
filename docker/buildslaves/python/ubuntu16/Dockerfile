@@ -8,7 +8,7 @@ USER root
 # Install Couchbase build dependencies
 RUN apt-get update && \
     apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release openjdk-8-jdk sudo tar && \
-    apt-get install -y libbz2-dev libffi-dev && \
+    apt-get install -y libbz2-dev libffi-dev libxml2-dev libxslt1-dev && \
     apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give
