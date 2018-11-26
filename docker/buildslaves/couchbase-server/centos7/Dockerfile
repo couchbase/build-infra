@@ -99,7 +99,7 @@ RUN pip install pygerrit2
 
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.6/cmake-3.6.1-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
 

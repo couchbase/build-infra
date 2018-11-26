@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 16.04
 
-FROM couchbasebuild/server-ubuntu16-build:20180829
+FROM couchbasebuild/server-ubuntu16-build:20181125
 MAINTAINER build-team@couchbase.com
 
 USER root

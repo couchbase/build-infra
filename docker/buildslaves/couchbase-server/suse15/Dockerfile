@@ -36,7 +36,6 @@ RUN zypper -n install \
                 ed \
                 gcc-c++ \
                 make \
-                cmake \
                 ccache \
                 git \
                 man \
@@ -51,6 +50,12 @@ RUN zypper -n install \
                 tar \
                 unzip && \
                 zypper clean
+
+# * CMake (from cmake.org)
+RUN mkdir /tmp/deploy && \
+    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
+    rm -fr /tmp/deploy
 
 #paramiko for testrunner
 RUN zypper -n --gpg-auto-import-keys install python-pip

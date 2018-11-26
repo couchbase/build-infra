@@ -39,7 +39,6 @@ RUN zypper -n install \
                 curl \
                 ed \
                 make \
-                cmake \
                 ccache \
                 git \
                 man \
@@ -59,6 +58,12 @@ RUN zypper -n install \
 COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
+
+# * CMake (from cmake.org)
+RUN mkdir /tmp/deploy && \
+    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
+    rm -fr /tmp/deploy
 
 #paramiko for testrunner
 #RUN zypper install -y python-paramiko && zypper clean
