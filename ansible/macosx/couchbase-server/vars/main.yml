@@ -13,6 +13,7 @@ homebrew_installed_packages:
    - { name: cmake, version: 3.13.0, state: linked }
    - { name: libtool, version: 2.4.6_1, state: linked }
    - { name: maven, version: 3.5.3, state: linked }
+   - { name: repo, version: 1.12.37, state: linked }
    - { name: sha2, version: 1.0.1, state: linked }
 
 homebrew_cask_uninstalled_apps:
