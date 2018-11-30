@@ -34,7 +34,7 @@ services:
     image: couchbasebuild/server-amzn2-build:20181109
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
-      - "JENKINS_SLAVE_LABELS=amzn2 mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=amzn2 alice mad-hatter master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
     deploy:
