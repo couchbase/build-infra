@@ -8,6 +8,10 @@ mega4-02.build.couchbase.com
 mega4-04.build.couchbase.com
 mega4-06.build.couchbase.com
 mega4-07.build.couchbase.com
+mega4-08.build.couchbase.com
+mega4-09.build.couchbase.com
+mega4-10.build.couchbase.com
+mega4-11.build.couchbase.com
 
 [all:vars]
 ansible_user=couchbase
