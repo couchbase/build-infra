@@ -108,7 +108,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20181125
+    image: couchbasebuild/server-ubuntu18-build:20181207
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18 alice mad-hatter master"
@@ -116,6 +116,8 @@ services:
     <<: *default-jenkins-slave
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 2
 
 secrets:
   jenkins_master_username:

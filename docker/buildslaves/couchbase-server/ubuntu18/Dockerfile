@@ -66,16 +66,9 @@ RUN apt-get update && \
 RUN apt-get install -y python-pip && \
     pip install pygerrit2
 
-# Install third-party build dependencies. Note: software-properties-common
-# is only required for add-apt-repository; add-apt-repository is only
-# required to get python2.6; and python2.6 is only required for gyp, which
-# is part of the v8 build. python2.6 is also required for our compiling of
-# pysqlite and pysnappy, and for that we even need python2.6-dev.
+# Install third-party build dependencies.
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y m4 python2.6 python2.6-dev && \
+    apt-get install -y m4 && \
     apt-get clean
 RUN mkdir /tmp/deploy && \
     curl -L http://ftpmirror.gnu.org/autoconf/autoconf-2.69.tar.gz -o /tmp/deploy/autoconf-2.69.tar.gz && \
