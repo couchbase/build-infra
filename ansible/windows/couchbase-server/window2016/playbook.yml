@@ -1,0 +1,135 @@
+---
+- hosts: all
+
+  tasks:
+
+    # Needed for WiX Toolset
+    - name: "Enable .NET Framework 3.5"
+      win_feature:
+        name: "NET-Framework-Core"
+        state: present
+
+    # Have to do this first so that the later python2 ends up
+    # earlier on PATH (ie, we want python2 to be default)
+    - name: "Install Python 3"
+      win_chocolatey:
+        name: python3
+        version: 3.6.6
+      tags: python3
+
+    - name: "Provide python3 alias"
+      win_shell: copy C:\Python36\python.exe C:\Python36\python3.exe
+      args:
+        creates: C:\Python36\python3.exe
+      tags: python3
+
+    - name: "Provide python3.6 alias"
+      win_shell: copy C:\Python36\python.exe C:\Python36\python3.6.exe
+      args:
+        creates: C:\Python36\python3.6.exe
+      tags: python3
+
+    - name: "Install Python 2"
+      win_chocolatey:
+        name: python2
+      tags: python2
+
+    - name: "Install tools"
+      win_chocolatey:
+        name: "{{ item }}"
+        allow_empty_checksums: "yes"
+      with_items:
+        - kb2919355
+        - kb2999226
+        - kb2919442
+        - git
+        - cmake
+        - curl
+        - ninja
+        - MinGW
+        - vcpython27
+        - ruby
+        - wixtoolset
+        - 7zip.commandline
+        - jdk8
+        - maven
+        - activeperl
+        - googlechrome
+        - insted
+        - pandoc
+        - vscode
+
+    - name: "Install python paramiko module"
+      win_command: C:\Python27\Scripts\pip.exe install paramiko
+      tags: python2
+
+    - name: "Download py2exe"
+      win_get_url:
+        url: https://iweb.dl.sourceforge.net/project/py2exe/py2exe/0.6.9/py2exe-0.6.9.win64-py2.7.amd64.exe
+        dest: 'C:\py2exe.exe'
+
+    - name: "Install py2exe"
+      raw: 'easy_install C:\py2exe.exe'
+      ignore_errors: yes
+
+    - name: Create bin directory
+      win_file:
+        path: 'C:\bin'
+        state: directory
+
+    - name: "Install repo"
+      win_copy:
+        src: "repo.exe"
+        dest: 'C:\bin\repo.exe'
+
+    - name: Get Current PATH
+      raw: $ENV:PATH
+      register: path_out
+
+    - debug: var=path_out.stdout_lines
+
+    - name: Add tools to PATH.
+      win_path:
+          elements:
+          - C:\bin
+          - C:\Program Files\CMake\bin
+          - C:\Program Files\git\cmd
+          - C:\Program Files (x86)\WiX Toolset v3.11\bin
+
+# Some of these files contain private information, so they're not all in git.
+    - name: Create SSH directory
+      win_file:
+        path: C:\Users\Administrator\.ssh
+        state: directory
+
+    - name: Copy SSH config files
+      win_copy:
+        src: "./ssh/{{ item }}"
+        dest: C:\Users\Administrator\.ssh\{{ item }}
+      with_items:
+        - authorized_keys
+        - buildbot_id_dsa
+        - config
+        - environment
+        - id_rsa
+        - known_hosts
+
+    - name: "Enable Remote Desktop"
+      win_regedit:
+        key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+        name: fDenyTSConnections
+        data: 0
+        type: dword
+        state: present
+
+    - name: "Open Remote Desktop in firewall"
+      win_firewall_rule:
+        name: "remote desktop"
+        enable: yes
+        state: present
+        localport: 3389
+        action: allow
+        direction: in
+        protocol: TCP
+
+    - include: msvc2017.yml
