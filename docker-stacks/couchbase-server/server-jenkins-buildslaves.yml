@@ -13,13 +13,23 @@ x-default-jenkins-slave: &default-jenkins-slave
     replicas: 1
   networks:
     - jenkins
+  configs:
+    - source: couchbase_ssh_config_20181212
+      target: /home/couchbase/.ssh/config
+      uid: '1000'
+      mode: 0400
+
   secrets:
     - source: jenkins_master_username
     - source: jenkins_master_password
-    - source: patch_via_gerrit
+    - source: patch_via_gerrit_20181212
       target: /home/couchbase/.ssh/patch_via_gerrit.ini
       uid: '1000'
-      mode: 0440
+      mode: 0400
+    - source: id_ns-codereview_20181212
+      target: /home/couchbase/.ssh/id_ns-codereview
+      uid: '1000'
+      mode: 0400
   volumes:
     - type: bind
       source: /home/couchbase/jenkinsdocker-ssh
@@ -39,6 +49,8 @@ services:
     <<: *default-jenkins-slave
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 2
 
   centos6:
     image: couchbasebuild/server-centos6-build:20180713
@@ -90,6 +102,8 @@ services:
     <<: *default-jenkins-slave
     deploy:
       replicas: 2
+      update_config:
+        parallelism: 2
 
   ubuntu14:
     image: couchbasebuild/server-ubuntu14-build:20180829
@@ -119,12 +133,18 @@ services:
       update_config:
         parallelism: 2
 
+configs:
+  couchbase_ssh_config_20181212:
+    file: conf/couchbase_ssh_config
+
 secrets:
   jenkins_master_username:
     external: true
   jenkins_master_password:
     external: true
-  patch_via_gerrit:
+  patch_via_gerrit_20181212:
+    external: true
+  id_ns-codereview_20181212:
     external: true
 
 networks:
