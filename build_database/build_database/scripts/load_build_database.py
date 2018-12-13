@@ -18,9 +18,11 @@ import argparse
 import configparser
 import logging
 import pathlib
+import smtplib
 import sys
 
 from collections import defaultdict
+from email.mime.text import MIMEText
 
 import cbbuild.manifest.info as mf_info
 import cbbuild.manifest.parse as mf_parse
@@ -36,12 +38,33 @@ ch = logging.StreamHandler()
 logger.addHandler(ch)
 
 
+def send_email(smtp_server, receivers, message):
+    """Simple method to send email"""
+
+    msg = MIMEText(message['body'])
+
+    msg['Subject'] = message['subject']
+    msg['From'] = 'build-team@couchbase.com'
+    msg['To'] = ', '.join(receivers)
+
+    smtp = smtplib.SMTP(smtp_server, 25)
+
+    try:
+        smtp.sendmail(
+            'build-team@couchbase.com', receivers, msg.as_string()
+        )
+    except smtplib.SMTPException as exc:
+        logger.error('Mail server failure: %s', exc)
+    finally:
+        smtp.quit()
+
+
 class BuildDBLoader:
     """
     Used for loading initial build and Git data into the build database
     """
 
-    def __init__(self, db_info, repo_info):
+    def __init__(self, db_info, repo_info, email_info):
         """Basic initialization"""
 
         self.initial_data = None
@@ -51,6 +74,8 @@ class BuildDBLoader:
         self.project = None
         self.repo_base_path = pathlib.Path(repo_info['repo_basedir'])
         self.repo_cache = cbutil_git.RepoCache()
+        self.smtp_server = email_info['smtp_server']
+        self.receivers = email_info['receivers']
 
     @staticmethod
     def get_manifest_info(manifest_xml):
@@ -268,6 +293,7 @@ class BuildDBLoader:
             commit_info, invalid_shas = self.find_commits(
                 project, projects[project], manifest_info
             )
+            remote_info = manifest_info.get_project_remote_info(project)[1]
 
             if invalid_shas:
                 # We hit a bad SHA, so pop the project and SHA onto
@@ -278,6 +304,22 @@ class BuildDBLoader:
                 build_data['manifest'][project] = [
                     sha for sha in shas if sha not in invalid_shas
                 ]
+
+                # Also send out an email to notify of an invalid SHA
+                # (or SHAs) having been found
+                manifest_url = manifest_info['manifest_url']
+                manifest_sha = manifest_info['manifest_sha']
+
+                message = {
+                    'subject': f'Invalid SHA(s) found in project {project}',
+                    'body': f'Found the following invalid SHA(s) in project '
+                            f'{project}:\n    {", ".join(invalid_shas)}\n\n'
+                            f'from remote {remote_info}, called from '
+                            f'manifest {manifest_url} at SHA {manifest_sha}'
+                }
+                send_email(
+                    self.smtp_server, self.receivers, message
+                )
                 continue
 
             for commit in commit_info:
@@ -306,8 +348,7 @@ class BuildDBLoader:
                     f'{project}-{commit_id.decode()}'
                     for commit_id in commit.parents
                 ]
-                commit_data['remote'] = \
-                    manifest_info.get_project_remote_info(project)[1]
+                commit_data['remote'] = remote_info
                 commits[commit_name] = commit_data
 
             if commits:
@@ -417,7 +458,8 @@ def main():
     db_repo_config = configparser.ConfigParser()
     db_repo_config.read(args.db_repo_config)
 
-    if any(key not in db_repo_config for key in ['build_db', 'repos']):
+    if any(key not in db_repo_config
+           for key in ['build_db', 'repos', 'email']):
         logger.error(
             f'Invalid or unable to read config file {args.db_repo_config}'
         )
@@ -443,6 +485,16 @@ def main():
         )
         sys.exit(1)
 
+    email_required_keys = ['smtp_server', 'receivers']
+    email_info = db_repo_config['email']
+
+    if any(key not in email_info for key in email_required_keys):
+        logger.error(
+            f'One of the following email keys is missing in the config '
+            f'file:\n    {", ".join(email_required_keys)}'
+        )
+        sys.exit(1)
+
     # Setup loader, read in latest manifest processed, get build manifest
     # information, checkout/update build manifest repo and walk it,
     # generating or update the project documents, then generating or
@@ -450,7 +502,7 @@ def main():
     # and then linking the build and commit entries to each other as needed,
     # finishing with updating the last manifest document (needed to do
     # incremental updates or restart an interrupted loading run)
-    build_db_loader = BuildDBLoader(db_info, repo_info)
+    build_db_loader = BuildDBLoader(db_info, repo_info, email_info)
     last_manifest = build_db_loader.get_last_manifest()
     manifest_repo = repo_info['manifest_dir']
 

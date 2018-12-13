@@ -7,3 +7,7 @@ password = couchbase
 manifest_dir = /home/couchbase/build-manifests
 manifest_url = https://github.com/couchbase/build-manifests.git
 repo_basedir = /tmp/builddb
+
+[email]
+smtp_server = itweb01.hq.northscale.net
+receivers = build-team@couchbase.com
