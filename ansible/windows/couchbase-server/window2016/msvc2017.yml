@@ -15,7 +15,7 @@
   when: msvc2017_installcleanup.stat.exists == True
 
 - name: Install Visual Studio Professional 2017
-  win_command: C:\bin\vs_professional.exe --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Workload.Universal --includeRecommended --quiet --productKey "{{ vskey }}" --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\bin\vs_professional.exe --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended --quiet --productKey "{{ vskey }}" --addProductLang en-US --norestart --wait --nocache
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 
