@@ -12,6 +12,8 @@ ALL_URLS = dict(
           '/versions/{product_version}/builds/{build_num}',
     build_alt_collection='/builds',
     build_alt='/builds/{build_key}',
+    changeset_collection='/changeset',
+    changeset='/changeset/{product_name}',
     commit_collection='/projects/{project_name}/commits',
     commit='/projects/{project_name}/commits/{commit_sha}',
     commit_alt_collection='/commits',

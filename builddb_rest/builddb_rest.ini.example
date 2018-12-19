@@ -13,6 +13,9 @@ builddb_uri = couchbase://build-db.build.couchbase.com/build_info
 builddb_user = Administrator
 builddb_pass = passwd
 
+# Specific entry for local repository checkout
+repo_basedir = /home/couchbase/build_database/repos
+
 # Location of product metadata (relative to couchbase user's home directory)
 prod_metadata = product-metadata
 

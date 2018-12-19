@@ -13,8 +13,12 @@ services:
       replicas: 3
     ports:
       - "8000:6543"
+    volumes:
+      - type: bind
+        source: /builds/builddb_repos
+        target: /var/builddb_repos
     configs:
-      - source: builddb_rest_20181029
+      - source: builddb_rest_20181219
         target: /etc/builddb_rest.ini
         uid: '1000'
         gid: '1000'
@@ -22,7 +26,7 @@ services:
       - builddb_rest
 
 configs:
-  builddb_rest_20181029:
+  builddb_rest_20181219:
     file: conf/builddb_rest.ini
 
 networks:

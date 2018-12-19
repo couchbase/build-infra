@@ -49,8 +49,8 @@ RUN apt-get update && \
 # Install libcouchbase (needed for Python Couchbase SDK)
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
-    curl -O http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb && \
-    dpkg -i couchbase-release-1.0-4-amd64.deb && \
+    curl -O http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-6-amd64.deb && \
+    dpkg -i couchbase-release-1.0-6-amd64.deb && \
     apt-get update && \
     apt-get install -y libcouchbase-dev libcouchbase2-bin && \
     cd /tmp && \

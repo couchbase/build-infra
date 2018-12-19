@@ -13,6 +13,7 @@ def main(global_config, **settings):
     config.include('cornice')
     config.include('builddb_rest.couch_db')
     config.include('builddb_rest.proddata')
+    config.include('builddb_rest.build_repos')
     config.scan()
 
     return config.make_wsgi_app()
