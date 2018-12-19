@@ -53,7 +53,7 @@ services:
         parallelism: 2
 
   centos6:
-    image: couchbasebuild/server-centos6-build:20180713
+    image: couchbasebuild/server-centos6-build:20181218
     environment:
       - "JENKINS_SLAVE_NAME=server-centos6"
       - "JENKINS_SLAVE_LABELS=centos6 vulcan alice mad-hatter master"

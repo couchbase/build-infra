@@ -99,16 +99,9 @@ RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bi
 
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.6/cmake-3.6.1-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
-
-# paramiko for testrunner
-RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && \
-    yum install -y python-pip libffi-devel && \
-    pip install -U setuptools==18.5 && \
-    pip install cffi && \
-    pip install paramiko
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
