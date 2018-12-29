@@ -47,6 +47,7 @@ RUN zypper -n install \
                 python-devel \
                 rpm-build \
                 ruby \
+                sqlite3-devel \
                 tar \
                 unzip && \
                 zypper clean
@@ -56,10 +57,6 @@ RUN mkdir /tmp/deploy && \
     curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
-
-#paramiko for testrunner
-RUN zypper -n --gpg-auto-import-keys install python-pip
-RUN pip install -U pip && pip install paramiko pygerrit2
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase. (The "full" version of perl is also required

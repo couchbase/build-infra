@@ -47,6 +47,7 @@ RUN apt-get update && \
         debhelper \
         dh-systemd \
         ed \
+        libsqlite3-dev \
         man \
         pkg-config \
         pixz \
@@ -57,14 +58,6 @@ RUN apt-get update && \
 COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
-
-# paramiko for testrunner
-RUN apt-get update && \
-    apt-get install -y python-paramiko
-
-# pygerrit (for toy builds)
-RUN apt-get install -y python-pip && \
-    pip install pygerrit2
 
 # Install third-party build dependencies.
 RUN apt-get update && \

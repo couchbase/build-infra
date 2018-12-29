@@ -47,6 +47,7 @@ RUN apt-get update && \
         devscripts \
         debhelper \
         dh-systemd \
+        libsqlite3-dev \
         ed \
         man \
         pixz && \
@@ -56,14 +57,6 @@ RUN apt-get update && \
 COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
-
-# paramiko for testrunner
-RUN apt-get update && \
-    apt-get install -y python-paramiko
-
-# pygerrit (for toy builds)
-RUN apt-get install -y python-pip && \
-    pip install pygerrit2
 
 # Install third-party build dependencies. Note: software-properties-common
 # is only required for add-apt-repository; add-apt-repository is only
@@ -114,7 +107,7 @@ RUN apt-get update && \
     pip install jenkinsapi && \
     apt-get clean
 
-#s3cmd for upload script
+# s3cmd for upload script
 RUN apt-get update && \
     apt-get install -y s3cmd && \
     apt-get clean

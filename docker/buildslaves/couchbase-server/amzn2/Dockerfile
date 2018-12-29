@@ -39,6 +39,7 @@ RUN yum install --setopt=keepcache=0 -y \
                 redhat-lsb-core \
                 rpm-build \
                 ruby rubygems rubygem-rake \
+                sqlite-devel \
                 sudo \
                 tar \
                 unzip \
@@ -76,17 +77,11 @@ RUN mkdir /tmp/deploy && \
     cd libtool-2.4.2 && ./configure --prefix=/usr/local && make -j8 && make install && \
     cd /tmp && rm -rf /tmp/deploy
 
-# paramiko for testrunner
-RUN rpm -iUvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum install -y python-pip libffi-devel && \
-    pip install paramiko
-
-# pygerrit (for toy builds)
-RUN pip install pygerrit2
-
 # * CMake 3 (from cmake.org)
-RUN yum install --setopt=keepcache=0 -y cmake3 && \
-    ln -s /usr/bin/cmake3 /usr/local/bin/cmake
+RUN mkdir /tmp/deploy && \
+    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
+    rm -fr /tmp/deploy
 
 # * ccache (from source)
 RUN mkdir /tmp/deploy && \

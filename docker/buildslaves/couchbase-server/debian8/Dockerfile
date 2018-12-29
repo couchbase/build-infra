@@ -19,11 +19,6 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # Jenkins Swarm jar
-# https://unix.stackexchange.com/questions/342403/openjdk-8-jre-headless-depends-ca-certificates-java-but-it-is-not-going-to-be
-RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -t jessie-backports -y openjdk-8-jre-headless ca-certificates-java && \
-    apt-get clean
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
     -o /usr/local/lib/swarm-client.jar
@@ -56,19 +51,20 @@ RUN apt-get update && \
         ed \
         man \
         pixz \
-        lsb-release && \
+        lsb-release \
+        libsqlite3-dev && \
+    apt-get clean
+
+# https://unix.stackexchange.com/questions/342403/openjdk-8-jre-headless-depends-ca-certificates-java-but-it-is-not-going-to-be
+RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -t jessie-backports -y openjdk-8-jre-headless ca-certificates-java && \
     apt-get clean
 
 # GCC (from couchbasebuild/debian-8-gcc)
 COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
-
-#paramiko for testrunner
-RUN apt-get update && apt-get install -y python-paramiko && apt-get clean
-
-# pygerrit (for toy builds)
-RUN apt-get install -y python-pip && pip install pygerrit2
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.

@@ -42,6 +42,7 @@ RUN yum install --setopt=keepcache=0 -y \
                 redhat-lsb-core \
                 rpm-build \
                 ruby rubygems rubygem-rake \
+                sqlite-devel \
                 sudo \
                 tar \
                 unzip \
@@ -88,14 +89,6 @@ RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && tar -xzf libtool-2.4.2.tar.gz && \
     cd libtool-2.4.2 && ./configure --prefix=/usr/local && make -j8 && make install && \
     cd /tmp && rm -rf /tmp/deploy
-
-# paramiko for testrunner
-RUN rpm -iUvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum install -y python-pip libffi-devel && \
-    pip install paramiko
-
-# pygerrit (for toy builds)
-RUN pip install pygerrit2
 
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
