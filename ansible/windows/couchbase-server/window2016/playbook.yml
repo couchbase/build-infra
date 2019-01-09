@@ -149,3 +149,10 @@
         protocol: TCP
 
     - include: msvc2017.yml
+
+    # Do OpenSSH last so the service has the latest version of the path
+    - name: Install OpenSSH (for Jenkins)
+      win_chocolatey:
+        name: openssh
+        params: /SSHServerFeature
+        state: latest
