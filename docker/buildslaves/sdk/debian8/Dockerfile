@@ -59,6 +59,17 @@ RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
+# libcouchbase
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L -o couchbase-release.deb http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-6-amd64.deb && \
+    dpkg -i couchbase-release.deb && \
+    apt-get update && \
+    apt-get install -y libcouchbase-dev libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
+    cd /tmp && \
+    rm -rf /tmp/deploy && \
+    apt-get clean
+
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
 RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep

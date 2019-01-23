@@ -22,3 +22,4 @@ homebrew_installed_packages:
   - { name: libuv, state: linked }
   - { name: libev, state: linked }
   - { name: libevent, state: linked }
+  - { name: libcouchbase, state: linked }

@@ -133,6 +133,15 @@ RUN mkdir /tmp/deploy && \
     ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin && \
     rm -rf /tmp/deploy
 
+# libcouchbase
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L -o couchbase-release.rpm http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-x86_64.rpm && \
+    rpm -iv couchbase-release.rpm && \
+    yum install -y libcouchbase-devel libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
+    cd /tmp && \
+    rm -rf /tmp/deploy
+
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
 RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
