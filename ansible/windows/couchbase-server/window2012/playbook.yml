@@ -109,6 +109,11 @@
         src: "repo.exe"
         dest: "C:\\bin\\repo.exe"
 
+    - name: "Download patch_via_gerrit"
+      win_get_url:
+        url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/8/windows_msvc2015/patch_via_gerrit.exe
+        dest: C:\bin\patch_via_gerrit.exe
+
     - name: Add tools to PATH.
       include: extend-path.yml
       with_items:
