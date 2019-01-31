@@ -9,7 +9,7 @@ RUN yum install --setopt=keepcache=0 -y sudo curl \
         zlib-devel bzip2-devel \
         openssl-devel ncurses-devel sqlite-devel \
         readline-devel tk-devel gdbm-devel db4-devel \
-        libpcap-devel xz-devel expat-devel && \
+        libpcap-devel xz-devel expat-devel curl-devel && \
     yum clean packages
 
 # Create couchbase user with password-less sudo privs, and give
@@ -22,6 +22,9 @@ RUN groupadd -g1000 couchbase && \
     chmod 440 /etc/sudoers.d/wheel_group
 
 # Python 3.6.6
+# Note we force pip==18.1, as there is a bug in pip 19.0.1 which prevents
+# PyInstaller and others from installing:
+# https://github.com/pypa/pip/issues/6163
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
     curl -LO http://python.org/ftp/python/3.6.6/Python-3.6.6.tar.xz && \
@@ -32,9 +35,7 @@ RUN mkdir /tmp/deploy && \
     make && make altinstall && \
     strip /usr/local/lib/libpython3.6m.so.1.0 && \
     ln -s /usr/local/bin/python3.6 /usr/local/bin/python3 && \
-    cd /tmp/deploy && \
-    curl -LO https://bootstrap.pypa.io/get-pip.py && \
-    python3.6 get-pip.py && \
+    /usr/local/bin/python3.6 -m pip install -U pip==18.1 && \
     cd /tmp && \
     rm -rf deploy
 
