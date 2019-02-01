@@ -25,7 +25,7 @@ x-default-jenkins-slave-environment:
 services:
 
   centos6:
-    image: couchbasebuild/python-centos6-build:20180920
+    image: couchbasebuild/python-centos6-build:20190130
     environment:
       - "JENKINS_SLAVE_NAME=python-centos6"
       - "JENKINS_SLAVE_LABELS=centos6 python3"
