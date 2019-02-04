@@ -34,11 +34,11 @@
       become: true
 
     # Required for CBL iOS doc generation
-    - name: Install jazzy gem package
-      gem:
-        name: jazzy
-        state: latest
-      become: true
+    - name: Install gem packages
+      gem: name={{ item }} state=latest
+      with_items:
+          - jazzy
+          - xcpretty
 
     - name: Copy SSH config files
       copy:
