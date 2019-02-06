@@ -3,10 +3,6 @@
 TAG=$(date "+%Y%m%d")
 IMAGE="couchbasebuild/generate_private_repos"
 
-rm -rf build-tools manifest
-git clone https://github.com/couchbase/build-tools.git
-git clone https://github.com/couchbase/manifest.git
-
 docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 
