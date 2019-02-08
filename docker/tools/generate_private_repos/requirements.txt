@@ -1,2 +1,0 @@
-git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild-manifest-0.5.1&subdirectory=cbbuild-manifest
-pydrive==1.3.1

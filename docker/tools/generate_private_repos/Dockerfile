@@ -1,20 +1,27 @@
-# Docker container for generate closed source
+# Docker container for generate closed source program on Ubuntu 16.04
+#
+# Contains the following:
+#  - cbbuild-manifest package from python-couchbase-commons
+#  - generate_private_repos code from build-tools
 
 FROM couchbasebuild/ubuntu-1604-python3.6-base:latest
 MAINTAINER build-team@couchbase.com
 
 USER root
 
-COPY requirements.txt /tmp
-WORKDIR /tmp
-RUN pip3.6 install -r requirements.txt
+# Checkout directory for build-tools repository
+ARG BUILD_TOOLS_GITDIR=/var/tmp/build-tools
 
-# Checkout directories for build-tools and manifest repositories
-ARG BUILD_TOOLS_GITDIR=/home/couchbase/build-tools
-ARG MANIFEST_GITDIR=/home/couchbase/manifest
+# Clone repository, install software in generate_private_repos directory,
+# then delete repository
+RUN git clone https://github.com/couchbase/build-tools $BUILD_TOOLS_GITDIR && \
+    cd $BUILD_TOOLS_GITDIR/generate_private_repos && \
+    git log -1 && \
+    pip3.6 install -r requirements.txt && \
+    pip3.6 install . && \
+    cd $HOME && \
+    rm -rf $BUILD_TOOLS_GITDIR
 
-RUN git clone https://github.com/couchbase/build-tools.git $BUILD_TOOLS_GITDIR && \
-    git clone https://github.com/couchbase/manifest.git $MANIFEST_GITDIR
-
-COPY gen-private-repo.sh /gen-private-repo.sh
-CMD ["/gen-private-repo.sh"]
+COPY gen-private-repo.sh /usr/sbin/
+CMD ["default"]
+ENTRYPOINT [ "/usr/sbin/gen-private-repo.sh" ]
