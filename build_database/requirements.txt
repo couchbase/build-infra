@@ -1,5 +1,5 @@
-git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild-database-0.5.1&subdirectory=cbbuild-database
-git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild-manifest-0.5.1&subdirectory=cbbuild-manifest
-git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild-util-0.5.1&subdirectory=cbbuild-util
+git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild_database-0.5.1&subdirectory=cbbuild-database
+git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild_manifest-0.5.1&subdirectory=cbbuild-manifest
+git+https://github.com/couchbase/python-couchbase-commons@v0.5.1#egg=cbbuild_util-0.5.1&subdirectory=cbbuild-util
 jira
 flask
