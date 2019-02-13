@@ -50,6 +50,13 @@ RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && 
     apt-get install --assume-yes --force-yes clang-format-6.0 && \
     rm -fr /var/cache/apt/archives/*.deb
 
+# Create symlinks so clang picks up gcc 7.3.0 and associated libraries
+RUN cd /usr/lib/gcc/x86_64-linux-gnu && \
+    ln -s /usr/local/lib/gcc/x86_64-pc-linux-gnu/7.3.0 . && \
+    mkdir -p /usr/local/include/x86_64-linux-gnu/c++ && \
+    cd /usr/local/include/x86_64-linux-gnu/c++ && \
+    ln -s ../../c++/7.3.0/x86_64-pc-linux-gnu 7.3.0
+
 # Install GDB - needed for detecting what program created a core file
 # & extracting the set of shared libraries.
 RUN apt-get install -y gdb && \
