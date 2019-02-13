@@ -26,8 +26,8 @@ from email.mime.text import MIMEText
 
 import cbbuild.manifest.info as mf_info
 import cbbuild.manifest.parse as mf_parse
-import cbbuild.cbutil.db as cbutil_db
-import cbbuild.cbutil.git as cbutil_git
+import cbbuild.database.db as cbdatabase_db
+import cbbuild.util.git as cbutil_git
 
 
 # Set up logging and handler
@@ -68,7 +68,7 @@ class BuildDBLoader:
         """Basic initialization"""
 
         self.initial_data = None
-        self.db = cbutil_db.CouchbaseDB(db_info)
+        self.db = cbdatabase_db.CouchbaseDB(db_info)
         self.prod_ver_index = self.db.get_product_version_index()
         self.first_prod_ver_build = False
         self.project = None
@@ -97,7 +97,7 @@ class BuildDBLoader:
 
         try:
             doc = self.db.get_document('last-manifest')
-        except cbutil_db.NotFoundError:
+        except cbdatabase_db.NotFoundError:
             return []
         else:
             return [doc['latest_sha']] if 'latest_sha' in doc else []
@@ -187,7 +187,7 @@ class BuildDBLoader:
 
             try:
                 project_data = self.db.get_document(key_name)
-            except cbutil_db.NotFoundError:
+            except cbdatabase_db.NotFoundError:
                 project_data = dict(
                     type='project', key_=key_name, name=proj_name
                 )
@@ -225,7 +225,7 @@ class BuildDBLoader:
         # population
         try:
             build_data = self.db.get_document(build_name)
-        except cbutil_db.NotFoundError:
+        except cbdatabase_db.NotFoundError:
             build_data = dict(type='build', key_=build_name)
 
         projects = dict()
@@ -307,15 +307,15 @@ class BuildDBLoader:
 
                 # Also send out an email to notify of an invalid SHA
                 # (or SHAs) having been found
-                manifest_url = manifest_info['manifest_url']
-                manifest_sha = manifest_info['manifest_sha']
+                manifest_path = build_data['manifest_path']
+                manifest_sha = build_data['manifest_sha']
 
                 message = {
                     'subject': f'Invalid SHA(s) found in project {project}',
                     'body': f'Found the following invalid SHA(s) in project '
                             f'{project}:\n    {", ".join(invalid_shas)}\n\n'
                             f'from remote {remote_info}, called from '
-                            f'manifest {manifest_url} at SHA {manifest_sha}'
+                            f'manifest {manifest_path} at SHA {manifest_sha}'
                 }
                 send_email(
                     self.smtp_server, self.receivers, message
@@ -332,7 +332,7 @@ class BuildDBLoader:
                 # a new dictionary for population
                 try:
                     commit_data = self.db.get_document(commit_name)
-                except cbutil_db.NotFoundError:
+                except cbdatabase_db.NotFoundError:
                     commit_data = dict(type='commit', key_=commit_name)
 
                 commit_data['project'] = project
