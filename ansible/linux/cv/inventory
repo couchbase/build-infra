@@ -17,7 +17,7 @@
 172.23.96.234
 
 [unit]
-172.23.96.171
+172.23.97.101
 
 [all:vars]
 ansible_user=couchbase

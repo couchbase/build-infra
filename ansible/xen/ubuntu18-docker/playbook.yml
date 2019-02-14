@@ -81,6 +81,9 @@
 
   tasks:
 
+    - name: Check Time
+      shell: date
+
     - name: Apt Update
       apt:
         update_cache: yes
