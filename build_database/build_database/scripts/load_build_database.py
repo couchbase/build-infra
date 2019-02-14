@@ -318,7 +318,7 @@ class BuildDBLoader:
                             f'manifest {manifest_path} at SHA {manifest_sha}'
                 }
                 send_email(
-                    self.smtp_server, self.receivers, message
+                    self.smtp_server, self.receivers.split(','), message
                 )
                 continue
 
