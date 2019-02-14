@@ -11,8 +11,8 @@ import sys
 
 import cbbuild.manifest.info as mf_info
 import cbbuild.manifest.parse as mf_parse
-import cbbuild.cbutil.db as cbutil_db
-import cbbuild.cbutil.git as cbutil_git
+import cbbuild.database.db as cbdatabase_db
+import cbbuild.util.git as cbutil_git
 
 
 class AddProject:
@@ -23,7 +23,7 @@ class AddProject:
     def __init__(self, db_info, repo_info):
         """Basic initialization"""
 
-        self.db = cbutil_db.CouchbaseDB(db_info)
+        self.db = cbdatabase_db.CouchbaseDB(db_info)
         self.repo_base_path = pathlib.Path(repo_info['repo_basedir'])
 
     @staticmethod
@@ -51,7 +51,7 @@ class AddProject:
 
             try:
                 project_data = self.db.get_document(key_name)
-            except cbutil_db.NotFoundError:
+            except cbdatabase_db.NotFoundError:
                 project_data = dict(
                     type='project', key_=key_name, name=proj_name
                 )

@@ -20,8 +20,8 @@ import sys
 
 import dulwich.errors
 
-import cbbuild.cbutil.db as cbutil_db
-import cbbuild.cbutil.git as cbutil_git
+import cbbuild.database.db as cbdatabase_db
+import cbbuild.util.git as cbutil_git
 
 
 # Set up logging and handler
@@ -39,7 +39,7 @@ def regenerate_repositories(db_info, repo_info):
     project
     """
 
-    db = cbutil_db.CouchbaseDB(db_info)
+    db = cbdatabase_db.CouchbaseDB(db_info)
     repo_base_dir = pathlib.Path(repo_info['repo_basedir'])
     repo_cache = cbutil_git.RepoCache()
 

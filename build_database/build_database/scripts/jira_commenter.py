@@ -9,7 +9,7 @@ import logging
 import re
 import sys
 
-import cbbuild.cbutil.db as cbutil_db
+import cbbuild.database.db as cbdatabase_db
 
 from jira import JIRA
 from jira.exceptions import JIRAError
@@ -23,7 +23,7 @@ logger.addHandler(ch)
 
 class JiraCommenter:
     def __init__(self, db_info, dryrun):
-        self.db = cbutil_db.CouchbaseDB(db_info)
+        self.db = cbdatabase_db.CouchbaseDB(db_info)
         self.jira = JIRA({'server': 'https://issues.couchbase.com/'})
         self.dryrun = dryrun
         self.ticket_re = re.compile(r'(\b[A-Z]+-\d+\b)')
