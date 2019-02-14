@@ -42,7 +42,7 @@ def load_requirements(fname):
         if 'git+' in req:
             subdir_re = re.compile(r'&subdirectory=.+$')
             req = '=='.join(
-                re.sub(subdir_re, r'', req).rsplit('=')[-1].split('-', 3)[:2]
+                re.sub(subdir_re, r'', req).rsplit('=')[-1].rsplit('-', 1)
             )
         if req.startswith('--'):
             continue
