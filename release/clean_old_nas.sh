@@ -28,12 +28,14 @@ remove_glob "*-PDB.zip" 30
 
 # All Ubuntu 12/14, Debian 8, Centos 6, Suse, Mac, "oel", and Windows builds
 # older than 30/60 days
+remove_glob "*amzn2*.rpm*" 30
 remove_glob "*macos*.zip*" 30
 remove_glob "*windows*exe*" 30
 remove_glob "*windows*msi*" 60
 remove_glob "*ubuntu12.04*.deb*" 30
 remove_glob "*ubuntu14.04*.deb*" 30
 remove_glob "*ubuntu16.04*.deb*" 30
+remove_glob "*ubuntu18.04*.deb*" 30
 remove_glob "*debian7*.deb*" 60
 remove_glob "*debian8*.deb*" 30
 remove_glob "*debian9*.deb*" 30
@@ -94,6 +96,14 @@ cd ${LATESTBUILDS}/couchbase-lite-net
 remove_glob "*.nupkg*" 60
 remove_glob "*.zip*"   60
 remove_glob "*.apk*"   60
+
+echo @@@@@@@@@
+echo Clean up couchbase-lite-log
+echo @@@@@@@@@
+cd ${LATESTBUILDS}/couchbase-lite-log
+
+# older than 30/60 days
+remove_glob "*.zip*" 60
 
 echo @@@@@@@@@
 echo Clean up ALL products
