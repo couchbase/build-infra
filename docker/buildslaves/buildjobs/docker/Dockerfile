@@ -18,6 +18,12 @@ RUN apt-get update && \
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# Python3 updates and s3cmd
+RUN apt-get update && \
+    apt-get install -y python3-pip && \
+    pip3 install s3cmd && \
+    apt-get clean
+
 # Add Docker
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
         | sudo apt-key add - && \
