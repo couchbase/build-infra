@@ -47,6 +47,7 @@ fi
     shift
 
     exec sudo -u couchbase -H \
+       env -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
        PATH=/usr/local/bin:/usr/bin:/bin \
        java $JAVA_OPTS \
        -jar /usr/local/lib/swarm-client.jar \
