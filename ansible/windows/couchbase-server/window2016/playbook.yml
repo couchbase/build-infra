@@ -64,6 +64,13 @@
       win_command: C:\Python27\Scripts\pip.exe install paramiko
       tags: python2
 
+    - name: Create download area for Ansible
+      win_file:
+        path: C:\ansible_files
+        state: directory
+      tags:
+        - setup
+
     - name: "Download py2exe"
       win_get_url:
         url: https://iweb.dl.sourceforge.net/project/py2exe/py2exe/0.6.9/py2exe-0.6.9.win64-py2.7.amd64.exe
@@ -72,6 +79,25 @@
     - name: "Install py2exe"
       raw: 'easy_install C:\py2exe.exe'
       ignore_errors: yes
+
+    - name: Download Cygwin setup program
+      win_get_url:
+        url: https://cygwin.com/setup-x86_64.exe
+        dest: C:\ansible_files\cygwin_setup.exe
+      tags:
+        - cygwin
+
+    - name: Copy Cygwin install batch script
+      win_copy:
+        src: install_cygwin.bat
+        dest: C:\ansible_files\install_cygwin.bat
+      tags:
+        - cygwin
+
+    - name: Install Cygwin
+      win_command: C:\ansible_files\install_cygwin.bat
+      tags:
+        - cygwin
 
     - name: Create required "C:\\Program Files (x86)\\Common Files\\Merge Modules" directory
       win_file:
