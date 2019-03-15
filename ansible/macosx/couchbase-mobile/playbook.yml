@@ -39,6 +39,7 @@
       with_items:
           - jazzy
           - xcpretty
+          - slather
 
     - name: Copy SSH config files
       copy:
