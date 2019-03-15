@@ -67,6 +67,10 @@ RUN apt-get update && \
     apt-get install -y lua5.3 lua5.3-dev && \
     rm -fr /var/cache/apt/archives/*.deb
 
+# Enable .gitconfig so repo doesn't get whiny
+ADD gitconfig /home/couchbase/.gitconfig
+RUN chown couchbase:couchbase /home/couchbase/.gitconfig
+
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 ARG CONTAINER_TAG_ARG
