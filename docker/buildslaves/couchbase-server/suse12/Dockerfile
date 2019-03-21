@@ -48,6 +48,7 @@ RUN zypper -n install \
                 libopenssl-devel \
                 lsb-release \
                 python-devel \
+                python-xml \
                 rpm-build \
                 ruby rubygems rubygem-rake \
                 sqlite3-devel \

@@ -94,7 +94,7 @@ services:
     <<: *default-jenkins-slave
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20190310
+    image: couchbasebuild/server-suse15-build:20190320
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=suse15 mad-hatter master"
