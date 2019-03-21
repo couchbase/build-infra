@@ -1,7 +1,7 @@
 Host github.com
         User git
 Host review.couchbase.org
-    User         buildbot
+    User         ns-codereview
     Port         29418
-    IdentityFile ~/.ssh/buildbot_id_dsa
+    IdentityFile ~/.ssh/id_ns-codereview
 

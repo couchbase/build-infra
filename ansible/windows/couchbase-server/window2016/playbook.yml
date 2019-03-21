@@ -157,8 +157,9 @@
         dest: C:\Users\Administrator\.ssh\{{ item }}
       with_items:
         - authorized_keys
-        - buildbot_id_dsa
+        - id_ns-codereview
         - config
+        - patch_via_gerrit.ini
         - environment
         - id_rsa
         - known_hosts

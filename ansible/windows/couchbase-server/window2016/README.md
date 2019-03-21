@@ -22,10 +22,12 @@ build slave. The rest of this document refers only to this playbook.
 # LOCAL FILE MODIFICATIONS NECESSARY BEFORE RUNNING PLAYBOOK
 
 First, add any private key files necessary to the `ssh` directory. The
-provided ssh/config file assumes that `buildbot_id_dsa` exists and can
+provided ssh/config file assumes that `id_ns-codereview` exists and can
 be used to pull from Gerrit (necessary for commit-validation jobs), and
 that a default key file such as `id_rsa` exists that can pull all private
-GitHub repositories.
+GitHub repositories. We also require a patch_via_gerrit.ini configured
+with the Gerrit username `ns-codereview` and that user's Gerrrit HTTP
+password.
 
 The `inventory` file here is a stub to show the required format. Replace at
 least the IP address(es) of the server(s) to configure.
