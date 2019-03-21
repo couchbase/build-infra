@@ -1,0 +1,26 @@
+#!/bin/sh -ex
+
+# Bump this when rebuilding with changes
+TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/server-rhel8-build
+
+PRIV_DIR=${HOME}/jenkinsdocker-ssh
+RH_USER=$(cat ${PRIV_DIR}/redhat_access_user.txt)
+RH_PASSWORD=$(cat ${PRIV_DIR}/redhat_access_password.txt)
+RH_POOL_ID=$(cat ${PRIV_DIR}/rhel_8_pool_id.txt)
+
+mkdir -p build
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/swarm*.properties build
+
+docker build \
+--build-arg RH_USER=${RH_USER} \
+    --build-arg RH_PASSWORD=${RH_PASSWORD} \
+    --build-arg RH_POOL_ID=${RH_POOL_ID} \
+    -t ${IMAGE}:${TAG} .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:$TAG
+  docker push ${IMAGE}:latest
+fi

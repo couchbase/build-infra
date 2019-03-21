@@ -85,6 +85,18 @@ services:
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
+  rhel8:
+    image: couchbasebuild/server-rhel8-build:20190320
+    environment:
+      - "JENKINS_SLAVE_NAME=server-rhel8"
+      - "JENKINS_SLAVE_LABELS=rhel8 alice mad-hatter master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+
   suse11:
     image: couchbasebuild/server-suse11-build:20180713
     environment:
