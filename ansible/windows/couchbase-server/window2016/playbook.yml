@@ -145,6 +145,12 @@
           - C:\Program Files\NASM
           - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
+    - name: Install Windows SDK version 10.1.17134.12
+      win_chocolatey:
+        name: windows-sdk-10.1
+        version: 10.1.17134.12
+      tags: v8_sdk
+
 # Some of these files contain private information, so they're not all in git.
     - name: Create SSH directory
       win_file:
