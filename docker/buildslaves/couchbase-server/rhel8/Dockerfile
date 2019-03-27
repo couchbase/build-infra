@@ -36,6 +36,7 @@ RUN dnf install --setopt=keepcache=0 -y \
                 git \
                 glibc-devel \
                 hostname \
+                libtirpc-devel \
                 libtool \
                 make \
                 man \
