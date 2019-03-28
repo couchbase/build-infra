@@ -106,6 +106,14 @@ cd ${LATESTBUILDS}/couchbase-lite-log
 remove_glob "*.zip*" 60
 
 echo @@@@@@@@@
+echo Clean up couchbase-lite-cblite
+echo @@@@@@@@@
+cd ${LATESTBUILDS}/couchbase-lite-cblite
+
+# older than 30/60 days
+remove_glob "*.zip*" 60
+
+echo @@@@@@@@@
 echo Clean up ALL products
 echo @@@@@@@@@
 cd ${LATESTBUILDS}
