@@ -50,6 +50,7 @@
         - awstools.powershell
         - cmake
         - curl
+        - docfx
         - git
         - jdk8
         - ninja
