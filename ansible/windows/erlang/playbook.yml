@@ -1,0 +1,123 @@
+---
+- hosts: all
+
+  tasks:
+
+    - name: "Install tools"
+      win_chocolatey:
+        name: "{{ item }}"
+        allow_empty_checksums: "yes"
+      with_items:
+        - kb2919355
+        - kb2999226
+        - kb2919442
+        - git
+        - cmake
+        - curl
+        - ninja
+        - MinGW
+        - ruby
+        - 7zip.commandline
+        - jdk8
+        - maven
+        - nasm
+        - activeperl
+        - googlechrome
+        - insted
+        - vscode
+
+    # latest version doesn't work with R20
+    - name: "Install nsis"
+      win_chocolatey:
+        name: nsis
+        version: 2.49
+
+    - name: Create download area for Ansible
+      win_file:
+        path: C:\ansible_files
+        state: directory
+      tags:
+        - cygwin
+
+    - name: Download Cygwin setup program
+      win_get_url:
+        url: https://cygwin.com/setup-x86_64.exe
+        dest: C:\ansible_files\cygwin_setup.exe
+      tags:
+        - cygwin
+
+    - name: Install Cygwin
+      script: install_cygwin.bat
+      tags:
+        - cygwin
+
+    # Some of these files contain private information, so they're not all in git.
+    - name: Create SSH directory
+      win_file:
+        path: C:\Users\Administrator\.ssh
+        state: directory
+
+    - name: Copy SSH config files
+      win_copy:
+        src: "./ssh/{{ item }}"
+        dest: C:\Users\Administrator\.ssh\{{ item }}
+      with_items:
+        - authorized_keys
+        - buildbot_id_dsa
+        - config
+        - environment
+        - id_rsa
+        - known_hosts
+
+    - name: "Enable Remote Desktop"
+      win_regedit:
+        key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+        name: fDenyTSConnections
+        data: 0
+        type: dword
+        state: present
+
+    - name: "Open Remote Desktop in firewall"
+      win_firewall_rule:
+        name: "remote desktop"
+        enable: yes
+        state: present
+        localport: 3389
+        action: allow
+        direction: in
+        protocol: TCP
+
+    - name: "Getting dos2unix tool"
+      win_get_url:
+        url: https://sourceforge.net/projects/dos2unix/files/dos2unix/7.3.4/dos2unix-7.3.4-win64.zip
+        dest: C:\dos2unix-7.3.4-win64.zip
+
+    - name: "Install dos2unix"
+      win_unzip:
+          src: C:\dos2unix-7.3.4-win64.zip
+          dest: C:\dos2unix-7.3.4-win64
+          creates: C:\dos2unix-7.3.4-win64
+
+    - name: Add tools to PATH.
+      win_path:
+          elements:
+          - C:\Program Files\CMake\bin
+          - C:\Program Files\git\cmd
+          - C:\Program Files\NASM
+          - C:\dos2unix-7.3.4-win64\bin
+
+    - name: "Install visualstudio2013professional"
+      win_chocolatey:
+        name: visualstudio2013professional
+        allow_empty_checksums: "yes"
+        package_params: "-paramns \"/ProductKey:{{ vskey }}\""
+
+   # Do OpenSSH last so the service has the latest version of the path
+    - name: Install OpenSSH (for Jenkins)
+      win_chocolatey:
+        name: openssh
+        params: /SSHServerFeature
+        state: latest
+
+    - name: Reboot Windows
+      win_reboot:
