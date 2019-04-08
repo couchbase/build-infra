@@ -86,12 +86,6 @@ RUN zypper -n install perl && \
     cd libtool-2.4.2 && ./configure --prefix=/usr/local && make -j8 && make install && \
     cd /tmp && rm -rf /tmp/deploy && zypper clean
 
-# * ccache symlinks
-RUN ln -s /usr/bin/ccache /home/couchbase/bin/gcc && \
-    ln -s /usr/bin/ccache /home/couchbase/bin/g++ && \
-    ln -s /usr/bin/ccache /home/couchbase/bin/cc && \
-    ln -s /usr/bin/ccache /home/couchbase/bin/c++
-
 # * repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
