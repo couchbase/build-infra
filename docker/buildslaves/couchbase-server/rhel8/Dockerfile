@@ -1,6 +1,6 @@
 # Docker container for RHEL 8.0
 
-FROM registry.access.redhat.com/ubi8/ubi:latest
+FROM registry.access.redhat.com/ubi8-dev-preview/ubi:latest
 MAINTAINER build-team@couchbase.com
 
 USER root
@@ -31,8 +31,6 @@ RUN dnf install --setopt=keepcache=0 -y \
                 autoconf \
                 automake \
                 ed \
-                gcc \
-                gcc-c++ \
                 git \
                 glibc-devel \
                 hostname \
@@ -79,10 +77,10 @@ COPY build/swarm*.properties /
 # Set default Python to Python 2
 RUN alternatives --set python /usr/bin/python2
 
-# GCC (from couchbasebuild/centos-7-gcc)
-#COPY build/local /usr/local
-#RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
-#     mv /tmp/ld.so.conf /etc && ldconfig
+# GCC (from couchbasebuild/rhel-8-gcc)
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+     mv /tmp/ld.so.conf /etc && ldconfig
 
 # Install third-party build dependencies
 RUN dnf install -y --setopt=keepcache=0 perl-Data-Dumper

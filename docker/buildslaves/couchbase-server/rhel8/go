@@ -13,6 +13,17 @@ mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 
+# Only copy this if it doesn't exist. Prevents re-running steps in
+# this Dockerfile. This does mean that if you need to update the gcc,
+# you need to manually delete this directory and rebuild.
+# Note: the gcc build image is in build-infra.
+if [ ! -d build/local ]
+then
+    docker run --rm -v $(pwd)/build:/output \
+        couchbasebuild/rhel-8-gcc:7.3.0 \
+        cp -a /usr/local /output
+fi
+
 docker build \
 --build-arg RH_USER=${RH_USER} \
     --build-arg RH_PASSWORD=${RH_PASSWORD} \
