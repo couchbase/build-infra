@@ -84,7 +84,7 @@ services:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
 
   centos6:
-    image: couchbasebuild/sdk-centos6-build:20190220
+    image: couchbasebuild/sdk-centos6-build:20190416
     environment:
       - "JENKINS_SLAVE_NAME=build-centos6"
       - "JENKINS_SLAVE_LABELS=centos6"
