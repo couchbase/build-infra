@@ -104,6 +104,8 @@ cd ${LATESTBUILDS}/couchbase-lite-log
 
 # older than 30/60 days
 remove_glob "*.zip*" 60
+remove_glob "*.rpm*" 60
+remove_glob "*.deb*" 60
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-cblite
