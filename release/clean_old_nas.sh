@@ -19,38 +19,35 @@ cd ${LATESTBUILDS}/couchbase-server
 remove_glob "*windows_amd64-bits.tar" 1
 
 # All MacOS .orig files from codesigning
-remove_glob "*macos*.orig" 5
+remove_glob "*macos*.orig" 2
 
-# All debug packages older than 30 days
-remove_glob "*debug*" 30
-remove_glob "*dbg*" 30
-remove_glob "*-PDB.zip" 30
+# All debug packages older than 15 days
+remove_glob "*debug*" 15
+remove_glob "*dbg*" 15
+remove_glob "*-PDB.zip" 15
 
 # All Ubuntu 12/14, Debian 8, Centos 6, Suse, Mac, "oel", and Windows builds
-# older than 30/60 days
-remove_glob "*amzn2*.rpm*" 30
-remove_glob "*macos*.zip*" 30
-remove_glob "*windows*exe*" 30
-remove_glob "*windows*msi*" 60
-remove_glob "*ubuntu12.04*.deb*" 30
-remove_glob "*ubuntu14.04*.deb*" 30
-remove_glob "*ubuntu16.04*.deb*" 30
-remove_glob "*ubuntu18.04*.deb*" 30
-remove_glob "*debian7*.deb*" 60
-remove_glob "*debian8*.deb*" 30
-remove_glob "*debian9*.deb*" 30
-remove_glob "*centos6*.rpm*" 30
-remove_glob "*suse11*.rpm*" 30
-remove_glob "*suse12*.rpm*" 30
-remove_glob "*oel*.rpm*" 30
+# older than 15/30 days
+remove_glob "*amzn2*.rpm" 15
+remove_glob "*macos*.zip*" 15
+remove_glob "*windows*exe*" 15
+remove_glob "*windows*msi*" 30
+remove_glob "*ubuntu*.deb*" 15
+remove_glob "*debian7*.deb*" 30
+remove_glob "*debian8*.deb*" 15
+remove_glob "*debian9*.deb*" 15
+remove_glob "*centos6*.rpm*" 15
+remove_glob "*suse*.rpm*" 15
+remove_glob "*rhel8*.rpm*" 15
+remove_glob "*oel*.rpm*" 15
 
 echo @@@@@@@@@
 echo Clean up cbq
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/cbq
-remove_glob cbq-linux 30
-remove_glob cbq-macos 30
-remove_glob cbq-windows.exe 30
+remove_glob cbq-linux 15
+remove_glob cbq-macos 15
+remove_glob cbq-windows.exe 15
 
 echo @@@@@@@@@
 echo Clean up couchbase-sync-gateway
@@ -120,5 +117,5 @@ echo Clean up ALL products
 echo @@@@@@@@@
 cd ${LATESTBUILDS}
 
-# All Source tarballs older than 7 days
-remove_glob "*source.tar.gz" 7
+# All Source tarballs older than 2 days
+remove_glob "*source.tar.gz" 2
