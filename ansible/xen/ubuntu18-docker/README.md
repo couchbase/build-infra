@@ -7,11 +7,22 @@ This Ansible playbook will deploy a fresh Ubuntu 18.04 VM configured with:
 
 Note: It is assumed that the target Xen Server has an ISO Library configured
 which contains "ubuntu-18.04-fully-automated.iso". Instructions on creating
-that ISO are in the fully_automated_iso subdirectory.
+that ISO are in the fully_automated_iso subdirectory. You can configure this
+in XenCenter by navigating to the "Storage" tab for the VM host and:
+
+ - click "New SR"
+ - select "NFS ISO" for the Type
+ - provide any name; I recommend "NFS ISO Library (Ubuntu)"
+ - you can leave "Autogenerate description based on SR settings" checked
+ - provide the share name "172.23.120.24:/data/builds/iso" (assuming that
+   the NAS IP hasn't changed) and select NFSv3
 
 The ssh password for the Xen host must be specified on the command line
-in the variable cmdline_password. You should also specify a custom value for
-vm_name.
+in the variable cmdline_password.
+
+You should also specify a custom value for vm_name. This will be used for
+the hostname of the new VM, including DNS, so don't include odd characters
+like periods or underscores.
 
 The default values for memory, disk size, and number of CPUs are in
 'inventory', and can be overridden on the command line. You can also

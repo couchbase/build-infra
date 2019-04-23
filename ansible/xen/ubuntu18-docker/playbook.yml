@@ -42,11 +42,8 @@
     - name: Attach VM to {{ network_name }}
       command: xe vif-create vm-uuid={{ vmuuid.stdout }} network-uuid={{ networkuuid.stdout }} mac=random device=0
 
-    - name: Create and attach CDROM drive
-      command: xe vbd-create type=CD device=xvdd vm-uuid={{ vmuuid.stdout }} mode=ro
-
-    - name: Insert Installation CD in CDROM drive
-      command: xe vm-cd-insert cd-name={{ install_iso }} vm={{ vmuuid.stdout }}
+    - name: Insert CD
+      command: xe vm-cd-add vm={{ vmuuid.stdout }} cd-name="{{ install_iso }}" device=1
 
     - name: Boot VM and start installation
       command: xe vm-start uuid={{ vmuuid.stdout }}
@@ -81,8 +78,19 @@
 
   tasks:
 
-    - name: Check Time
-      shell: date
+    # The space in " yes" is important due to the way 'cut' works
+    - name: Wait for clock to synchronize
+      shell: export synced=no; while [ "$synced" != " yes" ]; do sleep 1; synced=$(timedatectl status | grep synchronized | cut -d':' -f2); done
+
+    - name: Set hostname
+      hostname:
+        name: "{{ vm_name }}"
+
+    - name: Update /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1'
+        line: "127.0.1.1 {{ vm_name }}"
 
     - name: Apt Update
       apt:
@@ -125,15 +133,14 @@
 
     - name: Install additional packages for Docker and NFS
       apt:
-        name: "{{ item }}"
-      with_items:
-        - apt-transport-https
-        - ca-certificates
-        - software-properties-common
-        - python-pip
-        - curl
-        - nfs-common
-        - zsh
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+          - python-pip
+          - curl
+          - nfs-common
+          - zsh
 
     - name: Mount NAS directories
       tags: mount
@@ -159,6 +166,8 @@
     - name: Add docker key
       shell: >
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      args:
+        warn: False
 
     - name: Add docker apt repository
       shell: >
