@@ -10,7 +10,9 @@ version: '3.5'
 # https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
 x-default-jenkins-slave: &default-jenkins-slave
   deploy:
-    replicas: 1
+    replicas: 2
+    update_config:
+      parallelism: 1000
   networks:
     - jenkins
   configs:
@@ -41,16 +43,12 @@ x-default-jenkins-slave-environment:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20190310
+    image: couchbasebuild/server-amzn2-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=amzn2 alice mad-hatter master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
 
   centos6:
     image: couchbasebuild/server-centos6-build:20181218
@@ -60,9 +58,11 @@ services:
       - *default-jenkins-slave-environment-master
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
     <<: *default-jenkins-slave
+    deploy:
+      replicas: 1
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20190310
+    image: couchbasebuild/server-centos7-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 vulcan alice mad-hatter master"
@@ -70,7 +70,7 @@ services:
     <<: *default-jenkins-slave
 
   debian8:
-    image: couchbasebuild/server-debian8-build:20190310
+    image: couchbasebuild/server-debian8-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
       - "JENKINS_SLAVE_LABELS=debian8 vulcan alice mad-hatter master"
@@ -78,7 +78,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/server-debian9-build:20190310
+    image: couchbasebuild/server-debian9-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=debian9 vulcan alice mad-hatter master"
@@ -86,16 +86,12 @@ services:
     <<: *default-jenkins-slave
 
   rhel8:
-    image: couchbasebuild/server-rhel8-build:20190410
+    image: couchbasebuild/server-rhel8-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8"
       - "JENKINS_SLAVE_LABELS=rhel8 alice mad-hatter master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
 
   suse11:
     image: couchbasebuild/server-suse11-build:20180713
@@ -104,18 +100,16 @@ services:
       - "JENKINS_SLAVE_LABELS=suse11 vulcan alice mad-hatter master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
+    deploy:
+      replicas: 1
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20190320
+    image: couchbasebuild/server-suse15-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=suse15 mad-hatter master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
 
   ubuntu14:
     image: couchbasebuild/server-ubuntu14-build:20180829
@@ -124,9 +118,11 @@ services:
       - "JENKINS_SLAVE_LABELS=ubuntu14.04 ubuntu14 vulcan alice"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
+    deploy:
+      replicas: 1
 
   ubuntu16:
-    image: couchbasebuild/server-ubuntu16-build:20190310
+    image: couchbasebuild/server-ubuntu16-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice mad-hatter master"
@@ -134,16 +130,12 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20190310
+    image: couchbasebuild/server-ubuntu18-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18 alice mad-hatter master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
 
 configs:
   couchbase_ssh_config_20181212:

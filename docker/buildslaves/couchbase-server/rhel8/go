@@ -25,7 +25,8 @@ then
 fi
 
 docker build \
---build-arg RH_USER=${RH_USER} \
+    --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+    --build-arg RH_USER=${RH_USER} \
     --build-arg RH_PASSWORD=${RH_PASSWORD} \
     --build-arg RH_POOL_ID=${RH_POOL_ID} \
     -t ${IMAGE}:${TAG} .

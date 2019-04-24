@@ -99,9 +99,17 @@ RUN mkdir /tmp/deploy && \
     cd /tmp && rm -rf deploy
 ENV JAVA_HOME=/usr/java/latest
 
+# Set LANG
+ENV LANG=en_US.UTF-8
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "default" ]
+
+# Keep this stuff at the end, because the ARG declaration breaks
+# Docker build caching
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}

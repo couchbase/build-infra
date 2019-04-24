@@ -72,8 +72,6 @@ RUN groupadd -g1000 couchbase && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 
-COPY build/swarm*.properties /
-
 # Set default Python to Python 2
 RUN alternatives --set python /usr/bin/python2
 
@@ -111,3 +109,8 @@ ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
+
+# Keep this stuff at the end, because the ARG declaration breaks
+# Docker build caching
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}

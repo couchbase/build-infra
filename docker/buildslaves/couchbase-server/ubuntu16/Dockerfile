@@ -122,6 +122,8 @@ RUN apt-get update && \
     apt-get install -y locales && \
     apt-get clean && \
     locale-gen en_US.UTF-8
+
+# Set LANG
 ENV LANG=en_US.UTF-8
 
 # Set AWS credentials file environmental variable
@@ -136,3 +138,8 @@ ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
+
+# Keep this stuff at the end, because the ARG declaration breaks
+# Docker build caching
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}

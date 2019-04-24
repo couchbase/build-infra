@@ -17,5 +17,5 @@ then
         localonly/suse-12-gcc:7.3.0 \
         cp -a /usr/local /output
 fi
-docker build --build-arg REGCODE=$(cat $HOME/jenkinsdocker-ssh/suse_regcode.txt) -t ${IMAGE}:${TAG} .
+docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} --build-arg REGCODE=$(cat $HOME/jenkinsdocker-ssh/suse_regcode.txt) -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest

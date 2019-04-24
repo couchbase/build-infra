@@ -74,6 +74,12 @@ RUN ln -s /usr/bin/ccache /home/couchbase/bin/gcc && \
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# Set LANG
+ENV LANG=en_US.UTF-8
+
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
+
 # Run our builder startup script
 ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
