@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+export PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/ccache/libexec:/usr/local/bin:$PATH
+export LANG=en_US.UTF-8

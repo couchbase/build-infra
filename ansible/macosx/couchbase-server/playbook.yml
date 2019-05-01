@@ -28,10 +28,9 @@
       with_items:
         - authorized_keys
 
-    - name: Add default paths
+    - name: Add Jenkins' profile
       copy:
-        src=./files/jenkins dest=/etc/paths.d/jenkins owner=root group=wheel mode=0644
-      become: true
+        src=./files/jenkins_profile dest=/Users/jenkins/.profile owner=jenkins group=staff mode=0644
 
     - name: Create required /opt/couchbase directory
       file: path=/opt/couchbase state=directory owner=jenkins group=staff mode=0755
