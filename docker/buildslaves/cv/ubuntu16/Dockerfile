@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 16.04
 
-FROM couchbasebuild/server-ubuntu16-build:20181125
+FROM couchbasebuild/server-ubuntu16-build:20190430
 MAINTAINER build-team@couchbase.com
 
 USER root
@@ -72,9 +72,7 @@ ADD gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
-RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
-RUN echo "CONTAINER_TAG=${CONTAINER_TAG}" > /home/couchbase/.ssh/environment
-RUN chown couchbase:couchbase /home/couchbase/.ssh/environment
+RUN echo "CONTAINER_TAG=${CONTAINER_TAG}" >> /home/couchbase/.ssh/environment
 

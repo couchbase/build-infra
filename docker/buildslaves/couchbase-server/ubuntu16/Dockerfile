@@ -123,9 +123,6 @@ RUN apt-get update && \
     apt-get clean && \
     locale-gen en_US.UTF-8
 
-# Set LANG
-ENV LANG=en_US.UTF-8
-
 # Set AWS credentials file environmental variable
 ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 
@@ -138,6 +135,12 @@ ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
+
+# Set LANG
+ENV LANG=en_US.UTF-8
+RUN echo "LANG=${LANG}" > /home/couchbase/.ssh/environment && \
+    chown couchbase:couchbase /home/couchbase/.ssh/environment && \
+    echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching

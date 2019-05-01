@@ -102,6 +102,9 @@ ENV JAVA_HOME=/usr/java/latest
 # Set LANG
 ENV LANG=en_US.UTF-8
 
+# Needs to be in .bashrc for some reason
+RUN echo "export LANG=en_US.UTF-8" >> /home/couchbase/.bashrc
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh

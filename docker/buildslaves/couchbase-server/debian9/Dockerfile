@@ -75,6 +75,13 @@ RUN mkdir /tmp/deploy && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
+# Update locale
+RUN apt-get update && \
+    apt-get install -y locales && \
+    apt-get clean && \
+    sed -ie '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
+    locale-gen
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 

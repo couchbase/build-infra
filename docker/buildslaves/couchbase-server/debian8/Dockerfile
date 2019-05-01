@@ -1,6 +1,6 @@
-# Docker container for Debian 8.2 (Jessie)
+# Docker container for Debian 8 (Jessie)
 
-FROM debian:8.2
+FROM debian:8
 MAINTAINER ceej@couchbase.com
 
 USER root
@@ -9,7 +9,7 @@ USER root
 RUN apt-get update && \
     apt-get install -y openssh-server sudo curl && \
     rm -f /var/cache/apt/archives/*.deb && \
-    mkdir /var/run/sshd # update 3
+    mkdir /var/run/sshd # update 4
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -18,10 +18,18 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# Jenkins Swarm jar
+# Jenkins Swarm jar and JDK
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
     -o /usr/local/lib/swarm-client.jar
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.3%2B7/OpenJDK11U-jre_x64_linux_hotspot_11.0.3_7.tar.gz -o jre.tgz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/jre.tgz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # tini, to avoid zombie issues when running with Swarm jar
 ENV TINI_VERSION v0.18.0
@@ -55,12 +63,6 @@ RUN apt-get update && \
         libsqlite3-dev && \
     apt-get clean
 
-# https://unix.stackexchange.com/questions/342403/openjdk-8-jre-headless-depends-ca-certificates-java-but-it-is-not-going-to-be
-RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -t jessie-backports -y openjdk-8-jre-headless ca-certificates-java && \
-    apt-get clean
-
 # GCC (from couchbasebuild/debian-8-gcc)
 COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
@@ -79,6 +81,13 @@ RUN mkdir /tmp/deploy && \
     curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
+
+# Update locale
+RUN apt-get update && \
+    apt-get install -y locales && \
+    apt-get clean && \
+    sed -ie '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
+    locale-gen
 
 # Set LANG
 ENV LANG=en_US.UTF-8

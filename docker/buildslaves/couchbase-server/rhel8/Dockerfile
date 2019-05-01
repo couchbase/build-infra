@@ -33,6 +33,7 @@ RUN dnf install --setopt=keepcache=0 -y \
                 ed \
                 git \
                 glibc-devel \
+                glibc-langpack-en \
                 hostname \
                 libtirpc-devel \
                 libtool \
@@ -53,6 +54,7 @@ RUN dnf install --setopt=keepcache=0 -y \
                 sqlite-devel \
                 sudo \
                 unzip && \
+    dnf clean packages && \
     ln -s /usr/bin/python2.7 /usr/bin/python2.6
 
 # Set up for SSH daemon
@@ -80,9 +82,6 @@ COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
-# Install third-party build dependencies
-RUN dnf install -y --setopt=keepcache=0 perl-Data-Dumper
-
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
     curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
@@ -99,6 +98,9 @@ RUN mkdir /tmp/deploy && \
 # * repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
+
+# Set LANG
+ENV LANG=en_US.UTF-8
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
