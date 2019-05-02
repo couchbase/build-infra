@@ -3,5 +3,5 @@ Host github.com
 Host review.couchbase.org
     User         ns-codereview
     Port         29418
-    IdentityFile ~/.ssh/id_ns-codereview
+    IdentityFile ~/.ssh/id_%r
 

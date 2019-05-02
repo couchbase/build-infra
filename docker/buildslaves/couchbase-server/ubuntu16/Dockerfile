@@ -44,6 +44,7 @@ RUN apt-get update && \
         rake \
         ncurses-dev \
         python-dev \
+        python-pip \
         devscripts \
         debhelper \
         dh-systemd \
@@ -64,22 +65,8 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 # is part of the v8 build. python2.6 is also required for our compiling of
 # pysqlite and pysnappy, and for that we even need python2.6-dev.
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y m4 python2.6 python2.6-dev && \
+    apt-get install -y m4 autoconf automake libtool && \
     apt-get clean
-RUN mkdir /tmp/deploy && \
-    curl -L http://ftpmirror.gnu.org/autoconf/autoconf-2.69.tar.gz -o /tmp/deploy/autoconf-2.69.tar.gz && \
-    cd /tmp/deploy && tar -xzf autoconf-2.69.tar.gz && \
-    cd autoconf-2.69 && ./configure --prefix=/usr/local && make && make install && \
-    curl -L http://ftpmirror.gnu.org/automake/automake-1.14.tar.gz -o /tmp/deploy/automake-1.14.tar.gz && \
-    cd /tmp/deploy && tar -xzf automake-1.14.tar.gz && \
-    cd automake-1.14 && ./configure --prefix=/usr/local && make && make install && \
-    curl -L http://ftpmirror.gnu.org/libtool/libtool-2.4.2.tar.gz -o /tmp/deploy/libtool-2.4.2.tar.gz && \
-    cd /tmp/deploy && tar -xzf libtool-2.4.2.tar.gz && \
-    cd libtool-2.4.2 && ./configure --prefix=/usr/local && make && make install && \
-    cd /tmp && rm -rf /tmp/deploy
 
 RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
 RUN mkdir /tmp/deploy && \
@@ -91,21 +78,19 @@ RUN mkdir /tmp/deploy && \
 
 # Python 3-specific stuff for build scripts, mostly for Jira.
 RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
     apt-get -y install python3.6 python3.6-dev python3.6-venv libffi-dev && \
     apt-get clean && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 && \
-    curl https://bootstrap.pypa.io/get-pip.py | python3
+    curl https://bootstrap.pypa.io/get-pip.py | python3 && \
+    rm /usr/local/bin/pip /usr/local/bin/easy_install
 
 RUN pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     ccache --clear
-
-# Python 2-specific stuff for build scripts, mostly old build-sanity stuff.
-RUN apt-get update && \
-    apt-get -y install python-pip && \
-    pip install jenkinsapi && \
-    apt-get clean
 
 # s3cmd for upload script
 RUN apt-get update && \

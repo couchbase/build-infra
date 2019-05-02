@@ -1,15 +1,9 @@
 # Docker container for Ubuntu 16.04
 
-FROM couchbasebuild/server-ubuntu16-build:20190430
+FROM couchbasebuild/server-ubuntu16-build:20190501
 MAINTAINER build-team@couchbase.com
 
 USER root
-
-# Code coverage requires gcovr to convert from gcov to XML files consumable by
-# Jenkins.
-RUN apt-get update && \
-    apt-get install -y python-pip && \
-    pip install gcovr
 
 # Valgrind needed for leak checking as part of unit tests. Note: It requires
 # libc debug symbols (libc6-dbg) to ensure it can locate the address of strlen().
@@ -22,10 +16,9 @@ RUN mkdir /tmp/deploy && \
     apt-get update &&  apt-get install -y libc6-dbg && \
     rm -f /var/cache/apt/archives/*.deb
 
-# install easy_install and paramiko
-RUN apt-get update && apt-get install -y python-setuptools && \
-    rm -f /var/cache/apt/archives/*.deb && \
-    easy_install paramiko
+# paramiko for testrunner. Code coverage requires gcovr to convert from gcov
+# to XML files consumable by Jenkins.
+RUN pip install paramiko gcovr
 
 # Install Clang 6.0 (current stable) - needed for building with ThreadSanitizer.
 # (Note: This doesn't change the default compiler; users must explicitly
