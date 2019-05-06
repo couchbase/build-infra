@@ -14,7 +14,7 @@
         hostname: "{{ item }}"
         groups: swarm_manager_operational
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' == 'active'"
+      when: hostvars[item]['docker_info']['Swarm']['LocalNodeState'] == 'active'
       run_once: true
 
     - name: create swarm_manager_bootstrap group
@@ -22,7 +22,7 @@
         hostname: "{{ item }}"
         groups: swarm_manager_bootstrap
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' != 'active'"
+      when: hostvars[item]['docker_info']['Swarm']['LocalNodeState'] != 'active'
       run_once: true
 
 # determine the status of each worker node and break them
@@ -40,7 +40,7 @@
         hostname: "{{ item }}"
         groups: swarm_worker_operational
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' == 'active'"
+      when: hostvars[item]['docker_info']['Swarm']['LocalNodeState'] == 'active'
       run_once: true
 
     - name: create swarm_worker_bootstrap group
@@ -48,7 +48,7 @@
         hostname: "{{ item }}"
         groups: swarm_worker_bootstrap
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' != 'active'"
+      when: hostvars[item]['docker_info']['Swarm']['LocalNodeState'] != 'active'
       run_once: true
 
 # when the swarm_manager_operational group is empty, meaning there
