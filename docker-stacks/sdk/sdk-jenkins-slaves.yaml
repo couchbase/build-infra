@@ -1,0 +1,126 @@
+version: '3.5'
+
+# Suggested deployment command:
+#  docker --host mega4-swarm.build.couchbase.com stack deploy -c sdk-jenkins-slaves.yaml sdk
+# All services, networks, etc. will then get an "sdk_" prefix,
+# eg. "sdk_centos7"
+
+# Default slave configuration. This is written using a YAML anchor so
+# it can be substituted into all the slave declarations later. See
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+x-default-jenkins-slave: &default-jenkins-slave
+  deploy:
+    replicas: 2
+  networks:
+    - jenkins
+  secrets:
+    - source: ns-buildbot.rsa
+      target: /home/couchbase/.ssh/ns-buildbot.rsa
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: buildbot_id_dsa
+      target: /home/couchbase/.ssh/buildbot_id_dsa
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_private_key.gpgkey
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_public_key.gpgkey
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_jenkins_master_username
+      target: jenkins_master_username
+    - source: sdk_jenkins_master_password
+      target: jenkins_master_password
+  configs:
+    - source: jenkins_slave_ssh_config_20190423
+      target: /home/couchbase/.ssh/config
+      uid: '1000'
+      gid: '1000'
+      mode: 0644
+
+
+x-default-jenkins-slave-environment:
+# Due to https://github.com/docker/compose/issues/229, the Jenkins container is
+# created with a container name "sdk_jenkins", which is not a valid DNS entry.
+# "dig" will actually resolve it OK inside another container, but Java will
+# not, so we can't reference eg. "http://sdk_jenkins:8080/" as you would expect.
+# However, fortunately the "short" service name (the name from here in this
+# compose file) also works, so we use that here for the master URL.
+ - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://sdk-swarm.build.couchbase.com:8080/"
+
+services:
+
+  centos6:
+    image: couchbasebuild/sdk-centos6-build:20190430
+    environment:
+      - "JENKINS_SLAVE_NAME=build-centos6"
+      - "JENKINS_SLAVE_LABELS=centos6"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  centos7:
+    image: couchbasebuild/sdk-centos7-build:20190430
+    environment:
+      - "JENKINS_SLAVE_NAME=build-centos7"
+      - "JENKINS_SLAVE_LABELS=centos7"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  debian8:
+    image: couchbasebuild/sdk-debian8-build:20190430
+    environment:
+      - "JENKINS_SLAVE_NAME=build-debian8"
+      - "JENKINS_SLAVE_LABELS=debian8"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  debian9:
+    image: couchbasebuild/sdk-debian9-build:20190430
+    environment:
+      - "JENKINS_SLAVE_NAME=build-debian9"
+      - "JENKINS_SLAVE_LABELS=debian9"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  ubuntu14:
+    image: couchbasebuild/sdk-ubuntu14-build:20190430
+    environment:
+      - "JENKINS_SLAVE_NAME=build-ubuntu14"
+      - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  ubuntu16:
+    image: couchbasebuild/sdk-ubuntu16-build:20190430
+    environment:
+      - "JENKINS_SLAVE_NAME=build-ubuntu16"
+      - "JENKINS_SLAVE_LABELS=ubuntu16 ubuntu16.04"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+secrets:
+  # SSH key which can read private GitHub repos
+  ns-buildbot.rsa:
+    external: true
+  sdk_jenkins_master_username:
+    external: true
+  sdk_jenkins_master_password:
+    external: true
+  buildbot_id_dsa:
+    external: true
+  sdk_private_key.gpgkey:
+    external: true
+  sdk_public_key.gpgkey:
+    external: true
+
+configs:
+  jenkins_slave_ssh_config_20190423:
+    file: conf/jenkins_slave_ssh_config
+
+networks:
+  jenkins:
