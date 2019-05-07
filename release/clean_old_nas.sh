@@ -30,6 +30,7 @@ remove_glob "*-PDB.zip" 15
 # older than 15/30 days
 remove_glob "*amzn2*.rpm" 15
 remove_glob "*macos*.zip*" 15
+remove_glob "*macos*.dmg*" 15
 remove_glob "*windows*exe*" 15
 remove_glob "*windows*msi*" 30
 remove_glob "*ubuntu*.deb*" 15
