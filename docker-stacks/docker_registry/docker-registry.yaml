@@ -37,6 +37,8 @@ services:
       ENV_DOCKER_REGISTRY_HOST: registry
       ENV_DOCKER_REGISTRY_PORT: 443
       ENV_DOCKER_REGISTRY_USE_SSL: 1
+      ENV_REGISTRY_PROXY_FQDN: build-docker.couchbase.com
+      ENV_REGISTRY_PROXY_PORT: 443
     networks:
       registry:
 
@@ -47,7 +49,7 @@ services:
     ports:
       - 8020:80
     environment:
-      REGISTRY_URL: https://registry:443
+      REGISTRY_URL: https://build-docker.couchbase.com:443
       DELETE_IMAGES: "true"
       REGISTRY_TITLE: "Couchbase Build Registry"
     networks:
