@@ -55,6 +55,14 @@ x-default-jenkins-slave-environment:
 
 services:
 
+  amzn2:
+    image: couchbasebuild/sdk-amzn2-build:20190506
+    environment:
+      - "JENKINS_SLAVE_NAME=build-amzn2"
+      - "JENKINS_SLAVE_LABELS=amzn2"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
   centos6:
     image: couchbasebuild/sdk-centos6-build:20190430
     environment:
