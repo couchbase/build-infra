@@ -16,9 +16,10 @@ RUN mkdir /tmp/deploy && \
     apt-get update &&  apt-get install -y libc6-dbg && \
     rm -f /var/cache/apt/archives/*.deb
 
-# paramiko for testrunner. Code coverage requires gcovr to convert from gcov
-# to XML files consumable by Jenkins.
-RUN pip install paramiko gcovr
+# Code coverage requires gcovr to convert from gcov to XML files consumable by Jenkins.
+# Also, if we eventually remove paramiko from the main buildslave image, we could add
+# it back here for CV.
+RUN pip install gcovr
 
 # Install Clang 6.0 (current stable) - needed for building with ThreadSanitizer.
 # (Note: This doesn't change the default compiler; users must explicitly

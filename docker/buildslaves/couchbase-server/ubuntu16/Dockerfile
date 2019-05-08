@@ -59,11 +59,7 @@ COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
-# Install third-party build dependencies. Note: software-properties-common
-# is only required for add-apt-repository; add-apt-repository is only
-# required to get python2.6; and python2.6 is only required for gyp, which
-# is part of the v8 build. python2.6 is also required for our compiling of
-# pysqlite and pysnappy, and for that we even need python2.6-dev.
+# Install third-party build dependencies.
 RUN apt-get update && \
     apt-get install -y m4 autoconf automake libtool && \
     apt-get clean
@@ -91,6 +87,10 @@ RUN pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     ccache --clear
+
+# Still need paramiko in python2 for testrunner (necessary at least for simple-test,
+# which runs in the build image rather than the full CV image)
+RUN pip install paramiko
 
 # s3cmd for upload script
 RUN apt-get update && \

@@ -107,6 +107,11 @@ RUN mkdir /tmp/deploy && \
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# Still need paramiko in python2 for testrunner (necessary at least for simple-test,
+# which runs in the build image rather than the full CV image)
+RUN curl "https://bootstrap.pypa.io/get-pip.py" | python && \
+    pip install paramiko
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 

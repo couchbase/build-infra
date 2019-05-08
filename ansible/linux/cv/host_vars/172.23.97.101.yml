@@ -1,10 +1,10 @@
 ---
 slaves:
   - slave_name: slave-ubuntu16-unit-simple
-    docker_image: couchbasebuild/server-ubuntu16-build:20190501
+    docker_image: couchbasebuild/server-ubuntu16-build:20190507
     port: 2224
   - slave_name: slave-ubuntu14-unit-simple
     docker_image: ceejatec/ubuntu-1404-couchbase-build:20180109
     port: 2223
   - slave_name: slave-centos7-unit-simple
-    docker_image: couchbasebuild/server-centos7-build:20190430
+    docker_image: couchbasebuild/server-centos7-build:20190507
