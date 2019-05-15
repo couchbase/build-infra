@@ -121,9 +121,38 @@
         state: directory
 
     - name: "Install repo"
+      win_get_url:
+        url: "https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo"
+        dest: 'C:\bin\repo'
+      tags:
+        - repo
+
+    # This repo.exe was built using the "py-wrapper" source code here:
+    # https://github.com/couchbase/build-tools/tree/master/py-wrapper
+    - name: "Install repo wrapper"
       win_copy:
-        src: "repo.exe"
-        dest: 'C:\bin\repo.exe'
+        src: repo.exe
+        dest: 'C:\bin\'
+
+    # Due to a silly bug in ESRlabs' Repo port, git's core.pager setting MUST
+    # be set, and moreover it MUST be set to a command that exists as a .exe.
+    # more is actually "more.com", and while setting core.pager to "more.com"
+    # works well from a command prompt, it throws a Python error when invoked
+    # via Jenkins "Gerrit Repo" source-control plugin. So, we use MSYS's
+    # "cat.exe", which requires that we copy both that file and a few MSYS
+    # DLLs onto the PATH.
+    - name: "Copy MSYS tools to C:\\bin for repo"
+      win_copy:
+        src: 'C:\Program Files\Git\usr\bin\{{ item }}'
+        dest: 'C:\bin\'
+        remote_src: yes
+      loop:
+        - cat.exe
+        - msys-2.0.dll
+        - msys-iconv-2.dll
+        - msys-intl-8.dll
+      tags:
+        - repo
 
     - name: "Download patch_via_gerrit"
       win_get_url:
@@ -169,6 +198,13 @@
         - environment
         - id_rsa
         - known_hosts
+
+    - name: Copy .gitconfig file
+      win_copy:
+        src: "gitconfig"
+        dest: C:\Users\Administrator\.gitconfig
+      tags:
+        - repo
 
     - name: "Enable Remote Desktop"
       win_regedit:
