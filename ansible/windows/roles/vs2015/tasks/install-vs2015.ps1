@@ -22,7 +22,7 @@ function Invoke-InstallVS() {
     if (Test-Path("$baseFile.DONE")) {
       Move-Item "$baseFile.DONE" "$baseFile.$((Get-Date -Format O) -replace ':','').BAK";
     }
-    choco.exe install visualstudio2015professional --installargs "/ProductKey $vskey /AdminFile C:\vs2015\vs-unattended.xml" -y | Out-File "$baseFile.PROCESSING";
+    choco.exe install visualstudio2015professional --installargs "/ProductKey $vskey /AdminFile C:\vs2015\vs-unattended.xml " -y -f | Out-File "$baseFile.PROCESSING";
     Move-Item "$baseFile.PROCESSING" "$baseFile.DONE";
   };
 

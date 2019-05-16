@@ -1,12 +1,6 @@
 ---
 - hosts: all
 
-  roles:
-    - vs2012
-    - vs2013
-    - vs2015
-    - vs2017
-
   tasks:
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
@@ -19,6 +13,9 @@
         name: "{{ item }}"
         allow_empty_checksums: "yes"
       with_items:
+        - kb2919355
+        - kb2999226
+        - kb2919442
         - git
         - cmake
         - ninja
@@ -45,21 +42,21 @@
 
     - name: Create bin directory
       win_file:
-        path: "C:\\bin"
+        path: 'C:\bin'
         state: directory
 
     - name: "Install repo"
       win_copy:
         src: "repo.exe"
-        dest: "C:\\bin\\repo.exe"
+        dest: 'C:\bin\repo.exe'
 
     - name: Add tools to PATH.
-      include: extend-path.yml
-      with_items:
-        - C:\bin
-        - C:\Program Files\CMake\bin
-        - C:\Program Files\git\cmd
-        - C:\Program Files (x86)\WiX Toolset v3.11\bin
+      win_path:
+          elements:
+          - C:\bin
+          - C:\Program Files\CMake\bin
+          - C:\Program Files\git\cmd
+          - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
     - name: Install cbdep tool
       win_get_url:
@@ -105,4 +102,10 @@
         action: allow
         direction: in
         protocol: TCP
-        force: true
+
+  # Should be done last as it requires choco kbxxx pkg to install first
+  roles:
+  - vs2012
+  - vs2013
+  - vs2015
+  - vs2017
