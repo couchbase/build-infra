@@ -1,6 +1,6 @@
 # Docker container for RHEL 8.0
 
-FROM registry.access.redhat.com/ubi8-dev-preview/ubi:latest
+FROM registry.access.redhat.com/ubi8/ubi:latest
 MAINTAINER build-team@couchbase.com
 
 USER root
@@ -11,7 +11,7 @@ ARG RH_POOL_ID
 # Initialize a subscription and update the repositories
 RUN subscription-manager register --username ${RH_USER} --password ${RH_PASSWORD} && \
     subscription-manager refresh && subscription-manager attach --pool=${RH_POOL_ID} && \
-    yum makecache
+    yum makecache # cachebust3
 
 # Jenkins Swarm jar
 RUN dnf install -y java-1.8.0-openjdk-headless curl && \
@@ -42,7 +42,6 @@ RUN dnf install --setopt=keepcache=0 -y \
                 ncurses-devel \
                 numactl-devel \
                 openssh-clients \
-                openssh-server \
                 openssl-devel \
                 perl-Thread-Queue \
                 python2 \
@@ -57,12 +56,6 @@ RUN dnf install --setopt=keepcache=0 -y \
     dnf clean packages && \
     ln -s /usr/bin/python2.7 /usr/bin/python2.6
 
-# Set up for SSH daemon
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
-    sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config && \
-    ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa && \
-    ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
-
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN groupadd -g1000 couchbase && \
@@ -76,6 +69,18 @@ RUN groupadd -g1000 couchbase && \
 
 # Set default Python to Python 2
 RUN alternatives --set python /usr/bin/python2
+
+# Python 2 saves the GCC build flags from when it was built in this file,
+# and uses them when building extensions. That doesn't work for us, because
+# this Python 2 was built by Red Hat using GCC 8, and some of the flags
+# don't work in our GCC 7.3. So I manually removed the bad ones from this
+# file. This is a hack solution, but it's only necessary for building the
+# python-snappy module in Alice; we removed all such Python dependencies
+# from cbdeps in Mad-Hatter and don't build them ourselves anymore (they come
+# in from Anaconda). So this workaround gets us going for now.
+# In any case, this probably is unnecessary for 3.7.2+ and 3.6.8+.
+# https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
+COPY _sysconfigdata.py /usr/lib64/python2.7
 
 # GCC (from couchbasebuild/rhel-8-gcc)
 COPY build/local /usr/local

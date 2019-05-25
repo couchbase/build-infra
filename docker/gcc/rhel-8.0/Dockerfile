@@ -1,13 +1,13 @@
 # Docker container just to build GCC, because it's slow.
 
-FROM registry.access.redhat.com/ubi8-dev-preview/ubi:latest
+FROM registry.access.redhat.com/ubi8/ubi:latest
 MAINTAINER build-team@couchbase.com
 
 ARG GCC_VER=7.3.0
 
-#ARG RH_USER
-#ARG RH_PASSWORD
-#ARG RH_POOL_ID
+ARG RH_USER
+ARG RH_PASSWORD
+ARG RH_POOL_ID
 
 # Initialize a subscription and update the repositories
 RUN subscription-manager register --username ${RH_USER} --password ${RH_PASSWORD} && \

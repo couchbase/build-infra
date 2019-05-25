@@ -100,7 +100,7 @@ services:
     <<: *default-jenkins-slave
 
   rhel8:
-    image: couchbasebuild/server-rhel8-build:20190430
+    image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20190524
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8"
       - "JENKINS_SLAVE_LABELS=rhel8 alice mad-hatter master"

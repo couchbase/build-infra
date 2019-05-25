@@ -2,7 +2,7 @@
 
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
-IMAGE=couchbasebuild/server-rhel8-build
+IMAGE=build-docker.couchbase.com/couchbasebuild/server-rhel8-build
 
 PRIV_DIR=${HOME}/jenkinsdocker-ssh
 RH_USER=$(cat ${PRIV_DIR}/redhat_access_user.txt)
@@ -20,7 +20,7 @@ cp -a ../../util/swarm*.properties build
 if [ ! -d build/local ]
 then
     docker run --rm -v $(pwd)/build:/output \
-        couchbasebuild/rhel-8-gcc:7.3.0 \
+        build-docker.couchbase.com/couchbasebuild/rhel-8-gcc:7.3.0 \
         cp -a /usr/local /output
 fi
 
