@@ -61,8 +61,12 @@ RUN apt-get update && \
     apt-get install -y lua5.3 lua5.3-dev && \
     rm -fr /var/cache/apt/archives/*.deb
 
+# Install patch_via_gerrit tool
+RUN curl -L https://packages.couchbase.com/patch_via_gerrit/1.0.0/patch_via_gerrit-1.0.0-linux -o /usr/local/bin/patch_via_gerrit && \
+    chmod 755 /usr/local/bin/patch_via_gerrit
+
 # Enable .gitconfig so repo doesn't get whiny
-ADD gitconfig /home/couchbase/.gitconfig
+COPY gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
