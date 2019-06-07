@@ -3,5 +3,5 @@ xx.xx.xx.xx
 
 [all:vars]
 ansible_connection=ssh
-ansible_user=jenkins
+ansible_user=couchbase
 ansible_password=xxx

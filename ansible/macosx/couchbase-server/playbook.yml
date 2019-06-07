@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  user: jenkins
+  user: "{{ ansible_ssh_user }}"
 
   vars_files:
     - vars/main.yml
@@ -9,34 +9,42 @@
     - geerlingguy.homebrew
 
   tasks:
-    - name: Check if /usr/bin/java is already installed
-      stat:
-        path: /usr/bin/java
-      register: java_state
-
-    - name: Install java
-      homebrew_cask: name=java state=present
-      when: not java_state.stat.exists
-
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
 
+    - name: Create jenkins's .ssh directory
+      file: path=/Users/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
+
     - name: Copy SSH config files
       copy:
-        src=./ssh/{{ item }} dest=/Users/jenkins/.ssh/{{ item }} owner=jenkins group=staff mode=0644
+        src=./ssh/{{ item }} dest=/Users/{{ ansible_ssh_user }}/.ssh/{{ item }} owner={{ ansible_ssh_user }} group=staff mode=0600
       with_items:
         - authorized_keys
+        - buildbot_id_dsa
+        - config
+        - id_ns-codereview
+        - ns-buildbot.rsa
+        - patch_via_gerrit.ini
 
     - name: Add Jenkins' profile
       copy:
-        src=./files/jenkins_profile dest=/Users/jenkins/.profile owner=jenkins group=staff mode=0644
+        src=./files/jenkins_profile dest=/Users/{{ ansible_ssh_user }}/.profile owner={{ ansible_ssh_user }} group=staff mode=0644
+
+    - name: Add Jenkins' .bashrc
+      copy:
+        src=./files/jenkins_bashrc dest=/Users/{{ ansible_ssh_user }}/.bashrc owner={{ ansible_ssh_user }} group=staff mode=0644
+
+    - name: Add Jenkins' gitconfig
+      copy:
+        src=./files/gitconfig dest=/Users/{{ ansible_ssh_user }}/.gitconfig owner={{ ansible_ssh_user }} group=staff mode=0644
 
     - name: Create required /opt/couchbase directory
-      file: path=/opt/couchbase state=directory owner=jenkins group=staff mode=0755
+      file: path=/opt/couchbase state=directory owner=couchbase group=staff mode=0755
       become: true
 
     - name: Install python 3.6
       homebrew:
         name: https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
       tags: python3
+
