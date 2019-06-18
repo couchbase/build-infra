@@ -33,6 +33,7 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
     libev-devel \
     libevent-devel \
     libffi-devel \
+    libxml2-devel \
     libxslt \
     numactl-devel \
     openssl-devel \
