@@ -58,11 +58,10 @@ class JiraCommenter:
 
         org = commit.remote.split('/')[3]
         url = f'https://github.com/{org}/{commit.project}/commit/{commit.sha}'
-        topic = commit.summary.split('\n', 1)[0]
         message = (
             f"Build {build.key} contains {commit.project} "
             f"commit [{commit.sha[0:7]}|{url}] with commit message:\n"
-            f"{topic}"
+            f"{commit.summary}"
         )
 
         if self.dryrun:
@@ -96,6 +95,10 @@ class JiraCommenter:
                             f"Skipping testrunner commit {commit.sha}"
                         )
                         continue
+
+                    # We actually only need and care about the commit message
+                    # subject (first line)
+                    commit.summary = commit.summary.split('\n', 1)[0]
 
                     for ticket in self.get_tickets(commit):
                         self.make_comment(ticket, commit, build)
