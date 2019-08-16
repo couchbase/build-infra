@@ -12,6 +12,13 @@ remove_glob() {
 echo @@@@@@@@@
 echo Clean up Couchbase Server
 echo @@@@@@@@@
+cd ${LATESTBUILDS}/couchbase-server/toybuilds
+
+remove_glob "*.*" 15
+
+echo @@@@@@@@@
+echo Clean up Couchbase Server
+echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-server
 
 # All Windows ".bits" files older than 1 day (only needed for intra-build
