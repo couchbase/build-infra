@@ -9,7 +9,7 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.164.2
+    image: jenkins/jenkins:2.189
     deploy:
       replicas: 1
     ports:
