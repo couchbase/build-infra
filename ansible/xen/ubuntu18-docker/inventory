@@ -5,7 +5,8 @@
 #172.23.113.115 sr_name=VMStore
 #172.23.110.9 sr_name=VMStore network_name="Pool-wide network associated with eth0"
 #172.23.123.45 sr_name="Local Storage 01" network_name="Pool-wide network associated with eth0"
-172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
+#172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
+172.23.104.32 network_name=vlan112
 
 [newvms]
 
@@ -17,6 +18,6 @@ sr_name="Local storage"
 vm_template="Ubuntu Xenial Xerus 16.04"
 install_iso="ubuntu-18.04-fully-automated.iso"
 vm_name="default-vm"
-vcpus=8
-memory=17179869184
-disksize=200000000000
+vcpus=4
+memory=8589934592
+disksize=120000000000
