@@ -10,11 +10,13 @@ remove_glob() {
 }
 
 echo @@@@@@@@@
-echo Clean up Couchbase Server
+echo Clean up Couchbase Server toy builds
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-server/toybuilds
 
 remove_glob "*.*" 15
+echo "Removing empty toy build directories - ignore errors"
+rmdir * || true
 
 echo @@@@@@@@@
 echo Clean up Couchbase Server
