@@ -24,6 +24,10 @@ x-default-jenkins-slave: &default-jenkins-slave
   secrets:
     - source: jenkins_master_username
     - source: jenkins_master_password
+    - source: rpm_signing_key.gpgkey
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
     - source: patch_via_gerrit_20181212
       target: /home/couchbase/.ssh/patch_via_gerrit.ini
       uid: '1000'
@@ -118,7 +122,7 @@ services:
       replicas: 1
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20190424
+    image: couchbasebuild/server-suse15-build:20190910
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=suse15 mad-hatter master"
@@ -165,6 +169,8 @@ secrets:
   id_ns-codereview_20181212:
     external: true
   id_buildbot_20190501:
+    external: true
+  rpm_signing_key.gpgkey:
     external: true
 
 networks:

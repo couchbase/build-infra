@@ -42,6 +42,17 @@ then
     /usr/sbin/couchhook.sh
 fi
 
+# Finally, if any files with a .gpgkey extension exist in /run/secrets
+# (and the gpg command is available), those files will be imported into
+# the couchbase user's gpg keychain.
+command -v gpg >/dev/null 2>&1 && {
+    for gpgkey in /run/secrets/*.gpgkey
+    do
+        echo Importing ${gpgkey} ...
+        sudo -u couchbase -H gpg --import ${gpgkey}
+    done
+}
+
 # if first argument is "swarm", run the (Jenkins) swarm jar with any arguments
 [[ "$1" == "swarm" ]] && {
     shift
