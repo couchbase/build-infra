@@ -1,0 +1,113 @@
+---
+- hosts: all
+
+  tasks:
+    - name: "Enable .NET Framework 3.5"
+      win_feature:
+        name: "NET-Framework-Core"
+        state: present
+
+    - name: "Install tools"
+      win_chocolatey:
+        name: "{{ item }}"
+        allow_empty_checksums: "yes"
+      with_items:
+        - kb2919355
+        - kb2999226
+        - kb2919442
+        - git
+        - cmake
+        - 7zip.commandline
+        - googlechrome
+        - insted
+        - python3
+        - curl
+        - openjdk11
+
+    # Code depends on .NET Framework 4.5.2 (chocolatey package
+    # "dotnet4.5.2"), but that package fails to install via Ansible due to
+    # silly limitations in WinRM. However, the framework is actually
+    # installed by default on Windows Server, so there's no need to install
+    # it. So we just tell chocolatey to skip dependencies.
+    - name: "Install Visual Studio Code"
+      win_chocolatey:
+        name: "visualstudiocode"
+        ignore_dependencies: yes
+
+    - name: Create bin directory
+      win_file:
+        path: 'C:\bin'
+        state: directory
+
+    - name: "Install repo"
+      win_get_url:
+        url: "https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo"
+        dest: 'C:\bin\repo'
+      tags:
+        - repo
+
+    # This repo.exe was built using the "py-wrapper" source code here:
+    # https://github.com/couchbase/build-tools/tree/master/py-wrapper
+    - name: "Install repo wrapper"
+      win_copy:
+        src: repo.exe
+        dest: 'C:\bin\'
+      tags:
+        - repo
+
+    - name: Add tools to PATH.
+      win_path:
+          elements:
+          - C:\bin
+          - C:\Program Files\CMake\bin
+          - C:\Program Files\git\cmd
+
+    - name: Install cbdep tool
+      win_get_url:
+        url: http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.windows.exe
+        dest: C:\Windows\cbdep.exe
+
+    # Do OpenSSH last so the service has the latest version of the path
+
+    - name: Install OpenSSH (for Jenkins)
+      win_chocolatey:
+        name: openssh
+        params: /SSHServerFeature
+        state: latest
+
+# Some of these files contain private information, so they're not all in git.
+
+    - name: Copy SSH config files
+      win_copy:
+        src: "./ssh/{{ item }}"
+        dest: C:\Users\Administrator\.ssh\
+      with_items:
+        - authorized_keys
+        - buildbot_id_dsa
+        - config
+        - environment
+        - id_rsa
+        - known_hosts
+
+    - name: "Enable Remote Desktop"
+      win_regedit:
+        key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+        name: fDenyTSConnections
+        data: 0
+        type: dword
+        state: present
+
+    - name: "Open Remote Desktop in firewall"
+      win_firewall_rule:
+        name: "remote desktop"
+        enable: yes
+        state: present
+        localport: 3389
+        action: allow
+        direction: in
+        protocol: TCP
+
+  # Should be done last as it requires choco kbxxx pkg to install first
+  roles:
+  - vs2015
+  - vs2017
