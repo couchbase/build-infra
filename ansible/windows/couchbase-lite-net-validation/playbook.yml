@@ -2,11 +2,6 @@
 - hosts: all
 
   tasks:
-    - name: "Enable .NET Framework 3.5"
-      win_feature:
-        name: "NET-Framework-Core"
-        state: present
-
     - name: "Install tools"
       win_chocolatey:
         name: "{{ item }}"
@@ -109,5 +104,5 @@
 
   # Should be done last as it requires choco kbxxx pkg to install first
   roles:
-  - vs2015
-  - vs2017
+  - vs2015_mobile
+  - vs2017_mobile
