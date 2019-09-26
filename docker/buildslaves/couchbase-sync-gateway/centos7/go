@@ -3,5 +3,5 @@
 TAG=$(date +%Y%m%d)
 
 mkdir -p build
-cp -a ../../util/couchbuilder_start.sh build
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 docker build -t ceejatec/centos-70-sgw-build:$TAG .

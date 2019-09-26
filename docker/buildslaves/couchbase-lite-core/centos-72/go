@@ -5,7 +5,7 @@ TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/centos-72-litecore-build
 
 mkdir -p build
-cp -a ../../util/couchbuilder_start.sh build
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 docker build -t ${IMAGE}:$TAG .
 docker tag ${IMAGE}:$TAG ${IMAGE}:latest
 if [ "$1" = "--publish" ]
