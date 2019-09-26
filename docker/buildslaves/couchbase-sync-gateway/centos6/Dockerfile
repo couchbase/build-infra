@@ -1,21 +1,19 @@
-# Docker container for Centos 7.0
+# Docker container for Centos 6.6
 
 # See https://github.com/ceejatec/naked-docker/ for details about the
 # construction of the base image.
 
-FROM centos:7.0.1406
+FROM centos:6.6
 MAINTAINER build-team@couchbase.com
 
 USER root
-RUN yum clean all && yum swap -y fakesystemd systemd
-RUN yum install --setopt=keepcache=0 -y yum-plugin-ovl && yum clean all
-RUN yum install --setopt=keepcache=0 -y openssh-server sudo deltarpm
+RUN yum install -y yum-plugin-ovl
+RUN yum clean all && yum install -y --setopt=keepcache=0 openssh-server sudo
 
 # Set up for SSH daemon
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
     sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config && \
-    ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa && \
-    ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
+    /etc/init.d/sshd start
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -32,31 +30,53 @@ RUN groupadd -g1000 couchbase && \
 RUN yum install --setopt=keepcache=0 -y \
                 curl \
                 ed \
-                gcc \
-                gcc-c++ \
-                git \
                 glibc.i686 \
                 make \
                 man \
                 ncurses-devel \
                 nss \
-                numactl-devel \
                 openssh-clients openssl-devel \
-                python-devel \
                 redhat-lsb-core \
                 rpm-build \
                 ruby rubygems rubygem-rake \
                 tar \
                 unzip \
-                which && \
-    ln -s /usr/bin/python2.7 /usr/bin/python2.6
+                which
+
+# JDK for Jenkins.
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # * Required for sgcollect_info
+RUN yum install --setopt=keepcache=0 -y https://centos6.iuscommunity.org/ius-release.rpm && \
+    yum install --setopt=keepcache=0 -y python27 && \
+    curl -L https://bootstrap.pypa.io/get-pip.py | python2.7 && \
+    pip install --upgrade pip -Iv PyInstaller==3.1
+
+# * C++11 compliant compiler and related tools from CentOS's port of RHEL's
+#    devtools (http://people.centos.org/tru/devtools-2/)
+RUN curl -L http://people.centos.org/tru/devtools-2/devtools-2.repo > \
+         /etc/yum.repos.d/devtools-2.repo && \
+    yum install --setopt=keepcache=0 -y \
+                devtoolset-2-gcc-c++ \
+                devtoolset-2-binutils && \
+    ln -s /opt/rh/devtoolset-2/root/usr/bin/as /usr/local/bin/as && \
+    ln -s /opt/rh/devtoolset-2/root/usr/bin/gcc /usr/bin/gcc && \
+    ln -s /opt/rh/devtoolset-2/root/usr/bin/cc /usr/bin/cc && \
+    ln -s /opt/rh/devtoolset-2/root/usr/bin/g++ /usr/bin/g++ && \
+    ln -s /opt/rh/devtoolset-2/root/usr/bin/c++ /usr/bin/c++
+
+# * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
-    curl --insecure https://bootstrap.pypa.io/get-pip.py -o /tmp/deploy/get-pip.py && \
-    python /tmp/deploy/get-pip.py && \
-    rm -rf /tmp/deploy
-RUN pip install --upgrade pip -Iv PyInstaller==3.1
+    curl -L https://cmake.org/files/v3.6/cmake-3.6.1-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
+    rm -fr /tmp/deploy
 
 # * ccache (from source)
 RUN mkdir /tmp/deploy && \
@@ -84,31 +104,18 @@ RUN mkdir -p /usr/local/go/1.4.1 && cd /usr/local/go/1.4.1 && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.7.4 && cd /usr/local/go/1.7.4 && \
     curl https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz -o go.tar.gz && \
-    tar xzf go.tar.gz && \
-    mkdir /usr/local/go/1.8.5 && cd /usr/local/go/1.8.5 && \
-    curl https://storage.googleapis.com/golang/go1.8.5.linux-amd64.tar.gz -o go.tar.gz && \
-    tar xzf go.tar.gz && \
-    mkdir /usr/local/go/1.9 && cd /usr/local/go/1.9 && \
-    curl https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz -o go.tar.gz && \
-    tar xzf go.tar.gz && \
-    rm go.tar.gz
+    tar xzf go.tar.gz
 
 # * repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# * git
+RUN yum install -y --setopt=keepcache=0 devtoolset-2-git && \
+    ln -s /opt/rh/devtoolset-2/root/usr/bin/git /usr/local/bin/git
+
 # Install third-party build dependencies
 RUN yum install -y --setopt=keepcache=0 m4 file
-
-# JDK for Jenkins.
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/openjre.tar.gz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22

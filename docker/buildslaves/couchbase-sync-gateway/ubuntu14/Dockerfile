@@ -61,21 +61,15 @@ RUN mkdir -p /usr/local/go/1.4.1 && cd /usr/local/go/1.4.1 && \
     tar xzf go.tar.gz && \
     rm go.tar.gz
 
-# Install third-party build dependencies. Note: software-properties-common
-# is only required for add-apt-repository; add-apt-repository is only
-# required to get python2.6; and python2.6 is only required for gyp, which
-# is part of the v8 build. python2.6 is also required for our compiling of
-# pysqlite and pysnappy, and for that we even need python2.6-dev.
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y m4 python2.7 python2.7-dev && \
-    rm -f /var/cache/apt/archives/*.deb
-
 # JDK for Jenkins.
-RUN apt-get install -y openjdk-7-jre-headless && \
-    rm -f /var/cache/apt/archives/*.deb
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Force UTF-8 support, since it seems to fail to update properly at times
 RUN locale-gen en_US en_US.UTF-8 hu_HU hu_HU.UTF-8 && dpkg-reconfigure locales

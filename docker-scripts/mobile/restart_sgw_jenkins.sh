@@ -15,7 +15,7 @@ docker rm mobile-sgw-centos6
 docker run --name="mobile-sgw-centos6" -v /home/couchbase/jenkinsdocker-ssh:/ssh \
         --volume=/home/couchbase/latestbuilds:/latestbuilds \
         --restart=unless-stopped \
-        -p 2320:22 -d ceejatec/centos-65-sgw-build:20170627
+        -p 2320:22 -d couchbasebuild/centos6-sgw-build:20190926
 
 container_name="mobile-sgw-centos70"
 container=$(docker ps | grep $container_name | awk -F\" '{ print $1 }')
@@ -29,7 +29,7 @@ fi
 docker run --name=$container_name -v /home/couchbase/jenkinsdocker-ssh:/ssh \
         --volume=/home/couchbase/latestbuilds:/latestbuilds \
         --restart=unless-stopped \
-        -p 2322:22 -d ceejatec/centos-70-sgw-build:20180214
+        -p 2322:22 -d couchbasebuild/centos7-sgw-build:20190926
 
 container_name="mobile-sgw-ubuntu14"
 container=$(docker ps | grep $container_name | awk -F\" '{ print $1 }')
@@ -44,4 +44,4 @@ fi
 docker run --name=$container_name -v /home/couchbase/jenkinsdocker-ssh:/ssh \
         --volume=/home/couchbase/latestbuilds:/latestbuilds \
         --restart=unless-stopped \
-        -p 2321:22 -d ceejatec/ubuntu1404-sgw-build:20180214
+        -p 2321:22 -d couchbasebuild/ubuntu1404-sgw-build:20190926

@@ -1,7 +1,14 @@
 #!/bin/sh
 
 TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/centos7-sgw-build
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
-docker build -t ceejatec/centos-70-sgw-build:$TAG .
+docker build -t ${IMAGE}:$TAG .
+docker tag ${IMAGE}:$TAG ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+    docker push ${IMAGE}:$TAG
+    docker push ${IMAGE}:latest
+fi
