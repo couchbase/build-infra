@@ -114,3 +114,6 @@ RUN cd /opt && \
     chown -R couchbase:couchbase android-ndk-r15b && \
     chmod 755 android-ndk-r15b && \
     rm -rf android-ndk-r15b.zip
+
+# fr_FR locale for LiteCore testing
+RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true

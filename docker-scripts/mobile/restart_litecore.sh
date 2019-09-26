@@ -9,4 +9,4 @@ popd > /dev/null
 echo @@@@@@@@@@@@@@@@@@@@@@
 echo @ Recreating slaves
 echo @@@@@@@@@@@@@@@@@@@@@@
-${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/centos-72-litecore-build:20190415 mobile-litecore-linux 6501 mobile.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/centos-72-litecore-build:20190926 mobile-litecore-linux 6501 mobile.jenkins.couchbase.com
