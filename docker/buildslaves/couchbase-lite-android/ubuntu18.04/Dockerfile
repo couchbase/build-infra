@@ -63,7 +63,9 @@ RUN yes 'y' | sdkmanager --licenses >/dev/null
 # Update and install using sdkmanager
 ENV SDK_CMD $ANDROID_HOME/tools/bin/sdkmanager
 RUN $SDK_CMD "tools" "platform-tools" && \
+    $SDK_CMD "build-tools;28.0.3" && \
     $SDK_CMD "build-tools;29.0.0" && \
+    $SDK_CMD "build-tools;29.0.2" && \
     $SDK_CMD "platforms;android-29" && \
     $SDK_CMD "extras;android;m2repository" "extras;google;m2repository" && \
     $SDK_CMD "cmake;3.10.2.4988404"
