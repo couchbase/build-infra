@@ -24,14 +24,6 @@ x-default-jenkins-slave: &default-jenkins-slave
       uid: '1000'
       gid: '1000'
       mode: 0400
-    - source: sdk_private_key.gpgkey
-      uid: '1000'
-      gid: '1000'
-      mode: 0400
-    - source: sdk_public_key.gpgkey
-      uid: '1000'
-      gid: '1000'
-      mode: 0400
     - source: sdk_jenkins_master_username
       target: jenkins_master_username
     - source: sdk_jenkins_master_password
@@ -111,6 +103,74 @@ services:
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
+  centos7-signing:
+    image: couchbasebuild/sdk-centos7-signing:20190927
+    environment:
+      - "JENKINS_SLAVE_NAME=build-centos7-signing"
+      - "JENKINS_SLAVE_LABELS=centos7-signing"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+    deploy:
+      replicas: 1
+    secrets:
+      - source: sdk_signing_private_key.gpgkey
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: sdk_signing_public_key.gpgkey
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: ns-buildbot.rsa
+        target: /home/couchbase/.ssh/ns-buildbot.rsa
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: buildbot_id_dsa
+        target: /home/couchbase/.ssh/buildbot_id_dsa
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: sdk_jenkins_master_username
+        target: jenkins_master_username
+      - source: sdk_jenkins_master_password
+        target: jenkins_master_password
+
+
+  debian10-signing:
+    image: couchbasebuild/sdk-debian10-signing:20190927
+    environment:
+      - "JENKINS_SLAVE_NAME=build-debian10-signing"
+      - "JENKINS_SLAVE_LABELS=debian10-signing"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+    deploy:
+      replicas: 1
+    secrets:
+      - source: sdk_signing_private_key.gpgkey
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: sdk_signing_public_key.gpgkey
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: ns-buildbot.rsa
+        target: /home/couchbase/.ssh/ns-buildbot.rsa
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: buildbot_id_dsa
+        target: /home/couchbase/.ssh/buildbot_id_dsa
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+      - source: sdk_jenkins_master_username
+        target: jenkins_master_username
+      - source: sdk_jenkins_master_password
+        target: jenkins_master_password
+
+
 secrets:
   # SSH key which can read private GitHub repos
   ns-buildbot.rsa:
@@ -121,9 +181,9 @@ secrets:
     external: true
   buildbot_id_dsa:
     external: true
-  sdk_private_key.gpgkey:
+  sdk_signing_private_key.gpgkey:
     external: true
-  sdk_public_key.gpgkey:
+  sdk_signing_public_key.gpgkey:
     external: true
 
 configs:
