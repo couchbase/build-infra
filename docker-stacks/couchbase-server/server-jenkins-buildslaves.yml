@@ -54,7 +54,7 @@ services:
     image: couchbasebuild/server-amzn2-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
-      - "JENKINS_SLAVE_LABELS=amzn2 alice mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=amzn2 alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -73,7 +73,7 @@ services:
     image: couchbasebuild/server-centos7-build:20190430
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=centos7 vulcan alice mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=centos7 vulcan alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -91,7 +91,7 @@ services:
     image: couchbasebuild/server-debian8-build:20190426
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
-      - "JENKINS_SLAVE_LABELS=debian8 mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=debian8 mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -99,7 +99,7 @@ services:
     image: couchbasebuild/server-debian9-build:20190426
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
-      - "JENKINS_SLAVE_LABELS=debian9 vulcan alice mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=debian9 vulcan alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -107,7 +107,7 @@ services:
     image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20190524
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8"
-      - "JENKINS_SLAVE_LABELS=rhel8 alice mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=rhel8 alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -125,7 +125,7 @@ services:
     image: couchbasebuild/server-suse15-build:20190910
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
-      - "JENKINS_SLAVE_LABELS=suse15 mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=suse15 mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -143,7 +143,7 @@ services:
     image: couchbasebuild/server-ubuntu16-build:20190501
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
-      - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
@@ -151,7 +151,7 @@ services:
     image: couchbasebuild/server-ubuntu18-build:20190424
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
-      - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18 alice mad-hatter master"
+      - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18 alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
