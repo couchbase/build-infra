@@ -77,6 +77,14 @@ services:
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
+  centos8:
+    image: couchbasebuild/server-centos8-build:20191005
+    environment:
+      - "JENKINS_SLAVE_NAME=server-centos8"
+      - "JENKINS_SLAVE_LABELS=centos8 mad-hatter cheshire-cat master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
   debian8-alice:
     image: couchbasebuild/server-debian8-build:20190424
     environment:
@@ -100,6 +108,14 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=debian9 vulcan alice mad-hatter cheshire-cat master"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
+  debian10:
+    image: couchbasebuild/server-debian10-build:20191003
+    environment:
+      - "JENKINS_SLAVE_NAME=server-debian10"
+      - "JENKINS_SLAVE_LABELS=debian10 mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
