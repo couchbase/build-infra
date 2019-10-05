@@ -46,7 +46,9 @@ remove_glob "*ubuntu*.deb*" 15
 remove_glob "*debian7*.deb*" 30
 remove_glob "*debian8*.deb*" 15
 remove_glob "*debian9*.deb*" 15
+remove_glob "*debian10*.deb*" 15
 remove_glob "*centos6*.rpm*" 15
+remove_glob "*centos8*.rpm*" 15
 remove_glob "*suse*.rpm*" 15
 remove_glob "*rhel8*.rpm*" 15
 remove_glob "*oel*.rpm*" 15
