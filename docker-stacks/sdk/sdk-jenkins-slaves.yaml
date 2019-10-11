@@ -71,6 +71,14 @@ services:
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
+  centos8:
+    image: couchbasebuild/sdk-centos8-build:20191010
+    environment:
+      - "JENKINS_SLAVE_NAME=build-centos8"
+      - "JENKINS_SLAVE_LABELS=centos8"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+
   debian8:
     image: couchbasebuild/sdk-debian8-build:20190508
     environment:
