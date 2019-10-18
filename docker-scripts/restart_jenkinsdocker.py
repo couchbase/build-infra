@@ -103,6 +103,7 @@ run_args = [
      "--volume=/etc/localtime:/etc/localtime",
      "--volume=/etc/timezone:/etc/timezone",
      "--volume=/home/couchbase/jenkinsdocker-ssh:/ssh",
+     "--volume=/builds:/builds",
      "--volume={}:/latestbuilds".format(latestbuilds),
      "--volume={}:/releases".format(releases)
 ]
