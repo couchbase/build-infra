@@ -171,7 +171,7 @@
 
     - name: Add docker apt repository
       shell: >
-        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 
     - name: Install Docker
       apt:

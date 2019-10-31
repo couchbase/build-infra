@@ -1,5 +1,6 @@
 Host github.com
-        User git
+    User git
+    IdentityFile ~/.ssh/id_cb-robot
 Host review.couchbase.org
     User         ns-codereview
     Port         29418

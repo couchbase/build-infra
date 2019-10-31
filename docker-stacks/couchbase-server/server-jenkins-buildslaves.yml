@@ -16,7 +16,7 @@ x-default-jenkins-slave: &default-jenkins-slave
   networks:
     - jenkins
   configs:
-    - source: couchbase_ssh_config_20190501
+    - source: couchbase_ssh_config_20191031
       target: /home/couchbase/.ssh/config
       uid: '1000'
       mode: 0400
@@ -32,6 +32,10 @@ x-default-jenkins-slave: &default-jenkins-slave
       target: /home/couchbase/.ssh/patch_via_gerrit.ini
       uid: '1000'
       mode: 0400
+    - source: id_cb-robot_20191031
+      target: /home/couchbase/.ssh/id_cb-robot
+      uid: '1000'
+      mode: 0400
     - source: id_ns-codereview_20181212
       target: /home/couchbase/.ssh/id_ns-codereview
       uid: '1000'
@@ -40,10 +44,6 @@ x-default-jenkins-slave: &default-jenkins-slave
       target: /home/couchbase/.ssh/id_buildbot
       uid: '1000'
       mode: 0400
-  volumes:
-    - type: bind
-      source: /home/couchbase/jenkinsdocker-ssh
-      target: /ssh
 
 x-default-jenkins-slave-environment:
  - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
@@ -172,7 +172,7 @@ services:
     <<: *default-jenkins-slave
 
 configs:
-  couchbase_ssh_config_20190501:
+  couchbase_ssh_config_20191031:
     file: conf/couchbase_ssh_config
 
 secrets:
@@ -183,6 +183,8 @@ secrets:
   patch_via_gerrit_20181212:
     external: true
   id_ns-codereview_20181212:
+    external: true
+  id_cb-robot_20191031:
     external: true
   id_buildbot_20190501:
     external: true
