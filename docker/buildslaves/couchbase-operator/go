@@ -3,8 +3,9 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/ubuntu-1604-operator-build
+GOVERSION=1.13.3
 
-docker build -t ${IMAGE}:${TAG} .
+docker build --build-arg GOVERSION=${GOVERSION} -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then
