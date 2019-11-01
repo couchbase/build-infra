@@ -1,29 +1,40 @@
 [manager]
-mega4-03.build.couchbase.com
-mega4-08.build.couchbase.com
-mega4-12.build.couchbase.com
 
 [worker]
-mega4-01.build.couchbase.com
-mega4-02.build.couchbase.com
-mega4-04.build.couchbase.com
-mega4-05.build.couchbase.com
-mega4-06.build.couchbase.com
-mega4-07.build.couchbase.com
-mega4-09.build.couchbase.com
-mega4-10.build.couchbase.com
-mega4-11.build.couchbase.com
-mega4-13.build.couchbase.com
-mega4-14.build.couchbase.com
-mega4-15.build.couchbase.com
-mega4-16.build.couchbase.com
-mega4-17.build.couchbase.com
-mega4-18.build.couchbase.com
-mega4-19.build.couchbase.com
-mega4-20.build.couchbase.com
+172.23.96.171  name=mega4-01.build.couchbase.com
+172.23.96.173  name=mega4-02.build.couchbase.com
+172.23.96.176  name=mega4-03.build.couchbase.com
+172.23.96.177  name=mega4-04.build.couchbase.com
+172.23.96.208  name=mega4-05.build.couchbase.com
+172.23.96.211  name=mega4-06.build.couchbase.com
+172.23.96.249  name=mega4-07.build.couchbase.com
+172.23.121.103 name=mega4-08.build.couchbase.com
+172.23.121.98  name=mega4-09.build.couchbase.com
+172.23.121.100 name=mega4-10.build.couchbase.com
+172.23.121.99  name=mega4-11.build.couchbase.com
+172.23.121.104 name=mega4-12.build.couchbase.com
+172.23.121.105 name=mega4-13.build.couchbase.com
+172.23.121.106 name=mega4-14.build.couchbase.com
+172.23.121.109 name=mega4-15.build.couchbase.com
+172.23.121.110 name=mega4-16.build.couchbase.com
+172.23.121.111 name=mega4-17.build.couchbase.com
+172.23.121.112 name=mega4-18.build.couchbase.com
+172.23.121.113 name=mega4-19.build.couchbase.com
+172.23.121.114 name=mega4-20.build.couchbase.com
+172.23.113.28  name=mega4-21.build.couchbase.com
+172.23.113.44  name=mega4-22.build.couchbase.com
+172.23.113.49  name=mega4-23.build.couchbase.com
+172.23.113.41  name=mega4-24.build.couchbase.com
+172.23.113.42  name=mega4-25.build.couchbase.com
+172.23.113.43  name=mega4-26.build.couchbase.com
+172.23.113.46  name=mega4-27.build.couchbase.com
+172.23.113.50  name=mega4-28.build.couchbase.com
+172.23.113.48  name=mega4-29.build.couchbase.com
+172.23.113.45  name=mega4-30.build.couchbase.com
+172.23.113.47  name=mega4-31.build.couchbase.com
+172.23.113.40  name=mega4-32.build.couchbase.com
 
 [all:vars]
 ansible_user=couchbase
 ansible_password=couchbase
 ansible_sudo_password=couchbase
-
