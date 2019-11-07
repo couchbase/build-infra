@@ -41,7 +41,7 @@ if [ ! -e ${LATESTBUILDS} ]; then
 fi
 
 pushd ${LATESTBUILDS}
-files=$(ls |egrep -v '.xml|.json|.properties|CHANGELOG|source.tar.gz')
+files=$(ls)
 IFS=$'\n'
 popd
 
