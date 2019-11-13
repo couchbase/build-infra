@@ -111,6 +111,11 @@ RUN apt-get update && \
 # Set AWS credentials file environmental variable
 ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 
+# Utilities that are handy for zz-lightweight jobs and occasional interactive use
+RUN apt-get update && \
+    apt-get install -y jq vim && \
+    apt-get clean
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
