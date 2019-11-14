@@ -62,6 +62,7 @@ perl -pi -e 's/([A-Z1-9])\. /\1FROBOZ /g' ${tmpfile}
 txt2html --titlefirst --outfile $html \
   --custom_heading_regexp 'License Agreement($| for the Java)' \
   --custom_heading_regexp 'SUPPLEMENTAL LICENSE TERMS$' \
+  --short_line_length 8000 \
   ${tmpfile}
 
 # Un-tweak.

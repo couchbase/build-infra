@@ -11,7 +11,7 @@ RUN apt-get update && \
     perl -MCPAN -e "CPAN::Shell->notest('install', 'HTML::TextToHTML')" && \
     apt-get purge -y build-essential && \
     apt-get --purge autoremove -y && \
-    apt-get clean
+    apt-get clean # comment
 
 COPY entrypoint.sh /
 ENTRYPOINT [ "/entrypoint.sh" ]
