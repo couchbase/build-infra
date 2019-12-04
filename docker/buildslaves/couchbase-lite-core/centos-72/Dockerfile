@@ -117,3 +117,9 @@ RUN cd /opt && \
 
 # fr_FR locale for LiteCore testing
 RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true
+
+# Add "shasum" command (use by cbl-java build, at least)
+RUN yum install -y --setopt=keepcache=0 perl-Digest-SHA
+
+# Add cbdep tool (used by cbl-java build, at least)
+RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
