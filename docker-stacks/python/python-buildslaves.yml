@@ -11,13 +11,19 @@ version: '3.5'
 x-default-jenkins-slave: &default-jenkins-slave
   deploy:
     replicas: 1
+  configs:
+    - source: couchbase_ssh_config_20191203
+      target: /home/couchbase/.ssh/config
+      uid: '1000'
+      mode: 0400
+
   secrets:
     - source: jenkins_master_username
     - source: jenkins_master_password
-  volumes:
-    - type: bind
-      source: /home/couchbase/jenkinsdocker-ssh
-      target: /ssh
+    - source: id_cb-robot_20191031
+      target: /home/couchbase/.ssh/id_cb-robot
+      uid: '1000'
+      mode: 0400
 
 x-default-jenkins-slave-environment:
  - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
@@ -42,10 +48,14 @@ services:
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
     <<: *default-jenkins-slave
 
+configs:
+  couchbase_ssh_config_20191203:
+    file: conf/couchbase_ssh_config
+
 secrets:
   jenkins_master_username:
     external: true
   jenkins_master_password:
     external: true
-  patch_via_gerrit:
+  id_cb-robot_20191031:
     external: true
