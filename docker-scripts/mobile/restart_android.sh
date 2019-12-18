@@ -6,9 +6,9 @@ pushd `dirname $0` > /dev/null
 SCRIPTPATH=`pwd -P`
 popd > /dev/null
 
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-workspace couchbasebuild/ubuntu1604-mobile-lite-android:20190318 mobile-lite-android    6502 mobile.jenkins.couchbase.com
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-workspace couchbasebuild/ubuntu1604-mobile-lite-android:20190318 mobile-lite-android-02 6503 mobile.jenkins.couchbase.com
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-workspace couchbasebuild/ubuntu1804-mobile-lite-android:20190926 mobile-lite-android-03 6504 mobile.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py --no-workspace couchbasebuild/ubuntu1604-mobile-lite-android:20191217 mobile-lite-android    6502 mobile.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py --no-workspace couchbasebuild/ubuntu1604-mobile-lite-android:20191217 mobile-lite-android-02 6503 mobile.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py --no-workspace couchbasebuild/ubuntu1804-mobile-lite-android:20191217 mobile-lite-android-03 6504 mobile.jenkins.couchbase.com
 
 docker rm -f mobile-light
 docker run --name="mobile-light" -v /home/couchbase/jenkinsdocker-ssh:/ssh \

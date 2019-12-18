@@ -73,21 +73,6 @@ RUN $SDK_CMD "tools" "platform-tools" && \
 RUN $SDK_CMD --uninstall "cmake;3.10.2.4988404"  &&\
     $SDK_CMD "cmake;3.6.4111459"
 
-# Android NDK
-USER couchbase
-RUN cd /home/couchbase/jenkins/tools && \
-    curl -L https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip -o android-ndk-r15c.zip && \
-    unzip -qq android-ndk-r15c.zip && \
-    chown -R couchbase:couchbase android-ndk-r15c && \
-    chmod 755 android-ndk-r15c && \
-    rm -rf android-ndk-r15c.zip
-RUN cd /home/couchbase/jenkins/tools && \
-    curl -L https://dl.google.com/android/repository/android-ndk-r19c-linux-x86_64.zip -o android-ndk-r19c.zip && \
-    unzip -qq android-ndk-r19c.zip && \
-    chown -R couchbase:couchbase android-ndk-r19c && \
-    chmod 755 android-ndk-r19c && \
-    rm -rf android-ndk-r19c.zip
-
 # Revert so CMD will run as root.
 USER root
 
