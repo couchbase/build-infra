@@ -102,6 +102,9 @@ RUN rm /usr/local/bin/c++ && \
     update-alternatives --install /usr/local/bin/cc clang /usr/local/bin/clang 100 && \
     update-alternatives --install /usr/local/bin/c++ clang++ /usr/local/bin/clang++ 100
 
+# Remove the g++ include files as they seem to confuse Gradle
+RUN rm -rf /usr/local/include/c++
+
 # Install Couchbase Lite Core toolchain requirements
 RUN yum install -y --setopt=keepcache=0 glibc-devel tar openssl-devel make redhat-lsb-core wget unzip zip
 
@@ -114,3 +117,9 @@ RUN mkdir /tmp/deploy && \
 
 # fr_FR locale for LiteCore testing
 RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true
+
+# Add "shasum" command (use by cbl-java build, at least)
+RUN yum install -y --setopt=keepcache=0 perl-Digest-SHA
+
+# Add cbdep tool (used by cbl-java build, at least)
+RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
