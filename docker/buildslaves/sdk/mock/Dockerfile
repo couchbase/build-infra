@@ -1,10 +1,21 @@
-# Docker container for Centos7
+# Docker container for Centos8
 
-FROM couchbasebuild/sdk-centos7-build:20181002
+FROM couchbasebuild/sdk-centos8-build:20191204
 MAINTAINER build-team@couchbase.com
 
-RUN sudo yum install --setopt=keepcache=0 -y mock
-RUN sudo usermod -a -G mock couchbase
+USER root
+
+# Not at all sure about this workaround
+RUN rpm --rebuilddb || ( \
+        rm -rf /var/lib/rpm && \
+        mv /var/lib/rpmrebuild* /var/lib/rpm \
+)
+
+RUN yum clean all && \
+    yum install --setopt=keepcache=0 -y mock
+RUN usermod -a -G mock couchbase
+
+USER couchbase
 
 # Need to repeat this to override settings from base image
 ARG CONTAINER_TAG_ARG
