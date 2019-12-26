@@ -1,4 +1,4 @@
 git+https://github.com/couchbase/python-couchbase-commons@v0.4.6#egg=cbbuild-0.4.6&subdirectory=cbbuild
 pyramid==1.10
 cornice==3.4.0
-waitress==1.1.0
+waitress==1.4.1
