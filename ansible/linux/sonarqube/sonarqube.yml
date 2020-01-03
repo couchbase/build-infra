@@ -1,0 +1,133 @@
+---
+- hosts: sonar
+  become: true
+  become_user: root
+  tasks:
+    - name: Install required package
+      apt:
+        pkg:
+          - nginx
+          - python3
+          - python3-psycopg2
+          - openjdk-11-jdk
+          - postgresql
+          - postgresql-contrib
+          - sudo
+          - unzip
+        update_cache: yes
+        state: present
+
+    - name: Enable postgresql service
+      service:
+        name: postgresql
+        enabled: yes
+        state: started
+
+    - name: Copy nginx config file
+      copy:
+        src: sonar-nginx.conf
+        dest: /etc/nginx/sites-enabled/sonar-nginx.conf
+        owner: root
+        group: root
+        backup: yes
+
+    - name: Enable nginx service
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Create postgres user for SonarQube
+      become: yes
+      become_user: postgres
+      postgresql_user:
+        name: "{{ sonar_db_user }}"
+        password: '{{ sonar_db_user }}'
+
+    - name: Create the sonar database
+      postgresql_db:
+        name: "{{ sonar_db }}"
+        owner: "{{ sonar_db_user }}"
+        encoding: UTF-8
+        lc_collate: en_US.UTF-8
+        lc_ctype: en_US.UTF-8
+        template: template0
+      become_user: postgres
+      become: yes
+
+    - name: Create the sonar user for running the SonarQube services
+      user:
+        name: sonar
+
+    - name: Download SonarQube
+      get_url:
+        url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonar_version }}.zip"
+        dest: "/opt"
+
+    - name: Extract SonarQube
+      unarchive:
+        src: "/opt/sonarqube-{{ sonar_version }}.zip"
+        dest: "/opt"
+        copy: no
+        owner: sonar
+
+    - name: Remove file (delete file)
+      file:
+        path: "/opt/sonarqube-{{ sonar_version }}.zip"
+        state: absent
+
+    - name: Link this version of sonarqube as the server SonarQube version
+      file:
+        src: "/opt/sonarqube-{{ sonar_version }}"
+        dest: "/opt/sonarqube"
+        state: link
+        force: yes
+        owner: sonar
+
+    - name: Configure SonarQube DB username
+      lineinfile:
+        path: "/opt/sonarqube/conf/sonar.properties"
+        regexp: "^sonar.jdbc.username="
+        insertafter: "^#sonar.jdbc.username="
+        line: "sonar.jdbc.username={{ sonar_db_user }}"
+
+    - name: Configure SonarQube DB password
+      lineinfile:
+        path: "/opt/sonarqube/conf/sonar.properties"
+        regexp: "^sonar.jdbc.password="
+        insertafter: "^#sonar.jdbc.password="
+        line: "sonar.jdbc.password={{ sonar_db_pass }}"
+
+    - name: Configure SonarQube DB connection string
+      lineinfile:
+        path: "/opt/sonarqube/conf/sonar.properties"
+        regexp: "sonar.jdbc.url=jdbc:postgresql://localhost/sonar"
+        insertafter: "^#sonar.jdbc.url=jdbc:postgresql://localhost/sonar"
+        line: "sonar.jdbc.url=jdbc:postgresql://localhost/sonar"
+
+    - name: Configure SonarQube to run as the sonar user
+      lineinfile:
+        path: "/opt/sonarqube/bin/linux-x86-64/sonar.sh"
+        regexp: "RUN_AS_USER=sonar"
+        insertafter: "#RUN_AS_USER="
+        line: "RUN_AS_USER=sonar"
+
+    - name: Create sonar service file
+      copy:
+        src: sonar.service
+        dest: /etc/systemd/system/sonar.service
+        owner: root
+        group: root
+        backup: no
+
+    - name: Update system vm.max_map_count
+      lineinfile:
+        path: "/etc/sysctl.conf"
+        regexp: "^vm.max_map_count"
+        line: "vm.max_map_count=262144"
+        state: present
+        backup: yes
+
+    - name: Enable sonar service
+      shell:
+        cmd: systemctl restart sonar;systemctl enable sonar
