@@ -131,3 +131,22 @@
     - name: Enable sonar service
       shell:
         cmd: systemctl restart sonar;systemctl enable sonar
+
+    - name: Copy sql backup script
+      copy:
+        src: sonar_backup.sh
+        dest: /usr/local/bin/sonar_backup.sh
+        mode: '0755'
+        owner: postgres
+        group: postgres
+
+
+    - name: Install backup crontab
+      cron:
+        name: "backup sonar postgres db"
+        minute: "00"
+        hour: "02"
+        weekday: "0-6"
+        job: "/usr/local/bin/sonar_backup.sh  >> /var/log/sonar_bacup.log 2>&1"
+        user: "postgres"
+        disabled: "no"
