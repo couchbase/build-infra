@@ -15,17 +15,6 @@
     url: "https://aka.ms/vs/15/release/vs_professional.exe"
     dest: C:\vs2017\vs_professional.exe
 
-- name: Check if MSVC2017 install
-  win_stat:
-    path: C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe
-  register: msvc2017_installcleanup
-
-- debug: var=msvc2017_installcleanup.stdout_lines
-
-- name: Run MSVC2017 install cleanup
-  win_command: '"C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe" -full'
-  when: msvc2017_installcleanup.stat.exists == True
-
 - name: Install Visual Studio Professional 2017 and dotnet tools
   win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.Universal --add Component.Android.NDK.R15C --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
   register: install_output

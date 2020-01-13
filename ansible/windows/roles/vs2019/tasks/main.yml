@@ -1,0 +1,29 @@
+---
+- name: Create directory structure
+  win_file:
+    path: C:\vs2019
+    state: directory
+
+- name: Add bin to PATH.
+  include: extend-path.yml
+  with_items:
+    - C:\vs2019
+
+# https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
+- name: Download vs_professional.exe installer
+  win_get_url:
+    url: "https://aka.ms/vs/16/release/vs_professional.exe"
+    dest: C:\vs2019\vs_professional.exe
+
+- name: Install Visual Studio Professional 2019 and dotnet tools
+  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R11C --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  register: install_output
+  failed_when: ( install_output.rc not in [ 3010, 0 ] )
+
+- debug: var=install_output.stdout_lines
+
+- name: Reboot Windows if necessary
+  win_reboot:
+    shutdown_timeout_sec: 3600
+    reboot_timeout_sec: 3600
+  when: install_output.rc == 3010
