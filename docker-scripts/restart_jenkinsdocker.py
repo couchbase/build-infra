@@ -17,6 +17,7 @@ parser.add_argument("jenkins", type=str, help="Jenkins to connect to",
     nargs='?', default="factory.couchbase.com")
 parser.add_argument("--ccache-dir", type=str, help="Host directory to mount as ~/.ccache")
 parser.add_argument("--no-workspace", action="store_true", help="Skip mounting /home/couchbase/jenkins")
+parser.add_argument("--no-std-mounts", action="store_true", help="Skip mounting /builds /latestbuilds /releases")
 parser.add_argument("--mount-docker", action="store_true", help="Mount docker.sock")
 parser.add_argument("--mount-dir", type=str, help="Mount local directories",
     nargs="+")
@@ -102,11 +103,14 @@ run_args = [
      "--volume=/home/couchbase/reporef:/home/couchbase/reporef",
      "--volume=/etc/localtime:/etc/localtime",
      "--volume=/etc/timezone:/etc/timezone",
-     "--volume=/home/couchbase/jenkinsdocker-ssh:/ssh",
+     "--volume=/home/couchbase/jenkinsdocker-ssh:/ssh"
+]
+if not args.no_std_mounts:
+    run_args.extend([
      "--volume=/builds:/builds",
      "--volume={}:/latestbuilds".format(latestbuilds),
      "--volume={}:/releases".format(releases)
-]
+    ])
 if not args.no_workspace:
     run_args.append(
      "--volume=/home/couchbase/slaves/{0}:/home/couchbase/jenkins".format(slave)
