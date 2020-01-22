@@ -8,7 +8,7 @@ homebrew_taps:
 homebrew_installed_packages:
   - { name: ccache, version: 3.4.1, state: linked }
   - { name: coreutils, version: 8.29, state: linked }
-  - { name: cmake, version: 3.10.3, state: linked }
+  - { name: cmake, version: 3.16.3, state: linked }
   - { name: carthage, version: 0.29.0, state: linked }
   - { name: doxygen, version: 1.8.14, state: linked }
   - { name: git, version: 2.16.2, state: linked }
