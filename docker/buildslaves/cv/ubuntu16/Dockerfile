@@ -21,27 +21,33 @@ RUN mkdir /tmp/deploy && \
 # it back here for CV.
 RUN pip install gcovr
 
-# Install Clang 6.0 (current stable) - needed for building with ThreadSanitizer.
+# Install Clang 9 (current stable) - needed for building with ThreadSanitizer.
 # (Note: This doesn't change the default compiler; users must explicitly
-# select clang-6.0 / clang++-6.0).
+# select clang-9 / clang++-9).
 RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
-    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-6.0 main" > /etc/apt/sources.list.d/llvm.list && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-9 main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update && \
-    apt-get install --assume-yes clang-6.0 && \
+    apt-get install --assume-yes clang-9 && \
     rm -fr /var/cache/apt/archives/*.deb
 
 # Install clang-tools for scan-build
 RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
-    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-6.0 main" > /etc/apt/sources.list.d/llvm.list && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-9 main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update && \
-    apt-get install --assume-yes clang-tools-6.0 && \
+    apt-get install --assume-yes clang-tools-9 && \
     rm -fr /var/cache/apt/archives/*.deb
 
-# Install clang-format from Clang 6.0 - needed for checking if formatting of patch is correct
+# Install clang-format from Clang 9 - needed for checking if formatting of patch is correct
 RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
-    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-6.0 main" > /etc/apt/sources.list.d/llvm.list && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-9 main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update && \
-    apt-get install --assume-yes --force-yes clang-format-6.0 && \
+    apt-get install --assume-yes --force-yes clang-format-9 && \
+    rm -fr /var/cache/apt/archives/*.deb
+
+RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - && \
+    echo "deb http://llvm.org/apt/xenial/ llvm-toolchain-xenial-9 main" > /etc/apt/sources.list.d/llvm.list && \
+    apt-get update && \
+    apt-get install --assume-yes --force-yes clang-tidy-9 && \
     rm -fr /var/cache/apt/archives/*.deb
 
 # Create symlinks so clang picks up gcc 7.3.0 and associated libraries
