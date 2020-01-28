@@ -104,5 +104,4 @@
 
   # Should be done last as it requires choco kbxxx pkg to install first
   roles:
-  - vs2015_mobile
   - vs2017_mobile

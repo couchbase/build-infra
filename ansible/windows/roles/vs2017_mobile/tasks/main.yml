@@ -16,7 +16,7 @@
     dest: C:\vs2017\vs_professional.exe
 
 - name: Install Visual Studio Professional 2017 and dotnet tools
-  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.Universal --add Component.Android.NDK.R15C --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.Universal --add Component.Android.NDK.R15C --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP --add Microsoft.VisualStudio.ComponentGroup.UWP.VC --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 
