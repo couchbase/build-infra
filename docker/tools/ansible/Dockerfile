@@ -8,10 +8,10 @@ MAINTAINER Couchbase Build Team <build-team@couchbase.com>
 ARG ANSIBLE_VERSION
 
 RUN apt-get update                                       && \
-    apt-get install -y python-pip sshpass openssh-client rsync && \
+    apt-get install -y python3-pip sshpass openssh-client rsync && \
     apt-get clean
-RUN pip install --upgrade ansible==${ANSIBLE_VERSION}   && \
-    pip install --upgrade pywinrm
+RUN pip3 install --upgrade ansible==${ANSIBLE_VERSION}   && \
+    pip3 install --upgrade pywinrm
 
 ADD entrypoint.sh /
 # Need to save this arg in an environment variable, because ENTRYPOINT
