@@ -2,5 +2,6 @@
 
 docker run --rm -it -v `pwd`:/mnt \
 -v /home/couchbase/jenkinsdocker-ssh:/home/couchbase/jenkinsdocker-ssh \
-couchbasebuild/ansible-playbook -v -i inventory restart_cv_dockerslaves.yml $@
+couchbasebuild/ansible-playbook -v -i inventory --forks 30 \
+restart_cv_dockerslaves.yml $@
 
