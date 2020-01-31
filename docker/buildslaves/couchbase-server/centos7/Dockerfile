@@ -17,7 +17,7 @@ RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm
 RUN yum install -y java-1.8.0-openjdk-headless curl && \
     yum clean packages
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar

@@ -4,7 +4,7 @@
 TAG=$(date +%Y%m%d)
 IMAGE=build-docker.couchbase.com/couchbasebuild/server-rhel8-build
 
-PRIV_DIR=${HOME}/jenkinsdocker-ssh
+PRIV_DIR=/home/couchbase/jenkinsdocker-ssh
 RH_USER=$(cat ${PRIV_DIR}/redhat_access_user.txt)
 RH_PASSWORD=$(cat ${PRIV_DIR}/redhat_access_password.txt)
 RH_POOL_ID=$(cat ${PRIV_DIR}/rhel_8_pool_id.txt)

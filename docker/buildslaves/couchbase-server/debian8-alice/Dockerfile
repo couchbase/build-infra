@@ -4,7 +4,7 @@
 # older releases. The file Dockerfile.historic is the Dockerfile that
 # the image was originally build from.
 
-FROM build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20190524
+FROM couchbasebuild/server-debian8-build:20190424
 
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \

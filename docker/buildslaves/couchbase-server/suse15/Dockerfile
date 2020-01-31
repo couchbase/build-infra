@@ -24,7 +24,7 @@ RUN chmod +x /tini
 # JDK for Jenkins
 RUN zypper -n install java-1_8_0-openjdk-headless && zypper clean
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
 
 ### Install Couchbase build dependencies ######################################

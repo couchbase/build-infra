@@ -24,10 +24,15 @@ fi
 # COPY them into the image. This is annoying because COPY makes a
 # new image layer and hence the image will be larger than it needs
 # to be.
-if [ ! -d build/ccache.tar.gz ]
+if [ ! -e build/ccache.tar.bz2 ]
 then
     curl -o build/ccache.tar.bz2 \
         https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.bz2
+fi
+if [ ! -e build/swarm-client-3.17.jar ]
+then
+    curl -o build/swarm-client-3.17.jar \
+        https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar
 fi
 
 docker build -t ${IMAGE}:${TAG} .

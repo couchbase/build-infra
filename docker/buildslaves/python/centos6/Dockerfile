@@ -43,7 +43,7 @@ RUN mkdir /tmp/deploy && \
 RUN yum install --setopt=keepcache=0 -y java-1.8.0-openjdk-headless && \
     yum clean packages
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar

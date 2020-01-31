@@ -31,7 +31,7 @@ x-default-jenkins-slave-environment:
 services:
 
   centos6:
-    image: couchbasebuild/python-centos6-build:20190130
+    image: couchbasebuild/python-centos6-build:20200131
     environment:
       - "JENKINS_SLAVE_NAME=python-centos6"
       - "JENKINS_SLAVE_LABELS=centos6 python3"
@@ -40,7 +40,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/python-ubuntu16-build:20181121
+    image: couchbasebuild/python-ubuntu16-build:20200131
     environment:
       - "JENKINS_SLAVE_NAME=python-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16.04 python3"

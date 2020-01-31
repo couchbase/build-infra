@@ -20,7 +20,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Jenkins Swarm jar and JDK
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.13/swarm-client-3.13.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \

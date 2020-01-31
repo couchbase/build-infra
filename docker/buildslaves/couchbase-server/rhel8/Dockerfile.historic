@@ -1,14 +1,21 @@
-# Docker container for Amazon 2.0
+# Docker container for RHEL 8.0
 
-FROM amazonlinux:2.0.20181010
+FROM registry.access.redhat.com/ubi8/ubi:latest
 MAINTAINER build-team@couchbase.com
 
 USER root
-RUN yum -y update; yum clean all
+ARG RH_USER
+ARG RH_PASSWORD
+ARG RH_POOL_ID
+
+# Initialize a subscription and update the repositories
+RUN subscription-manager register --username ${RH_USER} --password ${RH_PASSWORD} && \
+    subscription-manager refresh && subscription-manager attach --pool=${RH_POOL_ID} && \
+    yum makecache # cachebust3
 
 # Jenkins Swarm jar
-RUN yum install -y java-1.8.0-openjdk-headless curl && \
-    yum clean packages
+RUN dnf install -y java-1.8.0-openjdk-headless curl && \
+    dnf clean packages
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
@@ -19,34 +26,34 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
 ### Install Couchbase build dependencies ######################################
-# * Packages from the base Amazon Linux 2 repositories
-RUN yum install --setopt=keepcache=0 -y \
-                deltarpm \
+# * Packages from the base CentOS repositories
+RUN dnf install --setopt=keepcache=0 -y \
+                autoconf \
+                automake \
                 ed \
                 git \
                 glibc-devel \
-                gzip \
-                gcc \
-                gcc-c++ \
+                glibc-langpack-en \
+                hostname \
+                libtirpc-devel \
+                libtool \
                 make \
                 man \
                 ncurses-devel \
                 numactl-devel \
                 openssh-clients \
-                openssl \
                 openssl-devel \
-                python-devel \
+                perl-Thread-Queue \
+                python2 \
+                python2-devel \
+                python36-devel \
                 redhat-lsb-core \
                 rpm-build \
                 ruby rubygems rubygem-rake \
                 sqlite-devel \
                 sudo \
-                tar \
-                unzip \
-                vim \
-                wget \
-                which \
-                xz && \
+                unzip && \
+    dnf clean packages && \
     ln -s /usr/bin/python2.7 /usr/bin/python2.6
 
 # Create couchbase user with password-less sudo privs, and give
@@ -60,24 +67,27 @@ RUN groupadd -g1000 couchbase && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 
-# Install third-party build dependencies
-RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper
+# Set default Python to Python 2
+RUN alternatives --set python /usr/bin/python2
 
-# Install autoconf and friends - necessary for building some third-party deps
-# from source, not for Couchbase.
-RUN mkdir /tmp/deploy && \
-    curl -L http://ftpmirror.gnu.org/autoconf/autoconf-2.69.tar.gz -o /tmp/deploy/autoconf-2.69.tar.gz && \
-    cd /tmp/deploy && tar -xzf autoconf-2.69.tar.gz && \
-    cd autoconf-2.69 && ./configure --prefix=/usr/local && make -j8 && make install && \
-    curl -L http://ftpmirror.gnu.org/automake/automake-1.14.tar.gz -o /tmp/deploy/automake-1.14.tar.gz && \
-    cd /tmp/deploy && tar -xzf automake-1.14.tar.gz && \
-    cd automake-1.14 && ./configure --prefix=/usr/local && make && make install && \
-    curl -L http://ftpmirror.gnu.org/libtool/libtool-2.4.2.tar.gz -o /tmp/deploy/libtool-2.4.2.tar.gz && \
-    cd /tmp/deploy && tar -xzf libtool-2.4.2.tar.gz && \
-    cd libtool-2.4.2 && ./configure --prefix=/usr/local && make -j8 && make install && \
-    cd /tmp && rm -rf /tmp/deploy
+# Python 2 saves the GCC build flags from when it was built in this file,
+# and uses them when building extensions. That doesn't work for us, because
+# this Python 2 was built by Red Hat using GCC 8, and some of the flags
+# don't work in our GCC 7.3. So I manually removed the bad ones from this
+# file. This is a hack solution, but it's only necessary for building the
+# python-snappy module in Alice; we removed all such Python dependencies
+# from cbdeps in Mad-Hatter and don't build them ourselves anymore (they come
+# in from Anaconda). So this workaround gets us going for now.
+# In any case, this probably is unnecessary for 3.7.2+ and 3.6.8+.
+# https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
+COPY _sysconfigdata.py /usr/lib64/python2.7
 
-# * CMake 3 (from cmake.org)
+# GCC (from couchbasebuild/rhel-8-gcc)
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+     mv /tmp/ld.so.conf /etc && ldconfig
+
+# * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
     curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
