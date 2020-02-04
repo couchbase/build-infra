@@ -13,7 +13,9 @@ RUN yum install --setopt=keepcache=0 -y openssh-server sudo deltarpm
 
 # Set up for SSH daemon
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
-    sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config && \
+    sed -ri '/UsePAM yes/a UsePAM no' /etc/ssh/sshd_config && \
+    sed -ri '0,/HostKey/s//Protocol 2\n&/' /etc/ssh/sshd_config  && \
+    sed -ri 's/^HostKey/#HostKey/g' /etc/ssh/sshd_config && \
     ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa && \
     ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
 

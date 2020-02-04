@@ -16,7 +16,9 @@ RUN yum install --setopt=keepcache=0 -y \
 
 # Set up for SSH daemon
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
-    sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config && \
+    sed -ri '/UsePAM yes/a UsePAM no' /etc/ssh/sshd_config && \
+    sed -ri '0,/HostKey/s//Protocol 2\n&/' /etc/ssh/sshd_config  && \
+    sed -ri 's/^HostKey/#HostKey/g' /etc/ssh/sshd_config && \
     ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa && \
     ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
 
@@ -78,18 +80,6 @@ RUN mkdir /tmp/deploy && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy
-
-# Android SDK
-RUN mkdir -p /home/couchbase/jenkins/tools && \
-    cd /home/couchbase/jenkins/tools && \
-    curl -L http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz -o android-sdk.tgz && \
-    tar xzf android-sdk.tgz && \
-    rm -rf android-sdk.tgz && \
-    (echo y | android-sdk-linux/tools/android -s update sdk --no-ui --filter platform-tools,tools -a ) && \
-    (echo y | android-sdk-linux/tools/android -s update sdk --no-ui --filter extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository -a) && \
-    (echo y | android-sdk-linux/tools/android -s update sdk --no-ui --filter build-tools-26.0.0,android-26 -a) && \
-    chmod 755 android-sdk-linux && \
-    chown -R couchbase:couchbase /home/couchbase
 
 # fr_FR locale for LiteCore testing
 RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true
