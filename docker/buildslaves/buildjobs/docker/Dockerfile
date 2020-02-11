@@ -15,7 +15,7 @@ RUN apt-get update && \
     ln -s /usr/bin/python2.7 /usr/local/bin/python
 
 # Repo
-RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
+RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
 # Python3 updates and s3cmd

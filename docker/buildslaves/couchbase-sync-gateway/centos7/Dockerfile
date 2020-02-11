@@ -96,7 +96,7 @@ RUN mkdir -p /usr/local/go/1.4.1 && cd /usr/local/go/1.4.1 && \
     rm go.tar.gz
 
 # * repo
-RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
+RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
 # Install third-party build dependencies

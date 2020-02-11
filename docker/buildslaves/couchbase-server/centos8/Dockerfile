@@ -91,7 +91,7 @@ RUN mkdir /tmp/deploy && \
     rm -fr /tmp/deploy
 
 # * repo
-RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
+RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
 # Set LANG

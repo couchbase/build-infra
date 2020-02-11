@@ -9,3 +9,6 @@ FROM build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20190524
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
+# Also need to update repo
+RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
+    chmod a+x /usr/local/bin/repo

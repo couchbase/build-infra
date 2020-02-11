@@ -51,7 +51,7 @@ x-default-jenkins-slave-environment:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20200131
+    image: couchbasebuild/server-amzn2-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=amzn2 alice mad-hatter cheshire-cat master"
@@ -70,7 +70,7 @@ services:
       replicas: 1
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20200131
+    image: couchbasebuild/server-centos7-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 vulcan alice mad-hatter cheshire-cat master magma-preview"
@@ -80,7 +80,7 @@ services:
       replicas: 3
 
   centos8:
-    image: couchbasebuild/server-centos8-build:20200131
+    image: couchbasebuild/server-centos8-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-centos8"
       - "JENKINS_SLAVE_LABELS=centos8 mad-hatter cheshire-cat master magma-preview"
@@ -90,7 +90,7 @@ services:
       replicas: 3
 
   debian8-alice:
-    image: couchbasebuild/server-debian8-alice-build:20200131
+    image: couchbasebuild/server-debian8-alice-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8-alice"
       - "JENKINS_SLAVE_LABELS=debian8 vulcan alice"
@@ -100,7 +100,7 @@ services:
       replicas: 1
 
   debian8:
-    image: couchbasebuild/server-debian8-build:20200131
+    image: couchbasebuild/server-debian8-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
       - "JENKINS_SLAVE_LABELS=debian8 mad-hatter cheshire-cat master"
@@ -108,7 +108,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/server-debian9-build:20200131
+    image: couchbasebuild/server-debian9-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=debian9 vulcan alice mad-hatter cheshire-cat master"
@@ -116,7 +116,7 @@ services:
     <<: *default-jenkins-slave
 
   debian10:
-    image: couchbasebuild/server-debian10-build:20200131
+    image: couchbasebuild/server-debian10-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-debian10"
       - "JENKINS_SLAVE_LABELS=debian10 mad-hatter cheshire-cat master"
@@ -124,7 +124,7 @@ services:
     <<: *default-jenkins-slave
 
   rhel8:
-    image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20200131
+    image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8"
       - "JENKINS_SLAVE_LABELS=rhel8 alice"
@@ -142,7 +142,7 @@ services:
       replicas: 1
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20200131
+    image: couchbasebuild/server-suse15-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=suse15 mad-hatter cheshire-cat master"
@@ -160,7 +160,7 @@ services:
       replicas: 1
 
   ubuntu16:
-    image: couchbasebuild/server-ubuntu16-build:20200131
+    image: couchbasebuild/server-ubuntu16-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16.04 ubuntu16 vulcan alice mad-hatter cheshire-cat master"
@@ -168,7 +168,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20200131
+    image: couchbasebuild/server-ubuntu18-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18 alice mad-hatter cheshire-cat master"

@@ -16,7 +16,7 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/ubuntu-1604-c
 # Spock Debian 9.1 builder
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/debian-9-couchbase-build:20170911 spock-debian9 5230 server.jenkins.couchbase.com
 # Primary zz-server-lightweight running on mega2 (same port as backup on mega3)
-${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/server-ubuntu16-build:20191113 zz-server-lightweight 5322 server.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/server-ubuntu16-build:20200211 zz-server-lightweight 5322 server.jenkins.couchbase.com
 
 # ClamAV slave
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/clamav-slave:20180507 clamav-slave-server 2888 server.jenkins.couchbase.com

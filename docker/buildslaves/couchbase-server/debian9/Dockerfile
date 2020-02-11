@@ -71,7 +71,7 @@ RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
 RUN mkdir /tmp/deploy && \
     curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
-    curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
+    curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 
