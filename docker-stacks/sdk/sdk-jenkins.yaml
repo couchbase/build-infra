@@ -9,7 +9,7 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.199
+    image: jenkins/jenkins:2.219
     deploy:
       replicas: 1
     ports:
@@ -20,7 +20,7 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
       - type: bind
-        source: /builds/jenkins/sdk-jenkins-home
+        source: /buildteam/jenkins/sdk-jenkins-home
         target: /var/jenkins_home
     secrets:
       - source: buildbot_id_dsa

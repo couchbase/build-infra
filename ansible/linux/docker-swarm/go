@@ -1,4 +1,4 @@
 #!/bin/bash
 
 docker run --rm -it -v `pwd`:/mnt -v ~/jenkinsdocker-ssh:/ssh \
-  couchbasebuild/ansible -i inventory "$@"
+  couchbasebuild/ansible -i inventory -f 100 "$@"

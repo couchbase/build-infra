@@ -1,5 +1,3 @@
-[manager]
-
 [worker]
 172.23.96.171  name=mega4-01.build.couchbase.com
 172.23.96.173  name=mega4-02.build.couchbase.com
@@ -20,7 +18,7 @@
 172.23.121.111 name=mega4-17.build.couchbase.com
 172.23.121.112 name=mega4-18.build.couchbase.com
 172.23.121.113 name=mega4-19.build.couchbase.com
-172.23.121.114 name=mega4-20.build.couchbase.com
+172.23.120.19  name=mega4-20.build.couchbase.com
 172.23.113.28  name=mega4-21.build.couchbase.com
 172.23.113.44  name=mega4-22.build.couchbase.com
 172.23.113.49  name=mega4-23.build.couchbase.com
@@ -34,7 +32,14 @@
 172.23.113.47  name=mega4-31.build.couchbase.com
 172.23.113.40  name=mega4-32.build.couchbase.com
 
+[sdk]
+172.23.96.47   name=sdk-swarm-01.build.couchbase.com
+172.23.96.46   name=sdk-swarm-02.build.couchbase.com
+172.23.96.44   name=sdk-swarm-03.build.couchbase.com
+
+
 [all:vars]
 ansible_user=couchbase
 ansible_password=couchbase
-ansible_sudo_password=couchbase
+ansible_become_password=couchbase
+ansible_python_interpreter=/usr/bin/python3
