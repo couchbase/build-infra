@@ -21,22 +21,25 @@ RUN groupadd -g1000 couchbase && \
 # * Packages from the base CentOS repository
 RUN yum install --setopt=keepcache=0 -y epel-release && \
     yum install --setopt=keepcache=0 -y \
-                ed \
-                glibc.i686 \
                 bzip2-devel \
-                libicu \
-                libunwind \
-                libuv-devel \
+                cmake \
+                ed \
+                git \
+                glibc.i686 \
                 libev-devel \
                 libevent-devel \
                 libffi-devel \
+                libicu \
+                libunwind \
+                libuv-devel \
                 libxml2-devel \
-                openssl-devel \
                 make \
                 man \
                 ncurses-devel \
                 numactl-devel \
-                openssh-clients openssl-devel \
+                openssl-devel \
+                openssh-clients \
+                perl-XML-XPath \
                 python-devel \
                 python-pip \
                 python-virtualenv \
@@ -45,12 +48,8 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
                 ruby rubygems rubygem-rake \
                 tar \
                 unzip \
-                which \
-                git \
-                cmake \
-                python-pip \
                 wget \
-                python-pip
+                which
 
 # Dev basic tools
 RUN yum groupinstall -y "Development Tools"
