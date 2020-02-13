@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 
 # Suggested deployment command:
 #   docker --host mega4-swarm.build.couchbase.com stack deploy -c docker-registry.yaml docker
@@ -12,17 +12,37 @@ services:
     image: registry:2
     ports:
       - 443:443
+    configs:
+      - source: docker_registry_config_20200212
+        target: /etc/docker/registry/config.yml
+        mode: 0664
     secrets:
       - source: buildhub.crt
       - source: buildhub.key
-    environment:
-      REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/buildhub.crt
-      REGISTRY_HTTP_TLS_KEY: /run/secrets/buildhub.key
-      REGISTRY_HTTP_ADDR: 0.0.0.0:443
-      REGISTRY_STORAGE_DELETE_ENABLED: "true"
     volumes:
       - type: bind
-        source: /builds/docker/registry
+        source: /buildteam/docker/registry
+        target: /var/lib/registry
+    networks:
+      registry:
+
+  registry-cleanup:
+    deploy:
+      replicas: 0
+      restart_policy:
+        condition: none
+    image: registry:2
+    entrypoint:
+      - /entrypoint.sh
+      - garbage-collect
+      - /etc/docker/registry/config.yml
+    configs:
+      - source: docker_registry_config_20200212
+        target: /etc/docker/registry/config.yml
+        mode: 0664
+    volumes:
+      - type: bind
+        source: /buildteam/docker/registry
         target: /var/lib/registry
     networks:
       registry:
@@ -54,6 +74,10 @@ services:
       REGISTRY_TITLE: "Couchbase Build Registry"
     networks:
       registry:
+
+configs:
+  docker_registry_config_20200212:
+    file: conf/registry-config.yml
 
 secrets:
   buildhub.crt:
