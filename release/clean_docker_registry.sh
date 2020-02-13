@@ -2,7 +2,8 @@
 
 # Here is where to add any expiry-policy commands you want
 function expire-images() {
-    ./deckschrubber -day 2 -registry https://build-docker.couchbase.com/ -repo 'couchbase/server-toy' -tag 'analytics-jenkins' -repos 1000
+    ./deckschrubber -day 2 -registry https://build-docker.couchbase.com/ -repo 'couchbase/server-toy' -tag 'analytics-jenkins' -repos 100
+    ./deckschrubber -day 90 -registry https://build-docker.couchbase.com/ -repo 'couchbase/server-toy' -repos 100
     ./deckschrubber -day 90 -latest 5 -registry https://build-docker.couchbase.com/ -repo 'couchbase/couchbase-(admission|exporter|operator).*' -repos 100
 }
 
