@@ -1,4 +1,5 @@
 backup/*
+workspace/*
 fingerprints/*
 jobs/*/workspace*
 jobs/*/builds/*/log
