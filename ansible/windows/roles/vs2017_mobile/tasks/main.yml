@@ -20,6 +20,12 @@
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 
+- name: extra vs2017 components
+  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.SDK27 --add Microsoft.VisualStudio.Component.Windows10SDK.16299.Desktop --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP.Native --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.Windows10SDK.14393 --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  register: install_output
+  failed_when: ( install_output.rc not in [ 3010, 0 ] )
+  when: PRODUCT == "couchbase-lite-core"
+
 - debug: var=install_output.stdout_lines
 
 - name: Reboot Windows if necessary
