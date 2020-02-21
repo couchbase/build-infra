@@ -1,7 +1,7 @@
 version: '3.5'
 
 # Suggested deployment command:
-#  docker stack deploy -c builddb_rest.yaml builddb_rest
+#  docker --host build-db-01.build.couchbase.com stack deploy -c builddb_rest.yaml builddb_rest
 # All services, networks, etc. will then get an "builddb_rest" prefix,
 # eg. "builddb_rest_server"
 
@@ -15,7 +15,7 @@ services:
       - "8000:6543"
     volumes:
       - type: bind
-        source: /builds/builddb_repos
+        source: /buildteam/builddb_repos
         target: /var/builddb_repos
     configs:
       - source: builddb_rest_20181219

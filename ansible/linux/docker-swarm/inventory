@@ -37,6 +37,10 @@
 172.23.96.46   name=sdk-swarm-02.build.couchbase.com
 172.23.96.44   name=sdk-swarm-03.build.couchbase.com
 
+[builddb]
+172.23.96.69   name=build-db-01.build.couchbase.com
+172.23.112.8   name=build-db-02.build.couchbase.com
+172.23.96.73   name=build-db-03.build.couchbase.com
 
 [all:vars]
 ansible_user=couchbase
