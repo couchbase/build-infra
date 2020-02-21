@@ -14,8 +14,8 @@ in XenCenter by navigating to the "Storage" tab for the VM host and:
  - select "NFS ISO" for the Type
  - provide any name; I recommend "NFS ISO Library (Ubuntu)"
  - you can leave "Autogenerate description based on SR settings" checked
- - provide the share name "172.23.120.24:/data/builds/iso" (assuming that
-   the NAS IP hasn't changed) and select NFSv3
+ - provide the share name "cnt-s231.sc.couchbase.com:/data/buildteam/iso"
+   and select NFSv3
 
 The ssh password for the Xen host must be specified on the command line
 in the variable cmdline_password.

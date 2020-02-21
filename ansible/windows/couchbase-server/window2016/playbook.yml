@@ -110,9 +110,9 @@
           dest: "C:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
           force: no
       with_items:
-        - url: http://172.23.120.24/builds/latestbuilds/winbits/Microsoft_VC100_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/winbits/Microsoft_VC100_CRT_x64.msm
           filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://172.23.120.24/builds/latestbuilds/winbits/Microsoft_VC120_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/winbits/Microsoft_VC120_CRT_x64.msm
           filename: Microsoft_VC120_CRT_x64.msm
 
     - name: Create bin directory
