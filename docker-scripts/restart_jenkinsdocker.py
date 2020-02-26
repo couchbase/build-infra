@@ -75,16 +75,6 @@ if os.path.isdir(slave_dir):
             else:
                 os.rmdir(path)
 
-# Prefer /latestbuilds etc. to /home/couchbase/latestbuilds etc.
-if os.path.isdir("/latestbuilds"):
-    latestbuilds = "/latestbuilds"
-else:
-    latestbuilds = "/home/couchbase/latestbuilds"
-if os.path.isdir("/releases"):
-    releases = "/releases"
-else:
-    releases = "/home/couchbase/releases"
-
 # Check out the Docker network situation
 output = check_output(["docker", "network", "ls", "--format", "{{ .Name }}"])
 networks = output.split("\n")
@@ -108,8 +98,8 @@ run_args = [
 if not args.no_std_mounts:
     run_args.extend([
      "--volume=/builds:/builds",
-     "--volume={}:/latestbuilds".format(latestbuilds),
-     "--volume={}:/releases".format(releases)
+     "--volume=/san/latestbuilds:/latestbuilds",
+     "--volume=/san/releases:/releases"
     ])
 if not args.no_workspace:
     run_args.append(

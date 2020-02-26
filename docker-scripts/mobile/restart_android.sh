@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# These are currently all hosted on mega
+# These are currently all hosted on mega1
 
 pushd `dirname $0` > /dev/null
 SCRIPTPATH=`pwd -P`
