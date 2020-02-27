@@ -7,8 +7,8 @@
 #172.23.123.45 sr_name="Local Storage 01" network_name="Pool-wide network associated with eth0"
 #172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
 #172.23.104.32 network_name=vlan112
-172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
-
+#172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
+172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
 [newvms]
 
 [xenservers:vars]

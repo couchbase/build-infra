@@ -74,7 +74,8 @@
     ansible_user: couchbase
     ansible_password: couchbase
     ansible_become: true
-    ansible_sudo_password: couchbase
+    ansible_become_password: couchbase
+    ansible_python_interpreter: /usr/bin/python3
 
   tasks:
 
@@ -137,7 +138,6 @@
           - apt-transport-https
           - ca-certificates
           - software-properties-common
-          - python-pip
           - curl
           - nfs-common
           - zsh
@@ -149,19 +149,13 @@
         src: "{{ item.nasserver }}:{{ item.naspath }}"
         fstype: nfs
         opts: rw,soft
-        dump: 0
-        passno: 0
+        dump: "0"
+        passno: "0"
         state: mounted
       with_items:
-        - mountpoint: /latestbuilds
-          nasserver: latestbuilds.service.couchbase.com
-          naspath: /data/builds/latestbuilds
-        - mountpoint: /releases
-          nasserver: latestbuilds.service.couchbase.com
-          naspath: /data/builds/releases
-        - mountpoint: /builds
-          nasserver: nas-n.mgt.couchbase.com
-          naspath: /data/builds
+        - mountpoint: /buildteam
+          nasserver: nas.build.couchbase.com
+          naspath: /data/buildteam
 
     - name: Add docker key
       shell: >
@@ -177,11 +171,6 @@
       apt:
         name: docker-ce
         update_cache: yes
-
-    - name: Install docker-py
-      pip:
-        name: docker-py
-        version: 1.9.0
 
     - name: Add couchbase user to docker group
       user:
@@ -212,4 +201,3 @@
         name: unattended-upgrades
         state: absent
         purge: yes
-
