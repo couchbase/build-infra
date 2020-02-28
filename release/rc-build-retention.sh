@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 # Program to retain release candidate build a bit longer or expire them on NAS
 
 usage() {
@@ -69,19 +69,27 @@ mark_file_outdated() {
 add_git_file() {
     pushd ${CURRENT_DIR}/${GIT_DIR}/
     mkdir -p ${CURRENT_DIR}/${GIT_DIR}/${PRODUCT}/${RELEASE}
-    touch ${CURRENT_DIR}/${GIT_DIR}/${PRODUCT}/${RELEASE}/${BLD_NUM}
-    git add ${PRODUCT}/${RELEASE}/${BLD_NUM}
-    git commit -m "retain RC build - ${PRODUCT}/${RELEASE}/${BLD_NUM}"
-    git push origin master:refs/heads/master
+    if [ ! -e "${PRODUCT}/${RELEASE}/${BLD_NUM}" ]; then
+        touch ${CURRENT_DIR}/${GIT_DIR}/${PRODUCT}/${RELEASE}/${BLD_NUM}
+        git add ${PRODUCT}/${RELEASE}/${BLD_NUM}
+        git commit -m "retain RC build - ${PRODUCT}/${RELEASE}/${BLD_NUM}"
+        git push origin master:refs/heads/master
+    else
+        echo "${PRODUCT} ${RELEASE} ${BLD_NUM} already retained!"
+    fi
     popd
 }
 
 # Remove bld_num to git repo
 remove_git_file() {
     pushd ${CURRENT_DIR}/${GIT_DIR}/
-    git rm ${PRODUCT}/${RELEASE}/${BLD_NUM}
-    git commit -m "remove RC build - ${PRODUCT}/${RELEASE}/${BLD_NUM}"
-    git push origin master:refs/heads/master
+    if [ -e "${PRODUCT}/${RELEASE}/${BLD_NUM}" ]; then
+        git rm ${PRODUCT}/${RELEASE}/${BLD_NUM}
+        git commit -m "remove RC build - ${PRODUCT}/${RELEASE}/${BLD_NUM}"
+        git push origin master:refs/heads/master
+    else
+        echo "${PRODUCT} ${RELEASE} ${BLD_NUM} not previously retained!"
+    fi
     popd
 }
 
