@@ -153,9 +153,9 @@
         dest: "C:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
         force: no
       with_items:
-        - url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/winbits/Microsoft_VC100_CRT_x64.msm
+        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC100_CRT_x64.msm
           filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/winbits/Microsoft_VC120_CRT_x64.msm
+        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC120_CRT_x64.msm
           filename: Microsoft_VC120_CRT_x64.msm
 
 # Do OpenSSH last so the service has the latest version of the path

@@ -39,26 +39,24 @@
         name: "{{ item }}"
         allow_empty_checksums: "yes"
       with_items:
-        - kb2919355
-        - kb2999226
-        - kb2919442
         - git
         - cmake
         - curl
         - nasm
         - ninja
         - MinGW
-        - vcpython27
         - ruby
         - wixtoolset
         - 7zip.commandline
-        - jdk8
-        - maven
-        - activeperl
         - googlechrome
         - insted
         - pandoc
         - vscode
+
+    - name: Install JDK for Jenkins
+      win_chocolatey:
+        name: openjdk
+        version: 11.0.2.01
 
     - name: "Install python paramiko module"
       win_command: C:\Python27\Scripts\pip.exe install paramiko
@@ -71,34 +69,6 @@
       tags:
         - setup
 
-    - name: "Download py2exe"
-      win_get_url:
-        url: https://iweb.dl.sourceforge.net/project/py2exe/py2exe/0.6.9/py2exe-0.6.9.win64-py2.7.amd64.exe
-        dest: 'C:\py2exe.exe'
-
-    - name: "Install py2exe"
-      raw: 'easy_install C:\py2exe.exe'
-      ignore_errors: yes
-
-    - name: Download Cygwin setup program
-      win_get_url:
-        url: https://cygwin.com/setup-x86_64.exe
-        dest: C:\ansible_files\cygwin_setup.exe
-      tags:
-        - cygwin
-
-    - name: Copy Cygwin install batch script
-      win_copy:
-        src: install_cygwin.bat
-        dest: C:\ansible_files\install_cygwin.bat
-      tags:
-        - cygwin
-
-    - name: Install Cygwin
-      win_command: C:\ansible_files\install_cygwin.bat
-      tags:
-        - cygwin
-
     - name: Create required "C:\\Program Files (x86)\\Common Files\\Merge Modules" directory
       win_file:
           path: "C:\\Program Files (x86)\\Common Files\\Merge Modules"
@@ -110,10 +80,14 @@
           dest: "C:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
           force: no
       with_items:
-        - url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/winbits/Microsoft_VC100_CRT_x64.msm
+        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC100_CRT_x64.msm
           filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/winbits/Microsoft_VC120_CRT_x64.msm
+        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC120_CRT_x64.msm
           filename: Microsoft_VC120_CRT_x64.msm
+        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC140_CRT_x64.msm
+          filename: Microsoft_VC140_CRT_x64.msm
+      tags:
+        - mergemodules
 
     - name: Create bin directory
       win_file:
@@ -224,7 +198,11 @@
         direction: in
         protocol: TCP
 
-    - include: msvc2017.yml
+    - name: install vs2017
+      include_role:
+        name: "vs2017"
+      vars:
+        PRODUCT: "couchbase-server"
 
     # Do OpenSSH last so the service has the latest version of the path
     - name: Install OpenSSH (for Jenkins)
