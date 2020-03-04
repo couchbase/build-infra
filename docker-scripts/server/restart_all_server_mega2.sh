@@ -21,6 +21,9 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/server-ubuntu16-build:2
 # ClamAV slave
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/clamav-slave:20180507 clamav-slave-server 2888 server.jenkins.couchbase.com
 
+# Sonar Scanner slave
+${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/centos-73-sonar-scanner-build:latest sonarscanner-centos73-01 5240 server.jenkins.couchbase.com
+
 wait
 echo "All done!"
 
