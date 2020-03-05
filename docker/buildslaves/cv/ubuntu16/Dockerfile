@@ -95,6 +95,11 @@ RUN apt-get update && \
 RUN curl -L https://packages.couchbase.com/patch_via_gerrit/1.0.0/patch_via_gerrit-1.0.0-linux -o /usr/local/bin/patch_via_gerrit && \
     chmod 755 /usr/local/bin/patch_via_gerrit
 
+# Install Ninja for faster builds
+RUN apt-get update && \
+    apt-get install -y ninja-build && \
+    rm -fr /var/cache/apt/archives/*.deb
+
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
