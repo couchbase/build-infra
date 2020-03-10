@@ -198,6 +198,9 @@
         direction: in
         protocol: TCP
 
+    - name: Exclude Jenkins from windows antivirus
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+
     - name: install vs2017
       include_role:
         name: "vs2017"

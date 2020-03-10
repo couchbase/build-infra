@@ -133,6 +133,9 @@
         protocol: TCP
         force: true
 
+    - name: Exclude Jenkins from windows antivirus
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+
     #base vs2017 install role from ../../roles/vs2017_mobile/
     - name: install vs2017_mobile
       include_role:
