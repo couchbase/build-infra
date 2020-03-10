@@ -55,7 +55,7 @@ COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "default" ]
 
-# FPM packaging tool.  
+# FPM packaging tool.
 RUN yum install -y ruby-devel gcc make rpm-build rubygems && \
     gem install fpm
 
@@ -88,4 +88,4 @@ RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true
 RUN yum install -y --setopt=keepcache=0 perl-Digest-SHA
 
 # Add cbdep tool (used by cbl-java build, at least)
-RUN curl http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep

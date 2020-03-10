@@ -88,15 +88,9 @@
         passno: 0
         state: mounted
       with_items:
-        - mountpoint: /latestbuilds
-          nasserver: latestbuilds.service.couchbase.com
-          naspath: /data/builds/latestbuilds
-        - mountpoint: /releases
-          nasserver: latestbuilds.service.couchbase.com
-          naspath: /data/builds/releases
-        - mountpoint: /builds
-          nasserver: nas-n.mgt.couchbase.com
-          naspath: /data/builds
+        - mountpoint: /buildteam
+          nasserver: cnt-s231.sc.couchbase.com
+          naspath: /data/buildteam
 
     - name: Add docker key
       shell: >

@@ -1,17 +1,14 @@
-# Docker container for Centos7
+# Docker container for Centos 6.9
 
-FROM centos:centos7.4.1708
+FROM centos:6.9
 MAINTAINER build-team@couchbase.com
-
-USER root
-RUN yum clean all && \
-    yum install --setopt=keepcache=0 -y sudo deltarpm
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN groupadd -g1000 couchbase && \
     useradd couchbase -g couchbase -u1000 -G wheel -m -s /bin/bash && \
     mkdir /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase && \
+    mkdir -p /etc/sudoers.d && \
     echo 'couchbase:couchbase' | chpasswd && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
@@ -21,41 +18,89 @@ RUN groupadd -g1000 couchbase && \
 # * Packages from the base CentOS repository
 RUN yum install --setopt=keepcache=0 -y epel-release && \
     yum install --setopt=keepcache=0 -y \
-                bzip2-devel \
-                cmake \
-                ed \
-                git \
-                glibc.i686 \
-                libev-devel \
-                libevent-devel \
-                libffi-devel \
-                libicu \
-                libunwind \
-                libuv-devel \
-                libxml2-devel \
-                make \
-                man \
-                ncurses-devel \
-                numactl-devel \
-                openssl-devel \
-                openssh-clients \
-                perl-XML-XPath \
-                python-devel \
-                python-pip \
-                python-virtualenv \
-                redhat-lsb-core \
-                rpm-build \
-                ruby rubygems rubygem-rake \
-                tar \
-                unzip \
-                wget \
-                which
+    sudo \
+    bzip2-devel \
+    centos-release-scl \
+    http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm \
+    glibc.i686 \
+    krb5-libs \
+    libunwind \
+    libnghttp2-devel \
+    libidn-devel \
+    libuuid \
+    lttng-ust \
+    libuv-devel \
+    libev-devel \
+    libevent-devel \
+    libffi-devel \
+    libxml2-devel \
+    libxslt \
+    numactl-devel \
+    openssl-devel \
+    openssh-clients \
+    redhat-lsb-core \
+    rpm-build \
+    tar \
+    unzip \
+    which \
+    zlib-devel \
+    curl \
+    wget \
+    java-1.8.0-openjdk && \
+    yum clean packages
 
-# Dev basic tools
-RUN yum groupinstall -y "Development Tools"
+# devtoolset 6 (plus git from wandisco)
+RUN yum install --setopt=keepcache=0 -y \
+    git \
+    devtoolset-6-gcc \
+    devtoolset-6-gcc-c++ \
+    devtoolset-6-binutils \
+    devtoolset-6-make \
+    devtoolset-6-elfutils && \
+    yum clean packages && \
+    for file in /opt/rh/devtoolset-6/root/usr/bin/*; do ln -s $file /usr/local/bin; done
 
-# JDK for Jenkins
-RUN yum install -y --setopt=keepcache=0 java-1.8.0-openjdk && yum clean packages
+# Pre-compiled libicu for .NET Core
+# https://github.com/dotnet/core/blob/master/Documentation/build-and-install-rhel6-prerequisites.md
+RUN curl -o /tmp/icu.tgz http://download.icu-project.org/files/icu4c/57.1/icu4c-57_1-RHEL6-x64.tgz && \
+    tar -xf /tmp/icu.tgz -C / && \
+    rm /tmp/icu.tgz
+
+# Build Curl 7.45 for .NET Core
+# https://github.com/dotnet/core/blob/master/Documentation/build-and-install-rhel6-prerequisites.md
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    wget https://curl.haxx.se/download/curl-7.45.0.tar.gz && \
+    tar xf curl-7.45.0.tar.gz && \
+    cd curl-7.45.0 && \
+    ./configure \
+      --disable-dict \
+      --disable-file \
+      --disable-ftp \
+      --disable-gopher \
+      --disable-imap \
+      --disable-ldap \
+      --disable-ldaps \
+      --disable-libcurl-option \
+      --disable-manual \
+      --disable-pop3 \
+      --disable-rtsp \
+      --disable-smb \
+      --disable-smtp \
+      --disable-telnet \
+      --disable-tftp \
+      --enable-ipv6 \
+      --enable-optimize \
+      --enable-symbol-hiding \
+      --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt \
+      --with-nghttp2 \
+      --with-gssapi \
+      --with-ssl \
+      --without-librtmp \
+      --prefix=/usr/local && \
+    make -j4 && make install && \
+    cd /tmp && \
+    rm -rf deploy
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
@@ -95,6 +140,17 @@ RUN mkdir /tmp/deploy && \
     curl -L -o couchbase-release.rpm http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-x86_64.rpm && \
     rpm -iv couchbase-release.rpm && \
     yum install -y libcouchbase-devel libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
+    cd /tmp && \
+    rm -rf /tmp/deploy
+
+# autoconf et al for building PHP cbdep packages
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L -O http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz && \
+    tar zxf autoconf-2.69.tar.gz && \
+    cd autoconf-2.69 && \
+    ./configure && \
+    make && make install && \
     cd /tmp && \
     rm -rf /tmp/deploy
 

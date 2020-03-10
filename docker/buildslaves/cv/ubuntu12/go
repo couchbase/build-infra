@@ -6,7 +6,7 @@ IMAGE=couchbasebuild/server-ubuntu12-cv
 
 mkdir -p build
 if [ ! -d build/jdk1.8.0_181 ]; then
-    curl http://nas-n.mgt.couchbase.com/builds/downloads/jdk/jdk-8u181-linux-x64.tar.gz | \
+    curl http://downloads.build.couchbase.com/jdk/jdk-8u181-linux-x64.tar.gz | \
     tar x -C build -z
 fi
 

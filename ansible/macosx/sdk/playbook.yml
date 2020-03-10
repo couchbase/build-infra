@@ -14,7 +14,7 @@
 
     - name: Install cbdep tool
       get_url:
-        url: http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.darwin
+        url: http://downloads.build.couchbase.com/cbdep/cbdep.darwin
         dest: /usr/local/bin/cbdep
         mode: 0755
       become: true

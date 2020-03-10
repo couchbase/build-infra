@@ -60,7 +60,7 @@
 
     - name: Install cbdep tool
       win_get_url:
-        url: http://nas-n.mgt.couchbase.com/builds/downloads/cbdep/cbdep.windows.exe
+        url: http://downloads.build.couchbase.com/cbdep/cbdep.windows.exe
         dest: C:\Windows\cbdep.exe
 
     # Do OpenSSH last so the service has the latest version of the path
