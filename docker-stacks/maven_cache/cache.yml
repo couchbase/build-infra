@@ -1,0 +1,26 @@
+version: "3.7"
+
+# Suggested deployment command:
+#   docker -H mega4.build.couchbase.com stack deploy -c cache.yml maven
+# All services, networks, etc. will then get an "maven_" prefix,
+# eg. "maven_cache"
+
+secrets:
+  archiva_password:
+    external: true
+
+services:
+  cache:
+    deploy:
+      replicas: 1
+    image: build-docker.couchbase.com/couchbase/archiva:20200311
+    environment:
+      admin_email: build-team@couchbase.com
+    ports:
+      - "8100:8080"
+    secrets:
+      - source: archiva_password
+    volumes:
+      - type: bind
+        source: /buildteam/maven_cache
+        target: /var/archiva
