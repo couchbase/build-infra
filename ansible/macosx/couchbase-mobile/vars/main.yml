@@ -3,7 +3,7 @@
 homebrew_cask_appdir: /Applications
 
 homebrew_taps:
-   - caskroom/cask
+   - homebrew/cask
 
 homebrew_installed_packages:
   - { name: ccache, version: 3.4.1, state: linked }
@@ -18,3 +18,5 @@ homebrew_installed_packages:
   - { name: ssh-copy-id, version: 7.6p1, state: linked }
   - { name: pass, version: 1.7.1_1, state: linked }
   - { name: wget, version: 1.19.4_1, state: linked }
+  - { name: ruby, version: "{{ ruby_version }}", state: linked }
+  - { name: ruby-completion, state: linked }

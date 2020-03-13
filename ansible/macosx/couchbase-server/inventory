@@ -5,3 +5,4 @@ xx.xx.xx.xx
 ansible_connection=ssh
 ansible_user=couchbase
 ansible_password=xxx
+ruby_version=2.7.0

@@ -22,6 +22,20 @@
       shell: systemsetup -setcomputersleep Never
       become: true
 
+    - name: add homebrew to PATH
+      lineinfile:
+        path: ~/.bash_profile
+        state: present
+        regexp: '[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion'
+        line: '[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion'
+
+    - name: add ruby to PATH
+      lineinfile:
+        path: ~/.bash_profile
+        state: present
+        regexp: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$PATH"'
+        line: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$HOME/.gem/ruby/{{ruby_version}}/bin:$PATH"'
+
     - name: Upgrade pip
       command: "pip install --upgrade pip"
       ignore_errors: yes
@@ -40,6 +54,12 @@
           - jazzy
           - xcpretty
           - slather
+
+    # instlall xcversion, which is used to manage xcode installation from command line
+    - name: Install gem packages
+      gem: name={{ item }} state=latest
+      with_items:
+          - xcode-install
 
     - name: Copy SSH config files
       copy:
