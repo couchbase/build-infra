@@ -1,4 +1,4 @@
-Setup Mobile MACOS
+Setup Server MACOS
 # Credit: https://github.com/geerlingguy/mac-dev-playbook
 # Used role geerlingguy.homebrew
 
@@ -8,10 +8,11 @@ Prereq
 3. Run on command line: sudo xcodebuild -license accept
 4. Require a local copy of .ssh/authorized_keys, .ssh/buildbot_id_dsa,
 .ssh/config, .ssh/id_ns-codereview, .ssh/ns-buildbot.rsa, .ssh/patch_via_gerrit.ini  from official's jenkinsdocker-ssh directory
+5. Download MacOS codesign cert, from lastpass. unzip it to files directory so that it becomes files/Certificates.p12
 
 Deploy tools via ansible
 1. git clone https://github.com/couchbase/build-infra.git
 2. cd build-infra/ansible/macosx/couchbase-server
 3. run % ansible-galaxy install -r requirements.yml
-4. Run the playbook
-    % ansible-playbook -i inventory playbook.yml  -e ansible_ssh_pass=<jenkins_password>
+4. Run the playbook and enter sudo password
+    % ansible-playbook -i inventory playbook.yml  -e ansible_ssh_pass=<jenkins_password> --ask-become-pass

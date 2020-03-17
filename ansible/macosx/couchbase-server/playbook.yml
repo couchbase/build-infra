@@ -13,19 +13,35 @@
       shell: systemsetup -setcomputersleep Never
       become: true
 
+    - name: ensure .zshenv exist
+      copy:
+        content: ""
+        dest: ~/.zshenv
+        force: no
+        group: staff
+        owner: "{{ ansible_user }}"
+        mode: 0644
+
     - name: add homebrew to PATH
       lineinfile:
-        path: ~/.bash_profile
+        path: ~/.zshenv
         state: present
-        regexp: '[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion'
-        line: '[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion'
+        regexp: 'if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi'
+        line: 'if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi'
 
     - name: add ruby to PATH
       lineinfile:
-        path: ~/.bash_profile
+        path: ~/.zshenv
         state: present
         regexp: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$PATH"'
         line: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$HOME/.gem/ruby/{{ruby_version}}/bin:$PATH"'
+
+    - name: add java to PATH
+      lineinfile:
+        path: ~/.zshenv
+        state: present
+        regexp: 'export PATH="/usr/local/opt/java/bin:$PATH"'
+        line: 'export PATH="/usr/local/opt/java/bin:$PATH"'
 
     # instlall xcversion, which is used to manage xcode installation from command line
     - name: Install gem packages
@@ -51,9 +67,9 @@
       copy:
         src=./files/jenkins_profile dest=/Users/{{ ansible_ssh_user }}/.profile owner={{ ansible_ssh_user }} group=staff mode=0644
 
-    - name: Add Jenkins' .bashrc
+    - name: Add Jenkins' .zshrc
       copy:
-        src=./files/jenkins_bashrc dest=/Users/{{ ansible_ssh_user }}/.bashrc owner={{ ansible_ssh_user }} group=staff mode=0644
+        src=./files/jenkins_zshrc dest=/Users/{{ ansible_ssh_user }}/.zshrc owner={{ ansible_ssh_user }} group=staff mode=0644
 
     - name: Add Jenkins' gitconfig
       copy:
@@ -68,3 +84,24 @@
         name: https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
       tags: python3
 
+    - name: Check Codesign Cert exist
+      stat:
+        path: /home/mdtutorials2/sample_file.txt
+      register:
+        cert_exist
+
+    - name: Copy certificate to remote for import
+      copy:
+          src="./files/{{ p12_cert_file }}" dest="/tmp/{{ p12_cert_file }}" owner="{{ ansible_ssh_user }}" group=staff mode=0644
+      with_items:
+          - "{{ p12_cert_file }}"
+      when: cert_exist.stat.exists == true
+
+    - name: Import certificate
+      shell: |
+        security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
+        security import /tmp/{{ p12_cert_file }} -k /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain -P {{ p12_cert_password }} -A
+        rm -f /tmp/{{ p12_cert_file }}
+      args:
+        executable: /bin/bash
+      when: cert_exist.stat.exists == true
