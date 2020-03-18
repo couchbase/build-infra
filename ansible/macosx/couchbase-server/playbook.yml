@@ -8,6 +8,13 @@
   roles:
     - geerlingguy.homebrew
 
+  post_tasks:
+    - name: Link libtoolize
+      file:
+        src: "/usr/local/bin/glibtoolize"
+        dest: "/usr/local/bin/libtoolize"
+        state: link
+
   tasks:
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
