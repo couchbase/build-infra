@@ -11,6 +11,9 @@ RUN rpm --rebuilddb || ( \
         mv /var/lib/rpmrebuild* /var/lib/rpm \
 )
 
+# clean up nsswitch
+RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
+
 # tini, to avoid zombie issues when running with Swarm jar
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini

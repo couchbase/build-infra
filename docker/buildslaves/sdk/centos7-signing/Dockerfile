@@ -17,6 +17,9 @@ RUN groupadd -g1000 couchbase && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
     chmod 440 /etc/sudoers.d/wheel_group
 
+# clean up nsswitch
+RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
+
 ### Install build signing dependencies ######################################
 RUN yum install --setopt=keepcache=0 -y \
                 git rpm-sign createrepo expect

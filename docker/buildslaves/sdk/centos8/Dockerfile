@@ -23,6 +23,9 @@ RUN groupadd -g1000 couchbase && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
     chmod 440 /etc/sudoers.d/wheel_group
 
+# clean up nsswitch
+RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
+
 ### Install Couchbase build dependencies ######################################
 # Add EPEL
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm dnf-plugins-core && \

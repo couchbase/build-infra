@@ -27,7 +27,7 @@ fi
 
 docker run --name=$container_name -v /home/couchbase/jenkinsdocker-ssh:/ssh \
         --restart=unless-stopped \
-        -p 2322:22 -d couchbasebuild/centos7-sgw-build:20190926
+        -p 2322:22 -d couchbasebuild/centos7-sgw-build:20200319
 
 container_name="mobile-sgw-ubuntu14"
 container=$(docker ps | grep $container_name | awk -F\" '{ print $1 }')

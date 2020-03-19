@@ -65,7 +65,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20200310
+    image: couchbasebuild/sdk-centos7-build:20200319
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=centos7"
@@ -74,7 +74,7 @@ services:
     <<: *default-jenkins-slave
 
   centos8:
-    image: couchbasebuild/sdk-centos8-build:20200310
+    image: couchbasebuild/sdk-centos8-build:20200319
     environment:
       - "JENKINS_SLAVE_NAME=build-centos8"
       - "JENKINS_SLAVE_LABELS=centos8"
@@ -119,7 +119,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7-signing:
-    image: couchbasebuild/sdk-centos7-signing:20190927
+    image: couchbasebuild/sdk-centos7-signing:20200319
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"

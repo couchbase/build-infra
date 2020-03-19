@@ -22,6 +22,9 @@ RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
     ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa && \
     ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
 
+# clean up nsswitch
+RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
+
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN groupadd -g1000 couchbase && \

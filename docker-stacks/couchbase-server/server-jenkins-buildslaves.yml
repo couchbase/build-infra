@@ -70,7 +70,7 @@ services:
       replicas: 1
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20200211
+    image: couchbasebuild/server-centos7-build:20200319
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 vulcan alice mad-hatter cheshire-cat master magma-preview"
@@ -80,7 +80,7 @@ services:
       replicas: 3
 
   centos8:
-    image: couchbasebuild/server-centos8-build:20200211
+    image: couchbasebuild/server-centos8-build:20200319
     environment:
       - "JENKINS_SLAVE_NAME=server-centos8"
       - "JENKINS_SLAVE_LABELS=centos8 mad-hatter cheshire-cat master magma-preview"
