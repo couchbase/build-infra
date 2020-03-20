@@ -1,0 +1,42 @@
+#!/bin/sh
+
+NGINX_VER=1.16.1
+PCRE_VER=8.44
+ZLIB_VER=1.2.11
+OPENSSL_VER=1.1.1e
+FANCYIDX_VER=0.4.4
+VER=7.3.0
+
+IMAGE=couchbasebuild/centos-7-nginx
+
+docker build \
+    --build-arg NGINX_VER=${NGINX_VER} \
+    --build-arg PCRE_VER=${PCRE_VER} \
+    --build-arg ZLIB_VER=${ZLIB_VER} \
+    --build-arg OPENSSL_VER=${OPENSSL_VER} \
+    --build-arg FANCYIDX_VER=${FANCYIDX_VER} \
+    -t ${IMAGE}:${NGINX_VER} .
+docker tag ${IMAGE}:${NGINX_VER} ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:${NGINX_VER}
+  docker push ${IMAGE}:latest
+fi
+
+# Assemble the bits to deploy on SAN server
+mkdir -p build/etc/nginx
+mkdir -p build/lib/systemd/system
+mkdir -p build/usr/sbin
+
+cp -a conf/nginx.service build/lib/systemd/system
+cp -a conf/nginx.conf conf/conf.d conf/mime.types build/etc/nginx
+
+docker run --rm -v $(pwd)/build/usr/sbin:/out ${IMAGE}:${NGINX_VER}
+
+rm -f deploy.tar.gz
+cd build
+tar czf ../deploy.tar.gz *
+
+echo
+echo Final package is in ./deploy.tar.gz
+echo
