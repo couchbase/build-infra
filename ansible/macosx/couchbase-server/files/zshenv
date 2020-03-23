@@ -1,0 +1,12 @@
+# Add homebrew to PATH
+if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi
+
+# Add ruby to PATH
+ruby_ver=$(/usr/local/opt/ruby/bin/ruby -e 'print "#{RUBY_VERSION}"')
+export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/${ruby_ver}/bin:$HOME/.gem/ruby/${ruby_ver}/bin:$PATH"
+
+# Add Java to PATH
+export PATH="/usr/local/opt/java/bin:$PATH"
+
+# Ensure LANG can handle UTF-8 filenames
+export LANG=en_US.UTF-8

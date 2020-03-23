@@ -20,43 +20,13 @@
       shell: systemsetup -setcomputersleep Never
       become: true
 
-    - name: ensure .zshenv exist
-      copy:
-        content: ""
-        dest: ~/.zshenv
-        force: no
-        group: staff
-        owner: "{{ ansible_user }}"
-        mode: 0644
-
-    - name: add homebrew to PATH
-      lineinfile:
-        path: ~/.zshenv
-        state: present
-        regexp: 'if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi'
-        line: 'if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi'
-
-    - name: add ruby to PATH
-      lineinfile:
-        path: ~/.zshenv
-        state: present
-        regexp: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$PATH"'
-        line: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$HOME/.gem/ruby/{{ruby_version}}/bin:$PATH"'
-
-    - name: add java to PATH
-      lineinfile:
-        path: ~/.zshenv
-        state: present
-        regexp: 'export PATH="/usr/local/opt/java/bin:$PATH"'
-        line: 'export PATH="/usr/local/opt/java/bin:$PATH"'
-
-    # instlall xcversion, which is used to manage xcode installation from command line
+    # install xcversion, which is used to manage xcode installation from command line
     - name: Install gem packages
       gem: name={{ item }} state=latest
       with_items:
           - xcode-install
 
-    - name: Create jenkins's .ssh directory
+    - name: Create .ssh directory
       file: path=/Users/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
 
     - name: Copy SSH config files
@@ -70,15 +40,11 @@
         - ns-buildbot.rsa
         - patch_via_gerrit.ini
 
-    - name: Add Jenkins' profile
+    - name: Add .zshenv
       copy:
-        src=./files/jenkins_profile dest=/Users/{{ ansible_ssh_user }}/.profile owner={{ ansible_ssh_user }} group=staff mode=0644
+        src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
 
-    - name: Add Jenkins' .zshrc
-      copy:
-        src=./files/jenkins_zshrc dest=/Users/{{ ansible_ssh_user }}/.zshrc owner={{ ansible_ssh_user }} group=staff mode=0644
-
-    - name: Add Jenkins' gitconfig
+    - name: Add .gitconfig
       copy:
         src=./files/gitconfig dest=/Users/{{ ansible_ssh_user }}/.gitconfig owner={{ ansible_ssh_user }} group=staff mode=0644
 
