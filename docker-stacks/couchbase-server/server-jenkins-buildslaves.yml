@@ -175,6 +175,16 @@ services:
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
+  clamav:
+    image: couchbasebuild/clamav-slave:latest
+    environment:
+      - "JENKINS_SLAVE_NAME=clamav"
+      - "JENKINS_SLAVE_LABELS=clamav"
+      - *default-jenkins-slave-environment-master
+    <<: *default-jenkins-slave
+    deploy:
+      replicas: 1
+
 configs:
   couchbase_ssh_config_20191031:
     file: conf/couchbase_ssh_config

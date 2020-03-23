@@ -18,9 +18,6 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/debian-9-couc
 # Primary zz-server-lightweight running on mega2 (same port as backup on mega3)
 ${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/server-ubuntu16-build:20200211 zz-server-lightweight 5322 server.jenkins.couchbase.com
 
-# ClamAV slave
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/clamav-slave:20180507 clamav-slave-server 2888 server.jenkins.couchbase.com
-
 # Sonar Scanner slave
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/centos-73-sonar-scanner-build:latest sonarscanner-centos73-01 5240 server.jenkins.couchbase.com
 
