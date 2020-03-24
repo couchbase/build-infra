@@ -9,6 +9,19 @@
     - geerlingguy.homebrew
 
   tasks:
+    - name: Check if ruby is already installed
+      stat:
+        path: /usr/bin/ruby
+      register: ruby_installed
+
+    - name: Install ruby
+      homebrew_cask: name=ruby@{{ ruby_version }} state=linked
+      when: not ruby_installed.stat.exists
+
+    - name: Install ruby-completion
+      homebrew_cask: name=ruby-completion state=linked
+      when: not ruby_installed.stat.exists
+
     - name: Check if /usr/bin/java is already installed
       stat:
         path: /usr/bin/java
@@ -22,35 +35,9 @@
       shell: systemsetup -setcomputersleep Never
       become: true
 
-    - name: ensure .zshenv exist
+    - name: Add .zshenv
       copy:
-        content: ""
-        dest: ~/.zshenv
-        force: no
-        group: staff
-        owner: "{{ ansible_user }}"
-        mode: 0644
-
-    - name: add homebrew to PATH
-      lineinfile:
-        path: ~/.zshenv
-        state: present
-        regexp: 'if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi'
-        line: 'if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi'
-
-    - name: add ruby to PATH
-      lineinfile:
-        path: ~/.zshenv
-        state: present
-        regexp: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$PATH"'
-        line: 'export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/{{ruby_version}}/bin:$HOME/.gem/ruby/{{ruby_version}}/bin:$PATH"'
-
-    - name: add java to PATH
-      lineinfile:
-        path: ~/.zshenv
-        state: present
-        regexp: 'export PATH="/usr/local/opt/java/bin:$PATH"'
-        line: 'export PATH="/usr/local/opt/java/bin:$PATH"'
+        src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
 
     - name: Upgrade pip
       command: "pip install --upgrade pip"
@@ -89,8 +76,7 @@
           src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/"{{ ansible_ssh_user }}"/Download/jenkins-appledeveloper.developerprofile  owner="{{ ansible_ssh_user }}" group=staff mode=0644
 
     - name: Check Codesign Cert exist
-      stat:
-        path: /home/mdtutorials2/sample_file.txt
+      local_action: stat path={{ playbook_dir }}/files/{{ p12_cert_file }}
       register:
         cert_exist
 
@@ -111,9 +97,9 @@
       when: cert_exist.stat.exists == true
 
     # Open xcode to import profile, need a fix for this
-    - debug: msg="Open xcode app -> preferences -> import /Users/jenkins/Download/jenkins-appledeveloper.developerprofile"
+    - debug: msg="Open xcode app -> preferences -> import /Users/couchbase/Download/jenkins-appledeveloper.developerprofile"
 
-    - debug: msg="Password for /Users/jenkins/Download/jenkins-appledeveloper.developerprofile, should be the same as VM's password"
+    - debug: msg="Password for /Users/couchbase/Download/jenkins-appledeveloper.developerprofile, should be the same as VM's password"
 
     - debug: msg="Also sign-in to developer account; required for xcode signing during the build"
 

@@ -16,6 +16,19 @@
         state: link
 
   tasks:
+    - name: Check if ruby is already installed
+      stat:
+        path: /usr/bin/ruby
+      register: ruby_installed
+
+    - name: Install ruby
+      homebrew_cask: name=ruby@{{ ruby_version }} state=linked
+      when: not ruby_installed.stat.exists
+
+    - name: Install ruby-completion
+      homebrew_cask: name=ruby-completion state=linked
+      when: not ruby_installed.stat.exists
+
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
@@ -58,8 +71,7 @@
       tags: python3
 
     - name: Check Codesign Cert exist
-      stat:
-        path: /home/mdtutorials2/sample_file.txt
+      local_action: stat path={{ playbook_dir }}/files/{{ p12_cert_file }}
       register:
         cert_exist
 
