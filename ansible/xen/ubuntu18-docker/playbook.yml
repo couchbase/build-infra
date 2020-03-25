@@ -127,6 +127,11 @@
         autoremove: yes
         purge: yes
 
+
+    - name: Get distro codename
+      shell: lsb_release -sc
+      register: distro_codename
+
     - name: Get kernel version
       shell: uname -r
       register: uname
@@ -165,7 +170,7 @@
 
     - name: Add docker apt repository
       shell: >
-        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ distro_codename.stdout }} stable"
 
     - name: Install Docker
       apt:
@@ -201,3 +206,53 @@
         name: unattended-upgrades
         state: absent
         purge: yes
+
+    - name: Add apt key for netdata
+      become: true
+      apt_key:
+        url: https://packagecloud.io/netdata/netdata/gpgkey
+        state: present
+
+    - name: Add netdata apt repository
+      become: true
+      apt_repository:
+        repo: deb https://packagecloud.io/netdata/netdata/ubuntu/ {{ distro_codename.stdout }} main
+        state: present
+        filename: netdata
+
+    - name: Install netdata
+      become: true
+      apt:
+        name: netdata
+        state: latest
+        update_cache: yes
+
+    - name: Create netdata cache dir
+      become: true
+      file:
+        path: /var/cache/netdata
+        state: directory
+        mode: '0755'
+        owner: netdata
+        group: netdata
+
+    - name: Create netdata log dir
+      become: true
+      file:
+        path: /var/log/netdata
+        state: directory
+        mode: '0755'
+        owner: netdata
+        group: adm
+
+    - name: Start netdata
+      become: true
+      service:
+        name: netdata
+        state: started
+
+    - name: Start netdata at boot
+      become: true
+      service:
+        name: "netdata"
+        enabled: yes

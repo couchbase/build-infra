@@ -1,5 +1,5 @@
 [xenservers]
-#172.23.99.41 sr_name="Local Storage 01 - SSD" network_name="Pool-wide network associated with eth1"
+#172.23.99.41 sr_name="VMStore3" network_name="Pool-wide network associated with eth1"
 #172.23.96.155 sr_name=VMStore
 #172.23.104.32 network_name="vlan112"
 #172.23.113.115 sr_name=VMStore

@@ -51,8 +51,20 @@
     - name: "Pull latest CV container"
       shell: docker pull "{{ docker_image }}"
 
+    - name: "Who am I?"
+      shell: whoami
+
+    - name: "Where am I?"
+      shell: hostname
+
     - name: "Restart CV container"
       shell: "{{ restart_cmd }}"
+
+    - name: "Take ownership of ~/slaves"
+      file:
+        path: /home/couchbase/slaves/{{ slave_name }}
+        owner: couchbase
+        group: docker
 
     - name: "Append to disk-check cron script"
       lineinfile:
