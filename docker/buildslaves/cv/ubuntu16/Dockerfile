@@ -119,7 +119,8 @@ RUN set -x \
 ENV JYTHON_VERSION=2.7.2
 RUN set -x \
         && curl -sLO https://repo1.maven.org/maven2/org/python/jython-installer/${JYTHON_VERSION}/jython-installer-${JYTHON_VERSION}.jar \
-        && java -jar jython-installer-${JYTHON_VERSION}.jar -s -t minimum -d /opt/jython \
+        && mkdir /opt/jython && chown couchbase:couchbase /opt/jython \
+        && su couchbase -c "java -jar jython-installer-${JYTHON_VERSION}.jar -s -t minimum -d /opt/jython" \
         && ln -s /opt/jython/bin/jython /usr/local/bin/ \
         && rm -rf /tmp/*
 
