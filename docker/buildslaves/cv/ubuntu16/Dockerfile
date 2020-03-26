@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 16.04
 
-FROM couchbasebuild/server-ubuntu16-build:20200305
+FROM couchbasebuild/server-ubuntu16-build:20200211
 MAINTAINER build-team@couchbase.com
 
 USER root
@@ -20,6 +20,11 @@ RUN mkdir /tmp/deploy && \
 # Also, if we eventually remove paramiko from the main buildslave image, we could add
 # it back here for CV.
 RUN pip install gcovr
+
+# apt-transport-https is required to install clang
+RUN apt update && \
+    apt install apt-transport-https && \
+    apt clean
 
 # Install Clang 6.0 - needed for building with ThreadSanitizer for older branches.
 # (Note: This doesn't change the default compiler; users must explicitly
