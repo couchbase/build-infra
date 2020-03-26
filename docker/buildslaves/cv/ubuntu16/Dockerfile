@@ -115,6 +115,14 @@ RUN set -x \
         && apt install -y ninja-build \
         && apt clean
 
+# Install Jython
+ENV JYTHON_VERSION=2.7.2
+RUN set -x \
+        && curl -sLO https://repo1.maven.org/maven2/org/python/jython-installer/${JYTHON_VERSION}/jython-installer-${JYTHON_VERSION}.jar \
+        && java -jar jython-installer-${JYTHON_VERSION}.jar -s -t minimum -d /opt/jython \
+        && ln -s /opt/jython/bin/jython /usr/local/bin/ \
+        && rm -rf /tmp/*
+
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
