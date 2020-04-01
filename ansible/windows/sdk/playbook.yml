@@ -1,7 +1,10 @@
 ---
 - hosts: all
 
-  tasks:
+  pre_tasks:
+    - name: Disable Windows antivirus during setup
+      win_shell: Add-MpPreference -ExclusionPath "C:\"
+
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
       win_feature:
@@ -25,10 +28,14 @@
         - maven
         - gradle
         - sbt
-        - googlechrome
         - insted
         - python2
         - curl
+
+    - name: "Install Chrome"
+      win_chocolatey:
+        name: googlechrome
+        ignore_checksums: "yes"
 
     # Code depends on .NET Framework 4.5.2 (chocolatey package "dotnet4.5.2"),
     # but that package fails to install via Ansible due to silly limitations
@@ -105,9 +112,13 @@
 
   # Should be done last as it requires choco kbxxx pkg to install first
   roles:
-  - vs2012
-  - vs2013
-  - vs2015
-  - vs2017
-  - role: vs2019
-    tags: vs2019
+    - vs2015
+    - vs2017
+    - vs2019
+
+  post_tasks:
+    - name: Restore basic Windows antivirus
+      win_shell: Remove-MpPreference -ExclusionPath "C:\"
+
+    - name: Disable Windows antivirus during setup
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"

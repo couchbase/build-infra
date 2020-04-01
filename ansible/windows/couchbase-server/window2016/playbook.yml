@@ -3,6 +3,9 @@
 
   tasks:
 
+    - name: Disable Windows antivirus during setup
+      win_shell: Add-MpPreference -ExclusionPath "C:\"
+
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
       win_feature:
@@ -197,6 +200,9 @@
         action: allow
         direction: in
         protocol: TCP
+
+    - name: Restore basic Windows antivirus
+      win_shell: Remove-MpPreference -ExclusionPath "C:\"
 
     - name: Exclude Jenkins from windows antivirus
       win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"

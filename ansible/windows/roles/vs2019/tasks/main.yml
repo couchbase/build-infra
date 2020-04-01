@@ -16,7 +16,9 @@
     dest: C:\vs2019\vs_professional.exe
 
 - name: Install Visual Studio Professional 2019 and dotnet tools
-  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R11C --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  args:
+    chdir: C:\vs2019
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 

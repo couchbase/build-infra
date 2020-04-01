@@ -22,7 +22,9 @@
     dest: "C:\\vs2013\\vs-unattended.xml"
 
 - name: Install Visual Studio Professional 2013
-  win_command: C:\vs2013\vs_professional.exe /Quiet /NoRestart /AdminFile C:\vs2013\vs-unattended.xml /ProductKey {{ vs2013_key }}
+  win_command: C:\vs2013\vs_professional.exe /Quiet /NoRestart /Log C:\vs2013\install.log /AdminFile C:\vs2013\vs-unattended.xml /ProductKey {{ vs2013_key }}
+  args:
+    chdir: C:\vs2013\
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 

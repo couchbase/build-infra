@@ -1,7 +1,7 @@
 ---
 - hosts: all
 
-  tasks:
+  pre_tasks:
     - name: "Install tools"
       win_chocolatey:
         name: "{{ item }}"
@@ -104,4 +104,4 @@
 
   # Should be done last as it requires choco kbxxx pkg to install first
   roles:
-  - vs2017_mobile
+    - vs2017_mobile
