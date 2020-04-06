@@ -18,4 +18,12 @@ fi
 
 export ANSIBLE_HOST_KEY_CHECKING=false
 
+# If there's a requirements.txt, assume it's for ansible-galaxy tools that
+# we need to have
+
+if [ -e requirements.yml ]; then
+    echo "requirements.yml exists - loading with ansible-galaxy"
+    ansible-galaxy install -r requirements.yml
+fi
+
 exec ${ANSIBLE_COMMAND} "$@"

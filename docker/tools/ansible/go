@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-VERSION=2.9.4
+VERSION=2.9.6
 
 for command in ansible ansible-playbook
 do
