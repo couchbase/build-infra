@@ -73,17 +73,21 @@ RUN mkdir /tmp/deploy && \
     cd /tmp && rm -rf /tmp/deploy
 
 # Python 3-specific stuff for build scripts, mostly for Jira.
+# Second "pip3 install" command is for requirements for testrunner/python3.
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get -y install python3.6 python3.6-dev python3.6-venv libffi-dev && \
+    apt-get -y install python3.7 python3.7-dev python3.7-venv libffi-dev && \
     apt-get clean && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1 && \
     curl https://bootstrap.pypa.io/get-pip.py | python3 && \
-    rm /usr/local/bin/pip /usr/local/bin/easy_install
-
-RUN pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
+    rm /usr/local/bin/pip /usr/local/bin/easy_install && \
+    pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr && \
+    pip3 install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1 \
+         beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2 \
+         pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3 \
+         docker==4.2.0 decorator==4.4.2 && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     ccache --clear

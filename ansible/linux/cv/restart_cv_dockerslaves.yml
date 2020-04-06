@@ -42,10 +42,10 @@
         name: "{{ ccache_dir }}"
         state: directory
 
-    - name: "Copy CCache configuration"
+    - name: "Create CCache configuration"
       copy:
-        src: ccache.conf
         dest: "{{ ccache_dir }}/ccache.conf"
+        content: "{{'max_size=50G\n' if 'large' in ansible_hostname else 'max_size=8G\n'}}"
         mode: 0644
 
     - name: "Pull latest CV container"

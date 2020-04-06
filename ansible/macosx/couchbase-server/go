@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker run --rm -it -v $(pwd):/mnt \
+    couchbasebuild/ansible-playbook:2.9.6 -i inventory --ask-become-pass \
+    playbook.yml $@

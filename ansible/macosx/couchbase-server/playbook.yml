@@ -65,10 +65,29 @@
       file: path=/opt/couchbase state=directory owner=couchbase group=staff mode=0755
       become: true
 
-    - name: Install python 3.6
+    - name: Install python 3.7.7
       homebrew:
-        name: https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
+        name: https://raw.githubusercontent.com/Homebrew/homebrew-core/6949fc6f36de1261dffbe37f3b2216cf903431ed/Formula/python.rb
       tags: python3
+
+    - name: Install python3 modules for testrunner
+      pip:
+        name:
+          - sgmllib3k==1.0.0
+          - paramiko==2.7.1
+          - httplib2==0.17.1
+          - pyyaml==5.3.1
+          - beautifulsoup4==4.8.2
+          - Geohash==1.0
+          - python-geohash==0.8.5
+          - deepdiff==4.3.2
+          - pyes==0.99.6
+          - pytz==2019.3
+          - requests==2.23.0
+          - jsonpickle==1.3
+          - docker==4.2.0
+          - decorator==4.4.2
+        executable: /usr/local/bin/pip3
 
     - name: Check Codesign Cert exist
       local_action: stat path={{ playbook_dir }}/files/{{ p12_cert_file }}

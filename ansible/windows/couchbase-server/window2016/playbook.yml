@@ -4,7 +4,7 @@
   tasks:
 
     - name: Disable Windows antivirus during setup
-      win_shell: Add-MpPreference -ExclusionPath "C:\"
+      win_shell: Add-MpPreference -ExclusionPath "C:"
 
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
@@ -17,19 +17,19 @@
     - name: "Install Python 3"
       win_chocolatey:
         name: python3
-        version: 3.6.6
+        version: 3.7.7
       tags: python3
 
     - name: "Provide python3 alias"
-      win_shell: copy C:\Python36\python.exe C:\Python36\python3.exe
+      win_shell: copy C:\Python37\python.exe C:\Python37\python3.exe
       args:
-        creates: C:\Python36\python3.exe
+        creates: C:\Python37\python3.exe
       tags: python3
 
-    - name: "Provide python3.6 alias"
-      win_shell: copy C:\Python36\python.exe C:\Python36\python3.6.exe
+    - name: "Provide python3.7 alias"
+      win_shell: copy C:\Python37\python.exe C:\Python37\python3.7.exe
       args:
-        creates: C:\Python36\python3.6.exe
+        creates: C:\Python37\python3.7.exe
       tags: python3
 
     - name: "Install Python 2"
@@ -64,6 +64,14 @@
     - name: "Install python paramiko module"
       win_command: C:\Python27\Scripts\pip.exe install paramiko
       tags: python2
+
+    - name: "Install python3 modules for testrunner"
+      win_command: >-
+        C:\Python37\Scripts\pip.exe install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1
+        beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2
+        pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3
+        docker==4.2.0 decorator==4.4.2
+      tags: python3
 
     - name: Create download area for Ansible
       win_file:
@@ -202,7 +210,7 @@
         protocol: TCP
 
     - name: Restore basic Windows antivirus
-      win_shell: Remove-MpPreference -ExclusionPath "C:\"
+      win_shell: Remove-MpPreference -ExclusionPath "C:"
 
     - name: Exclude Jenkins from windows antivirus
       win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"

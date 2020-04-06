@@ -1,0 +1,6 @@
+roles/
+ssh/buildbot_id_dsa
+ssh/config
+ssh/id_ns-codereview
+ssh/ns-buildbot.rsa
+ssh/patch_via_gerrit.ini
