@@ -42,10 +42,14 @@
         name: "{{ ccache_dir }}"
         state: directory
 
+    - name: "Get hostname"
+      shell: "hostname"
+      register: hostname
+
     - name: "Create CCache configuration"
       copy:
         dest: "{{ ccache_dir }}/ccache.conf"
-        content: "{{'max_size=50G\n' if 'large' in ansible_hostname else 'max_size=8G\n'}}"
+        content: "{{'max_size=50G\n' if 'large' in hostname.stdout else 'max_size=8G\n'}}"
         mode: 0644
 
     - name: "Pull latest CV container"
@@ -65,6 +69,7 @@
         path: /home/couchbase/slaves/{{ slave_name }}
         owner: couchbase
         group: docker
+      become: true
 
     - name: "Append to disk-check cron script"
       lineinfile:

@@ -245,6 +245,12 @@
         owner: netdata
         group: adm
 
+    - name: Expose netdata port
+      replace:
+        path: /etc/netdata/netdata.conf
+        regexp: 'bind to = localhost'
+        replace: '# bind to = localhost'
+
     - name: Start netdata
       become: true
       service:

@@ -1,5 +1,5 @@
 [xenservers]
-#172.23.99.41 sr_name="VMStore3" network_name="Pool-wide network associated with eth1"
+172.23.99.41 sr_name="VMStore4" network_name="Pool-wide network associated with eth1"
 #172.23.96.155 sr_name=VMStore
 #172.23.104.32 network_name="vlan112"
 #172.23.113.115 sr_name=VMStore
@@ -9,7 +9,7 @@
 #172.23.104.32 network_name=vlan112
 #172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
 #172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
-172.23.97.234 sr_name=VMStore1
+#172.23.97.234 sr_name=VMStore1
 [newvms]
 
 [xenservers:vars]
@@ -20,6 +20,6 @@ sr_name="Local storage"
 vm_template="Ubuntu Xenial Xerus 16.04"
 install_iso="ubuntu-18.04-fully-automated.iso"
 vm_name="default-vm"
-vcpus=8
-memory=12884901888
-disksize=200000000000
+vcpus=16
+memory=25769803776
+disksize=220000000000
