@@ -13,7 +13,11 @@ elif [ -f /usr/local/opt/ruby/bin/ruby ]; then
 fi
 
 # Add Java to PATH
-export PATH="/usr/local/opt/java/bin:$PATH"
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# Add Python Lib to PATH
+export PATH="/Users/couchbase/Library/Python/2.7/bin:$PATH"
 
 # Ensure LANG can handle UTF-8 filenames
 export LANG=en_US.UTF-8

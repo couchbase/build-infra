@@ -14,9 +14,16 @@ Deploy tools via ansible
 3. run % ansible-galaxy install -r requirements.yml
 4. Download MacOS codesign cert, from lastpass. unzip it to files directory so that it becomes files/Certificates.p12
 5. Ensure a copy of the following file in ssh directory
-    id_rsa_factory_macosx-x64-ios-builder
+       buildbot_id_dsa
+       config
+       id_ns-codereview
+       id_rsa
+       ns-buildbot.rsa
+       patch_via_gerrit.ini
 6. Ensure a copy of jenkins-appledeveloper.developerprofile in files directory
     info is in team's lastpass database
 7. Run the playbook and enter sudo password
-    % ansible-playbook -i inventory playbook.yml  -e ansible_ssh_pass=<jenkins_password> --ask-become-pass
+    % ansible-playbook -i inventory playbook.yml  --ask-become-pass
+   SGW mac uses python 2.x, hence skip python 3.x install
+    % ansible-playbook -i inventory playbook.yml  --ask-become-pass -e SGW=true
 8. Follow and run instructions from the ansible-playbook's post-install output message

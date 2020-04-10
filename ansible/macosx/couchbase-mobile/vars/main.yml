@@ -4,6 +4,10 @@ homebrew_cask_appdir: /Applications
 
 homebrew_taps:
    - homebrew/cask
+   - homebrew/cask-versions
+
+homebrew_cask_apps:
+   - homebrew/cask-versions/adoptopenjdk8
 
 homebrew_installed_packages:
   - { name: ccache, version: 3.4.1, state: linked }
@@ -13,7 +17,7 @@ homebrew_installed_packages:
   - { name: doxygen, version: 1.8.14, state: linked }
   - { name: git, version: 2.16.2, state: linked }
   - { name: bash-completion, version: 1.3_3, state: linked }
-  - { name: python, version: 3.6.4_4, state: linked }
+  - { name: python, version: 3.6.4_4, state: linked, when: SGW is defined }
   - { name: openssl, version: 1.0.2n,  state: linked }
   - { name: ssh-copy-id, version: 7.6p1, state: linked }
   - { name: pass, version: 1.7.1_1, state: linked }

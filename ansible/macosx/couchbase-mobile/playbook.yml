@@ -2,6 +2,13 @@
 - hosts: all
   user: "{{ ansible_ssh_user }}"
 
+  pre_tasks:
+    - name: add passwordless sudoer
+      copy:
+        src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
+      become: true
+
+
   vars_files:
     - vars/main.yml
 
@@ -22,15 +29,6 @@
       homebrew_cask: name=ruby-completion state=linked
       when: not ruby_installed.stat.exists
 
-    - name: Check if /usr/bin/java is already installed
-      stat:
-        path: /usr/bin/java
-      register: java_state
-
-    - name: Install java
-      homebrew_cask: name=java state=present
-      when: not java_state.stat.exists
-
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
@@ -39,16 +37,16 @@
       copy:
         src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
 
-    - name: Upgrade pip
-      command: "pip install --upgrade pip"
-      ignore_errors: yes
+    - name: Add SGW .zshenv
+      copy:
+        src=./files/zshenv_sgw dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
+      when: SGW is defined
 
     # SGW require pkg
-    - name: Install pyinstaller's pip package
-      pip:
-        name: pyinstaller
-        state: present
-      become: true
+    - name: install pip
+      shell: "curl 'https://bootstrap.pypa.io/get-pip.py' -o get-pip.py; python2 get-pip.py; pip2 intall pyinstaller"
+      ignore_errors: yes
+      when: SGW is defined
 
     # Required for CBL iOS doc generation
     - name: Install gem packages
@@ -64,16 +62,23 @@
       with_items:
           - xcode-install
 
+    - name: Create .ssh directory
+      file: path=/Users/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
+
     - name: Copy SSH config files
       copy:
-        src=./ssh/{{ item }} dest=/Users/"{{ ansible_ssh_user }}"/.ssh/{{ item }} owner="{{ ansible_ssh_user }}" group=staff mode=0644
+        src=./ssh/{{ item }} dest=/Users/{{ ansible_ssh_user }}/.ssh/{{ item }} owner={{ ansible_ssh_user }} group=staff mode=0600
       with_items:
         - authorized_keys
-        - id_rsa_factory_macosx-x64-ios-builder
+        - buildbot_id_dsa
+        - config
+        - id_ns-codereview
+        - ns-buildbot.rsa
+        - patch_via_gerrit.ini
 
     - name: Copy Mobile jenkins's CB developer profile
       copy:
-          src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/"{{ ansible_ssh_user }}"/Download/jenkins-appledeveloper.developerprofile  owner="{{ ansible_ssh_user }}" group=staff mode=0644
+          src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/{{ ansible_ssh_user }}/Downloads/jenkins-appledeveloper.developerprofile  owner="{{ ansible_ssh_user }}" group=staff mode=0644
 
     - name: Check Codesign Cert exist
       local_action: stat path={{ playbook_dir }}/files/{{ p12_cert_file }}
