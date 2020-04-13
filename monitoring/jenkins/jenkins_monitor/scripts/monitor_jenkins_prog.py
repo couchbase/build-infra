@@ -347,14 +347,18 @@ class JenkinsMonitor:
         return max((t_mean + (max_deviation + 2) * std_dev) / 1000, 300)
 
     def check_nodes(self):
-        """Ensure all nodes are online, alert via email if any are down"""
+        """Ensure all nodes are online, alert via email if any are down
+           two types of nodes are ignored:
+             1. node that is temporarily taken offline
+             2. has unmonitored in its label
+        """
 
         try:
             results = self.get_jenkins_data(
-                f'/computer/api/xml?tree=computer[displayName,offline,'
-                f'temporarilyOffline]&xpath=//computer[offline=%22true'
-                f'%22%20and%20temporarilyOffline=%22false%22]&wrapper='
-                f'computers'
+                f'/computer/api/xml?tree=computer[displayName,assignedLabels[name],'
+                f'offline,temporarilyOffline]&xpath=//computer[not%28assignedLabel[name]'
+                f'=%22unmonitored%22%29%20and%20offline=%22true%22%20and%20'
+                f'temporarilyOffline=%22false%22]&wrapper=computers'
             )['computers']
         except (ConnectionError, ValueError) as exc:
             raise RuntimeError(exc)
