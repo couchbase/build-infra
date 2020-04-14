@@ -1,5 +1,5 @@
 #!/bin/bash
-bpath=/builds/backups/sonarqube
+bpath=/buildteam/backups/sonarqube
 fname="sonar-postgres-"`date +%m-%d-%Y`".sql"
 echo "backing up $fname to $bpath"
 cd $bpath

@@ -140,6 +140,15 @@
         owner: postgres
         group: postgres
 
+    - name: Mount NAS directories
+      mount:
+        path: "/buildteam"
+        src: "cnt-s231.sc.couchbase.com:/data/buildteam"
+        fstype: nfs
+        opts: rw,soft
+        dump: 0
+        passno: 0
+        state: mounted
 
     - name: Install backup crontab
       cron:
@@ -147,6 +156,6 @@
         minute: "00"
         hour: "02"
         weekday: "0-6"
-        job: "/usr/local/bin/sonar_backup.sh  >> /var/log/sonar_bacup.log 2>&1"
+        job: "/usr/local/bin/sonar_backup.sh  >> /var/log/sonar_backup.log 2>&1"
         user: "postgres"
         disabled: "no"
