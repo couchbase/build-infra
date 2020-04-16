@@ -3,7 +3,7 @@
 
   pre_tasks:
     - name: Disable Windows antivirus during setup
-      win_shell: Add-MpPreference -ExclusionPath "C:\"
+      win_shell: "Add-MpPreference -ExclusionPath C:\\"
 
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
@@ -46,6 +46,19 @@
       win_chocolatey:
         name: "visualstudiocode"
         ignore_dependencies: yes
+
+    - name: "Install .NET Framework 4.8"
+      win_chocolatey:
+        name: "dotnetfx"
+        version: "4.8.0.0"
+        state: present
+      tags: dotnet
+      register: dotnetinstall
+
+    - name: Reboot if necessary
+      win_reboot:
+      when: dotnetinstall.rc == 3010
+      tags: dotnet
 
     - name: Create bin directory
       win_file:
@@ -118,7 +131,7 @@
 
   post_tasks:
     - name: Restore basic Windows antivirus
-      win_shell: Remove-MpPreference -ExclusionPath "C:\"
+      win_shell: "Remove-MpPreference -ExclusionPath C:\\"
 
-    - name: Disable Windows antivirus during setup
-      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+    - name: Disable Windows antivirus for Jenkins
+      win_shell: "Add-MpPreference -ExclusionPath C:\\Jenkins"
