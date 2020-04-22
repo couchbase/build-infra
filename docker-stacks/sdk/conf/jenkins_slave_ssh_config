@@ -5,7 +5,7 @@ Host github.com
   StrictHostKeyChecking no
 
 Host review.couchbase.org
-  Port 29418
-  User buildbot
-  IdentityFile /home/couchbase/.ssh/buildbot_id_dsa
+  User         ns-codereview
+  Port         29418
+  IdentityFile ~/.ssh/id_%r
   StrictHostKeyChecking no
