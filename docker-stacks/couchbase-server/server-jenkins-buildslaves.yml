@@ -171,7 +171,7 @@ services:
     image: couchbasebuild/server-ubuntu18-build:20200211
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
-      - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18 alice mad-hatter cheshire-cat master"
+      - "JENKINS_SLAVE_LABELS=ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 alice mad-hatter cheshire-cat master"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
 
