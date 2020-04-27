@@ -1,7 +1,7 @@
 # Docker container for Debian 8 (Jessie)
 
 FROM debian:8
-MAINTAINER ceej@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
@@ -97,7 +97,6 @@ COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

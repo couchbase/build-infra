@@ -1,8 +1,7 @@
 # Docker container for SUSE 15, based on openSUSE LEAP
 
 FROM opensuse/leap:15.0
-
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 RUN perl -pi -e 's#download.opensuse.org#suse.mirrors.tds.net/pub/opensuse#g' /etc/zypp/repos.d/*
@@ -30,28 +29,29 @@ RUN curl \
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
 RUN zypper -n install \
-                hostname \
                 binutils \
+                ccache \
                 curl \
                 ed \
                 gcc-c++ \
-                make \
-                ccache \
                 git \
-                man \
-                ncurses-devel \
+                hostname \
                 libffi-devel \
                 libnuma-devel \
                 libopenssl-devel \
                 lsb-release \
+                make \
+                man \
+                ncurses-devel \
                 python-devel \
                 python-xml \
                 rpm-build \
+                rsync \
                 ruby \
                 sqlite3-devel \
                 tar \
-                unzip && \
-                zypper clean
+                unzip \
+    && zypper clean
 
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
@@ -81,7 +81,6 @@ ENV LANG=en_US.UTF-8
 COPY build/swarm*.properties /
 
 # Run our builder startup script
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

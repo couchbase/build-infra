@@ -1,0 +1,319 @@
+version: '3.8'
+
+# Suggested deployment command:
+#   docker --host mega4.build.couchbase.com stack deploy -c profiledata.yaml profiledata
+# All services, networks, etc. will then get an "profile_" prefix,
+# eg. "profiledata_storage"
+
+#
+# Secrets and configs will often be shared across multiple products, types of build system and
+# operating systems. To make this file more manageable, config and secret sections are broken
+# down into subsections, separated by comments detailing:
+#
+#   product/type of build system/operating system
+#
+# e.g: couchbase-server/build/linux
+#
+
+services:
+  storage:
+    deploy:
+      replicas: 1
+    image: couchbasebuild/profiledata:20200424
+    init: true
+    ports:
+      - 4000:22
+    configs:
+      #############################
+      # couchbase-server/cv/linux #
+      #############################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv/linux/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv/linux/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_linux_ssh_config
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_environment
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      #############################
+      # couchbase-server/cv/macos #
+      #############################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv/macos/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv/macos/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_macos_ssh_cv_config
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      ################################
+      # couchbase-server/build/linux #
+      ################################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/build/linux/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/build/linux/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_linux_ssh_config
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_environment
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      ################################
+      # couchbase-server/build/macos #
+      ################################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/build/macos/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/build/macos/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_macos_ssh_build_config
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+
+    secrets:
+      # system
+      - source: profiledata.ssh_pubkey.profile_sync.20200417
+        target: /home/couchbase/.ssh/authorized_keys
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      # host pubkeys
+      - source: profiledata.ssh_host_pubkey.ssh_host_dsa_key.20200417
+        target: /etc/ssh/ssh_host_dsa_key.pub
+        mode: 0644
+      - source: profiledata.ssh_host_pubkey.ssh_host_ecdsa_key.20200417
+        target: /etc/ssh/ssh_host_ecdsa_key.pub
+        mode: 0644
+      - source: profiledata.ssh_host_pubkey.ssh_host_ed25519_key.20200417
+        target: /etc/ssh/ssh_host_ed25519_key.pub
+        mode: 0644
+      - source: profiledata.ssh_host_pubkey.ssh_host_rsa_key.20200417
+        target: /etc/ssh/ssh_host_rsa_key.pub
+        mode: 0644
+      # host privkeys
+      - source: profiledata.ssh_host_privkey.ssh_host_dsa_key.20200417
+        target: /etc/ssh/ssh_host_dsa_key
+        mode: 0600
+      - source: profiledata.ssh_host_privkey.ssh_host_ecdsa_key.20200417
+        target: /etc/ssh/ssh_host_ecdsa_key
+        mode: 0600
+      - source: profiledata.ssh_host_privkey.ssh_host_ed25519_key.20200417
+        target: /etc/ssh/ssh_host_ed25519_key
+        mode: 0600
+      - source: profiledata.ssh_host_privkey.ssh_host_rsa_key.20200417
+        target: /etc/ssh/ssh_host_rsa_key
+        mode: 0600
+      ################################
+      # couchbase-server/build/linux #
+      ################################
+      - source: profiledata.gpg_key.rpm_signing.20200417
+        target: /home/couchbase/couchbase-server/build/linux/.gpg/rpm_signing
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_buildbot.20200417
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/id_buildbot
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_cb-robot.20200417
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/id_cb-robot
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      ################################
+      # couchbase-server/build/macos #
+      ################################
+      - source: profiledata.cert.macos_codesign.20200421
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/Certificate.p12
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/buildbot_id_dsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/ns-buildbot.rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      #############################
+      # couchbase-server/cv/linux #
+      #############################
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_buildbot.20200417
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/id_buildbot
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      #############################
+      # couchbase-server/cv/macos #
+      #############################
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/buildbot_id_dsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/ns-buildbot.rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+
+configs:
+  # linux
+  couchbase_server_linux_ssh_config:
+    file: config/couchbase-server/linux/.ssh/config
+  # macos
+  couchbase_server_macos_ssh_build_config:
+    file: config/couchbase-server/macos/.ssh/build_config
+  couchbase_server_macos_ssh_cv_config:
+    file: config/couchbase-server/macos/.ssh/cv_config
+  # shared
+  couchbase_server_shared_m2_settings:
+    file: config/couchbase-server/shared/.m2/settings.xml
+  couchbase_server_shared_ssh_known_hosts:
+    file: config/couchbase-server/shared/.ssh/known_hosts
+  couchbase_server_shared_gitconfig:
+    file: config/couchbase-server/shared/.gitconfig
+  couchbase_server_shared_ssh_environment:
+    file: config/couchbase-server/shared/.ssh/environment
+
+secrets:
+  # gpg keys
+  profiledata.gpg_key.rpm_signing.20200417:
+    external: true
+  # certificates
+  profiledata.cert.macos_codesign.20200421:
+    external: true
+  # ssh keys
+  profiledata.ini_file.patch_via_gerrit.20200417:
+    external: true
+  profiledata.ssh_privkey.buildbot_id_dsa.20200417:
+    external: true
+  profiledata.ssh_privkey.id_buildbot.20200417:
+    external: true
+  profiledata.ssh_privkey.id_cb-robot.20200417:
+    external: true
+  profiledata.ssh_privkey.id_ns-codereview.20200417:
+    external: true
+  profiledata.ssh_privkey.ns-buildbot.rsa.20200417:
+    external: true
+  profiledata.ssh_pubkey.profile_sync.20200417:
+    external: true
+  # host privkeys
+  profiledata.ssh_host_privkey.ssh_host_dsa_key.20200417:
+    external: true
+  profiledata.ssh_host_privkey.ssh_host_ecdsa_key.20200417:
+    external: true
+  profiledata.ssh_host_privkey.ssh_host_ed25519_key.20200417:
+    external: true
+  profiledata.ssh_host_privkey.ssh_host_rsa_key.20200417:
+    external: true
+  # host pubkeys
+  profiledata.ssh_host_pubkey.ssh_host_dsa_key.20200417:
+    external: true
+  profiledata.ssh_host_pubkey.ssh_host_ecdsa_key.20200417:
+    external: true
+  profiledata.ssh_host_pubkey.ssh_host_ed25519_key.20200417:
+    external: true
+  profiledata.ssh_host_pubkey.ssh_host_rsa_key.20200417:
+    external: true

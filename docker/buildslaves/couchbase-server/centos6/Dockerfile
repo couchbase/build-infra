@@ -9,3 +9,9 @@ FROM couchbasebuild/server-centos6-build:20181218
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
+
+RUN yum install -y rsync && yum clean packages
+
+RUN rm -rf /home/couchbase/.ssh
+
+COPY build/couchbuilder_start.sh /usr/sbin/

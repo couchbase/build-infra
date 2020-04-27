@@ -5,7 +5,7 @@ TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-amzn2-build
 
 mkdir -p build
-cp -a -u ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a  ../../util/swarm*.properties build
 
 docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} -t ${IMAGE}:${TAG} .

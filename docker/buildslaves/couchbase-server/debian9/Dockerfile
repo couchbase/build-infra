@@ -1,7 +1,7 @@
 # Docker container for Debian 9.1 (Stretch)
 
 FROM debian:9.1
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
@@ -82,6 +82,12 @@ RUN apt-get update && \
     sed -ie '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
     locale-gen
 
+# Add rsync for pulling config+secrets at startup
+RUN set -x \
+        && apt update \
+        && apt install -y rsync \
+        && apt clean
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 
@@ -90,7 +96,6 @@ COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

@@ -5,7 +5,7 @@ TAG=$(date +%Y%m%d)
 IMAGE=localonly/suse-12-couchbase-build
 
 mkdir -p build
-cp -a -u ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 
 # Only copy this if it doesn't exist. Prevents re-running steps in
 # this Dockerfile. This does mean that if you need to update the

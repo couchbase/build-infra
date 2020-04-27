@@ -1,7 +1,7 @@
 # Docker container for Amazon 2.0
 
 FROM amazonlinux:2.0.20181010
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 RUN yum -y update; yum clean all
@@ -23,11 +23,11 @@ RUN chmod +x /tini
 RUN yum install --setopt=keepcache=0 -y \
                 deltarpm \
                 ed \
+                gcc \
+                gcc-c++ \
                 git \
                 glibc-devel \
                 gzip \
-                gcc \
-                gcc-c++ \
                 make \
                 man \
                 ncurses-devel \
@@ -38,6 +38,7 @@ RUN yum install --setopt=keepcache=0 -y \
                 python-devel \
                 redhat-lsb-core \
                 rpm-build \
+                rsync \
                 ruby rubygems rubygem-rake \
                 sqlite-devel \
                 sudo \
@@ -46,8 +47,8 @@ RUN yum install --setopt=keepcache=0 -y \
                 vim \
                 wget \
                 which \
-                xz && \
-    ln -s /usr/bin/python2.7 /usr/bin/python2.6
+                xz \
+    && ln -s /usr/bin/python2.7 /usr/bin/python2.6
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -102,7 +103,6 @@ COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

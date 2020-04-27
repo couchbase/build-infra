@@ -1,7 +1,7 @@
 # Docker container for Centos 8
 
 FROM centos:8
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
@@ -40,6 +40,7 @@ RUN dnf install --setopt=keepcache=0 -y \
                 python2 \
                 redhat-lsb-core \
                 rpm-build \
+                rsync \
                 ruby rubygems rubygem-rake \
                 sqlite-devel \
                 sudo \
@@ -105,7 +106,6 @@ COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]

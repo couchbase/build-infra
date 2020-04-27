@@ -4,7 +4,7 @@
 # construction of the base image.
 
 FROM suse/sles12sp2:latest
-MAINTAINER kenneth.lareau@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 ARG REGCODE
@@ -37,24 +37,25 @@ RUN groupadd -g1000 couchbase && \
 RUN zypper -n install \
                 binutils \
                 curl \
-                ed \
-                make \
                 ccache \
+                ed \
                 git \
-                man \
-                ncurses-devel \
                 libffi48-devel \
                 libnuma-devel \
                 libopenssl-devel \
                 lsb-release \
+                make \
+                man \
+                ncurses-devel \
                 python-devel \
                 python-xml \
                 rpm-build \
+                rsync \
                 ruby rubygems rubygem-rake \
                 sqlite3-devel \
                 tar \
-                unzip && \
-                zypper clean
+                unzip \
+    && zypper clean
 
 # GCC (from local suse-12-gcc)
 COPY build/local /usr/local
@@ -107,7 +108,6 @@ RUN echo "export LANG=en_US.UTF-8" >> /home/couchbase/.bashrc
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "default" ]

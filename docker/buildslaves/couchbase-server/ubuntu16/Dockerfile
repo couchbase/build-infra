@@ -1,7 +1,7 @@
 # Docker container for Ubuntu 16.04
 
 FROM ubuntu:16.04
-MAINTAINER ceej@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
@@ -120,21 +120,24 @@ RUN apt-get update && \
     apt-get install -y jq vim && \
     apt-get clean
 
+# Add rsync for pulling config+secrets at startup
+RUN set -x \
+        && apt update \
+        && apt install -y rsync \
+        && apt clean
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
-ADD .ssh /home/couchbase/.ssh
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 
 # Set LANG
 ENV LANG=en_US.UTF-8
-RUN echo "LANG=${LANG}" > /home/couchbase/.ssh/environment && \
-    chown couchbase:couchbase /home/couchbase/.ssh/environment && \
-    echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching

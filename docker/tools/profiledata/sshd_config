@@ -1,0 +1,11 @@
+AddressFamily          inet
+AllowTcpForwarding     no
+AuthorizedKeysFile     .ssh/authorized_keys
+GatewayPorts           no
+ListenAddress          0.0.0.0
+PasswordAuthentication no
+PermitRootLogin        no
+Port                   22
+PubkeyAuthentication   yes
+Subsystem              sftp /usr/lib/ssh/sftp-server
+X11Forwarding no

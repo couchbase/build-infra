@@ -5,8 +5,8 @@ TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-ubuntu18-build
 
 mkdir -p build
-cp -a -u ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
-cp -a -u ../../util/swarm*.properties build
+cp ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp ../../util/swarm*.properties build
 
 # Only copy this if it doesn't exist. Prevents re-running steps in
 # this Dockerfile. This does mean that if you need to update the
