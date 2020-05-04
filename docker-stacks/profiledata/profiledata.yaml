@@ -75,6 +75,34 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      ##################################
+      # couchbase-server/cv/windows #
+      ##################################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv/windows/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv/windows/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_config
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_environment
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/linux #
       ################################
@@ -123,6 +151,34 @@ services:
         gid: "901"
       - source: couchbase_server_macos_ssh_build_config
         target: /home/couchbase/couchbase-server/build/macos/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      ##################################
+      # couchbase-server/build/windows #
+      ##################################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/build/windows/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/build/windows/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_config
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_environment
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/known_hosts
         mode: 0644
         uid: "901"
         gid: "901"
@@ -216,6 +272,24 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      ##################################
+      # couchbase-server/build/windows #
+      ##################################
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_cb-robot.20200417
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/id_rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
       #############################
       # couchbase-server/cv/linux #
       #############################
@@ -257,6 +331,24 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      ##################################
+      # couchbase-server/cv/windows #
+      ##################################
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_cb-robot.20200417
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/id_rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
 
 configs:
   # linux
@@ -267,6 +359,15 @@ configs:
     file: config/couchbase-server/macos/.ssh/build_config
   couchbase_server_macos_ssh_cv_config:
     file: config/couchbase-server/macos/.ssh/cv_config
+  # windows
+  couchbase_server_windows_ssh_config:
+    file: config/couchbase-server/windows/.ssh/config
+  couchbase_server_windows_ssh_authorized_keys:
+    file: config/couchbase-server/windows/.ssh/authorized_keys
+  couchbase_server_windows_ssh_environment:
+    file: config/couchbase-server/windows/.ssh/environment
+  couchbase_server_windows_ssh_known_hosts:
+    file: config/couchbase-server/windows/.ssh/known_hosts
   # shared
   couchbase_server_shared_m2_settings:
     file: config/couchbase-server/shared/.m2/settings.xml
