@@ -47,7 +47,7 @@ x-default-jenkins-slave-environment:
 services:
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20200310
+    image: couchbasebuild/sdk-amzn2-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=amzn2"
@@ -56,7 +56,7 @@ services:
     <<: *default-jenkins-slave
 
   centos6:
-    image: couchbasebuild/sdk-centos6-build:20200310
+    image: couchbasebuild/sdk-centos6-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-centos6"
       - "JENKINS_SLAVE_LABELS=centos6"
@@ -65,7 +65,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20200319
+    image: couchbasebuild/sdk-centos7-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=centos7"
@@ -74,7 +74,7 @@ services:
     <<: *default-jenkins-slave
 
   centos8:
-    image: couchbasebuild/sdk-centos8-build:20200319
+    image: couchbasebuild/sdk-centos8-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-centos8"
       - "JENKINS_SLAVE_LABELS=centos8"
@@ -83,7 +83,7 @@ services:
     <<: *default-jenkins-slave
 
   debian8:
-    image: couchbasebuild/sdk-debian8-build:20200310
+    image: couchbasebuild/sdk-debian8-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-debian8"
       - "JENKINS_SLAVE_LABELS=debian8"
@@ -92,7 +92,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/sdk-debian9-build:20200310
+    image: couchbasebuild/sdk-debian9-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-debian9"
       - "JENKINS_SLAVE_LABELS=debian9"
@@ -101,7 +101,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20200310
+    image: couchbasebuild/sdk-ubuntu14-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu14"
       - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"
@@ -110,7 +110,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu16-build:20200310
+    image: couchbasebuild/sdk-ubuntu16-build:20200503
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu16"
       - "JENKINS_SLAVE_LABELS=ubuntu16 ubuntu16.04"
