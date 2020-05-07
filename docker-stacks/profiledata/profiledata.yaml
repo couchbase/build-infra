@@ -24,85 +24,7 @@ services:
     ports:
       - 4000:22
     configs:
-      #############################
-      # couchbase-server/cv/linux #
-      #############################
-      - source: couchbase_server_shared_gitconfig
-        target: /home/couchbase/couchbase-server/cv/linux/.gitconfig
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_shared_m2_settings
-        target: /home/couchbase/couchbase-server/cv/linux/.m2/settings.xml
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_shared_ssh_known_hosts
-        target: /home/couchbase/couchbase-server/cv/linux/.ssh/known_hosts
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_linux_ssh_config
-        target: /home/couchbase/couchbase-server/cv/linux/.ssh/config
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_shared_ssh_environment
-        target: /home/couchbase/couchbase-server/cv/linux/.ssh/environment
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      #############################
-      # couchbase-server/cv/macos #
-      #############################
-      - source: couchbase_server_shared_gitconfig
-        target: /home/couchbase/couchbase-server/cv/macos/.gitconfig
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_shared_m2_settings
-        target: /home/couchbase/couchbase-server/cv/macos/.m2/settings.xml
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_shared_ssh_known_hosts
-        target: /home/couchbase/couchbase-server/cv/macos/.ssh/known_hosts
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_macos_ssh_cv_config
-        target: /home/couchbase/couchbase-server/cv/macos/.ssh/config
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      ##################################
-      # couchbase-server/cv/windows #
-      ##################################
-      - source: couchbase_server_shared_gitconfig
-        target: /home/couchbase/couchbase-server/cv/windows/.gitconfig
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_shared_m2_settings
-        target: /home/couchbase/couchbase-server/cv/windows/.m2/settings.xml
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_windows_ssh_config
-        target: /home/couchbase/couchbase-server/cv/windows/.ssh/config
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_windows_ssh_environment
-        target: /home/couchbase/couchbase-server/cv/windows/.ssh/environment
-        mode: 0644
-        uid: "901"
-        gid: "901"
-      - source: couchbase_server_windows_ssh_known_hosts
-        target: /home/couchbase/couchbase-server/cv/windows/.ssh/known_hosts
-        mode: 0644
-        uid: "901"
-        gid: "901"
+
       ################################
       # couchbase-server/build/linux #
       ################################
@@ -182,6 +104,85 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      #############################
+      # couchbase-server/cv/linux #
+      #############################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv/linux/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv/linux/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_linux_ssh_config
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_environment
+        target: /home/couchbase/couchbase-server/cv/linux/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      #############################
+      # couchbase-server/cv/macos #
+      #############################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv/macos/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv/macos/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_macos_ssh_cv_config
+        target: /home/couchbase/couchbase-server/cv/macos/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      ##################################
+      # couchbase-server/cv/windows #
+      ##################################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv/windows/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv/windows/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_config
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_environment
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_windows_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv/windows/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
 
     secrets:
       # system
@@ -219,6 +220,11 @@ services:
       ################################
       # couchbase-server/build/linux #
       ################################
+      - source: profiledata.auth_token.macos_codesign.20200507
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/notarizer_token
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.gpg_key.rpm_signing.20200417
         target: /home/couchbase/couchbase-server/build/linux/.gpg/rpm_signing
         mode: 0600
@@ -247,6 +253,21 @@ services:
       ################################
       # couchbase-server/build/macos #
       ################################
+      - source: profiledata.auth_token.macos_codesign.20200507
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/notarizer_token
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.env_file.macos_codesign.20200507
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/notarizer_env
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.password.macos_codesign.20200505
+        target: /home/couchbase/couchbase-server/build/macos/.ssh/security-password.txt
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.cert.macos_codesign.20200421
         target: /home/couchbase/couchbase-server/build/macos/.ssh/Certificate.p12
         mode: 0600
@@ -378,9 +399,18 @@ configs:
   couchbase_server_shared_ssh_environment:
     file: config/couchbase-server/shared/.ssh/environment
 
+
 secrets:
   # gpg keys
   profiledata.gpg_key.rpm_signing.20200417:
+    external: true
+  # env files
+  profiledata.env_file.macos_codesign.20200507:
+    external: true
+  # credentials
+  profiledata.password.macos_codesign.20200505:
+    external: true
+  profiledata.auth_token.macos_codesign.20200507:
     external: true
   # certificates
   profiledata.cert.macos_codesign.20200421:
