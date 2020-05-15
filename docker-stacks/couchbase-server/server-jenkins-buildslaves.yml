@@ -187,6 +187,17 @@ services:
       - *node-product
     <<: *default-jenkins-slave
 
+  ubuntu20:
+    image: couchbasebuild/server-ubuntu20-build:20200513
+    init: true
+    environment:
+      - "JENKINS_SLAVE_NAME=server-ubuntu20"
+      - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 cheshire-cat master"
+      - *default-jenkins-slave-environment-master
+      - *node-class
+      - *node-product
+    <<: *default-jenkins-slave
+
   clamav:
     image: couchbasebuild/clamav-slave:20200424
     environment:

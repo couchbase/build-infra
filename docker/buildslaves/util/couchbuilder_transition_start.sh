@@ -24,6 +24,15 @@
 #
 #   /run/secrets/profile_ssh_key
 
+if [ -d /ssh ] && [ "$(ls -A /ssh)" ]
+then
+    mkdir -p /home/couchbase/.ssh
+    cp -a /ssh/* /home/couchbase/.ssh
+fi
+chown -R couchbase:couchbase /home/couchbase/.ssh
+chmod 600 /home/couchbase/.ssh/*
+
+
 # We need to ensure these env vars are available in the exported function, and the script string which is evaled or execed via su
 export profile_port="4000"
 export profile_host="profiledata.build.couchbase.com"
