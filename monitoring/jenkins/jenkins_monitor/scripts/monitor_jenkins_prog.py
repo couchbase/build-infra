@@ -3,6 +3,7 @@ Basic script to ensure the health of various components of a Jenkins setup;
 currently handled:
 
   - Jenkins slaves (online or offline)
+  - Jenkins slaves (free diskspace)
   - Jenkins jobs (hung jobs)
 
 More capability will be added as needed.
@@ -101,8 +102,8 @@ class JenkinsMonitor:
 
         if 'slaves' not in tables:
             self.conn.execute(
-                "create table slaves (server text, name text, "
-                "offline_since timestamp, checked int)"
+                "create table slaves (server text, name text, type text, "
+                "alert_since timestamp, checked int)"
             )
 
         if 'jobs' not in tables:
@@ -170,15 +171,15 @@ class JenkinsMonitor:
 
         return builds, running
 
-    def check_offline_time(self, node):
+    def check_node_alert_time(self, node, alert_type):
         """
-        Return time and number of checks for an offline node;
-        return None if node was not previously offline
+        Return time and number of checks for an node alert;
+        return None if node was not alerted for alert_type before
         """
 
         self.cursor.execute(
-            "select offline_since, checked from slaves where name=? "
-            "and server=?", (node, self.server_name)
+            "select alert_since, checked from slaves where name=? "
+            "and server=? and type=?", (node, self.server_name, alert_type)
         )
         res = self.cursor.fetchone()
 
@@ -189,9 +190,9 @@ class JenkinsMonitor:
 
         return int(time.mktime(now.timetuple()) - res[0]), res[1]
 
-    def add_offline_node(self, node):
+    def add_node_alert(self, node, alert_type):
         """
-        Add node that has just gone offline, setting number of times
+        Add new node alert, setting number of times
         checked to 0 (not checked yet)
         """
 
@@ -200,45 +201,45 @@ class JenkinsMonitor:
         try:
             with self.conn:
                 self.cursor.execute(
-                    "insert into slaves values(?, ?, ?, ?)",
-                    (self.server_name, node, now, 0)
+                    "insert into slaves values(?, ?, ?, ?, ?)",
+                    (self.server_name, node, alert_type, now, 0)
                 )
         except sqlite3.IntegrityError:
             raise RuntimeError(f'Node {node} already in slaves table')
 
-    def update_offline_node(self, node, checked):
+    def update_node_alert(self, node, alert_type, checked):
         """
-        Update an offline node with a new number of times checked
+        Update an node alert with a new number of times checked
         """
 
         try:
             with self.conn:
                 self.cursor.execute(
-                    "update slaves set checked=? where name=? and server=?",
-                    (checked, node, self.server_name)
+                    "update slaves set checked=? where name=? and server=? and type=?",
+                    (checked, node, self.server_name, alert_type)
                 )
         except sqlite3.IntegrityError as exc:
             raise RuntimeError(exc)
 
-    def clear_offline_nodes(self, offline):
-        """Remove any nodes that are no longer offline"""
+    def clear_node_alert(self, nodes, alert_type):
+        """Remove any nodes that are no longer in alert state"""
 
-        self.cursor.execute("select name from slaves where server=?",
-                            (self.server_name,))
+        self.cursor.execute("select name from slaves where server=? and type=?",
+                            (self.server_name, alert_type))
 
         for row in self.cursor.fetchall():
             node = row[0]
 
-            if node not in offline:
+            if node not in nodes:
                 logger.debug(
-                    f'Node {node} back online, removing from database'
+                    f'Remove node {node} from database'
                 )
 
                 try:
                     with self.conn:
                         self.cursor.execute(
-                            "delete from slaves where name=? and server=?",
-                            (node, self.server_name)
+                            "delete from slaves where name=? and server=? and type=?",
+                            (node, self.server_name, alert_type)
                         )
                 except sqlite3.IntegrityError as exc:
                     raise RuntimeError(exc)
@@ -346,7 +347,7 @@ class JenkinsMonitor:
 
         return max((t_mean + (max_deviation + 2) * std_dev) / 1000, 300)
 
-    def check_nodes(self):
+    def check_nodes_online(self):
         """Ensure all nodes are online, alert via email if any are down
            two types of nodes are ignored:
              1. node that is temporarily taken offline
@@ -368,7 +369,7 @@ class JenkinsMonitor:
         if not results:
             logger.debug(f'No nodes offline, clearing all nodes for '
                          f'{self.server_name} in database')
-            self.clear_offline_nodes(list())
+            self.clear_node_alert(list(), "offline")
 
             return
 
@@ -377,9 +378,9 @@ class JenkinsMonitor:
         if isinstance(systems, dict):
             systems = [systems]
 
-        offline = [system['displayName']['$'] for system in systems]
+        nodes = [system['displayName']['$'] for system in systems]
         logger.debug(f'Systems offline on {self.server_name}: '
-                     f'{", ".join(offline)}')
+                     f'{", ".join(nodes)}')
 
         # For each offline node, check to see if it's been offline
         # and for how long; if it wasn't already marked as offline,
@@ -388,12 +389,12 @@ class JenkinsMonitor:
         # spacing) and an offline time of more than 5 minutes and
         # email as necessary, then update node info in database (if
         # offline for more than 5 minutes)
-        for node in offline:
-            results = self.check_offline_time(node)
+        for node in nodes:
+            results = self.check_node_alert_time(node, "offline")
 
             if results is None:
                 logger.debug(f'Adding offline node {node} to database')
-                self.add_offline_node(node)
+                self.add_node_alert(node, "offline")
 
                 continue
 
@@ -413,10 +414,75 @@ class JenkinsMonitor:
                 )
 
             if off_time > 300:
-                self.update_offline_node(node, checked + 1)
+                self.update_node_alert(node, "offline", checked + 1)
 
         # Remove from database any nodes no longer offline
-        self.clear_offline_nodes(offline)
+        self.clear_node_alert(nodes, "offline")
+
+    def check_nodes_diskspace(self):
+        """ Use xpath to search for nodes that are low on diskspace.
+            At the moment, set the threshold at 2GB.  Nodes with 
+            unmonitored label is ignored
+        """
+
+        try:
+            results = self.get_jenkins_data(
+                f'/computer/api/xml?xpath=//computer[not%28assignedLabel[name]'
+                f'=%22unmonitored%22%29%20and%20monitorData'
+                f'[hudson.node_monitors.DiskSpaceMonitor[size[.%3C2147483648]]]]&wrapper=computers'
+            )['computers']
+        except (ConnectionError, ValueError) as exc:
+            raise RuntimeError(exc)
+
+        # If no results, clear all nodes from database
+        if not results:
+            logger.debug(f'Remove alert records for all nodes for '
+                         f'{self.server_name} in database')
+            self.clear_node_alert(list(), "diskspace")
+
+            return
+
+        # Start processing returned nodes
+        systems = results['computer']
+
+        if isinstance(systems, dict):
+            systems = [systems]
+
+        nodes = [system['displayName']['$'] for system in systems]
+
+        for node in nodes:
+            results = self.check_node_alert_time(node, "diskspace")
+
+            #Add node to database for new alert
+            if results is None:
+                logger.debug(f'Adding node {node} to database for diskspace alert')
+                self.add_node_alert(node, "diskspace")
+
+                continue
+
+            # Email the team about the diskspace shortage.  Use a counter, "checked"
+            # to determine when to send the email.  Current cron job runs every 3
+            # minutes; hence, email is sent every hour ( 3 x 20 minutes).
+
+            alerted_time, checked = results
+            logger.debug(f'Alerted time: {alerted_time}s, Checked: {checked}')
+            if checked % 20 == 0:
+                node_url = f'{self.server_url}/computer/{node}/'
+                message = {
+                    'subject': f'Node {node} on Jenkins server '
+                               f'{self.server_name} is low on diskspace',
+                    'body': f'{node_url} has less than 2GB of free space.\nPlease '
+                            f'investigate issue'
+                }
+                send_email(
+                    self.smtp_server, self.receivers, message
+                )
+
+            if alerted_time > 0:
+                self.update_node_alert(node, "diskspace", checked + 1)
+
+        # Remove nodes that are not low in diskspace from database
+        self.clear_node_alert(nodes, "diskspace")
 
     def check_running_builds(self):
         """
@@ -533,7 +599,8 @@ def main():
 
         try:
             monitor = JenkinsMonitor(email_info, server_info)
-            monitor.check_nodes()
+            monitor.check_nodes_online()
+            monitor.check_nodes_diskspace()
             monitor.check_running_builds()
         except RuntimeError as exc:
             logger.error(f'Monitoring of server {server_info["name"]} '

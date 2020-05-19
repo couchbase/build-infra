@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Ensure we have the latest image
-docker pull couchbasebuild/jenkins_monitor:latest
+docker pull couchbasebuild/jenkins_monitor:20200518
 
 # Needed for SQLite database
 mkdir -p /home/couchbase/db
