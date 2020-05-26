@@ -1,0 +1,28 @@
+# This script is copied into the user's home directory as .shell_env, and symlinked as
+# both .bashrc and .zshenv
+#
+# The playbook does set the user's default shell to zsh on Mojave in an effort to unify, but
+# as pipelines and scripts may call out to bash (e.g. via #!/usr/bin/bash, sh calls etc) it is
+# copied into the user's profile and symlinked accordingly
+#
+# please consider bash<->zsh portability when modifying this file
+
+# Ensure LANG can handle UTF-8 filenames
+export LANG=en_US.UTF-8
+
+# Add homebrew to PATH
+if type brew &>/dev/null
+then
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+  # autoload is a zsh builtin, skip for bash
+  command -v autoload && autoload -Uz compinit && compinit
+fi
+
+gem_paths=$(/usr/local/opt/ruby@{{ ruby_version }}/bin/gem env | grep "INSTALLATION DIRECTORY" | sed 's/.*: //g'  | sed 's/$/\/bin/g' | paste -sd ":" -)
+export PATH="/usr/local/opt/ruby@{{ ruby_version }}/bin:${gem_paths}:$PATH"
+
+# Add Java to PATH
+export PATH="/usr/local/opt/java/bin:$PATH"
+
+# Add other locations to PATH
+export PATH=~/bin:/usr/local/bin:/usr/local/opt/ccache/libexec:$PATH

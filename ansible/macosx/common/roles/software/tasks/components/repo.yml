@@ -1,0 +1,18 @@
+- name: install repo
+  block:
+  - name: Get (repo)
+    get_url:
+      url: "https://android.googlesource.com/tools/repo/+/refs/tags/v{{ repo_version }}/repo?format=TEXT"
+      dest: /tmp/repo
+      mode: 0755
+
+  - name: Decode (repo)
+    shell: "base64 -D /tmp/repo > /usr/local/bin/repo"
+    args:
+      creates: "/usr/local/bin/repo"
+
+  - name: Set mode (repo)
+    file:
+      path: "/usr/local/bin/repo"
+      mode: 0755
+  tags: repo

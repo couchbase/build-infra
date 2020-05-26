@@ -6,14 +6,6 @@ earlier versions.
 The remote Windows server needs to be ready for Ansible remote
 control; see README.txt in the parent directory.
 
-Your local world needs to have Ansible installed (obviously) and configured
-for controlling Windows hosts via WinRM, which means at least running
-
-    pip install "pywinrm>=0.1.1"
-
-See http://docs.ansible.com/ansible/intro_windows.html#installing-on-the-control-machine
-for more details.
-
 # PLAYBOOKS
 
 playbook.yml installs everything necessary for creating a Couchbase Server
@@ -21,43 +13,31 @@ build slave. The rest of this document refers only to this playbook.
 
 # LOCAL FILE MODIFICATIONS NECESSARY BEFORE RUNNING PLAYBOOK
 
-First, add any private key files necessary to the `ssh` directory. The
-provided ssh/config file assumes that `id_ns-codereview` exists and can
-be used to pull from Gerrit (necessary for commit-validation jobs), and
-that a default key file such as `id_rsa` exists that can pull all private
-GitHub repositories. We also require a patch_via_gerrit.ini configured
-with the Gerrit username `ns-codereview` and that user's Gerrrit HTTP
-password.
-
 The `inventory` file here is a stub to show the required format. Replace at
 least the IP address(es) of the server(s) to configure.
 
+Profile folder config+secrets will be pulled automatically at each boot,
+you will need to pass the profile_sync key as an extra var, along with the
+node product and class to enable this (e.g. product=couchbase-server
+class=build)
+
 # RUNNING THE PLAYBOOK
 
-The primary playbook here is `playbook.yml`. It will install all toolchain
-requirements for building Couchbase Server (spock release or later).
+The primary playbook here is `playbook.yml`. It will install all toolchain requirements
+for building Couchbase Server (spock release or later). It can be invoked via the `go`
+script, e.g.:
 
-    ansible-playbook -v -i inventory playbook.yml \
-      -e vskey=ABCDEFGHIJKLMNOPQRSTUVWYZ \
-      -e ansible_password=ADMINISTRATOR_PASSWORD
-
-or
-
-    docker run --rm -it -v $(pwd):/mnt couchbasebuild/ansible-playbook:2.7.4 \
-      -v -i inventory playbook.yml \
-      -e vskey=ABCDEFGHIJKLMNOPQRSTUVWYZ \
-      -e ansible_password=ADMINISTRATOR_PASSWORD
+./go [SSH_KEY] -e ansible_password=[password] -e vskey=ABCD1234 -e NODE_PRODUCT=couchbase-server -e NODE_CLASS=build
 
 `vskey` is the license key for Visual Studio Professional 2017 (omit any
-dashes in the license key).
+dashes in the license key)
+`SSH_KEY` is the path to the profile data synchronization key file the machine running `go` (see: lastpass)
+`NODE_PRODUCT` is the product associated with this builder, e.g. couchbase-server
+`NODE_CLASS` is the category of the worker, e.g. build, cv etc.
 
 # THINGS THAT COULD GO WRONG
 
-Installing the "py2exe" package via easy_install, seems to fail consistently
-even though it seems to install correctly. I've put an ignore_error to
-temporarily bypass this issue.
-
-This playbook worked on Dec 07, 2018. It does not specify explicit versions
+This playbook worked on May 4th 2020. It does not specify explicit versions
 of any of the toolchain requirements, because many of the packages (notably
 Visual Studio 2017 itself) are specifically designed to install only the
 latest version. That being the case, things could change over time to make

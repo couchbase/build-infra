@@ -1,4 +1,0 @@
-*.retry
-ssh/*id_*
-ssh/config
-ssh/patch_via_gerrit.ini

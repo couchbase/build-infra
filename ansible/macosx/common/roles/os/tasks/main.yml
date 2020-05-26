@@ -1,0 +1,23 @@
+- name: set energy saving to zero
+  shell: systemsetup -setcomputersleep Never
+  become: true
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: couchbase
+    group: staff
+    mode: '0755'
+  become: true
+  with_items:
+  - /opt/buildteam
+  - /opt/couchbase
+  - /var/log/couchbase
+
+- name: Disable user screensaver
+  shell: defaults -currentHost write com.apple.screensaver idleTime 0
+
+- name: Disable logon screensaver
+  shell: defaults -currentHost write com.apple.screensaver loginWindowIdleTime 0
+  become: true

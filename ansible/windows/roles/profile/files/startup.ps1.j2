@@ -1,0 +1,23 @@
+$profile_port=4000
+$profile_host="mega4.build.couchbase.com"
+$host_keys = (ssh-keyscan -p ${profile_port} ${profile_host} 2>$null) | Out-String
+
+$known_hosts = Get-Content -Path C:\Users\Administrator\.ssh\known_hosts
+
+foreach($key in ($host_keys.Trim() -split "`r`n")) {
+  if(!($known_hosts | Select-String -SimpleMatch -Pattern $key.Trim())) {
+    write-host "not found: '$key'"
+    Add-Content -Path C:\Users\Administrator\.ssh\known_hosts -Value "$key"
+  }
+}
+
+C:
+
+# rsync isn't an option, and scp seemingly won't let us target (.*|*) on windows so we take an awkward path here
+# creating a temporary directory, scping the 'windows' top level dir into it, copying the items out to their
+# correct local locations, and then removing the temporary directory to tidy up
+
+New-Item -Path "c:\Users\Administrator" -Name "profile_sync" -ItemType "directory"
+& 'scp' -r -P $profile_port -i /Users/Administrator/.ssh/profile_sync couchbase@${profile_host}:couchbase-server/build/windows/ /Users/Administrator/profile_sync
+Copy-Item "c:\Users\Administrator\profile_sync\windows\*" -Destination c:\Users\Administrator -Force -Recurse
+Remove-Item -Path C:\Users\Administrator\profile_sync -recurse

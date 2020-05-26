@@ -163,20 +163,6 @@
     - name: Install OpenSSH (for Jenkins)
       script: openssh.ps1
 
-# Some of these files contain private information, so they're not all in git.
-
-    - name: Copy SSH config files
-      win_copy:
-        src: "./ssh/{{ item }}"
-        dest: C:\Users\Administrator\.ssh\{{ item }}
-      with_items:
-        - authorized_keys
-        - buildbot_id_dsa
-        - config
-        - environment
-        - id_rsa
-        - known_hosts
-
     - name: "Enable Remote Desktop"
       win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
@@ -195,3 +181,11 @@
         direction: in
         protocol: TCP
 
+    - name: Configure profile synchronization
+      include_role:
+        name: "../../roles/profile"
+        apply:
+          tags:
+            - profile
+      tags:
+      - profile

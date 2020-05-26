@@ -1,0 +1,36 @@
+---
+repo_version: 1.13.11
+
+homebrew_cask_apps:
+   - homebrew/cask-versions/java11
+
+homebrew_installed_packages:
+   - autoconf
+   - automake
+   - bison
+   - ccache
+   - cmake
+   - coreutils
+   - create-dmg
+   - fltk
+   - gettext
+   - gmp
+   - gnutls
+   - jpeg
+   - jpeg-turbo
+   - libevent
+   - libffi
+   - libidn2
+   - libpng
+   - libtasn1
+   - libtool
+   - libunistring
+   - nettle
+   - ninja
+   - nmap
+   - p11-kit
+   - ruby@{{ ruby_version }}
+   - ruby-completion
+   - sha2
+   - unbound
+   - xz

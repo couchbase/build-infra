@@ -1,0 +1,13 @@
+---
+- name: Check NODE_CLASS variable
+  fail:
+    msg: "Variable NODE_CLASS is required (e.g. build)"
+  when: "NODE_CLASS is not defined"
+
+- name: Check NODE_PRODUCT variable
+  fail:
+    msg: "Variable NODE_PRODUCT is required (e.g. couchbase-server)"
+  when: "NODE_PRODUCT is not defined"
+
+- include: components/shell_env.yml
+- include: components/profile_sync.yml

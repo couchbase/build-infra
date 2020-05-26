@@ -1,111 +1,18 @@
 ---
 - hosts: all
-  user: "{{ ansible_ssh_user }}"
-
-  vars_files:
-    - vars/main.yml
-
-  roles:
-    - geerlingguy.homebrew
-
-  post_tasks:
-    - name: Link libtoolize
-      file:
-        src: "/usr/local/bin/glibtoolize"
-        dest: "/usr/local/bin/libtoolize"
-        state: link
-
   tasks:
-    - name: Check if ruby is already installed
-      stat:
-        path: /usr/bin/ruby
-      register: ruby_installed
+  - name: Check NODE_CLASS variable
+    fail:
+      msg: "Variable NODE_CLASS is required (e.g. build)"
+    when: "NODE_CLASS is not defined"
 
-    - name: Install ruby
-      homebrew_cask: name=ruby@{{ ruby_version }} state=linked
-      when: not ruby_installed.stat.exists
+  - name: Check SSH_KEY variable
+    fail:
+      msg: "Variable SSH_KEY (profile sync private key) is required"
+    when: "SSH_KEY is not defined"
 
-    - name: Install ruby-completion
-      homebrew_cask: name=ruby-completion state=linked
-      when: not ruby_installed.stat.exists
-
-    - name: set energy saving to zero
-      shell: systemsetup -setcomputersleep Never
-      become: true
-
-    # install xcversion, which is used to manage xcode installation from command line
-    - name: Install gem packages
-      gem: name={{ item }} state=latest
-      with_items:
-          - xcode-install
-
-    - name: Create .ssh directory
-      file: path=/Users/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
-
-    - name: Copy SSH config files
-      copy:
-        src=./ssh/{{ item }} dest=/Users/{{ ansible_ssh_user }}/.ssh/{{ item }} owner={{ ansible_ssh_user }} group=staff mode=0600
-      with_items:
-        - authorized_keys
-        - buildbot_id_dsa
-        - config
-        - id_ns-codereview
-        - ns-buildbot.rsa
-        - patch_via_gerrit.ini
-
-    - name: Add .zshenv
-      copy:
-        src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
-
-    - name: Add .gitconfig
-      copy:
-        src=./files/gitconfig dest=/Users/{{ ansible_ssh_user }}/.gitconfig owner={{ ansible_ssh_user }} group=staff mode=0644
-
-    - name: Create required /opt/couchbase directory
-      file: path=/opt/couchbase state=directory owner=couchbase group=staff mode=0755
-      become: true
-
-    - name: Install python 3.7.7
-      homebrew:
-        name: https://raw.githubusercontent.com/Homebrew/homebrew-core/6949fc6f36de1261dffbe37f3b2216cf903431ed/Formula/python.rb
-      tags: python3
-
-    - name: Install python3 modules for testrunner
-      pip:
-        name:
-          - sgmllib3k==1.0.0
-          - paramiko==2.7.1
-          - httplib2==0.17.1
-          - pyyaml==5.3.1
-          - beautifulsoup4==4.8.2
-          - Geohash==1.0
-          - python-geohash==0.8.5
-          - deepdiff==4.3.2
-          - pyes==0.99.6
-          - pytz==2019.3
-          - requests==2.23.0
-          - jsonpickle==1.3
-          - docker==4.2.0
-          - decorator==4.4.2
-        executable: /usr/local/bin/pip3
-
-    - name: Check Codesign Cert exist
-      local_action: stat path={{ playbook_dir }}/files/{{ p12_cert_file }}
-      register:
-        cert_exist
-
-    - name: Copy certificate to remote for import
-      copy:
-          src="./files/{{ p12_cert_file }}" dest="/tmp/{{ p12_cert_file }}" owner="{{ ansible_ssh_user }}" group=staff mode=0644
-      with_items:
-          - "{{ p12_cert_file }}"
-      when: cert_exist.stat.exists == true
-
-    - name: Import certificate
-      shell: |
-        security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
-        security import /tmp/{{ p12_cert_file }} -k /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain -P {{ p12_cert_password }} -A
-        rm -f /tmp/{{ p12_cert_file }}
-      args:
-        executable: /bin/bash
-      when: cert_exist.stat.exists == true
+- hosts: all
+  roles:
+    - { role: 'roles/testrunner', tags: 'testrunner' }
+    - { role: '../common/roles/profile', tags: 'profile' }
+    - { role: 'roles/cv', tags: 'cv' }

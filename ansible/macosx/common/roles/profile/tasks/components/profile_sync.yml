@@ -1,0 +1,64 @@
+---
+- name: Ensure user ssh directory is present
+  file:
+    path: "/Users/{{ ansible_ssh_user }}/.ssh"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: staff
+    mode: 0700
+
+- name: Populate deployment key
+  copy:
+    content: "{{ SSH_KEY }}\n"
+    dest: "/Users/{{ ansible_ssh_user }}/.ssh/profile_sync"
+    owner: "{{ ansible_ssh_user }}"
+    group: staff
+    mode: "0600"
+
+- name: Add startup.plist
+  copy:
+    src: ./files/com.couchbase.macos-startup.plist
+    dest: /Library/LaunchDaemons/com.couchbase.macos-startup.plist
+    owner: root
+    group: wheel
+    mode: "0644"
+  become: true
+  register: plist
+
+- name: Add startup script
+  template:
+    src: files/startup.j2
+    dest: /opt/buildteam/startup.sh
+    owner: "{{ ansible_ssh_user }}"
+    group: staff
+    mode: "0755"
+  register: startscript
+
+- name: Load startup script
+  shell: "launchctl unload {{ item }} && launchctl load -w {{ item }}"
+  become: true
+  with_items: /Library/LaunchDaemons/com.couchbase.macos-startup.plist
+
+- name: Check p12_cert_password was provided
+  fail:
+    msg: "Variable p12_cert_password is required"
+  when: NODE_CLASS == "build" and p12_cert_password is not defined
+
+- name: check if signing certificate is present
+  stat:
+    path: "/Users/{{ ansible_ssh_user }}/.ssh/Certificate.p12"
+  register: signing_cert
+  when: NODE_CLASS == "build"
+
+- name: Import code signing certificate
+  shell: |
+    security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
+    security import /Users/{{ ansible_ssh_user }}/.ssh/Certificate.p12 -k /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain -P {{ p12_cert_password }} -A
+  args:
+    executable: /bin/bash
+  when: NODE_CLASS == "build" and signing_cert.stat.exists
+  no_log: true
+
+- name: Grant keychain access
+  shell: "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k {{ ansible_ssh_pass }}"
+  no_log: true

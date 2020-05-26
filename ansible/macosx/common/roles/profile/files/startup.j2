@@ -1,0 +1,24 @@
+#!/bin/zsh -e
+
+# This script is called at startup, and is responsible for synchronising config+secrets.
+
+profile_port=4000
+profile_host=profiledata.build.couchbase.com
+
+ssh-keyscan -p ${profile_port} ${profile_host} 2>/dev/null |
+while IFS= read -r key; do
+    cat ~/.ssh/known_hosts 2>/dev/null | grep "$key" || echo "$key" >> ~/.ssh/known_hosts
+done
+
+rsync \
+  --archive \
+  --backup \
+  -e "ssh -p ${profile_port} -i ~/.ssh/profile_sync" \
+  --executability \
+  --no-group \
+  --no-owner \
+  --progress \
+  couchbase@${profile_host}:/home/couchbase/{{ NODE_PRODUCT }}/{{ NODE_CLASS }}/macos/ /Users/couchbase/ >> /var/log/couchbase/rsync.log
+
+if [ -d ~/.ssh ]; then chmod 00700 ~/.ssh; fi
+if [ -d ~/.gpg ]; then chmod 00700 ~/.gpg; fi

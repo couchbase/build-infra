@@ -1,0 +1,18 @@
+---
+- name: Ensure gtar and unzip are installed
+  homebrew:
+    name:
+    - gnu-tar
+    - unzip
+  when: NODE_CLASS == "cv"
+
+- name: Get additional XCode Command Line Tools versions
+  unarchive:
+    src: "http://downloads.build.couchbase.com/xcode/tools/tarballs/CommandLineTools_{{ item }}.tar.gz"
+    dest: /Library/Developer
+    remote_src: yes
+  environment:
+    PATH: /usr/local/opt/gnu-tar/libexec/gnubin:/usr/bin
+  with_items: "{{ xcode_cli_versions }}"
+  become: true
+  when: NODE_CLASS == "cv"

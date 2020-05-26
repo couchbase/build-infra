@@ -1,0 +1,88 @@
+---
+- name: Install Xcode
+  block:
+  - name: Check XCODE_VERSION variable
+    fail:
+      msg: "Variable XCODE_VERSION is required (e.g. 10.3)"
+    when: "XCODE_VERSION is not defined"
+
+  - name: Check XCODE_INSTALL_USER variable
+    fail:
+      msg: "Variable XCODE_INSTALL_USER is required"
+    when: "XCODE_INSTALL_USER is not defined"
+
+  - name: Check XCODE_INSTALL_PASSWORD variable
+    fail:
+      msg: "Variable XCODE_INSTALL_PASSWORD is required"
+    when: "XCODE_INSTALL_PASSWORD is not defined"
+
+  - name: Ensure gtar and unzip are installed (xcode)
+    homebrew:
+      name:
+      - gnu-tar
+      - unzip
+
+  - name: Install (xcode)
+    shell: "/usr/local/lib/ruby/gems/{{ ruby_version }}*/bin/xcversion install {{ XCODE_VERSION }}"
+    args:
+      creates: /Applications/Xcode.app
+    environment:
+      XCODE_INSTALL_USER: "{{ XCODE_INSTALL_USER }}"
+      XCODE_INSTALL_PASSWORD: "{{ XCODE_INSTALL_PASSWORD }}"
+    become: true
+    no_log: True
+
+  - name: Install CLI tools
+    block:
+      - name: Download command line tools dmg (xcode)
+        get_url:
+          url: http://downloads.build.couchbase.com/xcode/tools/Command_Line_Tools_for_Xcode_{{ XCODE_VERSION }}.dmg
+          dest: /tmp/cli_tools.dmg
+          mode: '0440'
+
+      - name: Mount dmg
+        shell: "hdiutil attach /tmp/cli_tools.dmg | grep \"Apple_HFS.*\\/Volumes\" | cut -f 3-"
+        register: volume_mount
+
+      - name: show mountpoint
+        debug:
+          msg: "Volume mounted at: {{volume_mount.stdout}}"
+
+      - name: Find package file (xcode)
+        find:
+          paths:
+          - "{{ volume_mount.stdout }}"
+          patterns: "*.pkg"
+          file_type: file
+        register: pkg
+
+      - name: show package
+        debug:
+          msg: "Package is: {{pkg.files[0].path}}"
+
+      - name: Install command line tools package (xcode)
+        shell: installer -pkg "{{ pkg.files[0].path }}" -target /
+
+      - name: Unmount dmg
+        shell: "hdiutil detach '{{ volume_mount.stdout }}'"
+
+      - name: Delete tools dmg (xcode)
+        file:
+          path: /tmp/cli_tools.dmg
+          state: absent
+    become: true
+    tags:
+    - cli_tools
+
+  - name: Install headers (xcode)
+    shell: installer -pkg /Applications/Xcode.app/Contents/Resources/Packages/XcodeSystemResources.pkg -target /
+    become: true
+
+  - name: Reset to default CLI tools path (xcode)
+    shell: xcode-select -r
+    become: true
+
+  - name: Accept license (xcode)
+    shell: xcodebuild -license accept
+    become: true
+  tags: xcode

@@ -1,0 +1,11 @@
+---
+- hosts: all
+  tasks:
+  - name: Set hostname
+    shell: "scutil --set HostName {{ inventory_hostname }}.{{ dns_suffix }}"
+    become: true
+
+- hosts: all
+  roles:
+    - { role: '../common/roles/os', tags: 'os' }
+    - { role: '../common/roles/software', tags: 'software' }

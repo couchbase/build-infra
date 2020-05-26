@@ -1,0 +1,32 @@
+---
+- name: Set user's shell to zsh
+  user:
+    name: "{{ ansible_ssh_user }}"
+    shell: /bin/zsh
+    state: present
+  become: true
+
+- name: Copy generic shell_env to user profile
+  template:
+    src: ./files/shell_env.j2
+    dest: "/Users/{{ ansible_ssh_user }}/.shell_env"
+    mode: 0644
+
+- name: Remove existing env files
+  file:
+    path: "/Users/{{ ansible_ssh_user }}/{{ item }}"
+    state: absent
+  with_items:
+    - .zshenv
+    - .bashrc
+    - .bash_profile
+
+- name: Symlink shell_env as .bashrc/.zshenv/.bash_profile
+  file:
+    src: "/Users/{{ ansible_ssh_user }}/.shell_env"
+    dest: "/Users/{{ ansible_ssh_user }}/{{ item }}"
+    state: link
+  with_items:
+    - .zshenv
+    - .bashrc
+    - .bash_profile

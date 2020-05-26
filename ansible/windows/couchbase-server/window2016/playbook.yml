@@ -2,7 +2,6 @@
 - hosts: all
 
   tasks:
-
     - name: Disable Windows antivirus during setup
       win_shell: Add-MpPreference -ExclusionPath "C:"
 
@@ -18,6 +17,7 @@
       win_chocolatey:
         name: python3
         version: 3.7.7
+        force: yes
       tags: python3
 
     - name: "Provide python3 alias"
@@ -165,32 +165,6 @@
         version: 10.1.17134.12
       tags: v8_sdk
 
-# Some of these files contain private information, so they're not all in git.
-    - name: Create SSH directory
-      win_file:
-        path: C:\Users\Administrator\.ssh
-        state: directory
-
-    - name: Copy SSH config files
-      win_copy:
-        src: "./ssh/{{ item }}"
-        dest: C:\Users\Administrator\.ssh\{{ item }}
-      with_items:
-        - authorized_keys
-        - id_ns-codereview
-        - config
-        - patch_via_gerrit.ini
-        - environment
-        - id_rsa
-        - known_hosts
-
-    - name: Copy .gitconfig file
-      win_copy:
-        src: "gitconfig"
-        dest: C:\Users\Administrator\.gitconfig
-      tags:
-        - repo
-
     - name: "Enable Remote Desktop"
       win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
@@ -217,9 +191,14 @@
 
     - name: install vs2017
       include_role:
-        name: "vs2017"
+        name: "../../roles/vs2017"
+        apply:
+          tags:
+            visualstudio
       vars:
-        PRODUCT: "couchbase-server"
+        PRODUCT: "{{ NODE_PRODUCT }}"
+      tags:
+      - visualstudio
 
     # Do OpenSSH last so the service has the latest version of the path
     - name: Install OpenSSH (for Jenkins)
@@ -227,3 +206,12 @@
         name: openssh
         params: /SSHServerFeature
         state: latest
+
+    - name: Configure profile synchronization
+      include_role:
+        name: "../../roles/profile"
+        apply:
+          tags:
+            - profile
+      tags:
+      - profile

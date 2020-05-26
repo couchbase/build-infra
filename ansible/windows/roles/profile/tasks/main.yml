@@ -1,0 +1,40 @@
+- name: Check NODE_CLASS variable
+  fail:
+    msg: "Variable NODE_CLASS is required (e.g. build)"
+  when: "NODE_CLASS is not defined"
+
+- name: Check NODE_PRODUCT variable
+  fail:
+    msg: "Variable NODE_PRODUCT is required (e.g. couchbase-server)"
+  when: "NODE_PRODUCT is not defined"
+
+- name: Populate deployment key
+  win_copy:
+    content: "{{ SSH_KEY }}\n"
+    dest: C:\Users\Administrator\.ssh\profile_sync
+  no_log: true
+
+- name: Copy startup script
+  win_template:
+    src: files/startup.ps1.j2
+    dest: C:\bin\startup.ps1
+  register: start_script
+
+- name: Create profile sync scheduled task
+  win_scheduled_task:
+    name: profile-sync
+    path: Couchbase
+    description: Pull required files at boot time
+    logon_type: password
+    password: "{{ ansible_password }}"
+    actions:
+    - path: powershell.exe
+      arguments: -ExecutionPolicy ByPass c:\bin\startup.ps1
+    triggers:
+    - type: boot
+    username: Administrator
+    run_level: highest
+    state: present
+
+- name: Run scheduled task
+  win_shell: SCHTASKS.EXE /RUN /TN "Couchbase\profile-sync"
