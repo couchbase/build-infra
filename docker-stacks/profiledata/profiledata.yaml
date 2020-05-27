@@ -19,7 +19,7 @@ services:
   storage:
     deploy:
       replicas: 1
-    image: couchbasebuild/profiledata:20200424
+    image: couchbasebuild/profiledata:20200527
     init: true
     ports:
       - 4000:22

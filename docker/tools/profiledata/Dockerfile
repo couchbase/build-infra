@@ -4,7 +4,11 @@ LABEL maintainer="build-team@couchbase.com"
 RUN set -x \
         && apk add --no-cache openssh rsync
 
-RUN addgroup -g 901 -S couchbase && adduser -u 901 -D couchbase -G couchbase && passwd -d couchbase
+RUN set -x \
+        && addgroup -g 901 -S couchbase \
+        && adduser -u 901 -D couchbase -G couchbase \
+        && passwd -d couchbase \
+        && chmod 755 /home/couchbase
 
 COPY sshd_config /tmp/sshd_config
 
