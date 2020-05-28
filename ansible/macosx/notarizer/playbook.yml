@@ -1,0 +1,49 @@
+---
+- hosts: all
+
+  tasks:
+  - name: Install node
+    homebrew:
+      name: node
+
+  - name: Make app dir
+    file:
+      path: "{{ app_dir }}"
+      state: directory
+      owner: "{{ ansible_ssh_user }}"
+      group: staff
+    become: true
+
+  - name: Copy app
+    copy:
+      # it's possible someone would have been working on the script and thus running it locally
+      # and generating files we don't need so lets be specific to avoid pulling node_modules or workdir
+      src: "../../../apple/notarizer/{{ item }}"
+      dest: "{{ app_dir }}/{{ item }}"
+    with_items:
+      - couchbase.entitlement
+      - index.js
+      - logger.js
+      - go.sh
+      - package.json
+
+  - name: Set trigger executable
+    file:
+      path: "{{ app_dir }}/go.sh"
+      mode: '0755'
+
+  - name: Install modules
+    npm:
+      path: "{{ app_dir }}"
+
+  - name: Copy plist
+    template:
+      src: files/com.couchbase.notarizer.plist.j2
+      dest: /Library/LaunchDaemons/com.couchbase.notarizer.plist
+    become: true
+
+  - name: Start service
+    shell: "launchctl unload {{ item }} ; launchctl load -w {{ item }}"
+    become: true
+    with_items:
+      - /Library/LaunchDaemons/com.couchbase.notarizer.plist

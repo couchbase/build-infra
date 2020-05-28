@@ -1,0 +1,21 @@
+{
+  "name": "notarizer",
+  "version": "1.0.0",
+  "description": "Helper service for signing and notarising binaries",
+  "main": "index.js",
+  "license": "",
+  "scripts": {
+    "dev": "nodemon ./index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-formidable": "^1.2.0",
+    "glob": "^7.1.6",
+    "istextorbinary": "^4.3.0",
+    "mkdirp": "^1.0.4",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}

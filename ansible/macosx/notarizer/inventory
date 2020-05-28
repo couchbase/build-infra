@@ -1,0 +1,7 @@
+[all]
+test  ansible_host=x.x.x.x
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=couchbase
+app_dir=/opt/buildteam/notarizer
