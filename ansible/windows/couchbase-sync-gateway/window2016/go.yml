@@ -1,0 +1,54 @@
+---
+
+- name: Go | Download go language tools
+  win_get_url:
+    url: "{{ item.url }}"
+    dest: C:\Users\Administrator\Downloads\{{ item.filename }}
+    force: yes
+  with_items:
+    - url: https://dl.google.com/go/go1.9.2.windows-amd64.msi
+      filename: go1.9.2.windows-amd64.msi
+    - url: https://dl.google.com/go/go1.7.4.windows-amd64.msi
+      filename: go1.7.4.windows-amd64.msi
+
+- name: Go | Install go language tools
+  win_package:
+     path: "{{ item.file }}"
+     state: present
+     product_id: "{{ item.pid }}"
+  with_items:
+     - { file: 'C:\Users\Administrator\Downloads\go1.9.2.windows-amd64.msi', pid: '959FD0EE-6A15-4AF0-B369-AE0F7AB75C3C' }
+
+- name: Go | Create sgw go install path
+  win_file:
+     path: C:\usr\local\go\1.9\go
+     state: directory
+
+- name: Go | Copy recursively installed go to expected path
+  win_copy:
+    src: c:\Go
+    dest: C:\usr\local\go\1.9\go
+    remote_src: True
+
+# Remove go package
+- name: Go | Uninstall go-1.9.2
+  win_command: wmic product where name='Go Programming Language' call uninstall
+
+- name: Go | Install go 1.7.4 language tools
+  win_package:
+     path: "{{ item.file }}"
+     state: present
+     product_id: "{{ item.pid }}"
+  with_items:
+     - { file: 'C:\Users\Administrator\Downloads\go1.7.4.windows-amd64.msi', pid: 'A45D76B0-ACF8-4F0B-936E-383E11CF7B14' }
+
+- name: Go | Create sgw go install path
+  win_file:
+     path: C:\usr\local\go\1.7.4\go
+     state: directory
+
+- name: Go | Copy recursively installed go to expected path
+  win_copy:
+    src: c:\Go
+    dest: C:\usr\local\go\1.7.4\go
+    remote_src: True

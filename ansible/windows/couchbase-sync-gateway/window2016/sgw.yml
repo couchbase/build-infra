@@ -1,0 +1,147 @@
+---
+
+  - name: "Disable Windows antivirus during setup"
+    win_shell: Add-MpPreference -ExclusionPath "C:"
+
+  # Needed for WiX Toolset
+  - name: "Enable .NET Framework 3.5"
+    win_feature:
+      name: "NET-Framework-Core"
+      state: present
+
+  - name: "Install tools"
+    win_chocolatey:
+      name: "{{ item }}"
+      allow_empty_checksums: "yes"
+    with_items:
+      - git
+      - cmake
+      - curl
+      - ninja
+      - MinGW
+      - ruby
+      - wixtoolset
+      - 7zip.commandline
+      - googlechrome
+      - insted
+      - pandoc
+      - vscode
+      - wget
+      - python2
+      - maven
+      - cmder
+      - dos2unix
+
+  - name: "Install JDK for Jenkins"
+    win_chocolatey:
+      name: openjdk
+      version: 11.0.2.01
+
+  - name: "Create bin directory"
+    win_file:
+      path: 'C:\bin'
+      state: directory
+
+  - name: "Install repo"
+    win_get_url:
+      url: "https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo"
+      dest: 'C:\bin\repo'
+    tags:
+      - repo
+
+  # This repo.exe was built using the "py-wrapper" source code here:
+  # https://github.com/couchbase/build-tools/tree/master/py-wrapper
+  - name: "Install repo wrapper"
+    win_copy:
+      src: repo.exe
+      dest: 'C:\bin\'
+
+  # Due to a silly bug in ESRlabs' Repo port, git's core.pager setting MUST
+  # be set, and moreover it MUST be set to a command that exists as a .exe.
+  # more is actually "more.com", and while setting core.pager to "more.com"
+  # works well from a command prompt, it throws a Python error when invoked
+  # via Jenkins "Gerrit Repo" source-control plugin. So, we use MSYS's
+  # "cat.exe", which requires that we copy both that file and a few MSYS
+  # DLLs onto the PATH.
+  - name: "Copy MSYS tools to C:\\bin for repo"
+    win_copy:
+      src: 'C:\Program Files\Git\usr\bin\{{ item }}'
+      dest: 'C:\bin\'
+      remote_src: yes
+    loop:
+      - cat.exe
+      - msys-2.0.dll
+      - msys-iconv-2.dll
+      - msys-intl-8.dll
+    tags:
+      - repo
+
+  - name: "Download patch_via_gerrit"
+    win_get_url:
+      url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/8/windows_msvc2015/patch_via_gerrit.exe
+      dest: 'C:\bin\patch_via_gerrit.exe'
+
+  - name: "Get Current PATH"
+    raw: $ENV:PATH
+    register: path_out
+
+  - debug: var=path_out.stdout_lines
+
+  - name: "Add tools to PATH"
+    win_path:
+        elements:
+        - C:\bin
+        - C:\Program Files\CMake\bin
+        - C:\Program Files\git\cmd
+        - C:\Program Files (x86)\WiX Toolset v3.11\bin
+        - C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin
+        - C:\ProgramData\chocolatey\lib\dos2unix\tools\bin
+        - C:\tools\Cmder
+
+  - name: "Enable Remote Desktop"
+    win_regedit:
+      key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+      name: fDenyTSConnections
+      data: 0
+      type: dword
+      state: present
+
+  - name: "Open Remote Desktop in firewall"
+    win_firewall_rule:
+      name: "remote desktop"
+      enable: yes
+      state: present
+      localport: 3389
+      action: allow
+      direction: in
+      protocol: TCP
+
+  - name: "Restore basic Windows antivirus"
+    win_shell: Remove-MpPreference -ExclusionPath "C:"
+
+  - name: "Exclude Jenkins from windows antivirus"
+    win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+
+  # Do OpenSSH last so the service has the latest version of the path
+  - name: "Install OpenSSH (for Jenkins)"
+    win_chocolatey:
+      name: openssh
+      params: /SSHServerFeature
+      state: latest
+
+  - name: "Create bin directory"
+    win_file:
+      path: 'C:\Users\Administrator\.ssh'
+      state: directory
+
+  - name: "Copy SSH Config Files"
+    win_copy:
+      src: "./ssh/{{ item }}"
+      dest: C:\Users\Administrator\.ssh\{{ item }}
+    with_items:
+      - authorized_keys
+      - buildbot_id_dsa
+      - config
+      - environment
+      - id_rsa
+      - known_hosts
