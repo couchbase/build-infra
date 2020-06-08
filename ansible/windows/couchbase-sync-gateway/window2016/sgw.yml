@@ -31,6 +31,8 @@
       - maven
       - cmder
       - dos2unix
+      - zip
+      - unzip
 
   - name: "Install JDK for Jenkins"
     win_chocolatey:
@@ -48,6 +50,11 @@
       dest: 'C:\bin\repo'
     tags:
       - repo
+
+  - name: Install cbdep tool
+    win_get_url:
+      url: "http://downloads.build.couchbase.com/cbdep/cbdep.windows.exe"
+      dest: 'C:\bin\cbdep.exe'
 
   # This repo.exe was built using the "py-wrapper" source code here:
   # https://github.com/couchbase/build-tools/tree/master/py-wrapper
@@ -81,6 +88,18 @@
       url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/8/windows_msvc2015/patch_via_gerrit.exe
       dest: 'C:\bin\patch_via_gerrit.exe'
 
+  - name: "Download clamAV"
+    win_get_url:
+      url: https://www.clamav.net/downloads/production/ClamAV-0.102.3.exe
+      dest: C:\Windows\Temp\ClamAV-0.102.3.exe
+      force: True
+
+  - name: "Install clamAV"
+    win_package:
+      path: C:\Windows\Temp\ClamAV-0.102.3.exe
+      product_id: ClamAV
+      arguments: /SILENT
+
   - name: "Get Current PATH"
     raw: $ENV:PATH
     register: path_out
@@ -97,6 +116,7 @@
         - C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin
         - C:\ProgramData\chocolatey\lib\dos2unix\tools\bin
         - C:\tools\Cmder
+        - C:\Program Files\clamav
 
   - name: "Enable Remote Desktop"
     win_regedit:
@@ -129,7 +149,7 @@
       params: /SSHServerFeature
       state: latest
 
-  - name: "Create bin directory"
+  - name: "Create .ssh directory"
     win_file:
       path: 'C:\Users\Administrator\.ssh'
       state: directory
