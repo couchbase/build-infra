@@ -18,9 +18,6 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/centos-70-cou
 # Debian8 watson builder
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/debian-8-couchbase-build:20171106 watson-debian8 5229 server.jenkins.couchbase.com
 
-# Vulcan CentOS 6 builder
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/server-centos6-build:20181218 vulcan-centos6 5225 server.jenkins.couchbase.com
-
 # server.jenkins slave for running Ansible playbooks
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/ansible-slave:20180312 ansible-slave-server 2999 server.jenkins.couchbase.com
 

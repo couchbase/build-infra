@@ -12,6 +12,13 @@ RUN curl \
 
 RUN yum install -y rsync && yum clean packages
 
+RUN set -x \
+  && mkdir /tmp/deploy \
+  && cd /tmp/deploy \
+  && curl -L https://repo.anaconda.com/miniconda/Miniconda2-4.7.12.1-Linux-x86_64.sh -o miniconda2.sh \
+  && chmod 755 miniconda2.sh \
+  && ./miniconda2.sh -b -f -p /home/couchbase/miniconda2
+
 RUN rm -rf /home/couchbase/.ssh
 
 COPY build/couchbuilder_start.sh /usr/sbin/

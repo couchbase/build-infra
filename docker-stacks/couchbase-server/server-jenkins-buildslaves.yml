@@ -45,7 +45,7 @@ services:
     <<: *default-jenkins-slave
 
   centos6:
-    image: couchbasebuild/server-centos6-build:20200424
+    image: couchbasebuild/server-centos6-build:20200615
     environment:
       - "JENKINS_SLAVE_NAME=server-centos6"
       - "JENKINS_SLAVE_LABELS=centos6 vulcan alice mad-hatter master"
