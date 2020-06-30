@@ -80,31 +80,40 @@ class BuildInfo:
 
         return [result['release'] for result in results]
 
-    def get_versions(self, product, release):
+    def get_versions(self, product, release=None):
         """
-        Get a list of all available version for a given release
+        Get a list of all available versions for a given release
         of a product
+
+        release is an optional argument, all versions of a product are returned
+        if it is not provided
         """
 
+        release_clause = f" and release='{release}'" if release else ""
         results = self.query_documents(
             'build',
-            where_clause=f"product='{product}' and release='{release}' "
-                         f"and version IS NOT NULL",
+            where_clause=f"product='{product}' {release_clause} and version IS NOT NULL",
             doc_keys=['version'], distinct=True
         )
 
         return [result['version'] for result in results]
 
-    def get_builds(self, product, release, version):
+    def get_builds(self, product, release=None, version=None):
         """
         Get a list of all available builds for a given version
         of a product (potentially release-specific)
+
+        All versions of a product are returned if a release is not specified.
+        Version should always be provided, but is given a default value of None
+        to avoid the syntax error of a non-default arg following a default arg
         """
 
+        assert version != None, "Version must be specified"
+
+        release_clause = f" and release='{release}'" if release else ""
         results = self.query_documents(
             'build',
-            where_clause=f"product='{product}' and release='{release}' "
-                         f"and version='{version}' and build_num IS NOT NULL",
+            where_clause=f"product='{product}' {release_clause} and version='{version}' and build_num IS NOT NULL",
             doc_keys=['build_num'], distinct=True
         )
 

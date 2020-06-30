@@ -16,6 +16,10 @@ Builds
 * /products/*product_name*/releases/*release_name*/versions/*version*
 * /products/*product_name*/releases/*release_name*/versions/*version*/builds
 * /products/*product_name*/releases/*release_name*/versions/*version*/builds/*build_num*
+* /products/*product_name*/versions
+* /products/*product_name*/versions/*version*
+* /products/*product_name*/versions/*version*/builds
+* /products/*product_name*/versions/*version*/builds/*build_num*
 * /builds
 * /builds/*product-version-build_num*
 
