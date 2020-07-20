@@ -23,3 +23,12 @@ homebrew_installed_packages:
   - { name: libev, state: linked }
   - { name: libevent, state: linked }
   - { name: libcouchbase, state: linked }
+  - { name: ruby-install, state: linked }
+  - { name: chruby, state: linked }
+  - { name: gcc@10, state: linked }
+  - { name: automake, state: linked }
+  - { name: bison, state: linked }
+  - { name: readline, state: linked }
+  - { name: libyaml, state: linked }
+  - { name: gdbm, state: linked }
+  - { name: libffi, state: linked }
