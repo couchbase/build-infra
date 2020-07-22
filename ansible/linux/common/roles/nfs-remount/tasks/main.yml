@@ -1,0 +1,23 @@
+---
+- name: Add nfs-remount script
+  copy:
+    src: ./files/nfs-remount
+    dest: /usr/local/bin/nfs-remount
+    owner: root
+    mode: "0755"
+  become: true
+
+- name: Ensure log directory is present
+  file:
+    path: /var/log/buildteam
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Set nfs-remount script to trigger every 5 minutes
+  cron:
+    name: reconnect NFS mounts
+    minute: "*/5"
+    hour: "*"
+    job: "/usr/local/bin/nfs-remount >> /var/log/buildteam/nfs-remount"
+  become: true
