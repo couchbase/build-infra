@@ -4,7 +4,7 @@ FROM ubuntu:20.04 AS builder
 MAINTAINER build-team@couchbase.com
 
 ARG GCC_VER
-ARG PREFIX=/opt/gcc
+ARG PREFIX=/usr/local
 
 COPY build/patches /tmp/patches
 
@@ -33,6 +33,3 @@ RUN mkdir /tmp/deploy/objdir && \
     ln -s gcc ${PREFIX}/bin/cc
 RUN cd /tmp/deploy/objdir && \
     cp -a x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6.0.24 ${PREFIX}/lib64
-
-FROM ubuntu:20.04
-COPY --from=builder /opt/gcc /opt/gcc

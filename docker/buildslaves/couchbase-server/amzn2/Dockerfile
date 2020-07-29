@@ -23,8 +23,6 @@ RUN chmod +x /tini
 RUN yum install --setopt=keepcache=0 -y \
                 deltarpm \
                 ed \
-                gcc \
-                gcc-c++ \
                 git \
                 glibc-devel \
                 gzip \
@@ -63,6 +61,11 @@ RUN groupadd -g1000 couchbase && \
 
 # Install third-party build dependencies
 RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper
+
+# GCC (from couchbasebuild/amzn-2-gcc)
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+     mv /tmp/ld.so.conf /etc && ldconfig
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.

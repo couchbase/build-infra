@@ -12,11 +12,11 @@ cp ../../util/swarm*.properties build
 # this Dockerfile. This does mean that if you need to update the
 # gcc, you need to manually delete this directory and rebuild.
 # Note: the gcc build image is in build-infra.
-if [ ! -d build/gcc ]
+if [ ! -d build/local ]
 then
     docker run --rm -v $(pwd)/build:/output \
         couchbasebuild/ubuntu-2004-gcc:7.5.0 \
-        cp -a /opt/gcc /output
+        cp -a /usr/local /output
 fi
 
 docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .

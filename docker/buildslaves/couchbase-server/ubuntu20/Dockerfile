@@ -43,7 +43,6 @@ RUN set -x \
         devscripts \
         dh-systemd \
         ed \
-        gcc-7 g++-7 \
         git-core \
         libnuma-dev \
         libsqlite3-dev \
@@ -58,8 +57,6 @@ RUN set -x \
         vim \
         zlib1g-dev \
     && apt-get clean \
-    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100 \
-    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100 \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 
 RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
@@ -106,6 +103,11 @@ ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
+
+# GCC (from couchbasebuild/ubuntu-2004-gcc)
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+     mv /tmp/ld.so.conf /etc && ldconfig
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22

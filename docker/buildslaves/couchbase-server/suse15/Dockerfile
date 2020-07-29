@@ -33,7 +33,6 @@ RUN zypper -n install \
                 ccache \
                 curl \
                 ed \
-                gcc-c++ \
                 git \
                 hostname \
                 libffi-devel \
@@ -76,6 +75,11 @@ RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchba
 
 # Set LANG
 ENV LANG=en_US.UTF-8
+
+# GCC (from couchbasebuild/suse-15-gcc)
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+     mv /tmp/ld.so.conf /etc && ldconfig
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /

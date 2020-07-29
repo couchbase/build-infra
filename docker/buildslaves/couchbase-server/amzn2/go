@@ -6,8 +6,18 @@ IMAGE=couchbasebuild/server-amzn2-build
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
-cp -a  ../../util/swarm*.properties build
+cp -a ../../util/swarm*.properties build
 
+# Only copy this if it doesn't exist. Prevents re-running steps in
+# this Dockerfile. This does mean that if you need to update the
+# gcc, you need to manually delete this directory and rebuild.
+# Note: the gcc build image is in build-infra.
+if [ ! -d build/local ]
+then
+    docker run --rm -v $(pwd)/build:/output \
+        couchbasebuild/amzn-2-gcc:7.3.0 \
+        cp -a /usr/local /output
+fi
 docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]

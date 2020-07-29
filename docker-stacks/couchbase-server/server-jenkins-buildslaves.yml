@@ -35,7 +35,7 @@ x-node-product:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20200424
+    image: couchbasebuild/server-amzn2-build:20200729
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=amzn2 alice mad-hatter cheshire-cat master"
@@ -146,7 +146,7 @@ services:
       replicas: 1
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20200424
+    image: couchbasebuild/server-suse15-build:20200729
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=suse15 mad-hatter cheshire-cat master"
@@ -188,7 +188,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20200513
+    image: couchbasebuild/server-ubuntu20-build:20200729
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
