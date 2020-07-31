@@ -3,8 +3,8 @@
 homebrew_cask_appdir: /Applications
 
 homebrew_taps:
-  - caskroom/cask
-  - homebrew/php
+   - homebrew/cask
+   - homebrew/cask-versions
 
 homebrew_installed_packages:
   - { name: ccache, state: linked }

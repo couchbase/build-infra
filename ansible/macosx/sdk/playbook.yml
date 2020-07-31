@@ -2,6 +2,12 @@
 - hosts: all
   user: couchbase
 
+  pre_tasks:
+    - name: add passwordless sudoer
+      copy:
+        src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
+      become: true
+
   vars_files:
     - vars/main.yml
 
@@ -30,3 +36,7 @@
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
+
+    - name: Add .zshenv
+      copy:
+        src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
