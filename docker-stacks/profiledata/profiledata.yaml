@@ -250,6 +250,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/ns-buildbot.rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/macos #
       ################################
@@ -308,6 +313,11 @@ services:
         gid: "901"
       - source: profiledata.ini_file.patch_via_gerrit.20200417
         target: /home/couchbase/couchbase-server/build/windows/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
+        target: /home/couchbase/couchbase-server/build/windows/.ssh/ns-buildbot.rsa
         mode: 0600
         uid: "901"
         gid: "901"

@@ -1,5 +1,6 @@
 Host github.com
         User git
+        IdentityFile ~/.ssh/ns-buildbot.rsa
 Host review.couchbase.org
     User         buildbot
     Port         29418
