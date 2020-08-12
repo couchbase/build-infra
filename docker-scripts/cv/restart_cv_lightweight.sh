@@ -7,7 +7,7 @@ popd > /dev/null
 # Currently these slaves are all hosted on mega2
 
 # cv.jenkins slaves
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/ubuntu-1604-couchbase-build:20180109 cv-zz-lightweight 3224 cv.jenkins.couchbase.com &
+${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/zz-lightweight:20200812 cv-zz-lightweight 3224 cv.jenkins.couchbase.com &
 
 wait
 echo "All done!"
