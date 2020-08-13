@@ -76,6 +76,11 @@
         - ns-buildbot.rsa
         - patch_via_gerrit.ini
 
+    - name: Copy .gitconfig file
+      copy:
+        src=./files/gitconfig
+        dest=/Users/{{ ansible_ssh_user }}/.gitconfig owner="{{ ansible_ssh_user }}" group=staff mode=0644
+
     - name: Copy Mobile jenkins's CB developer profile
       copy:
           src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/{{ ansible_ssh_user }}/Downloads/jenkins-appledeveloper.developerprofile  owner="{{ ansible_ssh_user }}" group=staff mode=0644

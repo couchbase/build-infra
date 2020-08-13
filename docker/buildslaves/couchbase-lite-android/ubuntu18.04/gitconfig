@@ -1,0 +1,9 @@
+[user]
+        name = Couchbase Build Team
+        email = build-team@couchbase.com
+[color]
+        ui = false
+[url "ssh://git@github.com/"]
+        insteadOf = https://github.com/
+[push]
+        default = simple

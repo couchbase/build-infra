@@ -32,6 +32,10 @@ RUN apt-get update && \
 # Set LANG
 ENV LANG=en_US.UTF-8
 
+# set gitconfig
+COPY gitconfig /home/couchbase/.gitconfig
+RUN chown couchbase:couchbase /home/couchbase/.gitconfig
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh

@@ -101,6 +101,11 @@
         - id_rsa
         - known_hosts
 
+    - name: Copy .gitconfig file
+      win_copy:
+        src: "gitconfig"
+        dest: C:\Users\Administrator\.gitconfig
+
     - name: Enable Remote Desktop
       win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
