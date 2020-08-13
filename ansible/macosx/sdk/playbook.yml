@@ -40,3 +40,18 @@
     - name: Add .zshenv
       copy:
         src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
+
+    - name: Create .ssh directory
+      file: path=/Users/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
+      tags: sshkey
+
+    - name: Copy SSH config files
+      copy:
+        src=./files/{{ item }} dest=/Users/{{ ansible_ssh_user }}/.ssh/{{ item }} owner={{ ansible_ssh_user }} group=staff mode=0600
+      with_items:
+        - authorized_keys
+        - config
+        - id_ns-codereview
+        - ns-buildbot.rsa
+        - patch_via_gerrit.ini
+      tags: sshkey
