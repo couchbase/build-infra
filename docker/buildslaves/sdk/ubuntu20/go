@@ -1,0 +1,18 @@
+#!/bin/sh -ex
+
+# Bump this when rebuilding with changes
+TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/sdk-ubuntu20-build
+
+mkdir -p build
+INFRADIR=$(git rev-parse --show-toplevel)
+cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
+
+docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+    --build-arg CACHEBUST=$(date +%Y%m%d-%H%M%S) -t ${IMAGE}:${TAG} .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:$TAG
+  docker push ${IMAGE}:latest
+fi
