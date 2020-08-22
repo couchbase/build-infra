@@ -41,79 +41,83 @@ x-default-jenkins-slave-environment:
 # created with a container name "sdk_jenkins", which is not a valid DNS entry.
 # "dig" will actually resolve it OK inside another container, but Java will
 # not, so we can't reference eg. "http://sdk_jenkins:8080/" as you would expect.
- - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://sdk-swarm.build.couchbase.com:8080/"
+# To support CBD-3558 and any other cases where we need to build sdk-specific
+# cbdeps packages, JENKINS_MASTER may be set in the local environment when
+# running this stack. If it is, its value will override the value here. This
+# means you can attach these agents temporarily to a different Jenkins master.
+ - &default-jenkins-slave-environment-master "JENKINS_MASTER=${JENKINS_MASTER:-http://sdk-swarm.build.couchbase.com:8080/}"
  - &default-jenkins-slave-lang "LANG=en_US.UTF-8"
 
 services:
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20200503
+    image: couchbasebuild/sdk-amzn2-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
-      - "JENKINS_SLAVE_LABELS=amzn2"
+      - "JENKINS_SLAVE_LABELS=sdk amzn2"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   centos6:
-    image: couchbasebuild/sdk-centos6-build:20200503
+    image: couchbasebuild/sdk-centos6-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-centos6"
-      - "JENKINS_SLAVE_LABELS=centos6"
+      - "JENKINS_SLAVE_LABELS=sdk centos6"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20200503
+    image: couchbasebuild/sdk-centos7-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
-      - "JENKINS_SLAVE_LABELS=centos7"
+      - "JENKINS_SLAVE_LABELS=sdk centos7"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   centos8:
-    image: couchbasebuild/sdk-centos8-build:20200503
+    image: couchbasebuild/sdk-centos8-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-centos8"
-      - "JENKINS_SLAVE_LABELS=centos8"
+      - "JENKINS_SLAVE_LABELS=sdk centos8"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   debian8:
-    image: couchbasebuild/sdk-debian8-build:20200503
+    image: couchbasebuild/sdk-debian8-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-debian8"
-      - "JENKINS_SLAVE_LABELS=debian8"
+      - "JENKINS_SLAVE_LABELS=sdk debian8"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/sdk-debian9-build:20200503
+    image: couchbasebuild/sdk-debian9-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-debian9"
-      - "JENKINS_SLAVE_LABELS=debian9"
+      - "JENKINS_SLAVE_LABELS=sdk debian9"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20200503
+    image: couchbasebuild/sdk-ubuntu14-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu14"
-      - "JENKINS_SLAVE_LABELS=ubuntu14 ubuntu14.04"
+      - "JENKINS_SLAVE_LABELS=sdk ubuntu14 ubuntu14.04"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu16-build:20200503
+    image: couchbasebuild/sdk-ubuntu16-build:20200813
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu16"
-      - "JENKINS_SLAVE_LABELS=ubuntu16 ubuntu16.04"
+      - "JENKINS_SLAVE_LABELS=sdk ubuntu16 ubuntu16.04"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave
@@ -122,7 +126,7 @@ services:
     image: couchbasebuild/sdk-ubuntu20-build:20200820
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=ubuntu20 ubuntu20.04"
+      - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
     <<: *default-jenkins-slave

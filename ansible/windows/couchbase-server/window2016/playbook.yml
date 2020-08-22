@@ -55,6 +55,7 @@
         - insted
         - pandoc
         - vscode
+        - activeperl
 
     - name: Install JDK for Jenkins
       win_chocolatey:
