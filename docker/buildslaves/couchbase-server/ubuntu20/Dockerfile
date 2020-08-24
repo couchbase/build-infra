@@ -106,8 +106,12 @@ COPY build/swarm*.properties /
 
 # GCC (from couchbasebuild/ubuntu-2004-gcc)
 COPY build/local /usr/local
-RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+RUN  (cat /etc/ld.so.conf ; echo "/usr/local/lib64") > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
+
+RUN set -x \
+        && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
+        && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22

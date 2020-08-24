@@ -1,10 +1,10 @@
 # Docker container for SUSE 15, based on openSUSE LEAP
 
-FROM opensuse/leap:15.0
+FROM opensuse/leap:15.2
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
-RUN perl -pi -e 's#download.opensuse.org#suse.mirrors.tds.net/pub/opensuse#g' /etc/zypp/repos.d/*
+
 RUN zypper -n install vim sudo curl && zypper clean
 
 # Create couchbase user with password-less sudo privs, and give
@@ -78,8 +78,12 @@ ENV LANG=en_US.UTF-8
 
 # GCC (from couchbasebuild/suse-15-gcc)
 COPY build/local /usr/local
-RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+RUN  (cat /etc/ld.so.conf ; echo "/usr/local/lib64") > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
+
+RUN set -x \
+        && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
+        && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /

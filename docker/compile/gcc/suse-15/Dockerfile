@@ -1,6 +1,6 @@
 # Docker container just to build GCC, because it's slow.
 
-FROM opensuse/leap:15.0
+FROM opensuse/leap:15.2
 LABEL maintainer=build-team@couchbase.com
 
 USER root
