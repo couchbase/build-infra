@@ -85,7 +85,7 @@
 
   - name: "Download patch_via_gerrit"
     win_get_url:
-      url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/8/windows_msvc2015/patch_via_gerrit.exe
+      url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/10/windows_msvc2017/patch_via_gerrit.exe
       dest: 'C:\bin\patch_via_gerrit.exe'
 
   - name: "Download clamAV"
