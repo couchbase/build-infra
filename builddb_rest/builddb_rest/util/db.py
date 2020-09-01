@@ -190,6 +190,7 @@ class BuildInfo:
         q_str = (f"product='{product}' and release='{release}' "
                  f"and version='{version}' "
                  f"and {self.check_missing('metadata.unit_test')}!='n/a' "
+                 f"and {self.check_missing('metadata.builds_complete')}='complete' "
                  f"and {self.check_missing('metadata.sanity')}='pass'")
 
         results = self.query_documents(
