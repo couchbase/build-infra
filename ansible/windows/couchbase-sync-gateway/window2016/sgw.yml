@@ -3,6 +3,10 @@
   - name: "Disable Windows antivirus during setup"
     win_shell: Add-MpPreference -ExclusionPath "C:"
 
+  - name: Copy patch_via_gerrit
+    include_role:
+      name: ../../../common/roles/patch_via_gerrit
+
   # Needed for WiX Toolset
   - name: "Enable .NET Framework 3.5"
     win_feature:
@@ -82,11 +86,6 @@
       - msys-intl-8.dll
     tags:
       - repo
-
-  - name: "Download patch_via_gerrit"
-    win_get_url:
-      url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/10/windows_msvc2017/patch_via_gerrit.exe
-      dest: 'C:\bin\patch_via_gerrit.exe'
 
   - name: "Download clamAV"
     win_get_url:

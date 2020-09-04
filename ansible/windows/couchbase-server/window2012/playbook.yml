@@ -23,6 +23,9 @@
         filename: Windows8.1-KB2999226-x64.msu
 
   tasks:
+    - name: Copy patch_via_gerrit
+      include_role:
+        name: ../../../common/roles/patch_via_gerrit
 
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
@@ -109,11 +112,6 @@
         src: "repo.exe"
         dest: "C:\\bin\\repo.exe"
 
-    - name: "Download patch_via_gerrit"
-      win_get_url:
-        url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/1.0.0/10/windows_msvc2017/patch_via_gerrit.exe
-        dest: C:\bin\patch_via_gerrit.exe
-
     - name: Add tools to PATH.
       include: extend-path.yml
       with_items:
@@ -122,7 +120,6 @@
         - C:\Program Files\git\cmd
         - C:\Program Files\NASM
         - C:\Program Files (x86)\WiX Toolset v3.11\bin
-
 
 # Next steps are all about installing Visual Studio
 

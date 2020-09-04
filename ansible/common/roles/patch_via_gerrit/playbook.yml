@@ -1,0 +1,5 @@
+---
+- hosts: all
+
+  roles:
+    - { role: '../patch_via_gerrit' }

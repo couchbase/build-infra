@@ -1,0 +1,21 @@
+---
+- name: "Download patch_via_gerrit (Windows)"
+  win_get_url:
+    url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/windows_msvc2017/patch_via_gerrit.exe
+    dest: 'C:\bin\patch_via_gerrit.exe'
+  when: ansible_os_family == "Windows"
+
+- name: "Download patch_via_gerrit (Linux)"
+  get_url:
+    url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/centos6/patch_via_gerrit
+    dest: /usr/local/bin/patch_via_gerrit
+  become: true
+  when: ansible_os_family == "Debian" or ansible_os_family == "CentOS" or ansible_os_family == "RedHat"
+
+- name: "Download patch_via_gerrit (Mac)"
+  get_url:
+    url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/macos/patch_via_gerrit
+    dest: /usr/local/bin/patch_via_gerrit
+  become: true
+  when: ansible_os_family == "Darwin"
+
