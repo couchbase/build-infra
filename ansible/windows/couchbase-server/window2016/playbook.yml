@@ -187,8 +187,9 @@
     - name: Restore basic Windows antivirus
       win_shell: Remove-MpPreference -ExclusionPath "C:"
 
-    - name: Exclude Jenkins from windows antivirus
+    - name: Exclude Jenkins from Windows antivirus
       win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+      win_shell: Add-MpPreference -ExclusionExtension “exe”
 
     - name: install vs2017
       include_role:

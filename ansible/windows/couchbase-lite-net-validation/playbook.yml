@@ -102,6 +102,12 @@
         direction: in
         protocol: TCP
 
+# Modify windows defender to exlude Jenkins and cbdep
+
+    - name: Exclude Jenkins and cbdep from Windows antivirus
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+      win_shell: Add-MpPreference -ExclusionExtension “exe”
+
   # Should be done last as it requires choco kbxxx pkg to install first
   roles:
     - vs2017_mobile

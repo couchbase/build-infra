@@ -133,5 +133,6 @@
     - name: Restore basic Windows antivirus
       win_shell: "Remove-MpPreference -ExclusionPath C:\\"
 
-    - name: Disable Windows antivirus for Jenkins
-      win_shell: "Add-MpPreference -ExclusionPath C:\\Jenkins"
+    - name: Exclude Jenkins and cbdep from Windows antivirus
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+      win_shell: Add-MpPreference -ExclusionExtension “exe”

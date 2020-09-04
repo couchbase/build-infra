@@ -135,6 +135,7 @@
 
     - name: Exclude Jenkins from windows antivirus
       win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
+      win_shell: Add-MpPreference -ExclusionExtension “exe”
 
     #base vs2017 install role from ../../roles/vs2017_mobile/
     - name: install vs2017_mobile
