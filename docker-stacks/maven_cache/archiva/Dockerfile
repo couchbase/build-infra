@@ -1,6 +1,6 @@
 FROM openjdk:8-slim
 
-ENV ARCHIVA_VERSION=2.2.4
+ENV ARCHIVA_VERSION=2.2.5
 ENV ARCHIVA_BASE=/var/archiva
 
 WORKDIR /tmp
@@ -17,8 +17,12 @@ RUN apt update \
 RUN mv apache-archiva-${ARCHIVA_VERSION} /app \
     && chown -R archiva:archiva /app
 
+COPY archiva.xml /app/conf/
+
 COPY entrypoint.sh /
 RUN chown archiva:archiva /entrypoint.sh \
     && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+EXPOSE 8080

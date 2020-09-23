@@ -4,6 +4,9 @@ version: "3.7"
 #   docker -H mega4.build.couchbase.com stack deploy -c cache.yml maven
 # All services, networks, etc. will then get an "maven_" prefix,
 # eg. "maven_cache"
+#
+# Note: Post-deployment, log in as admin and add Repository Observer
+# permissions to the guest account for the internal and snapshot repos
 
 secrets:
   archiva_password:
@@ -13,7 +16,7 @@ services:
   cache:
     deploy:
       replicas: 1
-    image: build-docker.couchbase.com/couchbase/archiva:20200311
+    image: build-docker.couchbase.com/couchbase/archiva:20200923
     environment:
       admin_email: build-team@couchbase.com
     ports:

@@ -21,6 +21,10 @@ if [ "$admin_email" = "" ]; then failures="${failures}    admin_email not specif
 mkdir -p ${ARCHIVA_BASE}/{logs,data,temp,conf}
 rsync --recursive --ignore-existing /app/conf/* ${ARCHIVA_BASE}/conf
 
+# As we used --ignore-exiting for the rsync, we need to explicitly copy the primary config
+# file at startup to ensure the copy in the mountpoint is current
+cp /app/conf/archiva.xml "${ARCHIVA_BASE}/conf"
+
 # We also need to make sure the user running the app owns this content
 chown -R archiva:archiva ${ARCHIVA_BASE}
 
@@ -40,28 +44,32 @@ then
 fi
 
 # If we got here without logging any failures, we know the service is alive
-# and we have all the information required to create the admin user
+# and we have all the information required to create the admin user if required
+#
+# Note: This step will only create the user on first boot. If the admin user
+# already exists, the API will give a 200 response with "false" in the body.
 if [ "$failures" == "" ]
 then
-    echo "INFO: archiva online, creating admin user"
+    echo "INFO: archiva online, creating initial admin user if not present"
     curl \
         http://localhost:8080/restServices/redbackServices/userService/createAdminUser \
         --header "Referer: http://localhost:8080" \
         --header "Content-Type: application/json; charset=utf-8" \
         --fail \
-        --data-binary @- <<EOF &>/dev/null || failures="$failures    unable to create admin user"
-{
-    "username":"admin",
-    "password":"${admin_password}",
-    "confirmPassword":"${admin_password}",
-    "fullName":"Administrator",
-    "email":"${admin_email}",
-    "validated":true,
-    "assignedRoles":[],
-    "modified":true,
-    "rememberme":false,
-    "logged":false
-}
+        --data-binary @- <<-EOF &>/dev/null || failures="$failures    unable to create admin user"
+        {
+            "username":"admin",
+            "password":"${admin_password}",
+            "confirmPassword":"${admin_password}",
+            "permanent":true,
+            "fullName":"Administrator",
+            "email":"${admin_email}",
+            "validated":true,
+            "assignedRoles":[],
+            "modified":true,
+            "rememberme":false,
+            "logged":false
+        }
 EOF
 fi
 
