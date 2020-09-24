@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LATESTBUILDS=${1-/home/couchbase/latestbuilds}
+LATESTBUILDS=${1-/latestbuilds}
 
 remove_glob() {
   glob=$1
@@ -14,7 +14,7 @@ echo Clean up Couchbase Server toy builds
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-server/toybuilds
 
-remove_glob "*.*" 15
+remove_glob "*.*" 30
 echo "Removing empty toy build directories - ignore errors"
 rmdir * || true
 
@@ -23,109 +23,99 @@ echo Clean up Couchbase Server
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-server
 
-# All Windows ".bits" files older than 1 day (only needed for intra-build
-# communication)
-remove_glob "*windows_amd64-bits.tar" 1
-
-# All MacOS .orig files from codesigning
+# All MacOS .orig/-unsigned files from codesigning
 remove_glob "*macos*.orig" 2
+remove_glob "*macos*-unsigned.zip" 2
 
-# All debug packages older than 15 days
-remove_glob "*debug*" 15
-remove_glob "*dbg*" 15
-remove_glob "*-PDB.zip" 15
+# All debug packages older than 60 days
+remove_glob "*debug*" 60
+remove_glob "*dbg*" 60
+remove_glob "*-PDB.zip" 60
 
-# All Ubuntu 12/14, Debian 8, Centos 6, Suse, Mac, "oel", and Windows builds
-# older than 15/30 days
-remove_glob "*amzn2*.rpm" 15
-remove_glob "*macos*.zip*" 15
-remove_glob "*macos*.dmg*" 15
-remove_glob "*windows*exe*" 15
-remove_glob "*windows*msi*" 30
-remove_glob "*ubuntu*.deb*" 15
-remove_glob "*debian7*.deb*" 30
-remove_glob "*debian8*.deb*" 15
-remove_glob "*debian9*.deb*" 15
-remove_glob "*debian10*.deb*" 15
-remove_glob "*centos6*.rpm*" 15
-remove_glob "*centos8*.rpm*" 15
-remove_glob "*suse*.rpm*" 15
-remove_glob "*rhel8*.rpm*" 15
-remove_glob "*oel*.rpm*" 15
-
-echo @@@@@@@@@
-echo Clean up cbq
-echo @@@@@@@@@
-cd ${LATESTBUILDS}/cbq
-remove_glob cbq-linux 15
-remove_glob cbq-macos 15
-remove_glob cbq-windows.exe 15
+# All non-centos7 builds older than 90 days
+remove_glob "*amzn2*.rpm" 90
+remove_glob "*macos*.zip*" 90
+remove_glob "*macos*.dmg*" 90
+remove_glob "*windows*exe*" 90
+remove_glob "*windows*msi*" 90
+remove_glob "*ubuntu*.deb*" 90
+remove_glob "*debian*.deb*" 90
+remove_glob "*centos6*.rpm*" 90
+remove_glob "*centos8*.rpm*" 90
+remove_glob "*suse*.rpm*" 90
+remove_glob "*rhel8*.rpm*" 90
+remove_glob "*oel*.rpm*" 90
 
 echo @@@@@@@@@
 echo Clean up couchbase-sync-gateway
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/sync_gateway
 
-# All tar.gz packages older than 30/60 days
-remove_glob "couchbase-sg-accel*.tar.gz*" 60
-remove_glob "couchbase-sync-gateway*.tar.gz*" 60
+# All tar.gz packages older than 90 days
+remove_glob "couchbase-sync-gateway*.tar.gz*" 90
 
-# older than 30/60 days
-remove_glob "*.zip*" 60
-remove_glob "*.rpm*" 60
-remove_glob "*.exe*" 60
-remove_glob "*.msi*" 60
-remove_glob "*.deb*" 60
+# older than 90 days
+remove_glob "*.zip*" 90
+remove_glob "*.rpm*" 90
+remove_glob "*.msi*" 90
+remove_glob "*.deb*" 90
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-android
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-lite-android
 
-# older than 30/60 days
-remove_glob "*.jar*" 60
-remove_glob "*.aar*" 60
-remove_glob "*.apk*" 60
-remove_glob "*.zip*" 60
+# older than 90 days
+remove_glob "*.jar*" 90
+remove_glob "*.aar*" 90
+remove_glob "*.apk*" 90
+remove_glob "*.zip*" 90
+
+echo @@@@@@@@@
+echo Clean up couchbase-lite-java
+echo @@@@@@@@@
+cd ${LATESTBUILDS}/couchbase-lite-java
+remove_glob "*.jar*" 90
+remove_glob "*.war*" 90
+remove_glob "*.zip*" 90
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-ios
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-lite-ios
 
-# older than 30/60 days
-remove_glob "*.zip*" 60
+# older than 90 days
+remove_glob "*.zip*" 90
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-net
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-lite-net
 
-# older than 30/60 days
-remove_glob "*.nupkg*" 60
-remove_glob "*.zip*"   60
-remove_glob "*.apk*"   60
+# older than 90 days
+remove_glob "*.nupkg*" 90
+remove_glob "*.zip*"   90
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-log
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-lite-log
 
-# older than 30/60 days
-remove_glob "*.zip*" 60
-remove_glob "*.rpm*" 60
-remove_glob "*.deb*" 60
+# older than 90 days
+remove_glob "*.zip*" 90
+remove_glob "*.rpm*" 90
+remove_glob "*.deb*" 90
 
 echo @@@@@@@@@
 echo Clean up couchbase-lite-cblite
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-lite-cblite
 
-# older than 30/60 days
-remove_glob "*.zip*" 60
+# older than 90 days
+remove_glob "*.zip*" 90
 
 echo @@@@@@@@@
-echo Clean up ALL products
+echo Clean up ALL products source tarballs
 echo @@@@@@@@@
 cd ${LATESTBUILDS}
 
