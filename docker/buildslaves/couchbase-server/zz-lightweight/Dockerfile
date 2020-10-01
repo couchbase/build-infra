@@ -12,6 +12,12 @@ RUN add-apt-repository ppa:git-core/ppa -y && \
     apt-get update && \
     apt-get install -y git
 
+#install rvm so that we can use it to upgrade ruby when necessary
+RUN groupadd rvm && \
+    sudo apt-add-repository -y ppa:rael-gc/rvm && \
+    sudo apt-get update && \
+    sudo apt-get install -y rvm
+
 COPY build/cb-buildbot-config.sh /usr/sbin/couchhook.d/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 
