@@ -22,10 +22,13 @@ RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
-RUN yum install --setopt=keepcache=0 -y epel-release && \
+# * CentOS SCLs for devtoolset-8 (devtoolset-9-gcc-c++),
+#   more info at https://www.softwarecollections.org/en/scls/rhscl/devtoolset-8/
+RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
     yum install --setopt=keepcache=0 -y \
                 bzip2-devel \
                 cmake \
+                cmake3 \
                 ed \
                 git \
                 glibc.i686 \
@@ -52,10 +55,11 @@ RUN yum install --setopt=keepcache=0 -y epel-release && \
                 tar \
                 unzip \
                 wget \
-                which
+                which \
+                devtoolset-9-gcc-c++
 
 # Dev basic tools
-RUN yum groupinstall -y "Development Tools"
+RUN yum groupinstall -y --setopt=keepcache=0 "Development Tools"
 
 # JDK for Jenkins
 RUN yum install -y --setopt=keepcache=0 java-1.8.0-openjdk && yum clean packages
@@ -97,13 +101,13 @@ RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
     curl -L -o couchbase-release.rpm http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-x86_64.rpm && \
     rpm -iv couchbase-release.rpm && \
-    yum install -y libcouchbase-devel libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
+    yum install -y --setopt=keepcache=0 libcouchbase-devel libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
     cd /tmp && \
     rm -rf /tmp/deploy
 
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
-RUN curl http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
