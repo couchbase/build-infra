@@ -69,7 +69,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20200930
+    image: couchbasebuild/sdk-centos7-build:20201007
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"

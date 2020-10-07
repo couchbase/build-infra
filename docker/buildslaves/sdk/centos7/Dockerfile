@@ -56,6 +56,9 @@ RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
                 unzip \
                 wget \
                 which \
+                llvm-toolset-7.0 \
+                llvm-toolset-7.0-clang-analyzer \
+                llvm-toolset-7.0-clang-tools-extra \
                 devtoolset-9-gcc-c++
 
 # Dev basic tools
