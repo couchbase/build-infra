@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+
+TAG=$(date "+%Y%m%d")
+IMAGE="couchbasebuild/code-pattern-matcher"
+
+docker build -t ${IMAGE}:${TAG} .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+
+if [ "$1" = "--publish" ]; then
+  docker push ${IMAGE}:${TAG}
+  docker push ${IMAGE}:latest
+fi

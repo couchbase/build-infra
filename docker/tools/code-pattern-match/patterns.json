@@ -1,0 +1,32 @@
+[
+    {
+        "name": "AWS Access Key ID",
+        "pattern": "(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}",
+        "description": "AWS Access Key ID",
+        "remediation": "Remove from source and cycle account credentials on AWS"
+    },
+    {
+        "name": "AWS Secret",
+        "pattern": "(\"|')?(AWS|aws|Aws)_?(SECRET|secret|Secret)_?(ACCESS|access|Access)_?(KEY|key|Key)(\"|')?\\s*(:|=>|=)\\s*(\"|')?[A-Za-z0-9/\\+=]{40}(\"|')?",
+        "description": "AWS Secret",
+        "remediation": "Remove from source and cycle account credentials on AWS"
+    },
+    {
+        "name": "AWS IAM account ID",
+        "pattern": "(\"|')?(AWS|aws|Aws)_?(ACCOUNT|account|Account)_?(ID|id|Id)(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?",
+        "description": "AWS IAM account ID",
+        "remediation": "Remove from source and cycle account credentials on AWS"
+    },
+    {
+        "name": "tasklist /v",
+        "pattern": ".*\\(([^\\)}]|\\n)*[.*[\\\" '\\`\\(]+tasklist[\\\" '\\`\\)]+([^\\)}]|\\n)*/v.*\\)",
+        "description": "Tasklist /V leaks process usernames and window titles",
+        "remediation": "Remove `/v`"
+    },
+    {
+        "name": "ps -o command",
+        "pattern": ".*\\(([^\\)}]|\\n)*[.*[\\\" '\\`\\(]+ps[\\\" '\\`]+([^\\)}]|\\n)*command([^\\)}]|\\n)*\\)",
+        "description": "ps -o command leaks process arguments",
+        "remediation": "Remove `command`, or exclude arguments by changing `command` to `comm`"
+    }
+]
