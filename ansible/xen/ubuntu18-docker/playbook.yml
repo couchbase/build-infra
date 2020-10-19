@@ -127,7 +127,6 @@
         autoremove: yes
         purge: yes
 
-
     - name: Get distro codename
       shell: lsb_release -sc
       register: distro_codename
@@ -182,6 +181,18 @@
         name: couchbase
         group: docker
         append: yes
+
+    - name: Create /home/couchbase/.docker directory
+      file:
+        path: /home/couchbase/.docker
+        state: directory
+        mode: 0700
+
+    - name: Add .docker/config.json for couchbase user
+      copy:
+        src: docker-config.json
+        dest: /home/couchbase/.docker/config.json
+        mode: 0600
 
     - name: Create docker systemd drop-in directory
       file:

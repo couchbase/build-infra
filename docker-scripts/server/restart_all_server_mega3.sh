@@ -29,7 +29,7 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py \
         /home/couchbase/check_builds:/home/couchbase/check_builds \
         /home/couchbase/repo_upload:/home/couchbase/repo_upload \
     --mount-docker \
-    couchbasebuild/docker-slave:20200211 \
+    couchbasebuild/docker-slave:20201019 \
     docker-slave-server \
     2995 server.jenkins.couchbase.com
 

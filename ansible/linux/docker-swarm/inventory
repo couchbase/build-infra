@@ -11,7 +11,7 @@
 172.23.121.100 name=mega4-10.build.couchbase.com
 172.23.121.99  name=mega4-11.build.couchbase.com
 172.23.121.104 name=mega4-12.build.couchbase.com
-172.23.121.105 name=mega4-13.build.couchbase.com
+172.23.120.91  name=mega4-13.build.couchbase.com
 172.23.121.106 name=mega4-14.build.couchbase.com
 172.23.121.109 name=mega4-15.build.couchbase.com
 172.23.121.110 name=mega4-16.build.couchbase.com
@@ -33,9 +33,10 @@
 172.23.113.40  name=mega4-32.build.couchbase.com
 
 [sdk]
-172.23.96.47   name=sdk-swarm-01.build.couchbase.com
-172.23.96.46   name=sdk-swarm-02.build.couchbase.com
-172.23.96.44   name=sdk-swarm-03.build.couchbase.com
+172.23.97.81   name=sdk-swarm-01.build.couchbase.com
+172.23.97.95   name=sdk-swarm-02.build.couchbase.com
+172.23.97.97   name=sdk-swarm-03.build.couchbase.com
+172.23.96.70   name=sdk-swarm-04.build.couchbase.com
 
 [builddb]
 172.23.96.69   name=build-db-01.build.couchbase.com

@@ -5,6 +5,12 @@ This Ansible playbook will deploy a fresh Ubuntu 18.04 VM configured with:
  - ssh, python, etc.
  - network configured via DHCP
 
+IMPORTANT: The playbook assumes a file named "docker-config.json" exists
+locally, and will copy it to ~/.docker/config.json on the newly-created
+Ubuntu 18.04 host. This should contain credentials for a Docker Hub user
+such as "nsbuildbot" that is in a paid organization on Docker Hub, to
+avoid rate limiting when pulling images. See CBD-3656.
+
 Note: It is assumed that the target Xen Server has an ISO Library configured
 which contains "ubuntu-18.04-fully-automated.iso". Instructions on creating
 that ISO are in the fully_automated_iso subdirectory. You can configure this
@@ -44,4 +50,3 @@ created at once.
 
 Don't try getting around this by using -l on the ansible-playbook
 command line. That will filter out the new hosts entirely.
-
