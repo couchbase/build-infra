@@ -23,7 +23,7 @@ for (let i = 0; i < patterns?.length; i++) {
     const outstr = `Checking pattern: ${patterns[i].name}`
     console.log(`${outstr}\n${'-'.repeat(outstr.length)}`)
     const p = Deno.run({
-        cmd: ['ag', patterns[i].pattern]
+        cmd: ['ag', '--parallel', patterns[i].pattern]
     })
     const { code } = await p.status()
     p.close()
