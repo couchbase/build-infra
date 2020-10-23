@@ -1,11 +1,21 @@
 # Docker container for Ubuntu 18.04
 
-FROM couchbasebuild/server-ubuntu18-clang9-build:20201021
+FROM couchbasebuild/server-ubuntu18-clang9-build:20201022
 LABEL maintainer="build-team@couchbase.com"
+
+# ENV vars for profile data retrieval
+ENV NODE_CLASS=cv
+ENV NODE_PRODUCT=couchbase-server
 
 USER root
 
 WORKDIR /tmp
+
+# Needed to ensure LANG is set correctly when ssh'ing into agent
+COPY ssh_environment /home/couchbase/.ssh/environment
+RUN set -x \
+        && sed -ri 's/#PermitUserEnvironment no/PermitUserEnvironment yes/g' /etc/ssh/sshd_config \
+        && chown -R couchbase:couchbase /home/couchbase/.ssh
 
 # Valgrind needed for leak checking as part of unit tests. Note: It requires
 # libc debug symbols (libc6-dbg) to ensure it can locate the address of strlen().
@@ -59,6 +69,12 @@ RUN set -x \
         && apt install -y ninja-build \
         && apt clean
 
+# Install chrpath - used to fix libtsan.so's dynamic linker
+RUN set -x \
+        && apt update \
+        && apt install -y chrpath \
+        && apt clean
+
 # Install Jython
 ENV JYTHON_VERSION=2.7.2
 RUN set -x \
@@ -68,6 +84,12 @@ RUN set -x \
         && ln -s /opt/jython/bin/jython /usr/local/bin/ \
         && rm -rf /tmp/*
 
+# Install venv
+RUN set -x \
+        && apt update \
+        && apt install -y python3-venv \
+        && apt clean
+
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
@@ -75,4 +97,5 @@ RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
-RUN mkdir ~couchbase/.ssh && echo "CONTAINER_TAG=${CONTAINER_TAG}" >> /home/couchbase/.ssh/environment
+
+RUN echo "CONTAINER_TAG=${CONTAINER_TAG}" >> /home/couchbase/.ssh/environment

@@ -122,7 +122,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_linux_ssh_config
+      - source: couchbase_server_linux_ssh_cv_config
         target: /home/couchbase/couchbase-server/cv/linux/.ssh/config
         mode: 0644
         uid: "901"
@@ -385,6 +385,8 @@ configs:
   # linux
   couchbase_server_linux_ssh_config:
     file: config/couchbase-server/linux/.ssh/config
+  couchbase_server_linux_ssh_cv_config:
+    file: config/couchbase-server/linux/.ssh/cv_config
   # macos
   couchbase_server_macos_ssh_build_config:
     file: config/couchbase-server/macos/.ssh/build_config

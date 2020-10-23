@@ -198,7 +198,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu18-clang9:
-    image: couchbasebuild/server-ubuntu18-clang9-build:20201021
+    image: couchbasebuild/server-ubuntu18-clang9-build:20201022
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu18 ubuntu18.04"
@@ -210,7 +210,7 @@ services:
       replicas: 1
 
   ubuntu20-clang9:
-    image: couchbasebuild/server-ubuntu20-clang9-build:20201021
+    image: couchbasebuild/server-ubuntu20-clang9-build:20201022
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu20 ubuntu20.04"
