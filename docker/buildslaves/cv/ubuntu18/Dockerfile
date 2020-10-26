@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04
 
-FROM couchbasebuild/server-ubuntu18-clang9-build:20201022
+FROM couchbasebuild/server-ubuntu18-clang9-build:20201026
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval
@@ -83,12 +83,6 @@ RUN set -x \
         && su couchbase -c "java -jar jython-installer-${JYTHON_VERSION}.jar -s -t minimum -d /opt/jython" \
         && ln -s /opt/jython/bin/jython /usr/local/bin/ \
         && rm -rf /tmp/*
-
-# Install venv
-RUN set -x \
-        && apt update \
-        && apt install -y python3-venv \
-        && apt clean
 
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
