@@ -84,6 +84,12 @@ RUN set -x \
         && ln -s /opt/jython/bin/jython /usr/local/bin/ \
         && rm -rf /tmp/*
 
+# Install aspell
+RUN set -x \
+        && apt update \
+        && apt install -y aspell \
+        && apt clean
+
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
