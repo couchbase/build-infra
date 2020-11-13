@@ -187,11 +187,21 @@ services:
       - *node-product
     <<: *default-jenkins-slave
 
+  ubuntu18-mad-hatter:
+    image: couchbasebuild/server-ubuntu18-build:20200424
+    environment:
+      - "JENKINS_SLAVE_NAME=server-ubuntu18-mad-hatter"
+      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18 alice alice-ubuntu18.04 mad-hatter mad-hatter-ubuntu18.04"
+      - *default-jenkins-slave-environment-master
+      - *node-class
+      - *node-product
+    <<: *default-jenkins-slave
+
   ubuntu18:
     image: couchbasebuild/server-ubuntu18-build:20201026
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
-      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 alice alice-ubuntu18.04 mad-hatter mad-hatter-ubuntu18.04 cheshire-cat cheshire-cat-ubuntu18.04 master master-ubuntu18.04"
+      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat cheshire-cat-ubuntu18.04 master master-ubuntu18.04"
       - *default-jenkins-slave-environment-master
       - *node-class
       - *node-product
