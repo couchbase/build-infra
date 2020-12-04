@@ -1,18 +1,31 @@
-[cv]
-#172.23.98.49   # ubuntu12-cv-10
-#172.23.98.159  # ubuntu16-cv-01
-#172.23.113.22  # ubuntu16-cv-large-01
+[cv:children]
+cvoldworkers
+cvsmallworkers
+cvlargeworkers
 
-#172.23.96.227  # ubuntu18-cv-11
-#172.23.96.230  # ubuntu18-cv-12
-#172.23.96.233  # ubuntu18-cv-13
-#172.23.96.235  # ubuntu18-cv-14
-#172.23.96.234  # ubuntu18-cv-15
-#172.23.112.254 # ubuntu18-cv-16
-#172.23.97.139  # ubuntu-cv-large-02
-#172.23.96.221  # ubuntu-cv-large-03
-#172.23.112.24  # ubuntu-cv-large-04
-#172.23.96.209  # ubuntu-cv-large-05
+[cvoldworkers]
+172.23.98.49   # ubuntu12-cv-10
+172.23.98.159  # ubuntu16-cv-01
+
+[cvsmallworkers]
+172.23.96.227  # ubuntu18-cv-11
+172.23.96.230  # ubuntu18-cv-12
+172.23.96.233  # ubuntu18-cv-13
+172.23.96.235  # ubuntu18-cv-14
+172.23.96.234  # ubuntu18-cv-15
+172.23.112.254 # ubuntu18-cv-16
+
+[cvlargeworkers]
+172.23.113.22  # ubuntu18-cv-large-01
+172.23.96.209  # ubuntu18-cv-large-05
+
+[cvlargeworkers:children]
+cvmanagers
+
+[cvmanagers]
+172.23.97.139  # ubuntu18-cv-large-02
+172.23.96.221  # ubuntu18-cv-large-03
+172.23.112.24  # ubuntu18-cv-large-04
 
 [all:vars]
 ansible_user=couchbase

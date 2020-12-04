@@ -1,15 +1,11 @@
-This directory contains Ansible configs for launching CV Linux slaves
-which are hosted on separate VMs.
+This directory contains an Ansible inventory for the current Linux CV
+VMs. These nodes were manually configured into a Docker Swarm. Each node
+was manually given the swarm node label "cvtype" with values:
 
-restart_cv_dockerslaves.yml - this is an Ansible playbook which does
-the necessary steps to restart a single slave on port 2222 of a VM.
-It expects the Ansible host to have /home/couchbase/jenkinsdocker-ssh
-available, and will synchronize it to the host.
+  ubuntu18-small
+  ubuntu18-large
+  ubuntu16-small
+  ubuntu12-small
 
-inventory - this is an Ansible inventory which specifies the current
-set of VMs for these CV slaves.
-
-host_vars - directory containing VM-specific configurations, such
-as the Docker image name(s) to run on the VM.
-
-The "go" script in this directory will run the playbook.
+These labels are used in a Docker stack file to deploy the CV agents on
+the corresponding nodes.

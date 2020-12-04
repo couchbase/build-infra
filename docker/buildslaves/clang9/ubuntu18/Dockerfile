@@ -1,4 +1,4 @@
-FROM couchbasebuild/server-ubuntu18-build:20201026
+FROM couchbasebuild/server-ubuntu18-build:20201202
 
 LABEL maintainer="build-team@couchbase.com"
 
@@ -27,4 +27,3 @@ RUN set -x \
 RUN set -x \
         && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 100 \
         && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 100
-        

@@ -1,3 +1,0 @@
----
-slave_name: ubuntu12-cv-10
-docker_image: couchbasebuild/server-ubuntu12-cv:20180921

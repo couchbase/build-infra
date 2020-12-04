@@ -56,8 +56,6 @@ then
   echo "# Populating profile data #"
   echo "###########################"
 
-  chmod 600 /run/secrets/profile_sync
-
   # Ensure the host where the profile data lives is in our known_hosts before synchronisation. We also
   # have to set permissions on directories here as we can only specify perms on files in the profile container
   start_cmd="mkdir -p ~/.ssh \
@@ -107,7 +105,7 @@ command -v gpg >/dev/null 2>&1 && {
 [[ "$1" == "swarm" ]] && {
     shift
 
-    exec sudo -u couchbase -H \
+    exec sudo -u couchbase --set-home --preserve-env \
        env -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
        PATH=/usr/local/bin:/usr/bin:/bin \
        java $JAVA_OPTS \

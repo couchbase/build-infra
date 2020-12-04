@@ -55,10 +55,6 @@ services:
       - *node-product
     <<: *default-jenkins-slave
 
-configs:
-  couchbase_ssh_config_20191031:
-    file: conf/couchbase_ssh_config
-
 secrets:
   jenkins_master_username:
     external: true

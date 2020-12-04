@@ -1,0 +1,153 @@
+version: '3.8'
+
+# Suggested deployment command:
+#  docker --host 172.23.97.139 stack deploy -c cv-jenkins-agents.yml cv
+# All services, networks, etc. will then get an "cv_" prefix,
+# eg. "cv_ubuntu18_large"
+
+# Default agent configuration. This is written using a YAML anchor so
+# it can be substituted into all the agent declarations later. See
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+x-default-jenkins-agent: &default-jenkins-agent
+  networks:
+    - jenkins
+  sysctls:
+    net.ipv6.conf.lo.disable_ipv6: 0
+
+  secrets:
+    - source: jenkins_master_username
+    - source: jenkins_master_password
+    - source: profiledata.ssh_privkey.profile_sync.20200423
+      target: /run/secrets/profile_sync
+    - source: dockerhub_nsbuildbot_password
+      target: /tmp/dockerhub_nsbuildbot_password
+
+services:
+
+  ubuntu18_small:
+    image: couchbasebuild/swarm-launcher:20201203
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/tmp:/mnt"
+
+    environment:
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20201202
+      LAUNCH_PULL: "true"
+      LAUNCH_EXT_NETWORKS: cv_jenkins
+      LAUNCH_PRIVILEGED: "true"
+      LAUNCH_ENVIRONMENTS: >-
+        JENKINS_SLAVE_NAME=CV
+        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.6.0@_@mad-hatter@_@master@_@ubuntu-18.04@_@small
+        JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
+        NODE_CLASS=cv
+        NODE_PRODUCT=couchbase-server
+        PARALLELISM=4
+      LAUNCH_SYSCTLS: "net.ipv6.conf.lo.disable_ipv6=0"
+      LAUNCH_HOSTNAME_FROM_HOST: "true"
+
+      LOGIN_USER: "nsbuildbot"
+      LOGIN_PASSWORD_FILE: "/tmp/dockerhub_nsbuildbot_password"
+
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu18-small"
+        max_replicas_per_node: 1
+      replicas: 9
+      update_config:
+        parallelism: 100
+
+  ubuntu18_large:
+    image: couchbasebuild/swarm-launcher:20201203
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/tmp:/mnt"
+
+    environment:
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20201202
+      LAUNCH_PULL: "true"
+      LAUNCH_EXT_NETWORKS: cv_jenkins
+      LAUNCH_PRIVILEGED: "true"
+      LAUNCH_ENVIRONMENTS: >-
+        JENKINS_SLAVE_NAME=CV
+        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.6.0@_@mad-hatter@_@master@_@ubuntu-18.04@_@large
+        JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
+        NODE_CLASS=cv
+        NODE_PRODUCT=couchbase-server
+        PARALLELISM=16
+      LAUNCH_SYSCTLS: "net.ipv6.conf.lo.disable_ipv6=0"
+      LAUNCH_HOSTNAME_FROM_HOST: "true"
+
+      LOGIN_USER: "nsbuildbot"
+      LOGIN_PASSWORD_FILE: "/tmp/dockerhub_nsbuildbot_password"
+
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu18-large"
+        max_replicas_per_node: 1
+      replicas: 9
+      update_config:
+        parallelism: 1000
+
+# These older services still depend on /home/couchbase/jenkinsdocker-ssh
+# existing on the host VMs as they have not (yet?) been configured to use
+# the profiledata mechanism. They also depend on exposing ports
+# for sshd as they are not using Jenkins Swarm (and hence they depend on
+# manually-configured agents on Jenkins). Both will likely be
+# retired before being converted.
+
+  ubuntu16_small:
+    image: ceejatec/ubuntu-1604-couchbase-cv:20170530
+    volumes:
+      - type: bind
+        source: /home/couchbase/jenkinsdocker-ssh
+        target: /ssh
+    ports:
+      - "22216:22"
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu16-small"
+        max_replicas_per_node: 1
+      replicas: 1
+      update_config:
+        parallelism: 1000
+
+  ubuntu12_small:
+    image: couchbasebuild/server-ubuntu12-cv:20180921
+    ports:
+      - "22212:22"
+    volumes:
+      - type: bind
+        source: /home/couchbase/jenkinsdocker-ssh
+        target: /ssh
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu12-small"
+        max_replicas_per_node: 1
+      replicas: 1
+      update_config:
+        parallelism: 1000
+
+
+secrets:
+  jenkins_master_username:
+    external: true
+  jenkins_master_password:
+    external: true
+  profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
+  dockerhub_nsbuildbot_password:
+    external: true
+
+networks:
+  jenkins:
+    attachable: true
