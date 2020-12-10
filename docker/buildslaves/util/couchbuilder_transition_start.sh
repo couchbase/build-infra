@@ -50,6 +50,12 @@ add_hostkeys() {
 
 export -f add_hostkeys
 
+# Handle invocations by the ECS plugin
+[[ "$1" == "-url" ]] && {
+  mkdir -p /run/secrets
+  echo "${profiledata_key}" > /run/secrets/profile_sync
+}
+
 if [ -f /run/secrets/profile_sync -a ! -e "${NODE_CLASS}" -a ! -e "${NODE_PRODUCT}" ]
 then
   echo "###########################"
@@ -68,8 +74,12 @@ then
   # to populate the profile data correctly either way
   if [ "$(whoami)" = "couchbase" ]
   then
+    sudo chmod 600 /run/secrets/profile_sync
+    sudo chown couchbase:couchbase /run/secrets/profile_sync
     eval $start_cmd
   else
+    chmod 600 /run/secrets/profile_sync
+    chown couchbase:couchbase /run/secrets/profile_sync
     su couchbase -c "$start_cmd"
   fi
 fi
@@ -121,12 +131,26 @@ command -v gpg >/dev/null 2>&1 && {
        -retry 5 \
        -username "$(cat /run/secrets/jenkins_master_username)" \
        -password "$(cat /run/secrets/jenkins_master_password)"
+    exit
 }
 
 # if first argument is "default", for backwards-compatibility start sshd
 # (as new, long-running, foreground process)
 [[ "$1" == "default" ]] && {
     exec /usr/sbin/sshd -D
+    exit
+}
+
+# Handle invocations by the ECS plugin
+[[ "$1" == "-url" ]] && {
+  unset profiledata_key
+  URL="-url $2"
+  TUNNEL="-tunnel $4"
+  OPT_JENKINS_SECRET=$5
+  OPT_JENKINS_AGENT_NAME=$6
+  JAVA_BIN=java
+  exec sudo -u couchbase --set-home --preserve-env $JAVA_BIN $JAVA_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME
+  exit
 }
 
 # If argument is not 'swarm', assume user want to run their own process,

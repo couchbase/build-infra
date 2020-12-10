@@ -107,14 +107,9 @@ RUN set -x \
     && ccache --clear
 
 # Still need paramiko in python2 for testrunner (necessary at least for simple-test,
-# which runs in the build image rather than the full CV image)
-RUN pip install paramiko
-
+# which runs in the build image rather than the full CV image).
 # Python 2-specific stuff for build scripts, mostly old build-sanity stuff.
-RUN apt-get update && \
-    apt-get -y install python-pip && \
-    pip install jenkinsapi && \
-    apt-get clean
+RUN python2 -m pip install paramiko jenkinsapi
 
 #s3cmd for upload script
 ENV DEBIAN_FRONTEND=noninteractive
@@ -138,6 +133,17 @@ RUN set -x \
         && apt update \
         && apt install -y rsync \
         && apt clean
+
+ENV AGENT_VERSION=4.3
+
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+  && chmod 755 /usr/share/jenkins \
+  && chmod 644 /usr/share/jenkins/agent.jar \
+  && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
+
+ENV AGENT_WORKDIR=/home/couchbase/agent
+RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
+  && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
 
 # Set LANG
 ENV LANG=en_US.UTF-8

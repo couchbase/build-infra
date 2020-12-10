@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04
 
-FROM couchbasebuild/server-ubuntu18-clang9-build:20201202
+FROM couchbasebuild/server-ubuntu18-clang9-build:20201209
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval
@@ -28,7 +28,7 @@ RUN set -x \
 # Code coverage requires gcovr to convert from gcov to XML files consumable by Jenkins.
 # Also, if we eventually remove paramiko from the main buildslave image, we could add
 # it back here for CV.
-RUN pip install gcovr
+RUN python2 -m pip install gcovr
 
 # Install clang-tools for scan-build for older branches
 RUN set -x \

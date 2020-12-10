@@ -32,7 +32,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20201202
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20201209
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -67,7 +67,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20201202
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20201209
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
