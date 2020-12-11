@@ -9,7 +9,7 @@ services:
   proxy:
     deploy:
       replicas: 1
-    image: gomods/athens:v0.9.0
+    image: gomods/athens:v0.10.0
     init: true
     ports:
       - 3000:3000
