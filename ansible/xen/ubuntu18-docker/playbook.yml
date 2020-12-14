@@ -187,12 +187,14 @@
         path: /home/couchbase/.docker
         state: directory
         mode: 0700
+        owner: couchbase
 
     - name: Add .docker/config.json for couchbase user
       copy:
         src: docker-config.json
         dest: /home/couchbase/.docker/config.json
         mode: 0600
+        owner: couchbase
 
     - name: Create docker systemd drop-in directory
       file:

@@ -1,0 +1,59 @@
+version: '3.8'
+
+# Suggested deployment command:
+#  docker --host 172.23.104.54 stack deploy -c analytics-jenkins-agents.yml analytics
+# All services, networks, etc. will then get an "analytics_" prefix,
+# eg. "analytics_ubuntu18"
+
+# Default agent configuration. This is written using a YAML anchor so
+# it can be substituted into all the agent declarations later. See
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+x-default-jenkins-agent: &default-jenkins-agent
+  networks:
+    - jenkins
+  sysctls:
+    net.ipv6.conf.lo.disable_ipv6: 0
+
+  secrets:
+    - source: jenkins_master_username
+    - source: jenkins_master_password
+    - source: profiledata.ssh_privkey.profile_sync.20200423
+      target: /run/secrets/profile_sync
+
+services:
+
+  ubuntu18:
+    image: couchbasebuild/analytics-ubuntu18-cv:20201209
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - JENKINS_SLAVE_NAME=analytics
+      - "JENKINS_SLAVE_LABELS=analytics server couchsterix-test"
+      - JENKINS_MASTER=http://mega2.build.couchbase.com:8081/
+      - NODE_CLASS=cv
+      - NODE_PRODUCT=couchbase-server
+
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu18"
+        max_replicas_per_node: 1
+      replicas: 9
+      update_config:
+        parallelism: 100
+
+secrets:
+  jenkins_master_username:
+    external: true
+  jenkins_master_password:
+    external: true
+  profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
+
+networks:
+  jenkins:
+    attachable: true
