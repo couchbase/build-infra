@@ -1,0 +1,8 @@
+Terraform for proget on couchbase-prod AWS account
+1. This script automically pick aws credentials from ~/.aws/credentials.  If your credentials are stored differently, you will need to update variables.tf
+2. terraform state is stored as couchbase-terraform-states/proget/terraform.tfstate on S3
+
+To modify existing configurations or recreate the AWS infrastructure:
+terraform init
+terraform plan
+terraform apply
