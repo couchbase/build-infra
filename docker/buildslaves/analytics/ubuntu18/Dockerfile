@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04 analytics.jenkins agent
 
-FROM couchbasebuild/server-ubuntu18-build:20201209
+FROM couchbasebuild/server-ubuntu18-build:20201216
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval - analytics is basically CV
@@ -42,6 +42,9 @@ RUN set -x \
 
 # Add couchbase user to "docker" group on host (999)
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase
+
+# Add hook for setting jenkins/workspace permissions
+COPY workspace-hook.sh /usr/sbin/couchhook.d/
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG

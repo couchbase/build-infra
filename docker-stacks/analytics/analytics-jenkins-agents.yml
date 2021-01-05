@@ -23,10 +23,11 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   ubuntu18:
-    image: couchbasebuild/analytics-ubuntu18-cv:20201209
+    image: couchbasebuild/analytics-ubuntu18-cv:20210105
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/home/couchbase/jenkins:/home/couchbase/jenkins"
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     environment:
@@ -42,7 +43,7 @@ services:
         constraints:
           - "node.labels.cvtype==ubuntu18"
         max_replicas_per_node: 1
-      replicas: 9
+      replicas: 15
       update_config:
         parallelism: 100
 

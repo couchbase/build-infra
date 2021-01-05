@@ -8,9 +8,10 @@
 #172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
 #172.23.104.32 network_name=vlan112
 #172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
-172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
+#172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
 #172.23.97.234 sr_name=VMStore1
 #172.23.105.159 network_name="Pool-wide network associated with eth0"
+172.23.104.59 sr_name="Local storage01" network_name="Pool-wide network associated with eth1"
 
 [newvms]
 
