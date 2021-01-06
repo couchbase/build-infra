@@ -45,6 +45,11 @@ RUN groupadd -g 999 docker && usermod -a -G docker couchbase
 
 # Add hook for setting jenkins/workspace permissions
 COPY workspace-hook.sh /usr/sbin/couchhook.d/
+# Enable additional hook for ccache
+COPY ccache-hook.sh /usr/sbin/couchhook.d/
+
+# For mad-hatter compatibility, "python" still needs to be python2
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 200
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG
