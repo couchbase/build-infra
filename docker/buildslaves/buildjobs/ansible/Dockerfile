@@ -30,6 +30,17 @@ RUN mkdir /tmp/deploy && \
     rm -rf /tmp/deploy
 ENV JAVA_HOME=/usr/local/java
 
+ENV AGENT_VERSION=4.3
+
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+  && chmod 755 /usr/share/jenkins \
+  && chmod 644 /usr/share/jenkins/agent.jar \
+  && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
+
+ENV AGENT_WORKDIR=/home/couchbase/agent
+RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
+  && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 ADD .ssh /home/couchbase/.ssh

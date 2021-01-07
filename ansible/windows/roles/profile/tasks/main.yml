@@ -8,16 +8,22 @@
     msg: "Variable NODE_PRODUCT is required (e.g. couchbase-server)"
   when: "NODE_PRODUCT is not defined"
 
+- name: Ensure Administrator .ssh dir present
+  win_file:
+    path: C:\Users\Administrator\.ssh
+    state: directory
+
 - name: Populate deployment key
   win_copy:
     content: "{{ SSH_KEY }}\n"
     dest: C:\Users\Administrator\.ssh\profile_sync
   no_log: true
+  when: "'SSH_KEY' in ansible_env"
 
 - name: Copy startup script
   win_template:
     src: files/startup.ps1.j2
-    dest: C:\bin\startup.ps1
+    dest: "{{ targetvolume | default('c') }}:\\bin\\startup.ps1"
   register: start_script
 
 - name: Create profile sync scheduled task
@@ -29,7 +35,7 @@
     password: "{{ ansible_password }}"
     actions:
     - path: powershell.exe
-      arguments: -ExecutionPolicy ByPass c:\bin\startup.ps1
+      arguments: -ExecutionPolicy ByPass "{{ targetvolume | default('c') }}:\bin\startup.ps1"
     triggers:
     - type: boot
     username: Administrator

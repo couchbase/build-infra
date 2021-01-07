@@ -1,6 +1,6 @@
-FROM couchbasebuild/server-ubuntu18-build:latest
+FROM couchbasebuild/server-ubuntu18-build:20201216
 
-MAINTAINER build-team@couchbase.com
+LABEL maintainer=build-team@couchbase.com
 
 RUN apt-get update && \
     apt-get install -y clamav rpm2cpio cpio rsync && \

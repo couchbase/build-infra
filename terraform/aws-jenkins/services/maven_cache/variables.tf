@@ -1,0 +1,16 @@
+variable "prefix" {}
+variable "private_subnets_cidr_blocks" {}
+variable "vpc_id" {}
+variable "ecs_role" {}
+variable "image" {}
+variable "region" {}
+variable "cpu" {}
+variable "memory" {}
+variable "ecs_cluster" {}
+variable "dns_namespace" {}
+variable "hostname" {}
+variable "subdomain" {}
+variable "domain" {}
+variable "stopped" {}
+variable "context" {}
+variable "private_subnets" {}

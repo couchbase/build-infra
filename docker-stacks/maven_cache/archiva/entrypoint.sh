@@ -11,7 +11,7 @@ max_iterations=10
 failures=""
 
 # Admin password is stored in a swarm secret
-admin_password=$(cat /run/secrets/archiva_password)
+admin_password=$(echo -n ${admin_password:-$(cat /run/secrets/archiva_password)} | xargs)
 
 if [ "$admin_password" = "" ]; then failures="${failures}    admin_password not found\n"; fi
 if [ "$admin_email" = "" ]; then failures="${failures}    admin_email not specified\n"; fi

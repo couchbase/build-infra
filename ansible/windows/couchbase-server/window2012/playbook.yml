@@ -3,8 +3,6 @@
 
   vars:
     kbs:
-      - guid: 2/5/6/256CCCFB-5341-4A8D-A277-8A81B21A1E35
-        filename: clearcompressionflag.exe
       - guid: D/6/0/D60ED3E0-93A5-4505-8F6A-8D0A5DA16C8A
         filename: Windows8.1-KB2919442-x64.msu
       - guid: 2/5/6/256CCCFB-5341-4A8D-A277-8A81B21A1E35
@@ -115,11 +113,11 @@
     - name: Add tools to PATH.
       include: extend-path.yml
       with_items:
-        - C:\bin
-        - C:\Program Files\CMake\bin
-        - C:\Program Files\git\cmd
-        - C:\Program Files\NASM
-        - C:\Program Files (x86)\WiX Toolset v3.11\bin
+        - "C:\\bin"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\git\\cmd"
+        - "C:\\Program Files\\NASM"
+        - "C:\\Program Files (x86)\\WiX Toolset v3.11\\bin"
 
 # Next steps are all about installing Visual Studio
 
@@ -144,15 +142,20 @@
         reboot_timeout_sec: 3600
       when: '"reboot is necessary" in choco_output.stdout'
 
+    - name: Ensure merge modules directory is present
+      win_file:
+        path: "C:\\Program Files (x86)\\Common Files\\Merge Modules"
+        state: directory
+
     - name: Download older VS CRT Merge Modules
       win_get_url:
         url: "{{ item.url }}"
         dest: "C:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
         force: no
       with_items:
-        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC100_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC100_CRT_x64.msm
           filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC120_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC120_CRT_x64.msm
           filename: Microsoft_VC120_CRT_x64.msm
 
 # Do OpenSSH last so the service has the latest version of the path
@@ -177,6 +180,14 @@
         action: allow
         direction: in
         protocol: TCP
+
+    - name: Install aws cli
+      win_chocolatey:
+        name: awscli
+        state: latest
+      tags:
+      - never
+      - aws
 
     - name: Configure profile synchronization
       include_role:

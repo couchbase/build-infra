@@ -1,5 +1,5 @@
 $profile_port=4000
-$profile_host="mega4.build.couchbase.com"
+$profile_host="profiledata.build.couchbase.com"
 $host_keys = (ssh-keyscan -p ${profile_port} ${profile_host} 2>$null) | Out-String
 
 $known_hosts = Get-Content -Path C:\Users\Administrator\.ssh\known_hosts

@@ -102,18 +102,6 @@
         path: C:\Users\{{ ansible_user }}\.ssh
         state: directory
 
-    - name: Copy SSH config files
-      win_copy:
-        src: "./ssh/{{ item }}"
-        dest: C:\Users\{{ ansible_user }}\.ssh\{{ item }}
-      with_items:
-        - authorized_keys
-        - buildbot_id_dsa
-        - config
-        - environment
-        - id_rsa
-        - known_hosts
-
     - name: Enable Remote Desktop
       win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
@@ -134,8 +122,7 @@
         force: true
 
     - name: Exclude Jenkins from windows antivirus
-      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
-      win_shell: Add-MpPreference -ExclusionExtension “exe”
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins" -ExclusionExtension "exe"
 
     #base vs2017 install role from ../../roles/vs2017_mobile/
     - name: install vs2017_mobile

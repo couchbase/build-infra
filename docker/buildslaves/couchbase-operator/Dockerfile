@@ -3,7 +3,7 @@
 # We'll inherit from the Couchbase Server build slave just to
 # avoid re-inventing the wheel and for Docker image cache sharing
 
-FROM couchbasebuild/server-ubuntu16-build:20200211
+FROM couchbasebuild/server-ubuntu16-build:20201210
 MAINTAINER Couchbase Build Team <build-team@couchbase.com>
 
 # Docker

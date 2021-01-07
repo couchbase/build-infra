@@ -1,0 +1,87 @@
+{
+    "variables": {
+        "tags": ",{{env `tags`}}",
+        "suffix": "{{env `suffix`}}",
+        "disk": "{{env `disk`}}",
+        "vs_key": "{{env `vs_key`}}",
+        "aws_access_key": "",
+        "aws_secret_key": ""
+    },
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "access_key": "{{user `aws_access_key`}}",
+            "secret_key": "{{user `aws_secret_key`}}",
+            "region": "us-east-1",
+            "ami_name": "build/couchbase-server/windows/2016{{user `suffix`}}",
+            "user_data_file": "./scripts/enable_winrm.ps1",
+            "communicator": "winrm",
+            "winrm_username": "Administrator",
+            "winrm_insecure": true,
+            "winrm_use_ssl": true,
+            "source_ami_filter": {
+                "filters": {
+                    "virtualization-type": "hvm",
+                    "name": "Windows_Server-2016-English-Full-Containers-*",
+                    "root-device-type": "ebs"
+                },
+                "owners": [
+                    "amazon"
+                ],
+                "most_recent": true
+            },
+            "launch_block_device_mappings": [
+                {
+                    "device_name": "/dev/sda1",
+                    "volume_size": "{{user `disk`}}",
+                    "volume_type": "gp2",
+                    "delete_on_termination": true
+                }
+            ],
+            "security_group_id": "sg-06373164d141006e7",
+            "subnet_id": "subnet-011c6344949f7e187",
+            "instance_type": "c5ad.xlarge"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "powershell",
+            "inline": [
+                "netsh advfirewall firewall add rule name= \"SSH\" dir=in action=allow protocol=TCP localport=22",
+                "netsh advfirewall firewall add rule name= \"SMB\" dir=in action=allow protocol=TCP localport=445",
+                "netsh advfirewall firewall add rule name= \"WinRM\" dir=in action=allow protocol=TCP localport=5985",
+                "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True"
+            ]
+        },
+        {
+            "type": "ansible",
+            "use_proxy": false,
+            "ansible_env_vars": [
+                "no_proxy=\"*\""
+            ],
+            "playbook_file": "../../../../ansible/windows/couchbase-server/window2016/playbook.yml",
+            "extra_arguments": [
+                "--tags",
+                "all,aws{{user `tags`}}",
+                "-e",
+                "vs2017_key={{user `vs_key`}} ansible_shell_type=powershell ansible_shell_executable=None ansible_winrm_server_cert_validation=ignore NODE_PRODUCT=couchbase-server NODE_CLASS=build"
+            ],
+            "user": "Administrator"
+        },
+        {
+            "type": "powershell",
+            "inline": [
+                "winrm quickconfig",
+                "winrm set winrm/config/service/Auth '@{Basic=\"true\"}'",
+                "winrm set winrm/config/service '@{AllowUnencrypted=\"true\"}'",
+                "winrm set winrm/config/winrs '@{MaxMemoryPerShellMB=\"10240\"}'",
+                "netsh advfirewall firewall add rule name= \"WinRM\" dir=in action=allow protocol=TCP localport=5985",
+                "netsh advfirewall firewall add rule name= \"SMB\" dir=in action=allow protocol=TCP localport=445",
+                "netsh advfirewall firewall add rule name= \"SSH\" dir=in action=allow protocol=TCP localport=22",
+                "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
+                "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\SysprepInstance.ps1 -NoShutdown",
+                "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True"
+            ]
+        }
+    ]
+}

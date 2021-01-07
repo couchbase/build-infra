@@ -1,4 +1,9 @@
 ---
+- name: "Ensure bin directory present"
+  win_file:
+    path: C:\bin
+    state: directory
+
 - name: "Download patch_via_gerrit (Windows)"
   win_get_url:
     url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/windows_msvc2017/patch_via_gerrit.exe

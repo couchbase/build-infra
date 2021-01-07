@@ -3,7 +3,7 @@
 # historic images and risk raising unexpected issues when rebuilding
 # older releases.
 
-FROM couchbasebuild/server-debian8-build:20190424
+FROM couchbasebuild/server-debian8-build:20201214
 
 RUN curl \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \

@@ -9,6 +9,17 @@
       include_role:
         name: ../../../common/roles/patch_via_gerrit
 
+    - name: Make temp dir
+      win_file:
+        path: C:\Temp
+        state: directory
+
+    - name: "Install OpenSSL"
+      win_chocolatey:
+        name: openssl
+        version: 1.1.1.800
+      tags: python3
+
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
       win_feature:
@@ -70,50 +81,47 @@
       win_command: C:\Python27\Scripts\pip.exe install paramiko
       tags: python2
 
-    - name: "Install python3 modules for testrunner"
-      win_command: >-
-        C:\Python37\Scripts\pip.exe install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1
-        beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2
-        pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3
-        docker==4.2.0 decorator==4.4.2
-      tags: python3
-
     - name: Create download area for Ansible
       win_file:
-        path: C:\ansible_files
+        path: "{{ targetvolume | default('c') }}:\\ansible_files"
         state: directory
       tags:
         - setup
 
-    - name: Create required "C:\\Program Files (x86)\\Common Files\\Merge Modules" directory
+    - name: Create required "[vol]:\\Program Files (x86)\\Common Files\\Merge Modules" directory
       win_file:
-          path: "C:\\Program Files (x86)\\Common Files\\Merge Modules"
+          path: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules"
           state: directory
 
     - name: Download older VS CRT Merge Modules
       win_get_url:
           url: "{{ item.url }}"
-          dest: "C:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
+          dest: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
           force: no
       with_items:
-        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC100_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC100_CRT_x64.msm
           filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC120_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC120_CRT_x64.msm
           filename: Microsoft_VC120_CRT_x64.msm
-        - url: http://downloads.build.couchbase.com/winbits/Microsoft_VC140_CRT_x64.msm
+        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC140_CRT_x64.msm
           filename: Microsoft_VC140_CRT_x64.msm
       tags:
         - mergemodules
 
-    - name: Create bin directory
+    - name: Create [targetvolume] bin directory
       win_file:
-        path: 'C:\bin'
+        path: "{{ targetvolume | default('c') }}:\\bin"
+        state: directory
+
+    - name: Create C bin directory
+      win_file:
+        path: "c:\\bin"
         state: directory
 
     - name: "Install repo"
       win_get_url:
         url: "https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo"
-        dest: 'C:\bin\repo'
+        dest: "{{ targetvolume | default('c') }}:\\bin\\repo"
       tags:
         - repo
 
@@ -122,7 +130,7 @@
     - name: "Install repo wrapper"
       win_copy:
         src: repo.exe
-        dest: 'C:\bin\'
+        dest: "{{ targetvolume | default('c') }}:\\bin\\"
 
     # Due to a silly bug in ESRlabs' Repo port, git's core.pager setting MUST
     # be set, and moreover it MUST be set to a command that exists as a .exe.
@@ -131,10 +139,10 @@
     # via Jenkins "Gerrit Repo" source-control plugin. So, we use MSYS's
     # "cat.exe", which requires that we copy both that file and a few MSYS
     # DLLs onto the PATH.
-    - name: "Copy MSYS tools to C:\\bin for repo"
+    - name: "Copy MSYS tools to [vol]:\\bin for repo"
       win_copy:
-        src: 'C:\Program Files\Git\usr\bin\{{ item }}'
-        dest: 'C:\bin\'
+        src: "c:\\Program Files\\Git\\usr\\bin\\{{ item }}"
+        dest: "{{ targetvolume | default('c') }}:\\bin\\"
         remote_src: yes
       loop:
         - cat.exe
@@ -153,23 +161,24 @@
     - name: Add tools to PATH.
       win_path:
           elements:
-          - C:\bin
+          - "{{ targetvolume | default('c') }}:\\bin"
           - C:\Program Files\CMake\bin
           - C:\Program Files\git\cmd
           - C:\Program Files\NASM
+          - C:\Program Files\OpenSSH-Win64
           - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
     - name: Install Windows SDK version 10.1.17134.12
       win_chocolatey:
         name: windows-sdk-10.1
-        version: 10.1.17134.12
+        version: "10.1.17134.12"
       tags: v8_sdk
 
     - name: "Enable Remote Desktop"
       win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
         name: fDenyTSConnections
-        data: 0
+        data: "0"
         type: dword
         state: present
 
@@ -178,7 +187,7 @@
         name: "remote desktop"
         enable: yes
         state: present
-        localport: 3389
+        localport: "3389"
         action: allow
         direction: in
         protocol: TCP
@@ -187,19 +196,34 @@
       win_shell: Remove-MpPreference -ExclusionPath "C:"
 
     - name: Exclude Jenkins from Windows antivirus
-      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
-      win_shell: Add-MpPreference -ExclusionExtension “exe”
+      win_shell: Add-MpPreference -ExclusionPath "{{ targetvolume | default('c') }}:\Jenkins" -ExclusionExtension "exe"
 
     - name: install vs2017
       include_role:
         name: "../../roles/vs2017"
         apply:
           tags:
-            visualstudio
+            - never
+            - visualstudio
       vars:
         PRODUCT: "{{ NODE_PRODUCT }}"
       tags:
-      - visualstudio
+        - never
+        - visualstudio
+
+    # bcrypt is installed in this step, and needs visual studio to be present
+    - name: "Install python3 modules for testrunner"
+      win_command: >-
+        C:\Python37\Scripts\pip.exe install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1
+        beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2
+        pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3
+        docker==4.2.0 decorator==4.4.2
+      environment:
+        LIB: C:\Program Files\OpenSSL-Win64\lib
+        INCLUDE: C:\Program Files\OpenSSL-Win64\include
+      tags:
+        - never
+        - testrunner
 
     # Do OpenSSH last so the service has the latest version of the path
     - name: Install OpenSSH (for Jenkins)
@@ -208,6 +232,71 @@
         params: /SSHServerFeature
         state: latest
 
+    - name: Ensure OpenSSH executables are pathed
+      win_path:
+        name: PATH
+        elements: C:\Program Files\OpenSSH-Win64
+        scope: machine
+        state: present
+      tags:
+        - path
+
+    - name: Ensure OpenSSH executables are pathed
+      win_path:
+        name: PATH
+        elements: C:\Program Files\OpenSSH-Win64
+        scope: user
+        state: present
+      tags:
+        - path
+
+    - name: Install AV tooling
+      win_chocolatey:
+        name: "{{ item }}"
+        allow_empty_checksums: "yes"
+      with_items:
+        - clamwin
+        - 7zip.commandline
+        - jdk8
+      tags:
+        - never
+        - av
+
+    - name: Copy diskpart script
+      win_copy:
+        src: files/{{ item }}
+        dest: C:\Temp\{{ item }}
+      with_items:
+        - aws_diskpart.cmd
+        - aws_diskpart.txt
+      tags:
+        - never
+        - aws
+
+    - name: Create diskpart scheduled task
+      win_scheduled_task:
+        name: Partition disk
+        description: Set up instance volumes in aws
+        logon_type: service_account
+        actions:
+        - path: cmd
+          arguments: /c start "" "C:\Temp\aws_diskpart.cmd"
+        enabled: yes
+        username: SYSTEM
+        triggers:
+          - type: boot
+      tags:
+        - never
+        - aws
+
+    - name: Install aws cli
+      win_chocolatey:
+        name: awscli
+        state: latest
+      tags:
+        - never
+        - aws
+
     - name: Configure profile synchronization
       include_role:
         name: "../../roles/profile"
@@ -215,4 +304,4 @@
           tags:
             - profile
       tags:
-      - profile
+        - profile

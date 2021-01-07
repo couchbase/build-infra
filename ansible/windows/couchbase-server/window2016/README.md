@@ -27,7 +27,7 @@ The primary playbook here is `playbook.yml`. It will install all toolchain requi
 for building Couchbase Server (spock release or later). It can be invoked via the `go`
 script, e.g.:
 
-./go [SSH_KEY] -e ansible_password=[password] -e vskey=ABCD1234 -e NODE_PRODUCT=couchbase-server -e NODE_CLASS=build
+./go [SSH_KEY] -e ansible_password=[password] -e vs2017_key=ABCD1234 -e NODE_PRODUCT=couchbase-server -e NODE_CLASS=build [-e targetvolume=d] [--tags all,aws,visualstudio,testrunner]
 
 `vskey` is the license key for Visual Studio Professional 2017 (omit any
 dashes in the license key)

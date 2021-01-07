@@ -85,6 +85,19 @@ RUN set -x \
         && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
         && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
+ENV AGENT_VERSION=4.3
+
+# RUN zypper install -y git-lfs && zypper clean
+
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+  && chmod 755 /usr/share/jenkins \
+  && chmod 644 /usr/share/jenkins/agent.jar \
+  && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
+
+ENV AGENT_WORKDIR=/home/couchbase/agent
+RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
+  && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
@@ -97,4 +110,3 @@ CMD [ "swarm" ]
 # Docker build caching
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
-

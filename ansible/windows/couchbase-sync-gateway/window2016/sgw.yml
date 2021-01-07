@@ -139,8 +139,7 @@
     win_shell: Remove-MpPreference -ExclusionPath "C:"
 
   - name: "Exclude Jenkins and cbdep from windows antivirus"
-    win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
-    win_shell: Add-MpPreference -ExclusionExtension “exe”
+    win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins" -ExclusionExtension "exe"
 
   # Do OpenSSH last so the service has the latest version of the path
   - name: "Install OpenSSH (for Jenkins)"

@@ -41,7 +41,9 @@ RUN set -x \
   && rm -rf deploy
 
 # Add couchbase user to "docker" group on host (999)
+# Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase
+RUN groupadd -g 996 dockerecs && usermod -a -G dockerecs couchbase
 
 # Add hook for setting jenkins/workspace permissions
 COPY workspace-hook.sh /usr/sbin/couchhook.d/

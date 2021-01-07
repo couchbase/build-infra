@@ -51,7 +51,7 @@ add_hostkeys() {
 export -f add_hostkeys
 
 # Handle invocations by the ECS plugin
-[[ "$1" == "-url" ]] && {
+[[ "$1" == "-url" || "$1" == "swarm" ]] && {
   mkdir -p /run/secrets
   echo "${profiledata_key}" > /run/secrets/profile_sync
 }
@@ -66,7 +66,7 @@ then
   # have to set permissions on directories here as we can only specify perms on files in the profile container
   start_cmd="mkdir -p ~/.ssh \
     && add_hostkeys \
-    && rsync --progress --archive --backup --executability --no-o --no-g -e \"ssh -p ${profile_port} -i /run/secrets/profile_sync\" couchbase@${profile_host}:${NODE_PRODUCT}/${NODE_CLASS}/linux/ /home/couchbase/ \
+    && rsync --progress --archive --backup --executability --no-o --no-g -e \"ssh -p ${profile_port} -i /run/secrets/profile_sync -o StrictHostKeyChecking=no\" couchbase@${profile_host}:${NODE_PRODUCT}/${NODE_CLASS}/linux/ /home/couchbase/ \
     && ([ -d ~/.ssh ] && chmod 00700 ~/.ssh) \
     && ([ -d ~/.gpg ] && chmod 00700 ~/.gpg)"
 
@@ -113,24 +113,29 @@ command -v gpg >/dev/null 2>&1 && {
 
 # if first argument is "swarm", run the (Jenkins) swarm jar with any arguments
 [[ "$1" == "swarm" ]] && {
+    unset profiledata_key
+
+    AGENT_MODE=${AGENT_MODE:-exclusive}
+    jenkins_user=$(echo -n ${jenkins_user:-$(cat /run/secrets/jenkins_master_username)} | xargs)
+    jenkins_password=$(echo -n ${jenkins_password:-$(cat /run/secrets/jenkins_master_password)} | xargs)
     shift
 
     exec sudo -u couchbase --set-home --preserve-env \
-       env -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
+       env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
        PATH=/usr/local/bin:/usr/bin:/bin \
        java $JAVA_OPTS \
        -jar /usr/local/lib/swarm-client.jar \
        -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
        -master "${JENKINS_MASTER}" \
-       -mode exclusive \
+       -mode ${AGENT_MODE} \
        -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
        -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
        -disableClientsUniqueId \
        -deleteExistingClients \
        -labels "${JENKINS_SLAVE_LABELS}" \
        -retry 5 \
-       -username "$(cat /run/secrets/jenkins_master_username)" \
-       -password "$(cat /run/secrets/jenkins_master_password)"
+       -username "${jenkins_user}" \
+       -password "${jenkins_password}"
     exit
 }
 
@@ -144,12 +149,26 @@ command -v gpg >/dev/null 2>&1 && {
 # Handle invocations by the ECS plugin
 [[ "$1" == "-url" ]] && {
   unset profiledata_key
+  unset jenkins_user
+  unset jenkins_password
   URL="-url $2"
   TUNNEL="-tunnel $4"
   OPT_JENKINS_SECRET=$5
   OPT_JENKINS_AGENT_NAME=$6
   JAVA_BIN=java
-  exec sudo -u couchbase --set-home --preserve-env $JAVA_BIN $JAVA_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME
+
+  if $(sudo --help &>/dev/null)
+  then
+      exec sudo -u couchbase --set-home --preserve-env \
+        env -u profiledata_key -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
+        PATH=/usr/local/bin:/usr/bin:/bin \
+        $JAVA_BIN $JAVA_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME
+  else
+      exec sudo -E -u couchbase \
+        env -u profiledata_key -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
+        PATH=/usr/local/bin:/usr/bin:/bin \
+        $JAVA_BIN $JAVA_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME
+  fi
   exit
 }
 

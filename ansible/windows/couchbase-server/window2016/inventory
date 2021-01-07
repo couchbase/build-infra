@@ -1,9 +1,9 @@
 [windows]
-172.23.120.9
+x.x.x.x
 
 [windows:vars]
 ansible_user=Administrator
-ansible_password=xxxx
+ansible_password=password
 ansible_winrm_server_cert_validation=ignore
 ansible_connection=winrm
 ansible_winrm_read_timeout_sec=90

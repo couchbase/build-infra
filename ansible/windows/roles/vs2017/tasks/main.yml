@@ -1,22 +1,22 @@
 ---
 - name: Create directory structure
   win_file:
-    path: C:\vs2017
+    path: "{{ targetvolume | default('c') }}:\\vs2017"
     state: directory
 
 - name: Add bin to PATH.
   include: extend-path.yml
   with_items:
-    - C:\vs2017
+    - "{{ targetvolume | default('c') }}:\\vs2017"
 
 # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 - name: Download vs_professional.exe installer
   win_get_url:
     url: "https://aka.ms/vs/15/release/vs_professional.exe"
-    dest: C:\vs2017\vs_professional.exe
+    dest: "{{ targetvolume | default('c') }}:\\vs2017\\vs_professional.exe"
 
 - name: Install Visual Studio Professional 2017 and dotnet tools
-  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R11C --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: "{{ targetvolume | default('c') }}:\\vs2017\\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.NDK.R11C --quiet --productKey \"{{ vs2017_key }}\" --includeRecommended --addProductLang en-US --norestart --wait --nocache"
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 

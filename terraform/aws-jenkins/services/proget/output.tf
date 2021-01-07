@@ -1,0 +1,7 @@
+output "efs_access_point" {
+    value = aws_efs_access_point.proget
+}
+
+output "iam_role" {
+    value = aws_iam_role.proget
+}

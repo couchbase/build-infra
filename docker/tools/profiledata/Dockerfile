@@ -23,8 +23,11 @@ RUN set -x \
 USER root
 
 HEALTHCHECK --interval=5s \
-        CMD (nc -z localhost:22 && cat /home/couchbase/.ssh/authorized_keys) || exit 1
+        CMD (nc -z localhost:4000 && cat /home/couchbase/.ssh/authorized_keys) || exit 1
+
+COPY entrypoint.sh /
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/sbin/sshd", "-D"]
-
-EXPOSE 22
+EXPOSE 4000

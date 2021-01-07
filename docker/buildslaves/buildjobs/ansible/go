@@ -4,6 +4,8 @@
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/ansible-slave
 
+cp ../../util/couchbuilder_transition_start.sh ./couchbuilder_start.sh
+
 docker build -t couchbasebuild/ansible-slave:$TAG .
 docker tag couchbasebuild/ansible-slave:$TAG couchbasebuild/ansible-slave:latest
 if [ "$1" = "--publish" ]

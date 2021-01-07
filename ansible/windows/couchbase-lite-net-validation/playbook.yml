@@ -105,8 +105,7 @@
 # Modify windows defender to exlude Jenkins and cbdep
 
     - name: Exclude Jenkins and cbdep from Windows antivirus
-      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins"
-      win_shell: Add-MpPreference -ExclusionExtension “exe”
+      win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins" -ExclusionExtension "exe"
 
   # Should be done last as it requires choco kbxxx pkg to install first
   roles:
