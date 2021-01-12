@@ -19,7 +19,7 @@ ENV AGENT_VERSION=4.3
 
 # RUN zypper install -y git-lfs && zypper clean
 
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar http://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar

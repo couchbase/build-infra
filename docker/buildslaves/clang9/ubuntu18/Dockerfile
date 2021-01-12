@@ -1,4 +1,4 @@
-FROM couchbasebuild/server-ubuntu18-build:20201210
+FROM couchbasebuild/server-ubuntu18-build:20210112
 
 LABEL maintainer="build-team@couchbase.com"
 
@@ -9,7 +9,7 @@ RUN set -x \
 
 RUN set -x \
         && wget -qO- http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - \
-        && echo "deb http://llvm.org/apt/bionic/ llvm-toolchain-bionic-9 main" > /etc/apt/sources.list.d/llvm.list \
+        && echo "deb https://apt.llvm.org/bionic llvm-toolchain-bionic-9 main" > /etc/apt/sources.list.d/llvm.list \
         && apt update \
         && apt install -y \
             clang-9 \

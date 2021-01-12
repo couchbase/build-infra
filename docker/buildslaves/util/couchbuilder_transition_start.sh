@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Script intended to be ENTRYPOINT for Couchbase build containers
 # based on Jenkins Swarm and running on Docker Swarm, OR as a
@@ -24,13 +24,16 @@
 #
 #   /run/secrets/profile_ssh_key
 
+mkdir -p /home/couchbase/.ssh
+touch /home/couchbase/.ssh/known_hosts
+
 if [ -d /ssh ] && [ "$(ls -A /ssh)" ]
 then
-    mkdir -p /home/couchbase/.ssh
     cp -a /ssh/* /home/couchbase/.ssh
 fi
 chown -R couchbase:couchbase /home/couchbase/.ssh
-chmod 600 /home/couchbase/.ssh/*
+chmod -R 600 /home/couchbase/.ssh
+chmod 700 /home/couchbase/.ssh
 
 
 # We need to ensure these env vars are available in the exported function, and the script string which is evaled or execed via su
@@ -41,7 +44,7 @@ add_hostkeys() {
     hostkeys="$(ssh-keyscan -p ${profile_port} ${profile_host})"
     for key in "$hostkeys"
     do
-      if ! cat /home/couchbase/.ssh/known_hosts 2>/dev/null | grep "$key"
+      if ! grep "$key" /home/couchbase/.ssh/known_hosts &>/dev/null && :
       then
         echo "$key" >> /home/couchbase/.ssh/known_hosts
       fi
@@ -76,11 +79,11 @@ then
   then
     sudo chmod 600 /run/secrets/profile_sync
     sudo chown couchbase:couchbase /run/secrets/profile_sync
-    eval $start_cmd
+    eval $start_cmd || exit 1
   else
     chmod 600 /run/secrets/profile_sync
     chown couchbase:couchbase /run/secrets/profile_sync
-    su couchbase -c "$start_cmd"
+    su couchbase -c "$start_cmd" || exit 1
   fi
 fi
 
@@ -157,7 +160,7 @@ command -v gpg >/dev/null 2>&1 && {
   OPT_JENKINS_AGENT_NAME=$6
   JAVA_BIN=java
 
-  if $(sudo --help &>/dev/null)
+  if $(sudo --help &>/dev/null && :)
   then
       exec sudo -u couchbase --set-home --preserve-env \
         env -u profiledata_key -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \

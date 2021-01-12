@@ -33,7 +33,7 @@ RUN python2 -m pip install gcovr
 # Install clang-tools for scan-build for older branches
 RUN set -x \
         && wget -qO- http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - \
-        && echo "deb http://llvm.org/apt/bionic/ llvm-toolchain-bionic-6.0 main" > /etc/apt/sources.list.d/llvm.list \
+        && echo "deb https://apt.llvm.org/bionic llvm-toolchain-bionic-6.0 main" > /etc/apt/sources.list.d/llvm.list \
         && apt update \
         && apt install -y clang-tools-6.0 \
         && apt clean
@@ -41,7 +41,7 @@ RUN set -x \
 # Install clang-format from Clang 6.0 - needed for checking if formatting of patch is correct for older branches
 RUN set -x \
         && wget -qO- http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add - \
-        && echo "deb http://llvm.org/apt/bionic/ llvm-toolchain-bionic-6.0 main" > /etc/apt/sources.list.d/llvm.list \
+        && echo "deb https://apt.llvm.org/bionic llvm-toolchain-bionic-6.0 main" > /etc/apt/sources.list.d/llvm.list \
         && apt update \
         && apt install -y clang-format-6.0 \
         && apt clean

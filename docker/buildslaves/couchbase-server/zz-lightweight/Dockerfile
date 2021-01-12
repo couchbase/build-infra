@@ -4,8 +4,11 @@ FROM couchbasebuild/server-ubuntu16-build:20201210
 LABEL maintainer="build-team@couchbase.com"
 
 # Install python3-apt
-RUN apt-get install python3-apt && \
-    cp /usr/lib/python3/dist-packages/apt_pkg.cpython-35m-x86_64-linux-gnu.so /usr/lib/python3/dist-packages/apt_pkg.so
+RUN set -x \
+        && apt-get update \
+        && apt-get install python3-apt \
+        && apt-get clean \
+        && cp /usr/lib/python3/dist-packages/apt_pkg.cpython-35m-x86_64-linux-gnu.so /usr/lib/python3/dist-packages/apt_pkg.so
 
 #install latest git
 RUN add-apt-repository ppa:git-core/ppa -y && \
