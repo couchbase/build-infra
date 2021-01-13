@@ -1,0 +1,26 @@
+version: '3.8'
+
+# Suggested deployment command:
+#   docker --host mega4.build.couchbase.com stack deploy -c changelog.yaml changelog
+# All services, networks, etc. will then get an "changelog_" prefix,
+# eg. "changelog_changelog"
+#
+# Note: the network traefik_reverse-proxy is created by the reverse-proxy stack
+# the reverse-proxy must already be running to allow this stack to be deployed.
+
+services:
+  changelog:
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.changelog.rule=Host(`changelog.build.couchbase.com`)"
+        - "traefik.http.services.changelog_changelog.loadbalancer.server.port=80"
+    image: couchbasebuild/changelog-frontend:20210112
+    init: true
+    networks:
+      - traefik_reverse-proxy
+networks:
+  traefik_reverse-proxy:
+    external: true

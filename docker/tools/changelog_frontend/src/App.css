@@ -1,0 +1,94 @@
+.App {
+  text-align: center;
+  height: 100vh;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+#OuterContainer {
+  background-color: #fff;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#InnerContainer {
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  flex: 2;
+  /* padding-left: 0px; */
+  margin: 0px;
+  border: 0px;
+  /* border-radius: 5px; */
+  border-color: #000;
+  background-color: #eaeaec;
+}
+
+#Filters {
+  overflow: auto;
+  height: 100%;
+  padding: 12px;
+}
+
+#ChangeLog {
+  padding: 12px;
+  overflow: auto;
+  height: 100%;
+  background: #fafaff;
+}
+
+#LoadingSpinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* overflow: hidden;
+  flex: 2;
+  flex-direction:row;
+  align-items: center;
+  justify-content: center; */
+  /* background: #ffffff; */
+}
+
+#FilterCard {
+  background-color: #fafaff;
+  color: #444444;
+  text-align: center;
+  margin-top: 10px;
+  padding: 16px;
+}
+
+.padded {
+  padding: 12px;
+}
+
+.toggleFilterButton {
+  background-color:#000;
+  font-size: "6px";
+  /* font-weight: bold; */
+  cursor: pointer;
+}
+
+.navLabel {
+  /* font-weight: bold; */
+  color: #888;
+}
