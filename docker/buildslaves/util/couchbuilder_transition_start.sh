@@ -31,8 +31,8 @@ if [ -d /ssh ] && [ "$(ls -A /ssh)" ]
 then
     cp -a /ssh/* /home/couchbase/.ssh
 fi
-chown -R couchbase:couchbase /home/couchbase/.ssh
-chmod -R 600 /home/couchbase/.ssh
+sudo chown -R couchbase:couchbase /home/couchbase/.ssh
+chmod -R 600 /home/couchbase/.ssh/*
 chmod 700 /home/couchbase/.ssh
 
 
@@ -55,8 +55,11 @@ export -f add_hostkeys
 
 # Handle invocations by the ECS plugin
 [[ "$1" == "-url" || "$1" == "swarm" ]] && {
-  mkdir -p /run/secrets
-  echo "${profiledata_key}" > /run/secrets/profile_sync
+  sudo mkdir -p /run/secrets
+  if [ "${profiledata_key}" != "" -a ! -f /run/secrets/profile_sync ]
+  then
+    echo "${profiledata_key}" | sudo tee -a /run/secrets/profile_sync >/dev/null
+  fi
 }
 
 if [ -f /run/secrets/profile_sync -a ! -e "${NODE_CLASS}" -a ! -e "${NODE_PRODUCT}" ]
@@ -77,12 +80,12 @@ then
   # to populate the profile data correctly either way
   if [ "$(whoami)" = "couchbase" ]
   then
-    sudo chmod 600 /run/secrets/profile_sync
-    sudo chown couchbase:couchbase /run/secrets/profile_sync
+    sudo chmod 600 /run/secrets/profile_sync || :
+    sudo chown couchbase:couchbase /run/secrets/profile_sync || :
     eval $start_cmd || exit 1
   else
-    chmod 600 /run/secrets/profile_sync
-    chown couchbase:couchbase /run/secrets/profile_sync
+    chmod 600 /run/secrets/profile_sync || :
+    chown couchbase:couchbase /run/secrets/profile_sync || :
     su couchbase -c "$start_cmd" || exit 1
   fi
 fi
