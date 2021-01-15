@@ -3,14 +3,14 @@
 # We'll inherit from the Couchbase Server build slave just to
 # avoid re-inventing the wheel and for Docker image cache sharing
 
-FROM couchbasebuild/server-ubuntu16-build:20201210
-MAINTAINER Couchbase Build Team <build-team@couchbase.com>
+FROM couchbasebuild/server-ubuntu20-build:20201209
+LABEL maintainer=build-team@couchbase.com
 
 # Docker
 RUN apt-get update && \
     apt-get install -y apt-transport-https && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" > /etc/apt/sources.list.d/docker.list && \
+    echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update && \
     apt-get install -y docker-ce-cli && \
     apt-get clean
@@ -34,5 +34,6 @@ RUN mkdir /tmp/deploy && \
     cd /tmp && \
     rm -rf deploy
 
-# Local hook (necessary for Docker configuration)
-COPY couchhook.sh /usr/sbin
+COPY build/couchbuilder_start.sh /usr/sbin/
+
+COPY build/swarm*.properties /

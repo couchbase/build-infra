@@ -1,0 +1,47 @@
+version: "3.8"
+
+# Suggested deployment command:
+#   docker -H mega4.build.couchbase.com stack deploy -c operator.yml operator
+# All services, networks, etc. will then get an "operator_" prefix,
+# eg. "operator_operator"
+#
+# Note: Post-deployment, log in as admin and add Repository Observer
+# permissions to the guest account for the internal and snapshot repos
+
+services:
+  operator:
+    image: couchbasebuild/ubuntu-2004-operator-build:20210115
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=operator-build"
+      - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=couchbase-server"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+      - source: operator.config.docker.20210115
+        target: /home/couchbase/.docker/config.json
+        mode: 0600
+        uid: "1000"
+        gid: "1000"
+    deploy:
+      update_config:
+        parallelism: 1000
+
+secrets:
+  jenkins_master_username:
+    external: true
+  jenkins_master_password:
+    external: true
+  operator.config.docker.20210115:
+    external: true
+  profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
