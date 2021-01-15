@@ -73,7 +73,7 @@ module "server_jenkins" {
     "clamav"         = "284614897128.dkr.ecr.us-east-1.amazonaws.com/clamav-slave:20201216"
     "ansible"        = "284614897128.dkr.ecr.us-east-1.amazonaws.com/ansible-slave:20201218"
     # builders
-    "operator-build" = "284614897128.dkr.ecr.us-east-1.amazonaws.com/ubuntu-1604-operator-build:latest"
+    "operator-build" = "284614897128.dkr.ecr.us-east-1.amazonaws.com/ubuntu-2004-operator-build:latest"
     "amzn2"          = "284614897128.dkr.ecr.us-east-1.amazonaws.com/server-amzn2-build:20201211"
     "centos7"        = "284614897128.dkr.ecr.us-east-1.amazonaws.com/server-centos7-build:20201214"
     "centos8"        = "284614897128.dkr.ecr.us-east-1.amazonaws.com/server-centos8-build:20201214"

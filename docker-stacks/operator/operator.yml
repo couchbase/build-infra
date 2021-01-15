@@ -14,7 +14,7 @@ services:
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=operator-build"
-      - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices"
+      - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices couchbase-operator master"
       - "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
