@@ -21,6 +21,11 @@ x-default-jenkins-agent: &default-jenkins-agent
     - source: jenkins_master_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
+    - source: nsbuildbot-docker-config.json
+      target: /home/couchbase/.docker/config.json
+      uid: "1000"
+      gid: "1000"
+      mode: 0400
 
 services:
 
@@ -56,6 +61,8 @@ secrets:
   jenkins_master_password:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
+  nsbuildbot-docker-config.json:
     external: true
 
 networks:
