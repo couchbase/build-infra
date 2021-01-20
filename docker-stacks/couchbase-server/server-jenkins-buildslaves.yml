@@ -145,6 +145,17 @@ services:
     deploy:
       replicas: 1
 
+  suse12:
+    image: build-docker.couchbase.com/internal/server-suse12-build:20210120
+    init: true
+    environment:
+      - "JENKINS_SLAVE_NAME=server-suse12"
+      - "JENKINS_SLAVE_LABELS=alice alice-suse12 cheshire-cat cheshire-cat-suse12 mad-hatter mad-hatter-suse12 master master-suse12 server suse12 suse12.2 vulcan vulcan-suse12"
+      - *default-jenkins-slave-environment-master
+      - *node-class
+      - *node-product
+    <<: *default-jenkins-slave
+
   suse15-mad-hatter:
     image: couchbasebuild/server-suse15-build:20200424
     environment:

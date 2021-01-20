@@ -33,7 +33,6 @@ RUN groupadd -g1000 couchbase && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 ### Install Couchbase build dependencies ######################################
-# * Packages from the base CentOS repository
 RUN zypper -n install \
                 binutils \
                 curl \
@@ -103,6 +102,18 @@ ENV JAVA_HOME=/usr/java/latest
 # Set LANG
 ENV LANG=en_US.UTF-8
 
+# Swarm client
+RUN set -x \
+        && cd /tmp \
+        && curl -LO https://cdn.azul.com/zulu/bin/zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm \
+        && rpm -i ./zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm \
+        && curl \
+                https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+                -o /usr/local/lib/swarm-client.jar
+
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
+
 # Needs to be in .bashrc for some reason
 RUN echo "export LANG=en_US.UTF-8" >> /home/couchbase/.bashrc
 
@@ -110,7 +121,7 @@ RUN echo "export LANG=en_US.UTF-8" >> /home/couchbase/.bashrc
 EXPOSE 22
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
-CMD [ "default" ]
+CMD [ "swarm" ]
 
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching
