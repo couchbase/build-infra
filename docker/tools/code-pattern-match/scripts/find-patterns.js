@@ -23,8 +23,9 @@ for (let i = 0; i < patterns?.length; i++) {
     const outstr = `Checking pattern: ${patterns[i].name}`
     console.log(`${outstr}\n${'-'.repeat(outstr.length)}`)
     const exclude = patterns[i]?.exclusions ? `(?!${patterns[i].exclusions.join('|')})` : ''
+    const pattern = patterns[i].pattern.replace("@EXCLUSIONS@", exclude)
     const p = Deno.run({
-        cmd: ['ag', '--parallel', exclude + patterns[i].pattern]
+        cmd: ['ag', '--parallel', pattern]
     })
     const { code } = await p.status()
     p.close()

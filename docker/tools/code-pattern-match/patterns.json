@@ -2,9 +2,9 @@
     {
         "name": "AWS Access Key ID",
         "description": "AWS Access Key ID",
-        "pattern": "(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}",
+        "pattern": "@EXCLUSIONS@(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}",
         "exclusions": [
-            ".*EXAMPLE.*",
+            "[A-Z0-9]+EXAMPLE[A-Z0-9]*",
             "AIPAABCDEFGHIJKLMN123",
             "ASIAXXXXXXXXXXXXXXXX",
             "AIDAJ3BA6O2FMJWCWXHEX",
@@ -12,15 +12,14 @@
             "AIPAJVQN4F5WVLGCJDRGM",
             "AIDAJNUEDQAQWFELJDLEX",
             "AIPAI5IVIHMFFYY2DKV5Y",
-            "AKIAJ56TQJRTWSMTNPEA",
-            "111122223333"
+            "AKIAJ56TQJRTWSMTNPEA"
         ],
         "remediation": "Remove from source and cycle account credentials on AWS"
     },
     {
         "name": "AWS Secret",
         "description": "AWS Secret",
-        "pattern": "(\"|')?(AWS|aws|Aws)_?(SECRET|secret|Secret)_?(ACCESS|access|Access)_?(KEY|key|Key)(\"|')?\\s*(:|=>|=)\\s*(\"|')?[A-Za-z0-9/\\+=]{40}(\"|')?",
+        "pattern": "(\"|')?(AWS|aws|Aws)_?(SECRET|secret|Secret)_?(ACCESS|access|Access)_?(KEY|key|Key)(\"|')?\\s*(:|=>|=)\\s*(\"|')?@EXCLUSIONS@[A-Za-z0-9/\\+=]{40}(\"|')?",
         "exclusions": [
             "ABGHEFCDABGHEFCDABGHEFCDABGHEFCDABGHEFCDAB"
         ],
@@ -29,7 +28,10 @@
     {
         "name": "AWS IAM account ID",
         "description": "AWS IAM account ID",
-        "pattern": "(\"|')?(AWS|aws|Aws)_?(ACCOUNT|account|Account)_?(ID|id|Id)(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?",
+        "pattern": "(\"|')?(AWS|aws|Aws)_?(ACCOUNT|account|Account)_?(ID|id|Id)(\"|')?\\s*(:|=>|=)\\s*(\"|')?@EXCLUSIONS@[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?",
+        "exclusions": [
+            "111122223333"
+        ],
         "remediation": "Remove from source and cycle account credentials on AWS"
     },
     {

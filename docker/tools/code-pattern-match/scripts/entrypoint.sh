@@ -8,7 +8,7 @@ else
     if [ "$SOURCE_URL" != "" ]
     then
         echo "Downloading source tarball..."
-        curl "$SOURCE_URL" | tar -xz
+        curl --fail --silent "$SOURCE_URL" | tar -xz
     else
         echo "Starting repo sync..."
         export MANIFEST_URL=${MANIFEST_URL:-git://github.com/couchbase/manifest}
