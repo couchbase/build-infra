@@ -247,7 +247,7 @@ services:
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 cheshire-cat cheshire-cat-ubuntu20.04 master master-ubuntu20.04"
+      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter mad-hatter-ubuntu20.04 cheshire-cat cheshire-cat-ubuntu20.04 master master-ubuntu20.04"
       - *default-jenkins-slave-environment-master
       - *node-class
       - *node-product
