@@ -12,10 +12,13 @@ services:
         constraints:
           - node.labels.role==infrastructure
       replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.athens.rule=Host(`goproxy.build.couchbase.com`)"
+        - "traefik.http.services.athens_proxy.loadbalancer.server.port=3000"
     image: gomods/athens:v0.10.0
     init: true
-    ports:
-      - 3000:3000
     environment:
       - ATHENS_LOG_LEVEL=info
       - ATHENS_STORAGE_TYPE=disk
@@ -25,7 +28,8 @@ services:
         source: /buildteam/athens
         target: /var/lib/athens
     networks:
-      - proxy
+      - traefik_reverse-proxy
 
 networks:
-  proxy:
+  traefik_reverse-proxy:
+    external: true
