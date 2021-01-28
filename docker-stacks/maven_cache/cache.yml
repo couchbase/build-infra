@@ -15,6 +15,9 @@ secrets:
 services:
   cache:
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
       replicas: 1
     image: build-docker.couchbase.com/couchbase/archiva:20200923
     environment:

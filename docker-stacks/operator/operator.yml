@@ -33,6 +33,9 @@ services:
         uid: "1000"
         gid: "1000"
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       update_config:
         parallelism: 1000
 

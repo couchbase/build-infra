@@ -11,6 +11,9 @@ version: '3.8'
 
 x-default-jenkins-slave: &default-jenkins-slave
   deploy:
+    placement:
+      constraints:
+        - node.labels.role==build
     replicas: 2
     update_config:
       parallelism: 1000
@@ -55,6 +58,9 @@ services:
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 1
 
   centos7:
@@ -67,6 +73,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 3
 
   centos8:
@@ -79,6 +88,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 3
 
   debian8-alice:
@@ -91,6 +103,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 1
 
   debian8:
@@ -143,6 +158,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 1
 
   suse12:
@@ -186,6 +204,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 1
 
   ubuntu16:
@@ -228,6 +249,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 1
 
   ubuntu20-clang9:
@@ -240,6 +264,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
       replicas: 1
 
   ubuntu20:

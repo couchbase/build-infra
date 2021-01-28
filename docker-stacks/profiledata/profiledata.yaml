@@ -18,6 +18,9 @@ version: '3.8'
 services:
   storage:
     deploy:
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
       replicas: 1
     image: couchbasebuild/profiledata:20200527
     init: true

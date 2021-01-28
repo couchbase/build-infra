@@ -10,6 +10,9 @@ version: '3.5'
 # https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
 x-default-jenkins-slave: &default-jenkins-slave
   deploy:
+    placement:
+      constraints:
+        - node.labels.role==build
     replicas: 1
   configs:
     - source: couchbase_ssh_config_20191203
