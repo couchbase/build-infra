@@ -22,7 +22,7 @@ services:
         constraints:
           - node.labels.role==infrastructure
       replicas: 1
-    image: couchbasebuild/profiledata:20200527
+    image: couchbasebuild/profiledata:20210202
     init: true
     ports:
       - 4000:4000
