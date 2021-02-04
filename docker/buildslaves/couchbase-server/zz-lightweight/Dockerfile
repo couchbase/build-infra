@@ -21,6 +21,13 @@ RUN groupadd rvm && \
     sudo apt-get update && \
     sudo apt-get install -y rvm
 
+# Install Deno for running javascript
+RUN set -x \
+        && cd /usr/local/bin \
+        && curl --fail -Lo deno.zip https://github.com/denoland/deno/releases/download/v1.7.1/deno-x86_64-unknown-linux-gnu.zip \
+        && unzip deno.zip \
+        && rm deno.zip
+
 COPY build/cb-buildbot-config.sh /usr/sbin/couchhook.d/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 

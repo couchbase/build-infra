@@ -3,20 +3,15 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/zz-lightweight
-IMAGE2=284614897128.dkr.ecr.us-east-1.amazonaws.com/server-zz-lightweight
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a cb-buildbot-config.sh build/cb-buildbot-config.sh
 
 docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} . \
   -t ${IMAGE}:${TAG} \
-  -t ${IMAGE}:latest \
-  -t ${IMAGE2}:${TAG} \
-  -t ${IMAGE2}:latest
+  -t ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:$TAG
   docker push ${IMAGE}:latest
-  docker push ${IMAGE2}:$TAG
-  docker push ${IMAGE2}:latest
 fi
