@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import base64
 import sys
 import urllib2
 import json
@@ -33,11 +34,29 @@ if mount_dirs is None:
 
 devnull = open(os.devnull, "w")
 
+# Track whether we require authentication - only true for server just now
+auth_required = True if jenkins == "server.jenkins.couchbase.com" else False
+
+# If auth is required, check we have the expected env vars (or die)
+if auth_required:
+    if not os.environ.get('jenkins_user') or not os.environ.get('jenkins_token'):
+        print("Authentication required for '{0}'".format(jenkins))
+        print("Ensure jenkins_user and jenkins_token environment variables are populated")
+        exit(1)
+
 # See if Jenkins thinks the slave is connected
 print "Seeing if {1} is connected to Jenkins master '{0}'...".format(jenkins, slave)
 slaveurl = 'http://{0}/computer/{1}/api/json?tree=offline,executors[idle],oneOffExecutors[idle]'
 while True:
-    response = urllib2.urlopen(slaveurl.format(jenkins, slave))
+    if auth_required:
+        request = urllib2.Request(slaveurl.format(jenkins, slave))
+        base64string = base64.b64encode('%s:%s' % (os.environ.get('jenkins_user'), os.environ.get('jenkins_token')))
+        request.add_header("Authorization", "Basic %s" % base64string)
+        response = urllib2.urlopen(request)
+    else:
+        # no auth needed
+        response = urllib2.urlopen(slaveurl.format(jenkins, slave))
+
     slavedata = json.load(response)
 
     # If slave is "offline", fine. Otherwise, if ALL executors are "idle", fine.
@@ -132,4 +151,3 @@ run_args.extend([
 print "Creating new {0} container...".format(slave)
 output = check_output(run_args)
 print "Result: {0}".format(output)
-
