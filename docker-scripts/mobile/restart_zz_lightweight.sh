@@ -9,4 +9,4 @@ popd > /dev/null
 echo @@@@@@@@@@@@@@@@@@@@@@
 echo @ Recreating slaves
 echo @@@@@@@@@@@@@@@@@@@@@@
-${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/zz-lightweight:20210204 zz-mobile-lightweight 2423 mobile.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/zz-lightweight:20210205 zz-mobile-lightweight 2423 mobile.jenkins.couchbase.com

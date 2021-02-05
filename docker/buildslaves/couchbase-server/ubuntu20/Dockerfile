@@ -68,15 +68,6 @@ RUN set -x \
     && chmod a+x /usr/local/bin/repo \
     && cd /tmp && rm -rf /tmp/deploy
 
-# Python 3-specific stuff for build scripts, mostly for Jira.
-RUN set -x \
-    && apt-get update \
-    && apt-get -y install python3-pip libffi-dev \
-    && pip3 install lxml oauthlib==0.7.2 jwt pycrypto jira boto3 pbr \
-    && apt-get autoremove --purge -y \
-    && apt-get clean \
-    && ccache --clear
-
 # Set 8G ccache limit
 USER couchbase
 RUN ccache -M 8G

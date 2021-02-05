@@ -270,7 +270,7 @@ services:
       replicas: 1
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20200821
+    image: couchbasebuild/server-ubuntu20-build:20210205
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"

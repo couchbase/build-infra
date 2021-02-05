@@ -13,7 +13,8 @@ RUN set -x \
 #install latest git
 RUN add-apt-repository ppa:git-core/ppa -y && \
     apt-get update && \
-    apt-get install -y git
+    apt-get install -y git \
+    && apt clean
 
 #install rvm so that we can use it to upgrade ruby when necessary
 RUN groupadd rvm && \
@@ -37,6 +38,14 @@ COPY build/couchbuilder_start.sh /usr/sbin/
 # Hack because build-from-manifest script (and possibly others) hardcodes
 # python3.6
 RUN ln -s python3.7 /usr/bin/python3.6
+
+# Python 3 Jira module
+RUN set -x \
+        # fix jira
+        && pip3 uninstall -y jira jwt pyjwt \
+        # Jira dependencies are not correctly installed if it is installed alongside
+        # the other packages. Install separately.
+        && pip3 install jira==2.0.0
 
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching
