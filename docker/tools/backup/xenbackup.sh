@@ -1,13 +1,13 @@
 #!/bin/bash
 # Wrapper script to run the backup
-# Required mount point: nas-n.mgt.couchbase.com:/data/builds /builds
+# Required mount point: cnt-s231.sc.couchbase.com:/buildteam /buildteam
 # Required VMs' UUID, BACKUP_NAME (name appended to .xva file for details
 # description), and CLUSTER (XEN)
 
-BACKUP_DIR="/builds/backups/xen/${CLUSTER}"
+BACKUP_DIR="/buildteam/backups/xen/${CLUSTER}"
 
-if [ ! -d /builds/backups/xen/ ]; then
-    echo "Required backup directory does not exist: /builds/backups/xen/"
+if [ ! -d /buildteam/backups/xen/ ]; then
+    echo "Required backup directory does not exist: /buildteam/backups/xen/"
     exit 1
 else
     mkdir ${BACKUP_DIR}
@@ -31,4 +31,4 @@ python /xenbackup/xenbackup backup ${UUID} --cluster ${CLUSTER} --config-file /t
 
 # Publish .xva files to S3's xen-cluster bucket
 source /home/couchbase/.ssh/aws-credentials.sh
-s3cmd put /builds/backups/xen/${CLUSTER}/${UUID}/*.xva s3://${S3_BUCKET_NAME}/ || exit 1
+s3cmd put /buildteam/backups/xen/${CLUSTER}/${UUID}/*.xva s3://${S3_BUCKET_NAME}/ || exit 1

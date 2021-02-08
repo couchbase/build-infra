@@ -59,7 +59,7 @@ def parse_args():
     parser.add_argument('--file', '-f', help='YAML File to convert',
                         default='/etc/servers.yaml', required=True)
     parser.add_argument('--repository', '-r', help='Directory for backup',
-                        default='/builds/backups/xen', required=True)
+                        default='/buildteam/backups/xen', required=True)
     parser.add_argument('--json-output', '-o', help='JSON output file',
                         default='/etc/xenbackup.json', required=True)
     return parser.parse_args()

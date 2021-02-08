@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 pushd `dirname $0` > /dev/null
 SCRIPTPATH=`pwd -P`
@@ -35,4 +35,3 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py \
 
 wait
 echo "All done!"
-
