@@ -31,10 +31,18 @@ if [ -d /ssh ] && [ "$(ls -A /ssh)" ]
 then
     cp -a /ssh/* /home/couchbase/.ssh
 fi
+
 sudo chown -R couchbase:couchbase /home/couchbase/.ssh
 chmod -R 600 /home/couchbase/.ssh/*
 chmod 700 /home/couchbase/.ssh
 
+if [ -f /ssh/aws-credentials ]
+then
+    mkdir -p /home/couchbase/.aws
+    printf "[default]\nregion=us-east-1\noutput=json" > /home/couchbase/.aws/config
+    cp -a /ssh/aws-credentials /home/couchbase/.aws/credentials
+    sudo chown -R couchbase:couchbase /home/couchbase/.aws
+fi
 
 # We need to ensure these env vars are available in the exported function, and the script string which is evaled or execed via su
 export profile_port="4000"

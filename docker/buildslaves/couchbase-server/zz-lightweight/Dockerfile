@@ -47,6 +47,12 @@ RUN set -x \
         # the other packages. Install separately.
         && pip3 install jira==2.0.0
 
+# install awscli which is used by s3 upload jobs
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && sudo ./aws/install \
+    && rm -rf ./aws awscliv2.zip
+
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching
 ARG CONTAINER_TAG_ARG
