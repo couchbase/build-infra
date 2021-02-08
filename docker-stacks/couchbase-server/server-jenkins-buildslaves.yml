@@ -11,6 +11,9 @@ version: '3.8'
 
 x-default-jenkins-slave: &default-jenkins-slave
   deploy:
+    resources:
+      reservations:
+        memory: 7G
     placement:
       constraints:
         - node.labels.role==build
@@ -58,6 +61,9 @@ services:
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -73,6 +79,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -88,6 +97,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -103,6 +115,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -158,6 +173,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -204,6 +222,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -249,6 +270,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -264,6 +288,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -290,6 +317,9 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
+      resources:
+        reservations:
+          memory: 7G
       replicas: 1
 
 secrets:
