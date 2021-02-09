@@ -270,9 +270,6 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
-      resources:
-        reservations:
-          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
@@ -288,9 +285,6 @@ services:
       - *node-product
     <<: *default-jenkins-slave
     deploy:
-      resources:
-        reservations:
-          memory: 7G
       placement:
         constraints:
           - node.labels.role==build
