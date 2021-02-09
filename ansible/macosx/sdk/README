@@ -6,6 +6,7 @@ Prereq
 1. Ceate new MAC VM on Mac clusters
 2. Download Xcode on the Mac, use the CB developer account
 3. Run on command line: sudo xcodebuild -license accept
+4. ansible 2.10.5+ is required to run the playbook.  "brew cask" commands were disabled in homebrew 2.7.0.
 
 Deploy tools via ansible
 1. git clone https://github.com/couchbase/build-infra.git

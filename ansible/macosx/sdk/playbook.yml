@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  user: couchbase
+  user: "{{ ansible_ssh_user }}"
 
   pre_tasks:
     - name: add passwordless sudoer
@@ -12,12 +12,10 @@
     - vars/main.yml
 
   roles:
+    - elliotweiser.osx-command-line-tools
     - geerlingguy.homebrew
 
   tasks:
-    - name: Install java
-      homebrew_cask: name=java state=present
-
     - name: Install cbdep tool
       get_url:
         url: http://downloads.build.couchbase.com/cbdep/cbdep.darwin

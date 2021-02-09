@@ -6,6 +6,9 @@ homebrew_taps:
    - homebrew/cask
    - homebrew/cask-versions
 
+homebrew_cask_apps:
+   - homebrew/cask-versions/adoptopenjdk8
+
 homebrew_installed_packages:
   - { name: ccache, state: linked }
   - { name: coreutils, state: linked }
