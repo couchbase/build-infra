@@ -305,6 +305,10 @@ cat ${COMPOSE_FILE}
 _echo "-----------------------------------"
 docker-compose config
 
+# Clean up any stale containers on the system
+_echo "Cleaning up any stale containers:"
+docker container prune -f
+
 # pull latest image version
 if [ "${LAUNCH_PULL}" = true ] && [ -n "${LAUNCH_IMAGE}" ] ; then
     _echo "Pulling ${LAUNCH_IMAGE}"

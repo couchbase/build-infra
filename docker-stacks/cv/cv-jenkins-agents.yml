@@ -25,7 +25,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   ubuntu18_small:
-    image: couchbasebuild/swarm-launcher:20201203
+    image: couchbasebuild/swarm-launcher:20210209
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -60,7 +60,7 @@ services:
         parallelism: 100
 
   ubuntu18_large:
-    image: couchbasebuild/swarm-launcher:20201203
+    image: couchbasebuild/swarm-launcher:20210209
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
