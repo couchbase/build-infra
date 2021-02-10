@@ -9,15 +9,6 @@ popd > /dev/null
 # Backup for zz-server-lightweight (same port as running on mega2)
 ${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/zz-lightweight:20210208 zz-server-lightweight-backup 5322 server.jenkins.couchbase.com
 
-# Centos6 watson builder
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/centos-65-couchbase-build:20170522 watson-centos6-01 5222 server.jenkins.couchbase.com
-# Debian7 watson builder
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/debian-7-couchbase-build:20170522 watson-debian7 5224 server.jenkins.couchbase.com
-# Centos 7 watson builder
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/centos-70-couchbase-build:20170522 watson-centos7-01 5227 server.jenkins.couchbase.com
-# Debian8 watson builder
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/debian-8-couchbase-build:20171106 watson-debian8 5229 server.jenkins.couchbase.com
-
 # server.jenkins slave for running Ansible playbooks
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/ansible-slave:20180312 ansible-slave-server 2999 server.jenkins.couchbase.com
 

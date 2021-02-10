@@ -6,8 +6,6 @@ popd > /dev/null
 
 # Slaves for server.jenkins running on mega2
 
-# Watson Ubuntu 14.04 builder
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/ubuntu-1404-couchbase-build:20170522 watson-ubuntu14.04 5226 server.jenkins.couchbase.com
 # Vulcan Ubuntu 14.04 builder
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/server-ubuntu14-build:20180829 vulcan-ubuntu14.04 5232 server.jenkins.couchbase.com
 # Spock Ubuntu 16.04 builder - using CV image because that helps some
@@ -23,4 +21,3 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/centos-
 
 wait
 echo "All done!"
-
