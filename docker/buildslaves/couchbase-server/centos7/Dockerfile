@@ -113,8 +113,10 @@ RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchba
 
 # Still need paramiko in python2 for testrunner (necessary at least for simple-test,
 # which runs in the build image rather than the full CV image)
-RUN curl "https://bootstrap.pypa.io/get-pip.py" | python && \
-    pip install paramiko
+RUN sudo yum install -y epel-release && sudo yum install -y python-pip && \
+    pip install --upgrade "pip < 21.0" && \
+    pip install paramiko && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV AGENT_VERSION=4.3
 
