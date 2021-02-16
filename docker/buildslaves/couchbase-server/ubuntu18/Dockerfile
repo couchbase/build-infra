@@ -96,7 +96,7 @@ RUN set -x \
     && apt-get clean \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1 \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 \
-    && rm /usr/local/bin/pip /usr/local/bin/easy_install \
+    && rm /usr/local/bin/pip \
     && pip3 install lxml==4.6.1 jwt==1.0.0 pycrypto jira==2.0.0 boto3==1.16.4 pbr==5.5.1 cffi==1.14.3 \
     && pip3 install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1 \
          beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2 \
