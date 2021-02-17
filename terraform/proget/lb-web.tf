@@ -27,8 +27,6 @@ resource "aws_lb" "proget" {
   load_balancer_type = "application"
   security_groups    = [ aws_security_group.proget_lb.id ]
   subnets            = data.aws_subnet_ids.public_subnet_ids.ids
-
-
   enable_deletion_protection = false
 }
 

@@ -15,4 +15,5 @@ locals {
   ami_id = "ami-01accb82117ea785e"
   eip_allocation_id = "eipalloc-07606aa1cf0c60cc2" # for EIP 34.231.36.140
   ssh_hosts = ["67.180.86.220/32"]
+  alarms_email = "build-team@couchbase.com"
 }
