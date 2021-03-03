@@ -156,6 +156,8 @@ command -v gpg >/dev/null 2>&1 && {
 # if first argument is "default", for backwards-compatibility start sshd
 # (as new, long-running, foreground process)
 [[ "$1" == "default" ]] && {
+    mkdir -p /home/couchbase/jenkins
+    chown -R couchbase:couchbase /home/couchbase/jenkins
     exec /usr/sbin/sshd -D
     exit
 }
