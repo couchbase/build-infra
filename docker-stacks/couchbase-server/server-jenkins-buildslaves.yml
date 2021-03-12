@@ -154,14 +154,32 @@ services:
     <<: *default-jenkins-slave
 
   rhel8:
-    image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20200424
+    image: couchbasebuild/server-rhel8-build:20210310
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8"
+      - "JENKINS_SLAVE_LABELS=server rhel8 cheshire-cat cheshire-cat-rhel8 master master-rhel8"
+      - *default-jenkins-slave-environment-master
+      - *node-class
+      - *node-product
+    <<: *default-jenkins-slave
+
+  rhel8-alice:
+    image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20200424
+    environment:
+      - "JENKINS_SLAVE_NAME=server-rhel8-alice"
       - "JENKINS_SLAVE_LABELS=server rhel8 alice alice-rhel8"
       - *default-jenkins-slave-environment-master
       - *node-class
       - *node-product
     <<: *default-jenkins-slave
+    deploy:
+      resources:
+        reservations:
+          memory: 7G
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
 
   suse11:
     image: couchbasebuild/server-suse11-build:20200424

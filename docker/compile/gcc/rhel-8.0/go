@@ -1,17 +1,9 @@
-#!/bin/sh
+#!/bin/bash -e
 
 GCC_VER=7.3.0
-IMAGE=build-docker.couchbase.com/couchbasebuild/rhel-8-gcc
-
-PRIV_DIR=${HOME}/jenkinsdocker-ssh
-RH_USER=$(cat ${PRIV_DIR}/redhat_access_user.txt)
-RH_PASSWORD=$(cat ${PRIV_DIR}/redhat_access_password.txt)
-RH_POOL_ID=$(cat ${PRIV_DIR}/rhel_8_pool_id.txt)
+IMAGE=couchbasebuild/rhel-8-gcc
 
 docker build \
-    --build-arg RH_USER=${RH_USER} \
-    --build-arg RH_PASSWORD=${RH_PASSWORD} \
-    --build-arg RH_POOL_ID=${RH_POOL_ID} \
     --build-arg GCC_VER=${GCC_VER} \
     -t ${IMAGE}:${GCC_VER} .
 

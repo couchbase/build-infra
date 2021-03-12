@@ -2,7 +2,12 @@
 
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
-IMAGE=couchbasebuild/server-rhel8-build
+IMAGE=build-docker.couchbase.com/couchbasebuild/server-rhel8-build
+
+PRIV_DIR=/home/couchbase/jenkinsdocker-ssh
+RH_USER=$(cat ${PRIV_DIR}/redhat_access_user.txt)
+RH_PASSWORD=$(cat ${PRIV_DIR}/redhat_access_password.txt)
+RH_POOL_ID=$(cat ${PRIV_DIR}/rhel_8_pool_id.txt)
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -11,15 +16,19 @@ cp -a ../../util/swarm*.properties build
 # Only copy this if it doesn't exist. Prevents re-running steps in
 # this Dockerfile. This does mean that if you need to update the gcc,
 # you need to manually delete this directory and rebuild.
+# Note: the gcc build image is in build-infra.
 if [ ! -d build/local ]
 then
     docker run --rm -v $(pwd)/build:/output \
-        couchbasebuild/rhel-8-gcc:7.3.0 \
+        build-docker.couchbase.com/couchbasebuild/rhel-8-gcc:7.3.0-alice \
         cp -a /usr/local /output
 fi
 
 docker build \
     --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+    --build-arg RH_USER=${RH_USER} \
+    --build-arg RH_PASSWORD=${RH_PASSWORD} \
+    --build-arg RH_POOL_ID=${RH_POOL_ID} \
     -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
