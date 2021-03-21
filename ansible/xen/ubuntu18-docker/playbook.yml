@@ -2,8 +2,16 @@
 - name: Deploy new Ubuntu VM
   gather_facts: False
   hosts: xenservers
+  vars:
+    - disksize_in_gib: "{{ disksize | int * 1024 * 1024 * 1024 }}"
+    - memory_in_gib: "{{ memory | int * 1024 * 1024 * 1024 }}"
 
   tasks:
+    - name: Check for existence of docker-config.json
+      local_action: stat path=docker-config.json
+      register: filestat
+      failed_when: filestat.stat.exists == False
+
     - name: Get UUID of share SR
       command: xe sr-list name-label="{{ sr_name }}" --minimal
       register: sruuid
@@ -34,10 +42,10 @@
       register: vdiuuid
 
     - name: Set disk size
-      command: xe vdi-resize disk-size="{{ disksize }}" uuid={{ vdiuuid.stdout }}
+      command: xe vdi-resize disk-size="{{ disksize_in_gib }}" uuid={{ vdiuuid.stdout }}
 
     - name: Set memory
-      command: xe vm-memory-limits-set uuid={{ vmuuid.stdout }} dynamic-min="{{ memory }}" dynamic-max="{{ memory }}" static-max="{{ memory }}" static-min="{{ memory }}"
+      command: xe vm-memory-limits-set uuid={{ vmuuid.stdout }} dynamic-min="{{ memory_in_gib }}" dynamic-max="{{ memory_in_gib }}" static-max="{{ memory_in_gib }}" static-min="{{ memory_in_gib }}"
 
     - name: Attach VM to {{ network_name }}
       command: xe vif-create vm-uuid={{ vmuuid.stdout }} network-uuid={{ networkuuid.stdout }} mac=random device=0
@@ -202,6 +210,15 @@
         state: directory
         mode: 0755
 
+    - name: Create jenkins directory
+      tags: tmp
+      file:
+        path: /home/couchbase/jenkins
+        state: directory
+        mode: '0755'
+        owner: couchbase
+        group: couchbase
+
     - name: Create docker systemd drop-in config file
       copy:
         src: docker-service.conf
@@ -275,3 +292,20 @@
       service:
         name: "netdata"
         enabled: yes
+
+    - name: Get Docker Swarm token
+      when: swarm_manager is defined
+      command: docker -H {{ swarm_manager }} swarm join-token -q --rotate worker
+      register: swarm_join_token
+      tags: docker_swarm
+
+    - name: Join Docker Swarm
+      when: swarm_manager is defined
+      command: docker swarm join --token {{ swarm_join_token.stdout }} {{ swarm_manager }}
+      tags: docker_swarm
+
+    - name: Add Swarm labels
+      when: swarm_labels is defined
+      command: docker -H {{ swarm_manager }} node update --label-add {{ item }} {{ vm_name }}
+      loop: "{{ swarm_labels.split(',') }}"
+      tags: docker_swarm
