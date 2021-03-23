@@ -1,6 +1,5 @@
 #!/bin/sh -ex
 
-# Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-centos7-build
 

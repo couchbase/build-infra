@@ -3,12 +3,10 @@
 FROM centos:7.2.1511
 LABEL maintainer="build-team@couchbase.com"
 
+# Set LANG
+ENV LANG=en_US.UTF-8
+
 USER root
-# We first add the Centos 7.2 repository from Centos Vault, so we're only
-# getting packages from Centos 7.2. This is primarily so that we stick
-# with OpenSSL 1.0.1e.
-COPY Centos72.repo /etc/yum.repos.d
-RUN rm /etc/yum.repos.d/CentOS-Base.repo
 
 # Work around odd RPM database problems - some from https://github.com/moby/moby/issues/10180
 RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm
@@ -16,7 +14,7 @@ RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm
 # Jenkins Swarm jar
 RUN yum install -y java-1.8.0-openjdk-headless curl && \
     yum clean packages
-RUN curl \
+RUN curl --fail \
     https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
     -o /usr/local/lib/swarm-client.jar
 
@@ -29,7 +27,6 @@ RUN chmod +x /tini
 # * Packages from the base CentOS repositories
 RUN yum install --setopt=keepcache=0 -y \
                 ed \
-                git \
                 glibc-devel \
                 make \
                 man \
@@ -108,8 +105,9 @@ RUN mkdir /tmp/deploy && \
     rm -fr /tmp/deploy
 
 # * repo
-RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
-    chmod a+x /usr/local/bin/repo
+RUN set -x \
+    && curl --fail https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
+    && chmod a+x /usr/local/bin/repo
 
 # Still need paramiko in python2 for testrunner (necessary at least for simple-test,
 # which runs in the build image rather than the full CV image)
@@ -118,12 +116,38 @@ RUN sudo yum install -y epel-release && sudo yum install -y python-pip && \
     pip install paramiko && \
     rm -rf /var/lib/apt/lists/*
 
-ENV AGENT_VERSION=4.3
+# Git
+ARG GIT_VERSION=2.9.5
+RUN set -x \
+    && yum install -y curl-devel expat-devel gettext-devel openssl-devel perl-devel zlib-devel \
+    && cd /usr/src \
+    && curl -LO https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz \
+    && tar xzf git-${GIT_VERSION}.tar.gz \
+    && rm -f git-${GIT_VERSION}.tar.gz \
+    && cd git-${GIT_VERSION} \
+    && make prefix=/usr/src all \
+    && make prefix=/usr/local install \
+    && echo "export PATH=$PATH:/usr/local/bin" >> /etc/bashrc
 
+# Python 3
+RUN set -x \
+    && yum groupinstall -y "Development Tools" \
+    && yum install -y openssl-devel libffi-devel bzip2-devel \
+    && cd /usr/src \
+    && curl -LO --fail https://www.python.org/ftp/python/3.9.2/Python-3.9.2.tgz \
+    && tar xvf Python-3.9.2.tgz \
+    && rm -f Python-3.9.2.tgz \
+    && cd Python-3.9.2 \
+    && ./configure --enable-optimizations \
+    && make altinstall \
+    && update-alternatives --install /usr/local/bin/python3 python3 /usr/local/bin/python3.9 1
+
+# JNLP agent
+ARG JNLP_AGENT_VERSION=4.3
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
 RUN yum install -y git-lfs && rm -rf /var/lib/apt/lists/*
 
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VERSION}/remoting-${JNLP_AGENT_VERSION}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
@@ -131,6 +155,11 @@ RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-
 ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
+
+# Fix locale
+RUN set -x \
+    && sed -i "s/^override_install_langs=/#override_install_langs=/" /etc/yum.conf \
+    && yum reinstall -y glibc-common
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
@@ -140,9 +169,6 @@ EXPOSE 22
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
-
-# Set LANG
-ENV LANG=en_US.UTF-8
 
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 
