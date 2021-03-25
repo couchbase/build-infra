@@ -200,7 +200,7 @@ services:
       replicas: 1
 
   suse12:
-    image: build-docker.couchbase.com/internal/server-suse12-build:20210120
+    image: build-docker.couchbase.com/internal/server-suse12-build:20210325
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-suse12"

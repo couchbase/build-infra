@@ -90,6 +90,15 @@ RUN zypper -n install perl && \
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# Install cbdep
+RUN curl https://packages.couchbase.com/cbdep/0.9.18/cbdep-0.9.18-linux -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
+
+# Install miniconda3
+# latest repo requires python 3.6+.  Official suse repository only provides python 3.3 for suse12
+RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
+    chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2
+
 # Oracle JDK (for Jenkins and Analytics).
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
