@@ -41,7 +41,7 @@ x-node-product:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20200729
+    image: couchbasebuild/server-amzn2-build:20210326
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice alice-amzn2 mad-hatter mad-hatter-amzn2 cheshire-cat cheshire-cat-amzn2 master master-amzn2"
@@ -70,7 +70,7 @@ services:
       replicas: 1
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20210324
+    image: couchbasebuild/server-centos7-build:20210326
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=server centos7 centos7-asan vulcan vulcan-centos7 alice alice-centos7 mad-hatter mad-hatter-centos7 cheshire-cat cheshire-cat-centos7 cheshire-cat-centos7-asan master master-centos7 master-centos7-asan"
@@ -88,7 +88,7 @@ services:
       replicas: 3
 
   centos8:
-    image: couchbasebuild/server-centos8-build:20200424
+    image: couchbasebuild/server-centos8-build:20210326
     environment:
       - "JENKINS_SLAVE_NAME=server-centos8"
       - "JENKINS_SLAVE_LABELS=server centos8 centos8-asan mad-hatter mad-hatter-centos8 cheshire-cat cheshire-cat-centos8 cheshire-cat-centos8-asan master master-centos8 master-centos8-asan"
@@ -221,7 +221,7 @@ services:
     <<: *default-jenkins-slave
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20200821
+    image: couchbasebuild/server-suse15-build:20210326
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat cheshire-cat-suse15 master master-suse15"

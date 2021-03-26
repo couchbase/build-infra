@@ -98,6 +98,17 @@ RUN mkdir /tmp/deploy && \
 RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
+# * Install cbdep
+RUN curl https://packages.couchbase.com/cbdep/0.9.18/cbdep-0.9.18-linux -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
+
+# * Install miniconda3
+# One of the benefits is: repo tool requires python 3.5+; the OS comes with python2.  miniconda3 is a flexible way
+# of installing python on a system
+RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
+    chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2
+
+
 ENV AGENT_VERSION=4.3
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash

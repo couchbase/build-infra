@@ -109,6 +109,16 @@ RUN set -x \
     && curl --fail https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
 
+# * Install cbdep
+RUN curl https://packages.couchbase.com/cbdep/0.9.18/cbdep-0.9.18-linux -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
+
+# * Install miniconda3
+# One of the benefits is: repo tool requires python 3.5+; the OS comes with python2.  miniconda3 is a flexible way
+# of installing python on a system
+RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
+    chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2
+
 # Still need paramiko in python2 for testrunner (necessary at least for simple-test,
 # which runs in the build image rather than the full CV image)
 RUN sudo yum install -y epel-release && sudo yum install -y python-pip && \

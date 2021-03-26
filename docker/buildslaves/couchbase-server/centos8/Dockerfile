@@ -7,6 +7,17 @@ RUN set -x \
     ; yes | mv /var/lib/rpmrebuilddb.*/* /var/lib/rpm \
     && rm -rf /var/lib/rpmrebuilddb*
 
+# Install cbdep
+RUN curl https://packages.couchbase.com/cbdep/0.9.18/cbdep-0.9.18-linux -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
+
+# Install miniconda3
+# One of the benefits is: repo tool requires python 3.5+; the OS comes with python2.  miniconda3 is a flexible way
+# of installing python on a system
+RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
+    chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2
+
+
 ENV AGENT_VERSION=4.3
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
 RUN yum install -y git-lfs
