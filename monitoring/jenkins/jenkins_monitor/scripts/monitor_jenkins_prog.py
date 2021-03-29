@@ -357,9 +357,11 @@ class JenkinsMonitor:
         try:
             results = self.get_jenkins_data(
                 f'/computer/api/xml?tree=computer[displayName,assignedLabels[name],'
-                f'offline,temporarilyOffline]&xpath=//computer[not%28assignedLabel[name]'
-                f'=%22unmonitored%22%29%20and%20offline=%22true%22%20and%20'
-                f'temporarilyOffline=%22false%22]&wrapper=computers'
+                f'offline,temporarilyOffline]&'
+                f'xpath=//computer[not%28contains%28@_class,%22DockerSwarmComputer%22%29%29%20'
+                f'and%20not%28assignedLabel[name]=%22unmonitored%22%29%20'
+                f'and%20offline=%22true%22%20'
+                f'and%20temporarilyOffline=%22false%22]&wrapper=computers'
             )['computers']
         except (ConnectionError, ValueError) as exc:
             raise RuntimeError(exc)
