@@ -86,14 +86,17 @@ RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
 # Set LANG
 ENV LANG=en_US.UTF-8
 
-# GCC (from couchbasebuild/suse-15-gcc)
-COPY build/local /usr/local
-RUN  (cat /etc/ld.so.conf ; echo "/usr/local/lib64") > /tmp/ld.so.conf && \
+# GCC (from couchbasebuild/debian-9-gcc)
+ARG GCC_VER=10.2.0
+RUN mkdir -p /opt
+COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+RUN  (echo "/opt/gcc-${GCC_VER}/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
+ENV PATH=/opt/gcc-${GCC_VER}/bin:$PATH
 
 RUN set -x \
-        && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
-        && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
+        && update-alternatives --install /usr/bin/gcc gcc /opt/gcc-${GCC_VER}/bin/gcc 100 \
+        && update-alternatives --install /usr/bin/g++ g++ /opt/gcc-${GCC_VER}/bin/g++ 100
 
 ENV AGENT_VERSION=4.3
 

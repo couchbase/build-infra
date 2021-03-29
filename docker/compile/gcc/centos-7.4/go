@@ -1,12 +1,13 @@
-#!/bin/sh
+#!/bin/bash -e
 
-GCC_VER=7.3.0
+GCC_VER=10.2.0
 IMAGE=couchbasebuild/centos-7-gcc
 
-docker build --build-arg GCC_VER=${GCC_VER} -t ${IMAGE}:${GCC_VER} .
-docker tag ${IMAGE}:${GCC_VER} ${IMAGE}:latest
+docker build \
+    --build-arg GCC_VER=${GCC_VER} \
+    -t ${IMAGE}:${GCC_VER} .
+
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:${GCC_VER}
-  docker push ${IMAGE}:latest
 fi

@@ -71,9 +71,12 @@ RUN curl \
     -o /usr/local/lib/swarm-client.jar
 
 # GCC (from couchbasebuild/centos-8-gcc)
-COPY build/local /usr/local
-RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+ARG GCC_VER
+RUN mkdir -p /opt
+COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+RUN  (echo "/opt/gcc-${GCC_VER}/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
+ENV PATH=/opt/gcc-${GCC_VER}/bin:$PATH
 
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
