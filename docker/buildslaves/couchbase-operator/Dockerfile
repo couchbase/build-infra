@@ -34,6 +34,12 @@ RUN mkdir /tmp/deploy && \
     cd /tmp && \
     rm -rf deploy
 
+# jq
+RUN set -x \
+    && apt update \
+    && apt install -y jq \
+    && apt clean
+
 COPY build/couchbuilder_start.sh /usr/sbin/
 
 COPY build/swarm*.properties /
