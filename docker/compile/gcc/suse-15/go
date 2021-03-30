@@ -1,13 +1,13 @@
-#!/bin/bash -e
+#!/bin/sh
 
-GCC_VER=10.2.0
+GCC_VER=7.3.0
 IMAGE=couchbasebuild/suse-15-gcc
 
-docker build \
-    --build-arg GCC_VER=${GCC_VER} \
-    -t ${IMAGE}:${GCC_VER} .
+docker build --build-arg GCC_VER=${GCC_VER} --build-arg REGCODE=$(cat $HOME/jenkinsdocker-ssh/suse_regcode.txt) -t ${IMAGE}:${GCC_VER} .
+docker tag ${IMAGE}:${GCC_VER} ${IMAGE}:latest
 
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:${GCC_VER}
+  docker push ${IMAGE}:latest
 fi

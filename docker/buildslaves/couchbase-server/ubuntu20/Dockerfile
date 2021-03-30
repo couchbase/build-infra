@@ -108,17 +108,14 @@ ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
-# GCC (from couchbasebuild/ubuntu-20-gcc)
-ARG GCC_VER=10.2.0
-RUN mkdir -p /opt
-COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
-RUN  (echo "/opt/gcc-${GCC_VER}/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+# GCC (from couchbasebuild/ubuntu-2004-gcc)
+COPY build/local /usr/local
+RUN  (cat /etc/ld.so.conf ; echo "/usr/local/lib64") > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
-ENV PATH=/opt/gcc-${GCC_VER}/bin:$PATH
 
 RUN set -x \
-        && update-alternatives --install /usr/bin/gcc gcc /opt/gcc-${GCC_VER}/bin/gcc 100 \
-        && update-alternatives --install /usr/bin/g++ g++ /opt/gcc-${GCC_VER}/bin/g++ 100
+        && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
+        && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22

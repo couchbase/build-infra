@@ -56,13 +56,10 @@ RUN apt-get update && \
     apt-get clean && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 
-# GCC (from couchbasebuild/ubuntu-18-gcc)
-ARG GCC_VER=10.2.0
-RUN mkdir -p /opt
-COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
-RUN  (echo "/opt/gcc-${GCC_VER}/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+# GCC (from couchbasebuild/ubuntu-1804-gcc)
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
-ENV PATH=/opt/gcc-${GCC_VER}/bin:$PATH
 
 # Install third-party build dependencies.
 RUN apt-get update && \

@@ -59,12 +59,9 @@ RUN apt-get update && \
     apt-get clean
 
 # GCC (from couchbasebuild/debian-9-gcc)
-ARG GCC_VER=10.2.0
-RUN mkdir -p /opt
-COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
-RUN  (echo "/opt/gcc-${GCC_VER}/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
+COPY build/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
-ENV PATH=/opt/gcc-${GCC_VER}/bin:$PATH
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.

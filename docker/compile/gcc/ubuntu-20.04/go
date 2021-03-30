@@ -1,13 +1,16 @@
-#!/bin/bash -e
+#!/bin/sh
 
-GCC_VER=10.2.0
-IMAGE=couchbasebuild/ubuntu-20-gcc
+GCC_VER=7.5.0
+IMAGE=couchbasebuild/ubuntu-2004-gcc
 
-docker build \
-    --build-arg GCC_VER=${GCC_VER} \
-    -t ${IMAGE}:${GCC_VER} .
+mkdir -p build/patches
+if [ -d ../patches/${GCC_VER} ]; then
+  cp ../patches/${GCC_VER}/*.patch build/patches
+fi
 
+docker build --build-arg GCC_VER=${GCC_VER} -t ${IMAGE}:${GCC_VER} -t ${IMAGE}:latest .
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:${GCC_VER}
+  docker push ${IMAGE}:latest
 fi
