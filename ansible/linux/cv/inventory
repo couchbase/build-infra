@@ -18,6 +18,11 @@ cvlargeworkers
 [cvlargeworkers]
 172.23.113.22  # ubuntu18-cv-large-01
 172.23.96.209  # ubuntu18-cv-large-05
+172.23.107.26  # ubuntu18-cv-large-06
+172.23.107.80  # ubuntu18-cv-large-07
+172.23.107.81  # ubuntu18-cv-large-08
+172.23.107.82  # ubuntu18-cv-large-09
+172.23.107.83  # ubuntu18-cv-large-10
 
 [cvlargeworkers:children]
 cvmanagers
