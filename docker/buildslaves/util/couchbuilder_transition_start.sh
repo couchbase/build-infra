@@ -81,8 +81,8 @@ then
   start_cmd="mkdir -p ~/.ssh \
     && add_hostkeys \
     && rsync --progress --archive --backup --executability --no-o --no-g -e \"ssh -p ${profile_port} -i /run/secrets/profile_sync -o StrictHostKeyChecking=no\" couchbase@${profile_host}:${NODE_PRODUCT}/${NODE_CLASS}/linux/ /home/couchbase/ \
-    && ([ -d ~/.ssh ] && chmod 00700 ~/.ssh) \
-    && ([ -d ~/.gpg ] && chmod 00700 ~/.gpg)"
+    && (if [ -d ~/.ssh ]; then chmod 00700 ~/.ssh; fi) \
+    && (if [ -d ~/.gpg ]; then chmod 00700 ~/.gpg; fi)"
 
   # we could concievably be running the container as root or couchbase, let's try
   # to populate the profile data correctly either way

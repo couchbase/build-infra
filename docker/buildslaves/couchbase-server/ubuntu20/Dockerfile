@@ -1,5 +1,11 @@
 # Docker container for Ubuntu 20.04
 
+# This has to be first - define the GCC version to use and
+# the image to pull it from
+ARG GCC_VER=10.2.0
+FROM couchbasebuild/ubuntu-20-gcc:${GCC_VER} AS gcc
+
+# This is the actual build agent base image
 FROM ubuntu:20.04
 LABEL maintainer="build-team@couchbase.com"
 
@@ -108,9 +114,13 @@ ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
-# GCC (from couchbasebuild/ubuntu-2004-gcc)
-COPY build/local /usr/local
-RUN  (cat /etc/ld.so.conf ; echo "/usr/local/lib64") > /tmp/ld.so.conf && \
+# GCC - need to redundantly declare GCC_ARG here
+ARG GCC_VER=10.2.0
+RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
+COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+# Historic gcc 7.5.0
+COPY --from=couchbasebuild/ubuntu-2004-gcc:7.5.0 /usr/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 RUN set -x \

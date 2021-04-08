@@ -56,7 +56,10 @@ RUN zypper -n install \
                 unzip \
     && zypper clean
 
-# GCC (from local suse-12-gcc)
+# GCC (from localonly/suse-12-gcc)
+ARG GCC_VER=10.2.0
+RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
+COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 COPY build/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig

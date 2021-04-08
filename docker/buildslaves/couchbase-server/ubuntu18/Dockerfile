@@ -1,5 +1,11 @@
 # Docker container for Ubuntu 18.04
 
+# This has to be first - define the GCC version to use and
+# the image to pull it from
+ARG GCC_VER=10.2.0
+FROM couchbasebuild/ubuntu-18-gcc:${GCC_VER} AS gcc
+
+# This is the actual build agent base image
 FROM ubuntu:18.04
 LABEL maintainer="build-team@couchbase.com"
 
@@ -56,8 +62,12 @@ RUN apt-get update && \
     apt-get clean && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 
-# GCC (from couchbasebuild/ubuntu-1804-gcc)
-COPY build/local /usr/local
+# GCC - need to redundantly declare GCC_ARG here
+ARG GCC_VER=10.2.0
+RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
+COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+# Historic gcc 7.3.0
+COPY --from=couchbasebuild/ubuntu-1804-gcc:7.3.0 /usr/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 

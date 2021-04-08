@@ -1,16 +1,14 @@
 #!/bin/sh
 
-GCC_VER=7.3.0
+GCC_VER=10.2.0
 IMAGE=localonly/suse-12-gcc
 
 docker build --build-arg GCC_VER=${GCC_VER} --build-arg REGCODE=$(cat $HOME/jenkinsdocker-ssh/suse_regcode.txt) -t ${IMAGE}:${GCC_VER} .
-docker tag ${IMAGE}:${GCC_VER} ${IMAGE}:latest
 
 # Leaving this commented out due to potential licensing restrictions
-# on uploading a built SuSE 12 Enterprise image
+# on uploading a built SuSE 12 Enterprise image to Docker Hub
 #
 # if [ "$1" = "--publish" ]
 # then
 #   docker push ${IMAGE}:${GCC_VER}
-#   docker push ${IMAGE}:latest
 # fi

@@ -1,5 +1,11 @@
 # Docker container for Amazon 2.0
 
+# This has to be first - define the GCC version to use and
+# the image to pull it from
+ARG GCC_VER=10.2.0
+FROM couchbasebuild/amzn-2-gcc:${GCC_VER} AS gcc
+
+# This is the actual build agent base image
 FROM amazonlinux:2.0.20181010
 LABEL maintainer="build-team@couchbase.com"
 
@@ -62,8 +68,12 @@ RUN groupadd -g1000 couchbase && \
 # Install third-party build dependencies
 RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper
 
-# GCC (from couchbasebuild/amzn-2-gcc)
-COPY build/local /usr/local
+# GCC - need to redundantly declare GCC_ARG here
+ARG GCC_VER=10.2.0
+RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
+COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+# Historic gcc 7.3.0
+COPY --from=couchbasebuild/amzn-2-gcc:7.3.0 /usr/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 

@@ -1,5 +1,11 @@
 # Docker container for SUSE 15, based on openSUSE LEAP
 
+# This has to be first - define the GCC version to use and
+# the image to pull it from
+ARG GCC_VER=10.2.0
+FROM couchbasebuild/suse-15-gcc:${GCC_VER} AS gcc
+
+# This is the actual build agent base image
 FROM opensuse/leap:15.2
 LABEL maintainer="build-team@couchbase.com"
 
@@ -86,9 +92,13 @@ RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
 # Set LANG
 ENV LANG=en_US.UTF-8
 
-# GCC (from couchbasebuild/suse-15-gcc)
-COPY build/local /usr/local
-RUN  (cat /etc/ld.so.conf ; echo "/usr/local/lib64") > /tmp/ld.so.conf && \
+# GCC - need to redundantly declare GCC_ARG here
+ARG GCC_VER=10.2.0
+RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
+COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+# Historic gcc 7.3.0
+COPY --from=couchbasebuild/suse-15-gcc:7.3.0 /usr/local /usr/local
+RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 RUN set -x \

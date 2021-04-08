@@ -1,24 +1,17 @@
 #!/bin/sh -ex
 
-# Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-debian10-build
+GCC_VER=10.2.0
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 
-# Only copy this if it doesn't exist. Prevents re-running steps in
-# this Dockerfile. This does mean that if you need to update the
-# gcc, you need to manually delete this directory and rebuild.
-if [ ! -d build/local ]
-then
-    docker run --rm -v $(pwd)/build:/output \
-        couchbasebuild/debian-10-gcc:7.3.0 \
-        cp -a /usr/local /output
-fi
-docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} -t ${IMAGE}:${TAG} .
-docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+docker build \
+  --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg GCC_VER=${GCC_VER} \
+  -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:$TAG
