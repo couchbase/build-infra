@@ -36,6 +36,14 @@
     npm:
       path: "{{ app_dir }}"
 
+  - name: Schedule cleanup
+    cron:
+      name: "Cleanup notarizer workspace"
+      minute: "0"
+      hour: "0"
+      user: "couchbase"
+      job: 'cd /tmp && find {{ app_dir }}/workdir -maxdepth 1 -type d -mtime +7 -exec rm -r "{}" \;'
+
   - name: Copy plist
     template:
       src: files/com.couchbase.notarizer.plist.j2
