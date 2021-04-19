@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#  docker --host 172.23.97.139 stack deploy -c cv-jenkins-agents.yml cv
+#  docker --host 172.23.112.24 stack deploy -c cv-jenkins-agents.yml cv
 # All services, networks, etc. will then get an "cv_" prefix,
 # eg. "cv_ubuntu18_large"
 
@@ -38,7 +38,7 @@ services:
       LAUNCH_PRIVILEGED: "true"
       LAUNCH_ENVIRONMENTS: >-
         JENKINS_SLAVE_NAME=CV
-        JENKINS_SLAVE_LABELS=docker
+        JENKINS_SLAVE_LABELS=docker@_@linux
         JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
         NODE_CLASS=cv
         NODE_PRODUCT=couchbase-server
