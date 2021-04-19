@@ -24,6 +24,42 @@ x-default-jenkins-agent: &default-jenkins-agent
 
 services:
 
+  ubuntu18_docker:
+    image: couchbasebuild/swarm-launcher:20210209
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/tmp:/mnt"
+
+    environment:
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20210413
+      LAUNCH_PULL: "true"
+      LAUNCH_EXT_NETWORKS: cv_jenkins
+      LAUNCH_PRIVILEGED: "true"
+      LAUNCH_ENVIRONMENTS: >-
+        JENKINS_SLAVE_NAME=CV
+        JENKINS_SLAVE_LABELS=docker
+        JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
+        NODE_CLASS=cv
+        NODE_PRODUCT=couchbase-server
+        PARALLELISM=4
+      LAUNCH_VOLUMES: "/var/run/docker.sock:/var/run/docker.sock:rw"
+      LAUNCH_SYSCTLS: "net.ipv6.conf.lo.disable_ipv6=0"
+      LAUNCH_HOSTNAME_FROM_HOST: "true"
+
+      LOGIN_USER: "nsbuildbot"
+      LOGIN_PASSWORD_FILE: "/tmp/dockerhub_nsbuildbot_password"
+
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==docker"
+        max_replicas_per_node: 1
+      replicas: 1
+      update_config:
+        parallelism: 100
+
   ubuntu18_small:
     image: couchbasebuild/swarm-launcher:20210209
 
