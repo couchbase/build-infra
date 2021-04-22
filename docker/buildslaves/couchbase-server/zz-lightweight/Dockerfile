@@ -95,9 +95,8 @@ RUN set -x \
 
 # Install repo
 RUN set -x \
-    && curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo \
-    && chmod a+x /usr/local/bin/repo \
-    && cd /tmp && rm -rf /tmp/deploy
+    && curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
+    && chmod a+x /usr/local/bin/repo
 
 # Install rsync
 RUN set -x \
