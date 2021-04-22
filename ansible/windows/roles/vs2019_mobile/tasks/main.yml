@@ -1,0 +1,46 @@
+---
+- name: Create directory structure
+  win_file:
+    path: C:\vs2019
+    state: directory
+
+- name: Add vs2019 to PATH.
+  win_path:
+    elements:
+      - C:\vs2019
+
+# https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
+- name: Download vs_professional.exe installer
+  win_get_url:
+    url: "https://aka.ms/vs/16/release/vs_professional.exe"
+    dest: C:\vs2019\vs_professional.exe
+
+- name: Check if MSVC install
+  win_stat:
+  path: C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe
+  register: msvc_installcleanup
+
+- debug: var=msvc_installcleanup.stdout_lines
+
+- name: "Run MSVC install cleanup"
+  win_command: '"C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe" -full'
+  when: msvc_installcleanup.stat.exists == True
+
+- name: Install Visual Studio Professional 2019 and dotnet tools
+  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.SDK26 --add Component.Android.SDK27 --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.Universal --add Component.Android.NDK.R15C --add Microsoft.VisualStudio.Component.Windows10SDK.16299 --add Microsoft.VisualStudio.ComponentGroup.UWP.VC --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  register: install_output
+  failed_when: ( install_output.rc not in [ 3010, 0 ] )
+
+- name: extra vs2019 components
+  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.Windows10SDK.14393 --add Microsoft.VisualStudio.Component.VC.ATL.ARM --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  register: install_output
+  failed_when: ( install_output.rc not in [ 3010, 0 ] )
+  when: PRODUCT == "couchbase-lite-core"
+
+- debug: var=install_output.stdout_lines
+
+- name: Reboot Windows if necessary
+  win_reboot:
+    shutdown_timeout_sec: 3600
+    reboot_timeout_sec: 3600
+  when: install_output.rc == 3010

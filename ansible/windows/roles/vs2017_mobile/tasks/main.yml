@@ -4,10 +4,10 @@
     path: C:\vs2017
     state: directory
 
-- name: Add bin to PATH.
-  include: extend-path.yml
-  with_items:
-    - C:\vs2017
+- name: Add vs2017 to PATH.
+  win_path:
+    elements:
+      - C:\vs2017
 
 # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 - name: Download vs_professional.exe installer
@@ -15,13 +15,24 @@
     url: "https://aka.ms/vs/15/release/vs_professional.exe"
     dest: C:\vs2017\vs_professional.exe
 
+- name: Check if MSVC install
+  win_stat:
+  path: C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe
+  register: msvc_installcleanup
+
+- debug: var=msvc_installcleanup.stdout_lines
+
+- name: "Run MSVC install cleanup"
+  win_command: '"C:\Program Files (x86)\Microsoft VisualStudio\Installer\resources\app\layout\InstallCleanup.exe" -full'
+  when: msvc_installcleanup.stat.exists == True
+
 - name: Install Visual Studio Professional 2017 and dotnet tools
-  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.Universal --add Component.Android.NDK.R15C --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP --add Microsoft.VisualStudio.ComponentGroup.UWP.VC --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.SDK26 --add Component.Android.SDK27 --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.Universal --add Component.Android.NDK.R15C --add Microsoft.VisualStudio.Component.Windows10SDK.16299 --add Microsoft.VisualStudio.ComponentGroup.UWP.VC --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
 
 - name: extra vs2017 components
-  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Component.Android.SDK27 --add Microsoft.VisualStudio.Component.Windows10SDK.16299.Desktop --add Microsoft.VisualStudio.Component.Windows10SDK.16299.UWP.Native --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.Windows10SDK.14393 --add Microsoft.VisualStudio.Component.VC.ATL.ARM --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\vs2017\vs_professional.exe --add Microsoft.VisualStudio.Component.VC.140 --add Microsoft.VisualStudio.Component.Windows10SDK.14393 --add Microsoft.VisualStudio.Component.VC.ATL.ARM --quiet --productKey "{{ vs2017_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
   register: install_output
   failed_when: ( install_output.rc not in [ 3010, 0 ] )
   when: PRODUCT == "couchbase-lite-core"

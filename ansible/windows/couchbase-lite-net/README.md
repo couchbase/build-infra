@@ -39,13 +39,7 @@ requirements for building couchbase-lite .NET
            -i inventory playbook.yml \
            -e vskey=ABCD-EFGH-IJKL-MNOP \
            -e ansible_password=ADMINISTRATOR_PASSWORD
+           -e VS_VERSION=vs2019
 
-`vskey` is the license key for Visual Studio Professional 2017 (hyphen is included).
-
-A few "Gotcha" note:
-1. If build starts failing with sdk/ndk path not found in xamarin:
-Solution: bring up control panel and repair msvc2017, this will likely set the sdk/ndk path correctly
-2. The current lite-net build requires android SDK level 26.  This is not available via command line vs_professional.exe workload option
-Solution: Install from inside visual studio
-Launch Tools -> Android -> Android SDK Manager
-Select Android 2.8 API 26, apply the change
+`vskey` is the license key for Visual Studio Professional (hyphen is included).
+`VS_VERSION` is the version of Visual Studio Professional intended to install; i.e. VS_VERSION=vs2017 or VS_VERSION=vs2019
