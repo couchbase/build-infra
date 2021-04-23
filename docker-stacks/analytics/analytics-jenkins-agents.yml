@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#  docker --host 172.23.104.54 stack deploy -c analytics-jenkins-agents.yml analytics
+#  docker --host 172.23.104.54 stack deploy --with-registry-auth -c analytics-jenkins-agents.yml analytics
 # All services, networks, etc. will then get an "analytics_" prefix,
 # eg. "analytics_ubuntu18"
 
@@ -30,7 +30,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   ubuntu18:
-    image: couchbasebuild/analytics-ubuntu18-cv:20210405
+    image: couchbasebuild/analytics-ubuntu18-cv:20210423
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

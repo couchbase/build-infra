@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#  docker --host mega4.build.couchbase.com stack deploy -c server-jenkins-buildslaves.yml serverbuild
+#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c server-jenkins-buildslaves.yml serverbuild
 # All services, networks, etc. will then get an "serverbuild_" prefix,
 # eg. "serverbuild_centos6"
 
@@ -250,7 +250,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20210405
+    image: couchbasebuild/server-ubuntu18-build:20210423
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat cheshire-cat-ubuntu18.04 master master-ubuntu18.04"

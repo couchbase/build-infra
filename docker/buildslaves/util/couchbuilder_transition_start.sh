@@ -148,6 +148,7 @@ command -v gpg >/dev/null 2>&1 && {
        -deleteExistingClients \
        -labels "${JENKINS_SLAVE_LABELS}" \
        -retry 5 \
+       -noRetryAfterConnected \
        -username "${jenkins_user}" \
        -password "${jenkins_password}"
     exit
