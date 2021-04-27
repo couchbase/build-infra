@@ -34,8 +34,12 @@ if mount_dirs is None:
 
 devnull = open(os.devnull, "w")
 
-# Track whether we require authentication - only true for server just now
-auth_required = True if jenkins == "server.jenkins.couchbase.com" else False
+# Auth token is now required for all jenkins.
+# Environment variables jenkins_user & jenkins_token need to be defined
+# jenkins_user:   user's github account that is used to log into jenkins
+# jenkins_token:  personal access token generated via https://github.com/settings/tokens
+
+auth_required = True
 
 # If auth is required, check we have the expected env vars (or die)
 if auth_required:
