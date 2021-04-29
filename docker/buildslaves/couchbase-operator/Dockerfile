@@ -18,21 +18,9 @@ RUN apt-get update && \
 RUN addgroup --gid 999 docker && \
     usermod -a -G docker couchbase
 
-# Go
-ARG GOVERSION=1.13.3
-RUN mkdir -p /usr/local/go/${GOVERSION} && cd /usr/local/go/${GOVERSION} && \
-    curl https://storage.googleapis.com/golang/go${GOVERSION}.linux-amd64.tar.gz -o go.tar.gz && \
-    tar xf go.tar.gz && \
-    rm go.tar.gz && \
-    ln -s /usr/local/go/${GOVERSION}/go/bin/go /usr/local/bin
-
-# Dep
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install-dep.sh && \
-    INSTALL_DIRECTORY=/usr/local/bin bash install-dep.sh && \
-    cd /tmp && \
-    rm -rf deploy
+# cbdep (used to install Go)
+ARG CACHEBUST=1
+RUN curl --fail https://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # jq
 RUN set -x \
