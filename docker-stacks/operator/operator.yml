@@ -1,7 +1,7 @@
 version: "3.8"
 
 # Suggested deployment command:
-#   docker -H mega4.build.couchbase.com stack deploy -c operator.yml operator
+#   docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c operator.yml operator
 # All services, networks, etc. will then get an "operator_" prefix,
 # eg. "operator_operator"
 #
@@ -10,7 +10,7 @@ version: "3.8"
 
 services:
   operator:
-    image: couchbasebuild/ubuntu-2004-operator-build:20210428
+    image: couchbasebuild/ubuntu-2004-operator-build:20210429
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=operator-build"

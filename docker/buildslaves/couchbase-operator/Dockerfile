@@ -6,14 +6,16 @@
 FROM couchbasebuild/server-ubuntu20-build:20201209
 LABEL maintainer=build-team@couchbase.com
 
-# Docker
-RUN apt-get update && \
-    apt-get install -y apt-transport-https && \
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli && \
-    apt-get clean
+# Docker; xmllint (used for parsing manifest); jq (used for parsing
+# output from builddb REST API)
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y apt-transport-https \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli libxml2-utils jq \
+    && apt-get clean
 
 RUN addgroup --gid 999 docker && \
     usermod -a -G docker couchbase
@@ -21,12 +23,6 @@ RUN addgroup --gid 999 docker && \
 # cbdep (used to install Go)
 ARG CACHEBUST=1
 RUN curl --fail https://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
-
-# jq
-RUN set -x \
-    && apt update \
-    && apt install -y jq \
-    && apt clean
 
 COPY build/couchbuilder_start.sh /usr/sbin/
 
