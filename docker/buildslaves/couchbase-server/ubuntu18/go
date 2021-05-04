@@ -2,7 +2,7 @@
 
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-ubuntu18-build
-GCC_VER=10.2.0
+source ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -10,7 +10,16 @@ cp -a ../../util/swarm*.properties build
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
-  --build-arg GCC_VER=${GCC_VER} \
+  --build-arg AUTOCONF_VER=${AUTOCONF} \
+  --build-arg AUTOMAKE_VER=${AUTOMAKE} \
+  --build-arg CMAKE_MAJOR=${CMAKE_MAJOR} \
+  --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
+  --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
+  --build-arg GCC_VER=${GCC} \
+  --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
+  --build-arg LIBTOOL_VER=${LIBTOOL} \
+  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
+  --build-arg TINI_VER=${TINI} \
   -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
 if [ "$1" = "--publish" ]
 then

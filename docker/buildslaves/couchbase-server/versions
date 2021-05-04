@@ -1,0 +1,29 @@
+# This file is sourced by each distro's `go` script.
+# Values are fed into container builds via build args passed to `docker run`
+#
+# Comments indicate which distros reference the values in this file as not all
+# are the same, e.g. some do not include all tooling, some install whatever
+# is available in their package manager, etc.
+
+# Cmake
+CMAKE_MAJOR=3   # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+CMAKE_MINOR=20  # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+CMAKE_PATCH=1   # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+
+# Python3
+PYTHON3_MAJOR=3  # centos7
+PYTHON3_MINOR=9  # centos7
+PYTHON3_PATCH=2  # centos7
+
+# Build tooling
+AUTOCONF=2.69    # amzn2, centos7, suse12, ubuntu18
+AUTOMAKE=1.15.1  # amzn2, centos7, suse12, ubuntu18
+CCACHE=3.1.9     # amzn2, centos7, rhel8
+GCC=10.2.0       # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
+GIT=2.9.5        # centos7
+LIBTOOL=2.4.2    # amzn2, centos7, suse12, ubuntu18
+
+# Other
+JNLP_AGENT=4.3     # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
+SWARM_CLIENT=3.17  # amzn2, centos7, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+TINI=0.18.0        # amzn2, centos7, debian8, debian9, debian10, rhel8, suse15, ubuntu16, ubuntu18

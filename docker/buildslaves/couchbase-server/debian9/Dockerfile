@@ -2,7 +2,7 @@
 
 # This has to be first - define the GCC version to use and
 # the image to pull it from
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 FROM couchbasebuild/debian-9-gcc:${GCC_VER} AS gcc
 
 # This is the actual build agent base image
@@ -28,13 +28,15 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 RUN apt-get update && \
     apt-get install -y openjdk-8-jre-headless && \
     apt-get clean
+
+ARG SWARM_CLIENT_VER
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
     -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar
-ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ARG TINI_VER
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini /tini
 RUN chmod +x /tini
 
 # Install Couchbase build dependencies.
@@ -65,7 +67,7 @@ RUN apt-get update && \
     apt-get clean
 
 # GCC - need to redundantly declare GCC_ARG here
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
 COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 # Historic gcc 7.3.0
@@ -78,8 +80,12 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 RUN apt-get update && apt-get install -y m4 autoconf automake libtool
 
 RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
+
+ARG CMAKE_MAJOR
+ARG CMAKE_MINOR
+ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo && \
@@ -98,11 +104,10 @@ RUN set -x \
         && apt install -y rsync \
         && apt clean
 
-ENV AGENT_VERSION=4.3
-
 # RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
 
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+ARG JNLP_AGENT_VER
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar

@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04
 
-FROM couchbasebuild/server-ubuntu18-clang9-build:20210405
+FROM couchbasebuild/server-ubuntu18-clang9-build:20210428
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval

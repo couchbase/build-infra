@@ -2,7 +2,7 @@
 
 # This has to be first - define the GCC version to use and
 # the image to pull it from
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 FROM couchbasebuild/suse-15-gcc:${GCC_VER} AS gcc
 
 # This is the actual build agent base image
@@ -22,14 +22,15 @@ RUN groupadd -g1000 couchbase && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # tini, to avoid zombie issues when running with Swarm jar
-ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ARG TINI_VER
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini /tini
 RUN chmod +x /tini
 
 # JDK for Jenkins
 RUN zypper -n install java-1_8_0-openjdk-headless && zypper clean
+ARG SWARM_CLIENT_VER
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
     -o /usr/local/lib/swarm-client.jar
 
 ### Install Couchbase build dependencies ######################################
@@ -59,8 +60,11 @@ RUN zypper -n install \
     && zypper clean
 
 # * CMake (from cmake.org)
+ARG CMAKE_MAJOR
+ARG CMAKE_MINOR
+ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl -f https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
 
@@ -93,7 +97,7 @@ RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
 ENV LANG=en_US.UTF-8
 
 # GCC - need to redundantly declare GCC_ARG here
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
 COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 # Historic gcc 7.3.0
@@ -105,11 +109,8 @@ RUN set -x \
         && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
         && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
-ENV AGENT_VERSION=4.3
-
-# RUN zypper install -y git-lfs && zypper clean
-
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+ARG JNLP_AGENT_VER
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar

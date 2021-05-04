@@ -3,6 +3,7 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-centos8-build
+source ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -19,7 +20,11 @@ then
 fi
 
 docker build \
-    --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg CMAKE_MAJOR=${CMAKE_MAJOR} \
+  --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
+  --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
+  --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
     -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]

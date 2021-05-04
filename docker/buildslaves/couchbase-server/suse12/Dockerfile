@@ -57,7 +57,7 @@ RUN zypper -n install \
     && zypper clean
 
 # GCC (from localonly/suse-12-gcc)
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
 COPY build/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 COPY build/local /usr/local
@@ -65,29 +65,36 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 # * CMake (from cmake.org)
+ARG CMAKE_MAJOR
+ARG CMAKE_MINOR
+ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase. (The "full" version of perl is also required
-# for some third-party builds, so don't remove that after building libtool.)
-RUN zypper -n install perl && \
-    mkdir /tmp/deploy && \
-    curl -L http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2 -o /tmp/deploy/m4-1.4.17.tar.bz2 && \
-    cd /tmp/deploy && tar -xjf m4-1.4.17.tar.bz2 && \
-    cd m4-1.4.17 && ./configure --prefix=/usr/local && make -j8 && make install && \
-    curl -L http://ftpmirror.gnu.org/autoconf/autoconf-2.69.tar.gz -o /tmp/deploy/autoconf-2.69.tar.gz && \
-    cd /tmp/deploy && tar -xzf autoconf-2.69.tar.gz && \
-    cd autoconf-2.69 && ./configure --prefix=/usr/local && make -j8 && make install && \
-    curl -L http://ftpmirror.gnu.org/automake/automake-1.14.tar.gz -o /tmp/deploy/automake-1.14.tar.gz && \
-    cd /tmp/deploy && tar -xzf automake-1.14.tar.gz && \
-    cd automake-1.14 && ./configure --prefix=/usr/local && make && make install && \
-    curl -L http://ftpmirror.gnu.org/libtool/libtool-2.4.2.tar.gz -o /tmp/deploy/libtool-2.4.2.tar.gz && \
-    cd /tmp/deploy && tar -xzf libtool-2.4.2.tar.gz && \
-    cd libtool-2.4.2 && ./configure --prefix=/usr/local && make -j8 && make install && \
-    cd /tmp && rm -rf /tmp/deploy && zypper clean
+# for some third-party builds, so don't remove that after building libtool.)\
+ARG AUTOCONF_VER
+ARG AUTOMAKE_VER
+ARG LIBTOOL_VER
+RUN set -x \
+    && zypper -n install perl \
+    && mkdir /tmp/deploy \
+    && curl -Lf http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2 -o /tmp/deploy/m4-1.4.17.tar.bz2 \
+    && cd /tmp/deploy && tar -xjf m4-1.4.17.tar.bz2 \
+    && cd m4-1.4.17 && ./configure --prefix=/usr/local && make -j8 && make install \
+    && curl -Lf http://ftpmirror.gnu.org/autoconf/autoconf-${AUTOCONF_VER}.tar.gz -o /tmp/deploy/autoconf-${AUTOCONF_VER}.tar.gz \
+    && cd /tmp/deploy && tar -xzf autoconf-${AUTOCONF_VER}.tar.gz \
+    && cd autoconf-${AUTOCONF_VER} && ./configure --prefix=/usr/local && make -j8 && make install \
+    && curl -Lf http://ftpmirror.gnu.org/automake/automake-${AUTOMAKE_VER}.tar.gz -o /tmp/deploy/automake-${AUTOMAKE_VER}.tar.gz \
+    && cd /tmp/deploy && tar -xzf automake-${AUTOMAKE_VER}.tar.gz \
+    && cd automake-${AUTOMAKE_VER} && ./configure --prefix=/usr/local && make && make install \
+    && curl -Lf http://ftpmirror.gnu.org/libtool/libtool-${LIBTOOL_VER}.tar.gz -o /tmp/deploy/libtool-${LIBTOOL_VER}.tar.gz \
+    && cd /tmp/deploy && tar -xzf libtool-${LIBTOOL_VER}.tar.gz \
+    && cd libtool-${LIBTOOL_VER} && ./configure --prefix=/usr/local && make -j8 && make install \
+    && cd /tmp && rm -rf /tmp/deploy && zypper clean
 
 # * repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
@@ -115,12 +122,13 @@ ENV JAVA_HOME=/usr/java/latest
 ENV LANG=en_US.UTF-8
 
 # Swarm client
+ARG SWARM_CLIENT_VER
 RUN set -x \
         && cd /tmp \
         && curl -LO https://cdn.azul.com/zulu/bin/zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm \
         && rpm -i ./zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm \
         && curl \
-                https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+                https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
                 -o /usr/local/lib/swarm-client.jar
 
 # Docker Swarm properties - keep this towards end of Dockerfile
@@ -130,9 +138,8 @@ COPY build/swarm*.properties /
 RUN echo "export LANG=en_US.UTF-8" >> /home/couchbase/.bashrc
 
 # Add jnlp agent for ECS/swarm invocation
-ENV AGENT_VERSION=4.3
-
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+ARG JNLP_AGENT_VER
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar

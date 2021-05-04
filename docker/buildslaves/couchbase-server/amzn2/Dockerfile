@@ -2,7 +2,7 @@
 
 # This has to be first - define the GCC version to use and
 # the image to pull it from
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 FROM couchbasebuild/amzn-2-gcc:${GCC_VER} AS gcc
 
 # This is the actual build agent base image
@@ -15,13 +15,15 @@ RUN yum -y update; yum clean all
 # Jenkins Swarm jar
 RUN yum install -y java-1.8.0-openjdk-headless curl && \
     yum clean packages
+
+ARG SWARM_CLIENT_VER
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
     -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar
-ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ARG TINI_VER
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini /tini
 RUN chmod +x /tini
 
 ### Install Couchbase build dependencies ######################################
@@ -69,7 +71,7 @@ RUN groupadd -g1000 couchbase && \
 RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper
 
 # GCC - need to redundantly declare GCC_ARG here
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
 COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 # Historic gcc 7.3.0
@@ -79,29 +81,36 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.
+ARG AUTOCONF_VER
+ARG AUTOMAKE_VER
+ARG LIBTOOL_VER
 RUN mkdir /tmp/deploy && \
-    curl -L http://ftpmirror.gnu.org/autoconf/autoconf-2.69.tar.gz -o /tmp/deploy/autoconf-2.69.tar.gz && \
-    cd /tmp/deploy && tar -xzf autoconf-2.69.tar.gz && \
-    cd autoconf-2.69 && ./configure --prefix=/usr/local && make -j8 && make install && \
-    curl -L http://ftpmirror.gnu.org/automake/automake-1.14.tar.gz -o /tmp/deploy/automake-1.14.tar.gz && \
-    cd /tmp/deploy && tar -xzf automake-1.14.tar.gz && \
-    cd automake-1.14 && ./configure --prefix=/usr/local && make && make install && \
-    curl -L http://ftpmirror.gnu.org/libtool/libtool-2.4.2.tar.gz -o /tmp/deploy/libtool-2.4.2.tar.gz && \
-    cd /tmp/deploy && tar -xzf libtool-2.4.2.tar.gz && \
-    cd libtool-2.4.2 && ./configure --prefix=/usr/local && make -j8 && make install && \
+    curl -L http://ftpmirror.gnu.org/autoconf/autoconf-${AUTOCONF_VER}.tar.gz -o /tmp/deploy/autoconf-${AUTOCONF_VER}.tar.gz && \
+    cd /tmp/deploy && tar -xzf autoconf-${AUTOCONF_VER}.tar.gz && \
+    cd autoconf-${AUTOCONF_VER} && ./configure --prefix=/usr/local && make -j8 && make install && \
+    curl -L http://ftpmirror.gnu.org/automake/automake-${AUTOMAKE_VER}.tar.gz -o /tmp/deploy/automake-${AUTOMAKE_VER}.tar.gz && \
+    cd /tmp/deploy && tar -xzf automake-${AUTOMAKE_VER}.tar.gz && \
+    cd automake-${AUTOMAKE_VER} && ./configure --prefix=/usr/local && make && make install && \
+    curl -L http://ftpmirror.gnu.org/libtool/libtool-${LIBTOOL_VER}.tar.gz -o /tmp/deploy/libtool-${LIBTOOL_VER}.tar.gz && \
+    cd /tmp/deploy && tar -xzf libtool-${LIBTOOL_VER}.tar.gz && \
+    cd libtool-${LIBTOOL_VER} && ./configure --prefix=/usr/local && make -j8 && make install && \
     cd /tmp && rm -rf /tmp/deploy
 
 # * CMake 3 (from cmake.org)
+ARG CMAKE_MAJOR
+ARG CMAKE_MINOR
+ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
 
 # * ccache (from source)
+ARG CCACHE_VER
 RUN mkdir /tmp/deploy && \
-    curl -L https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.bz2 -o /tmp/deploy/ccache.tar.bz2 && \
+    curl -L https://www.samba.org/ftp/ccache/ccache-${CCACHE_VER}.tar.bz2 -o /tmp/deploy/ccache.tar.bz2 && \
     cd /tmp/deploy && tar -xjf ccache.tar.bz2 && \
-    cd ccache-3.1.9 && ./configure --prefix=/usr/local && make -j8 && make install && \
+    cd ccache-${CCACHE_VER} && ./configure --prefix=/usr/local && make -j8 && make install && \
     rm -fr /tmp/deploy
 
 # * repo
@@ -118,13 +127,11 @@ RUN curl https://packages.couchbase.com/cbdep/0.9.18/cbdep-0.9.18-linux -o /usr/
 RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
     chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2
 
-
-ENV AGENT_VERSION=4.3
-
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
 RUN yum install -y git-lfs && rm -rf /var/lib/apt/lists/*
 
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+ARG JNLP_AGENT_VER
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar

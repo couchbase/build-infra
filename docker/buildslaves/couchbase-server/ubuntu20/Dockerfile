@@ -2,7 +2,7 @@
 
 # This has to be first - define the GCC version to use and
 # the image to pull it from
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 FROM couchbasebuild/ubuntu-20-gcc:${GCC_VER} AS gcc
 
 # This is the actual build agent base image
@@ -30,8 +30,10 @@ RUN set -x \
     && apt-get update \
     && apt-get install -y openjdk-11-jre-headless \
     && apt-get clean
+
+ARG SWARM_CLIENT_VER
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
     -o /usr/local/lib/swarm-client.jar
 
 # Install tzdata, telling it to skip user interaction
@@ -66,9 +68,13 @@ RUN set -x \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 
 RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
+
+ARG CMAKE_MAJOR
+ARG CMAKE_MINOR
+ARG CMAKE_PATCH
 RUN set -x \
     && mkdir /tmp/deploy \
-    && curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh \
+    && curl -f https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh \
     && (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local \
     && curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo \
@@ -92,11 +98,10 @@ RUN set -x \
     && apt-get install -y rsync \
     && apt-get clean
 
-ENV AGENT_VERSION=4.3
-
 RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
 
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+ARG JNLP_AGENT_VER
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
@@ -115,7 +120,7 @@ ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 COPY build/swarm*.properties /
 
 # GCC - need to redundantly declare GCC_ARG here
-ARG GCC_VER=10.2.0
+ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
 COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 # Historic gcc 7.5.0

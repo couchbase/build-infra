@@ -22,13 +22,15 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 RUN apt-get update && \
     apt-get install -y openjdk-8-jre-headless && \
     apt-get clean
+
+ARG SWARM_CLIENT_VER
 RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
     -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar
-ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ARG TINI_VER
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini /tini
 RUN chmod +x /tini
 
 # Install Couchbase build dependencies
@@ -65,8 +67,12 @@ RUN apt-get update && \
     apt-get clean
 
 RUN echo 'PATH="/usr/lib/ccache:$PATH"' >> /home/couchbase/.profile
+
+ARG CMAKE_MAJOR
+ARG CMAKE_MINOR
+ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
-    curl https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo && \
