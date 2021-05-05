@@ -119,6 +119,10 @@ RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
 # Set LANG
 ENV LANG=en_US.UTF-8
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 

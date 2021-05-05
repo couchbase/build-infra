@@ -131,6 +131,10 @@ RUN set -x \
                 https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
                 -o /usr/local/lib/swarm-client.jar
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 

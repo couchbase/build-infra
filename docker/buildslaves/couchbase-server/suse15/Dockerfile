@@ -119,6 +119,10 @@ ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 

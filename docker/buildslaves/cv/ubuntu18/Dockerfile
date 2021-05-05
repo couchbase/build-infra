@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04
 
-FROM couchbasebuild/server-ubuntu18-clang9-build:20210428
+FROM couchbasebuild/server-ubuntu18-clang9-build:20210505
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval
@@ -89,10 +89,6 @@ RUN set -x \
         && apt update \
         && apt install -y aspell \
         && apt clean
-
-# Enable disk-checking healthcheck
-COPY healthcheck.sh /usr/sbin/healthcheck.sh
-HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Enable additional hook for ccache
 COPY cv-hook.sh /usr/sbin/couchhook.d/

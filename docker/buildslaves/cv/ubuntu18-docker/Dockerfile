@@ -1,6 +1,6 @@
 # Docker-enabled container for CV
 
-FROM couchbasebuild/server-ubuntu18-build:20210428
+FROM couchbasebuild/server-ubuntu18-build:20210505
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
@@ -42,10 +42,6 @@ RUN set -x \
 # Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase
 RUN groupadd -g 996 dockerecs && usermod -a -G dockerecs couchbase
-
-# Enable disk-checking healthcheck
-COPY healthcheck.sh /usr/sbin/healthcheck.sh
-HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Avoid having to rebuild image chain for simple start script modifications
 COPY ./couchbuilder_start.sh /usr/sbin/

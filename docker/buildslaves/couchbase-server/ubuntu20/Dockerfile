@@ -132,6 +132,10 @@ RUN set -x \
         && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
         && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 

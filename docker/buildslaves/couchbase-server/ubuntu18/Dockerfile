@@ -172,6 +172,10 @@ ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 

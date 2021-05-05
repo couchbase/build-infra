@@ -7,6 +7,7 @@ source ../versions
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp ../../util/swarm*.properties build
+cp -a ../../util/healthcheck.sh build
 
 # Only copy this if it doesn't exist. Prevents re-running steps in
 # this Dockerfile. This does mean that if you need to update the

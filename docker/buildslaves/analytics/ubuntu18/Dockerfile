@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04 analytics.jenkins agent
 
-FROM couchbasebuild/server-ubuntu18-build:20210428
+FROM couchbasebuild/server-ubuntu18-build:20210505
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval - analytics is basically CV
@@ -21,10 +21,6 @@ RUN set -x \
         && apt update \
         && apt install -y ninja-build \
         && apt clean
-
-# Enable disk-checking healthcheck
-COPY healthcheck.sh /usr/sbin/healthcheck.sh
-HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig

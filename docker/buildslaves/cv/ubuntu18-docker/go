@@ -4,7 +4,6 @@ TAG=$(date "+%Y%m%d")
 IMAGE=couchbasebuild/server-ubuntu18-docker-cv
 
 cp ../../util/couchbuilder_transition_start.sh ./couchbuilder_start.sh
-cp ../../util/healthcheck.sh .
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \

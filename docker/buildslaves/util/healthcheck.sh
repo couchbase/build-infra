@@ -4,11 +4,6 @@ MIN_FREE_GB=20
 WORKSPACE=/home/couchbase/jenkins/workspace
 
 function check_free_space {
-    if [[ ! -d "${WORKSPACE}" ]]; then
-        # No workspace directory yet - nothing to check
-        exit 0
-    fi
-
     local free_kb=$(df -k --output=avail "${WORKSPACE}" | tail -1)
     local min_free_kb=$((MIN_FREE_GB*1024*1024))
 
@@ -17,6 +12,13 @@ function check_free_space {
         exit 0
     fi
 }
+
+if [[ ! -d "${WORKSPACE}" ]]; then
+    # No workspace directory yet - nothing to check
+    exit 0
+fi
+
+cd "$WORKSPACE"
 
 while true; do
     # Check free space (a happy check_free_space will exit 0)

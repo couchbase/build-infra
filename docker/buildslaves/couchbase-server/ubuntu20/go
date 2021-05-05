@@ -7,6 +7,7 @@ source ../versions
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
+cp -a ../../util/healthcheck.sh build
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
