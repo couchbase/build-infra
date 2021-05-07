@@ -64,14 +64,39 @@ x-default-jenkins-three-agent: &default-jenkins-three-agent
     - jenkins
   <<: *default-jenkins-secrets
 
+# Use this one for an agent with two replicas and IPv6 enabled.
+# Previously only CV unit tests agents had this, so to be
+# overly cautious, we'll continue only using this for CV.
+x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
+  deploy:
+    resources:
+      reservations:
+        memory: 7G
+    placement:
+      constraints:
+        - node.labels.role==build
+    replicas: 2
+    update_config:
+      parallelism: 1000
+  networks:
+    - jenkins
+  <<: *default-jenkins-secrets
+  sysctls:
+    net.ipv6.conf.lo.disable_ipv6: 0
+
 # Pointed to Jenkins master; use a YAML anchor so we can change this
 # globally when necessary
-x-default-jenkins-slave-environment:
- - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
+x-server-jenkins-environment:
+ - &server-jenkins-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
+x-cv-jenkins-environment:
+ - &cv-jenkins-master "JENKINS_MASTER=http://mega2.build.couchbase.com:8083/"
 
-x-node-class:
- - &node-class "NODE_CLASS=build"
+x-server-jenkins-node-class:
+ - &server-jenkins-node-class "NODE_CLASS=build"
+x-cv-jenkins-node-class:
+ - &cv-jenkins-node-class "NODE_CLASS=cv"
 
+# This one is still shared between server and cv
 x-node-product:
  - &node-product "NODE_PRODUCT=couchbase-server"
 
@@ -82,8 +107,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice alice-amzn2 mad-hatter mad-hatter-amzn2 cheshire-cat cheshire-cat-amzn2 master master-amzn2"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -92,8 +117,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-centos6"
       - "JENKINS_SLAVE_LABELS=server centos6 vulcan vulcan-centos6 alice alice-centos6 mad-hatter mad-hatter-centos6"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
     <<: *default-jenkins-one-agent
@@ -103,8 +128,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=server centos7 centos7-asan vulcan vulcan-centos7 alice alice-centos7 mad-hatter mad-hatter-centos7 cheshire-cat cheshire-cat-centos7 cheshire-cat-centos7-asan master master-centos7 master-centos7-asan"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-three-agent
 
@@ -113,8 +138,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-centos8"
       - "JENKINS_SLAVE_LABELS=server centos8 centos8-asan mad-hatter mad-hatter-centos8"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-three-agent
 
@@ -123,8 +148,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8-alice"
       - "JENKINS_SLAVE_LABELS=server debian8 vulcan vulcan-debian8 alice alice-debian8"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -133,8 +158,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
       - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter mad-hatter-debian8 cheshire-cat cheshire-cat-debian8 master master-debian8"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -143,8 +168,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=server debian9 vulcan vulcan-debian9 alice alice-debian9 mad-hatter mad-hatter-debian9 cheshire-cat cheshire-cat-debian9 master master-debian9"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -153,8 +178,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-debian10"
       - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter mad-hatter-debian10 cheshire-cat cheshire-cat-debian10 master master-debian10"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -163,8 +188,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8"
       - "JENKINS_SLAVE_LABELS=server rhel8 cheshire-cat cheshire-cat-rhel8 master master-rhel8"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -173,8 +198,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-rhel8-alice"
       - "JENKINS_SLAVE_LABELS=server rhel8 alice alice-rhel8"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -183,8 +208,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-suse11"
       - "JENKINS_SLAVE_LABELS=server suse11 vulcan alice alice-suse11 mad-hatter mad-hatter-suse11 master master-suse11"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -194,8 +219,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-suse12"
       - "JENKINS_SLAVE_LABELS=alice alice-suse12 cheshire-cat cheshire-cat-suse12 mad-hatter mad-hatter-suse12 master master-suse12 server suse12 suse12.2 vulcan vulcan-suse12"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -204,8 +229,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15-mad-hatter"
       - "JENKINS_SLAVE_LABELS=server suse15 mad-hatter mad-hatter-suse15"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -214,8 +239,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat cheshire-cat-suse15 master master-suse15"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -224,8 +249,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu14"
       - "JENKINS_SLAVE_LABELS=server ubuntu14.04 ubuntu14 vulcan vulcan-ubuntu14.04 alice alice-ubuntu14.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -234,8 +259,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
       - "JENKINS_SLAVE_LABELS=server ubuntu16.04 ubuntu16 vulcan vulcan-ubuntu16.04 alice alice-ubuntu16.04 mad-hatter mad-hatter-ubuntu16.04 cheshire-cat cheshire-cat-ubuntu16.04 master master-ubuntu16.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -244,8 +269,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18-mad-hatter"
       - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18 alice alice-ubuntu18.04 mad-hatter mad-hatter-ubuntu18.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -254,8 +279,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat cheshire-cat-ubuntu18.04 master master-ubuntu18.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -264,8 +289,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu18 ubuntu18.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -274,8 +299,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu20 ubuntu20.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
 
@@ -285,8 +310,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
       - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter mad-hatter-ubuntu20.04 cheshire-cat cheshire-cat-ubuntu20.04 master master-ubuntu20.04"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
 
@@ -295,10 +320,30 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=clamav"
       - "JENKINS_SLAVE_LABELS=clamav"
-      - *default-jenkins-slave-environment-master
-      - *node-class
+      - *server-jenkins-master
+      - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-one-agent
+
+  centos7_unittests:
+    image: couchbasebuild/server-centos7-build:20210505
+    environment:
+      - "JENKINS_SLAVE_NAME=unit-centos7"
+      - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
+      - *cv-jenkins-master
+      - *cv-jenkins-node-class
+      - *node-product
+    <<: *default-jenkins-two-agent-with-ipv6
+
+  ubuntu20_unittests:
+    image: couchbasebuild/server-ubuntu20-build:20210505
+    environment:
+      - "JENKINS_SLAVE_NAME=unit-ubuntu20"
+      - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"
+      - *cv-jenkins-master
+      - *cv-jenkins-node-class
+      - *node-product
+    <<: *default-jenkins-two-agent-with-ipv6
 
 secrets:
   jenkins_master_username:
