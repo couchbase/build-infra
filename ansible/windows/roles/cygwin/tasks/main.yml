@@ -1,0 +1,13 @@
+---
+- name: Create download area for Ansible
+  win_file:
+    path: C:\ansible_files
+    state: directory
+
+- name: Download Cygwin setup program
+  win_get_url:
+    url: https://cygwin.com/setup-x86_64.exe
+    dest: C:\ansible_files\cygwin_setup.exe
+
+- name: Install Cygwin
+  script: install_cygwin.bat

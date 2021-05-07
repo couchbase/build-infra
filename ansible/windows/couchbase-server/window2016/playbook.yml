@@ -305,3 +305,7 @@
             - profile
       tags:
         - profile
+
+    - name: Install cygwin
+      include_role:
+        name: ../../roles/cygwin
