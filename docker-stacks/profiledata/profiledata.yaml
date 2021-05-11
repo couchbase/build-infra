@@ -135,6 +135,34 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      ####################################
+      # couchbase-server/cv-docker/linux #
+      ####################################
+      - source: couchbase_server_shared_gitconfig
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.gitconfig
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_m2_settings
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_known_hosts
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_linux_ssh_cv_config
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: couchbase_server_shared_ssh_environment
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/environment
+        mode: 0644
+        uid: "901"
+        gid: "901"
       #############################
       # couchbase-server/cv/macos #
       #############################
@@ -352,6 +380,39 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      ####################################
+      # couchbase-server/cv-docker/linux #
+      ####################################
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/buildbot_id_dsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ini_file.patch_via_gerrit.20200417
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/patch_via_gerrit.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_buildbot.20200417
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/id_buildbot
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.id_ns-codereview.20200417
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/id_ns-codereview
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/ns-buildbot.rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: operator.config.docker.20210115
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.docker/config.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
       #############################
       # couchbase-server/cv/macos #
       #############################
@@ -376,7 +437,7 @@ services:
         uid: "901"
         gid: "901"
       ##################################
-      # couchbase-server/cv/windows #
+      # couchbase-server/cv/windows    #
       ##################################
       - source: profiledata.ssh_privkey.id_ns-codereview.20200417
         target: /home/couchbase/couchbase-server/cv/windows/.ssh/id_ns-codereview
@@ -472,4 +533,7 @@ secrets:
   profiledata.ssh_host_pubkey.ssh_host_ed25519_key.20200417:
     external: true
   profiledata.ssh_host_pubkey.ssh_host_rsa_key.20200417:
+    external: true
+  # docker config
+  operator.config.docker.20210115:
     external: true

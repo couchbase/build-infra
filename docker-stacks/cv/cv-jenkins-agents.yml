@@ -40,7 +40,7 @@ services:
         JENKINS_SLAVE_NAME=CV
         JENKINS_SLAVE_LABELS=docker@_@linux
         JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
-        NODE_CLASS=cv
+        NODE_CLASS=cv-docker
         NODE_PRODUCT=couchbase-server
         PARALLELISM=4
       LAUNCH_VOLUMES: "/var/run/docker.sock:/var/run/docker.sock:rw"
