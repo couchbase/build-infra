@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#   docker --host mega4.build.couchbase.com stack deploy -c nexus-cache.yaml nexus
+#   docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c nexus-cache.yaml nexus
 # All services, networks, etc. will then get an "nexus_" prefix,
 # eg. "nexus_cache"
 

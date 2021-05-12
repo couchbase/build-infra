@@ -1,7 +1,7 @@
 version: '3.5'
 
 # Suggested deployment command:
-#  docker --host sdk-swarm.build.couchbase.com stack deploy -c sdk-jenkins.yaml sdk
+#  docker --host sdk-swarm.build.couchbase.com stack deploy --with-registry-auth -c sdk-jenkins.yaml sdk
 # All services, networks, etc. will then get an "sdk_" prefix,
 # eg. "sdk_jenkins"
 

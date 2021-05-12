@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#   docker --host mega4.build.couchbase.com stack deploy -c athens.yaml athens
+#   docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c athens.yaml athens
 # All services, networks, etc. will then get an "athens_" prefix,
 # eg. "athens_proxy"
 

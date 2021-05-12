@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#  docker --host 172.23.112.24 stack deploy -c cv-jenkins-agents.yml cv
+#  docker --host 172.23.112.24 stack deploy --with-registry-auth -c cv-jenkins-agents.yml cv
 # All services, networks, etc. will then get an "cv_" prefix,
 # eg. "cv_ubuntu18_large"
 

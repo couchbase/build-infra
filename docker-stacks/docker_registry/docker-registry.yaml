@@ -1,7 +1,7 @@
 version: '3.7'
 
 # Suggested deployment command:
-#   docker --host mega4.build.couchbase.com stack deploy -c docker-registry.yaml docker
+#   docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c docker-registry.yaml docker
 # All services, networks, etc. will then get an "docker_" prefix,
 # eg. "docker_registry"
 

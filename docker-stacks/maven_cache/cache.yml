@@ -1,7 +1,7 @@
 version: "3.7"
 
 # Suggested deployment command:
-#   docker -H mega4.build.couchbase.com stack deploy -c cache.yml maven
+#   docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c cache.yml maven
 # All services, networks, etc. will then get an "maven_" prefix,
 # eg. "maven_cache"
 #
