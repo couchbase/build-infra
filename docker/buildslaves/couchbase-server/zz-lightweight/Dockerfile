@@ -42,17 +42,17 @@ RUN set -x \
     && echo 'couchbase:couchbase' | chpasswd \
     && sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# JDK and Jenkins Swarm jar
+# JDK for Jenkins
 RUN set -x \
     && apt-get update \
     && apt-get install -y openjdk-11-jre-headless \
     && apt-get clean
 
-# s3cmd for upload script
-# this can be removed once all jobs have been switched from s3cmd to aws cli (CBD-3970)
-RUN apt-get update \
-    && apt-get install -y s3cmd \
-    && apt-get clean
+# Swarm client jar
+ARG SWARM_CLIENT_VER
+RUN curl --fail \
+    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
+    -o /usr/local/lib/swarm-client.jar
 
 # Install python3-dev and python3-apt
 RUN set -x \
@@ -73,7 +73,7 @@ RUN set -x \
 # pip3 and python modules required by
 # i.e. jira, blackduck
 RUN set -x \
-    && curl https://bootstrap.pypa.io/get-pip.py | python3 \
+    && curl --fail https://bootstrap.pypa.io/get-pip.py | python3 \
     && rm -f /usr/local/bin/pip /usr/local/bin/easy_install \
     && pip3 install requests lxml oauthlib pycrypto boto3 pbr wheel filemagic --upgrade\
     && pip3 install jira
@@ -95,7 +95,7 @@ RUN set -x \
 
 # Install repo
 RUN set -x \
-    && curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
+    && curl --fail https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
 
 # Install rsync
@@ -104,7 +104,7 @@ RUN set -x \
     && apt-get install -y rsync \
     && apt-get clean
 
-#install rvm so that we can use it to upgrade ruby when necessary
+# Install rvm so that we can use it to upgrade ruby when necessary
 RUN set -x \
     && groupadd rvm \
     && sudo apt-add-repository -y ppa:rael-gc/rvm \
@@ -119,8 +119,8 @@ RUN set -x \
     && unzip deno.zip \
     && rm deno.zip
 
-# install awscli which is used by s3 upload jobs
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+# Install awscli which is used by s3 upload jobs
+RUN curl --fail "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
     && sudo ./aws/install \
     && rm -rf ./aws awscliv2.zip
@@ -129,7 +129,7 @@ ENV AGENT_VERSION=4.3
 
 RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
 
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+RUN curl --fail --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
@@ -149,11 +149,12 @@ ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
-COPY build/cb-buildbot-config.sh /usr/sbin/couchhook.d/
+COPY cb-buildbot-config.sh /usr/sbin/couchhook.d/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 
 # Avoid having to rebuild image chain for simple start script modifications
 COPY build/couchbuilder_start.sh /usr/sbin/
+COPY build/swarm*.properties /
 
 # Hack because build-from-manifest script (and possibly others) hardcodes
 # python3.6

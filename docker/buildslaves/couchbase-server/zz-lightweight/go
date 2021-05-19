@@ -1,15 +1,20 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/zz-lightweight
+. ../versions
+
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
-cp -a cb-buildbot-config.sh build/cb-buildbot-config.sh
+cp -a ../../util/swarm*.properties build
 
-docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} . \
+docker build \
+  --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   -t ${IMAGE}:${TAG} \
-  -t ${IMAGE}:latest
+  -t ${IMAGE}:latest \
+  .
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:$TAG

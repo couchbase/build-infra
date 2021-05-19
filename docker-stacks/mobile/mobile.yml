@@ -1,0 +1,154 @@
+version: "3.8"
+
+# Suggested deployment command:
+#   docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c mobile.yml mobile
+# All services, networks, etc. will then get an "mobile_" prefix,
+# eg. "mobile_zz-lightweight"
+#
+
+services:
+  zz-lightweight:
+    image: couchbasebuild/zz-lightweight:20210513
+    # Still need the next two lines since zz-lightweight image is shared
+    # with Server, and thus far it's not in swarm there
+    init: true
+    entrypoint: [ "/usr/sbin/couchbuilder_start.sh", "swarm" ]
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=zz-lightweight"
+      - "JENKINS_SLAVE_LABELS=zz-lightweight"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_SLAVE_EXECUTORS=8"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  lite-android-ubuntu18:
+    image: couchbasebuild/ubuntu1804-mobile-lite-android:20210518
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=lite-android-ubuntu18"
+      - "JENKINS_SLAVE_LABELS=android cobalt mobile-lite-android"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 3
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  sgw-centos7:
+    image: couchbasebuild/centos7-sgw-build:20210513
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=sgw-centos7"
+      - "JENKINS_SLAVE_LABELS=centos7 mobile mobile-sgw-centos7 sgw"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  litecore-centos72:
+    image: couchbasebuild/centos-72-litecore-build:20210513
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=litecore-centos72"
+      - "JENKINS_SLAVE_LABELS=cbl-java cbl-log cblite centos7 centos72 litecore"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  litecore-centos73:
+    image: couchbasebuild/centos-73-litecore-build:20210513
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=litecore-centos73"
+      - "JENKINS_SLAVE_LABELS=cbl-java cbl-log cblite centos73 litecore"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+secrets:
+  jenkins_master_username:
+    external: true
+  jenkins_master_password:
+    external: true
+  profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
+
+networks:
+  jenkins:

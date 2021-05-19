@@ -1,10 +1,13 @@
-#!/bin/sh
+#!/bin/sh -e
 
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/centos7-sgw-build
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/swarm*.properties build
+cp -a ../../util/healthcheck.sh build
+
 docker build -t ${IMAGE}:$TAG .
 docker tag ${IMAGE}:$TAG ${IMAGE}:latest
 if [ "$1" = "--publish" ]

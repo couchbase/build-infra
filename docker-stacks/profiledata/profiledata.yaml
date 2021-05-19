@@ -187,7 +187,7 @@ services:
         uid: "901"
         gid: "901"
       ##################################
-      # couchbase-server/cv/windows #
+      # couchbase-server/cv/windows    #
       ##################################
       - source: couchbase_server_shared_gitconfig
         target: /home/couchbase/couchbase-server/cv/windows/.gitconfig
@@ -211,6 +211,30 @@ services:
         gid: "901"
       - source: couchbase_server_windows_ssh_known_hosts
         target: /home/couchbase/couchbase-server/cv/windows/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      ###################################################################
+      # couchbase-server/mobile/linux                                   #
+      # (used for zz, android, sgw; litecore doesn't need anything)     #
+      ###################################################################
+      - source: mobile_shared_ssh_known_hosts
+        target: /home/couchbase/mobile/build/linux/.ssh/known_hosts
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: mobile_shared_ssh_authorized_keys
+        target: /home/couchbase/mobile/build/linux/.ssh/authorized_keys
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: mobile_linux_ssh_config
+        target: /home/couchbase/mobile/build/linux/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: mobile_linux_gitconfig
+        target: /home/couchbase/mobile/build/linux/.gitconfig
         mode: 0644
         uid: "901"
         gid: "901"
@@ -454,8 +478,40 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      ###################################################################
+      # couchbase-server/mobile/linux                                   #
+      # (used for zz, android, sgw; litecore doesn't need anything)     #
+      ###################################################################
+      - source: profiledata.ssh_privkey.id_cb-robot.20200417
+        target: /home/couchbase/mobile/build/linux/.ssh/id_rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+        target: /home/couchbase/mobile/build/linux/.ssh/buildbot_id_dsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
+        target: /home/couchbase/mobile/build/linux/.ssh/ns-buildbot.rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.aws_credentials.mobile.20210512
+        target: /home/couchbase/mobile/build/linux/.ssh/aws-credentials
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.gpg_key.maven_central.20210512
+        target: /home/couchbase/mobile/build/linux/.gpg/maven_central
+        mode: 0600
+        uid: "901"
+        gid: "901"
 
 configs:
+  #####################
+  # couchbase-server  #
+  #####################
   # linux
   couchbase_server_linux_ssh_config:
     file: config/couchbase-server/linux/.ssh/config
@@ -484,11 +540,26 @@ configs:
     file: config/couchbase-server/shared/.gitconfig
   couchbase_server_shared_ssh_environment:
     file: config/couchbase-server/shared/.ssh/environment
+  #####################
+  # mobile            #
+  #####################
+  # linux
+  mobile_linux_ssh_config:
+    file: config/mobile/linux/.ssh/config
+  mobile_linux_gitconfig:
+    file: config/mobile/linux/.gitconfig
+  # shared
+  mobile_shared_ssh_known_hosts:
+    file: config/mobile/shared/.ssh/known_hosts
+  mobile_shared_ssh_authorized_keys:
+    file: config/mobile/shared/.ssh/authorized_keys
 
 
 secrets:
   # gpg keys
   profiledata.gpg_key.rpm_signing.20200417:
+    external: true
+  profiledata.gpg_key.maven_central.20210512:
     external: true
   # env files
   profiledata.env_file.macos_codesign.20200507:
@@ -536,4 +607,7 @@ secrets:
     external: true
   # docker config
   operator.config.docker.20210115:
+    external: true
+  # aws credentials
+  profiledata.aws_credentials.mobile.20210512:
     external: true
