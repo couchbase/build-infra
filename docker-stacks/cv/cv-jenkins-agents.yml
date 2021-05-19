@@ -74,7 +74,7 @@ services:
       LAUNCH_PRIVILEGED: "true"
       LAUNCH_ENVIRONMENTS: >-
         JENKINS_SLAVE_NAME=CV
-        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@mad-hatter@_@master@_@ubuntu-18.04@_@small
+        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@mad-hatter@_@cheshire-cat@_@master@_@ubuntu-18.04@_@small
         JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
         NODE_CLASS=cv
         NODE_PRODUCT=couchbase-server
@@ -109,7 +109,7 @@ services:
       LAUNCH_PRIVILEGED: "true"
       LAUNCH_ENVIRONMENTS: >-
         JENKINS_SLAVE_NAME=CV
-        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@mad-hatter@_@master@_@ubuntu-18.04@_@large
+        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@mad-hatter@_@cheshire-cat@_@master@_@ubuntu-18.04@_@large
         JENKINS_MASTER=http://mega2.build.couchbase.com:8083/
         NODE_CLASS=cv
         NODE_PRODUCT=couchbase-server
