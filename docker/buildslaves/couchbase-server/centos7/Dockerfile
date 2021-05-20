@@ -158,7 +158,7 @@ RUN set -x \
     && make prefix=/usr/local install \
     && echo "export PATH=$PATH:/usr/local/bin" >> /etc/bashrc
 
-# Python 3
+# Python 3 & pip
 ARG PYTHON3_MAJOR
 ARG PYTHON3_MINOR
 ARG PYTHON3_PATCH
@@ -172,7 +172,10 @@ RUN set -x \
     && cd Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH} \
     && ./configure --enable-optimizations \
     && make altinstall \
-    && update-alternatives --install /usr/local/bin/python3 python3 /usr/local/bin/python${PYTHON3_MAJOR}.${PYTHON3_MINOR} 1
+    && update-alternatives --install /usr/local/bin/python3 python3 /usr/local/bin/python${PYTHON3_MAJOR}.${PYTHON3_MINOR} 1 \
+    && curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
+    && /usr/local/bin/python3 /tmp/get-pip.py \
+    && rm -f /tmp/get-pip.py
 
 # JNLP agent
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash

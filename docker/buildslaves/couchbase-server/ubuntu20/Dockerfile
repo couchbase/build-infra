@@ -60,6 +60,8 @@ RUN set -x \
         pixz \
         pkg-config \
         python3-dev \
+        python3-venv \
+        python3-pip \
         ruby \
         tar \
         vim \
