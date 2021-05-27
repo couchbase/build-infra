@@ -1,13 +1,15 @@
 #!/bin/bash -e
 
-GCC_VER=10.2.0
+GCC_VER=${$1:-10.2.0}
 IMAGE=couchbasebuild/amzn-2-gcc
+
+ARCH=$(uname -m)
 
 docker build \
     --build-arg GCC_VER=${GCC_VER} \
-    -t ${IMAGE}:${GCC_VER} .
+    -t ${IMAGE}:${GCC_VER}-${ARCH} .
 
 if [ "$1" = "--publish" ]
 then
-  docker push ${IMAGE}:${GCC_VER}
+  docker push ${IMAGE}:${GCC_VER}-${ARCH}
 fi

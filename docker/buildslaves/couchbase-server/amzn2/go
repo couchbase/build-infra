@@ -9,7 +9,10 @@ cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 cp -a ../../util/healthcheck.sh build
 
+ARCH=$(uname -m)
+
 docker build \
+  --build-arg ARCH=${ARCH} \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \
   --build-arg AUTOMAKE_VER=${AUTOMAKE} \
@@ -22,9 +25,9 @@ docker build \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   --build-arg TINI_VER=${TINI} \
-  -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
+  -t ${IMAGE}:${TAG}-${ARCH} .
+
 if [ "$1" = "--publish" ]
 then
-  docker push ${IMAGE}:$TAG
-  docker push ${IMAGE}:latest
+  docker push ${IMAGE}:$TAG-${ARCH}
 fi

@@ -23,7 +23,7 @@ RUN make -j8
 RUN make install-strip
 RUN set -x \
       && ln -s gcc /opt/gcc-${GCC_VER}/bin/cc \
-      && cp -a x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6.0.* /opt/gcc-${GCC_VER}/lib64
+      && cp -a $(uname -m)-*-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6.0.* /opt/gcc-${GCC_VER}/lib64
 
 # This will cause g++ to bake "-rpath /opt/gcc-10.2.0/lib64" into all
 # binaries it builds, so they'll run correctly on the build systems.

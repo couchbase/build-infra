@@ -103,7 +103,7 @@ x-node-product:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20210505
+    image: couchbasebuild/server-amzn2-build:20210521-x86_64
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice alice-amzn2 mad-hatter mad-hatter-amzn2 cheshire-cat cheshire-cat-amzn2 master master-amzn2"

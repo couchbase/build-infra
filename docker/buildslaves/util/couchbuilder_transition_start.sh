@@ -159,6 +159,10 @@ command -v gpg >/dev/null 2>&1 && {
 [[ "$1" == "default" ]] && {
     mkdir -p /home/couchbase/jenkins
     chown -R couchbase:couchbase /home/couchbase/jenkins
+    if ! ls /etc/ssh/ssh_host_* &>/dev/null
+    then
+      ssh-keygen -A
+    fi
     exec /usr/sbin/sshd -D
     exit
 }
