@@ -69,10 +69,9 @@ RUN mkdir /tmp/deploy && \
 
 # * CMake (from cmake.org)
 RUN mkdir /tmp/deploy && \
-    curl --fail -L https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl https://cmake.org/files/v3.20/cmake-3.20.1-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
-    rm /usr/local/bin/cmake-gui && \
-    rm -rf /tmp/deploy
+    rm -fr /tmp/deploy
 
 # fr_FR locale for LiteCore testing
 RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true
