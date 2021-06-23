@@ -24,6 +24,8 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "/etc/timezone:/etc/timezone"
+      - "latestbuilds:/latestbuilds"
+      - "releases:/releases"
     secrets:
       - source: jenkins_master_username
       - source: jenkins_master_password
@@ -37,6 +39,7 @@ services:
         parallelism: 1000
     networks:
       - jenkins
+      - nfs
 
   lite-android-ubuntu18:
     image: couchbasebuild/ubuntu1804-mobile-lite-android:20210518
@@ -176,3 +179,21 @@ secrets:
 
 networks:
   jenkins:
+  nfs:
+   driver: overlay
+   attachable: true
+
+volumes:
+   latestbuilds:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/builds/latestbuilds"
+
+   releases:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/builds/releases"
