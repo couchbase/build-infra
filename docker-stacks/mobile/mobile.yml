@@ -146,7 +146,7 @@ services:
       - jenkins
 
   litec-debian10-raspbian9:
-    image: couchbasebuild/debian10-litec-raspbian9-build:20210526
+    image: couchbasebuild/debian10-litec-raspbian9-build:20210623
     init: true
     user: couchbase
     environment:

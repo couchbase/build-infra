@@ -8,10 +8,17 @@ RUN apt-get update && apt-get install -y \
     unzip \
     wget \
     git \
-    cmake \
     sudo \
     curl \
 && rm -rf /var/lib/apt/lists
+
+# Install cmake from source
+ARG CMAKE_MAJOR=3
+ARG CMAKE_MINOR=20
+ARG CMAKE_PATCH=1
+RUN mkdir /tmp/deploy && \
+    curl -f https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && rm -rf /tmp/deploy
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
