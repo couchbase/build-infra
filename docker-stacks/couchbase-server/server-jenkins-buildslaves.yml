@@ -20,8 +20,10 @@ x-default-jenkins-secrets: &default-jenkins-secrets
 x-default-jenkins-one-agent: &default-jenkins-one-agent
   deploy:
     resources:
+      limits:
+        memory: 9G
       reservations:
-        memory: 7G
+        memory: 9G
     placement:
       constraints:
         - node.labels.role==build
@@ -36,8 +38,10 @@ x-default-jenkins-one-agent: &default-jenkins-one-agent
 x-default-jenkins-two-agent: &default-jenkins-two-agent
   deploy:
     resources:
+      limits:
+        memory: 9G
       reservations:
-        memory: 7G
+        memory: 9G
     placement:
       constraints:
         - node.labels.role==build
@@ -52,8 +56,10 @@ x-default-jenkins-two-agent: &default-jenkins-two-agent
 x-default-jenkins-three-agent: &default-jenkins-three-agent
   deploy:
     resources:
+      limits:
+        memory: 9G
       reservations:
-        memory: 7G
+        memory: 9G
     placement:
       constraints:
         - node.labels.role==build
@@ -70,8 +76,10 @@ x-default-jenkins-three-agent: &default-jenkins-three-agent
 x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
   deploy:
     resources:
+      limits:
+        memory: 9G
       reservations:
-        memory: 7G
+        memory: 9G
     placement:
       constraints:
         - node.labels.role==build
@@ -127,11 +135,33 @@ services:
     image: couchbasebuild/server-centos7-build:20210505
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=server centos7 centos7-asan vulcan vulcan-centos7 alice alice-centos7 mad-hatter mad-hatter-centos7 cheshire-cat cheshire-cat-centos7 cheshire-cat-centos7-asan neo neo-centos7 neo-centos7-asan master master-centos7 master-centos7-asan"
+      - "JENKINS_SLAVE_LABELS=server centos7 vulcan vulcan-centos7 alice alice-centos7 mad-hatter mad-hatter-centos7 cheshire-cat cheshire-cat-centos7 neo neo-centos7 master master-centos7"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-three-agent
+
+  centos7-asan:
+    image: couchbasebuild/server-centos7-build:20210505
+    environment:
+      - "JENKINS_SLAVE_NAME=server-centos70-asan"
+      - "JENKINS_SLAVE_LABELS=server centos7-asan cheshire-cat cheshire-cat-centos7-asan neo neo-centos7-asan"
+      - *server-jenkins-master
+      - *server-jenkins-node-class
+      - *node-product
+    deploy:
+      resources:
+        reservations:
+          memory: 16GB
+      placement:
+        constraints:
+          - node.labels.role==serverbuild-asan
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+    <<: *default-jenkins-secrets
 
   centos8:
     image: couchbasebuild/server-centos8-build:20210505

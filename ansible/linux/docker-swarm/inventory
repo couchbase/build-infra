@@ -56,7 +56,7 @@
 172.23.113.30  name=analytics-09.build.couchbase.com
 172.23.113.31  name=analytics-10.build.couchbase.com
 172.23.113.32  name=analytics-11.build.couchbase.com
-172.23.107.24  name=analytics-12.build.couchbase.com
+172.23.107.124  name=analytics-12.build.couchbase.com
 172.23.107.130 name=analytics-13.build.couchbase.com
 172.23.107.138 name=analytics-14.build.couchbase.com
 172.23.107.144 name=analytics-15.build.couchbase.com
