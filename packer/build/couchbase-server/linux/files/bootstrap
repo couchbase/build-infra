@@ -1,0 +1,90 @@
+#!/bin/bash
+
+set -x
+set +e
+environment="${1:-none}"
+
+# set up disks to house /var/lib/docker if we have a data disks present
+# the idea is to configure either EBS or instance volumes here, favouring EBS if both are present
+if lsblk -o NAME,FSTYPE -dsn | grep xvda1 && lsblk -o NAME,FSTYPE -dsn | grep nvme0
+then
+  IGNORE=xvda1
+else
+  IGNORE=nvme0
+fi
+
+DISKS=$(lsblk -o NAME,FSTYPE -dsn | awk '($2 == "" || $2 == "LVM2_member")' | grep -v "$IGNORE" | sed s/LVM2_member//g)
+
+if [ "$DISKS" != "/dev/" ]
+then
+    if echo $DISKS | grep nvme3n1
+    then
+      VOL=nvme1n1 # pick EBS volume if it exists (instance vols will be 2 + 3)
+    else
+      VOL=$(echo "${DISKS}" | head -n1 | xargs)
+    fi
+
+    # get size of first volume rounded down to nearest GB
+    DISKSIZE_STRING=$(lsblk | grep "${VOL}" | awk '{print $4}')
+
+    case $DISKSIZE_STRING in
+    *G)
+      DISK_UNIT=G
+      ;;
+    *T)
+      DISK_UNIT=T
+      ;;
+    esac
+
+    DISKSIZE_RAW=$(echo $DISKSIZE_STRING | cut -f1 -d$DISK_UNIT)
+
+    if [ $DISK_UNIT = "G" ]
+    then
+      DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.1" | bc)
+    else
+      DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.001" | bc)
+    fi
+
+    # create pv/vg/lv/fs
+    DEVICES=$(echo "${DISKS}" | sed "s/^/\/dev\//")
+    pvcreate ${DEVICES}
+    vgcreate nvme ${DEVICES}
+    lvcreate --name docker --size ${DISKSIZE_RAW}${DISK_UNIT} nvme
+    mkfs.ext4 /dev/nvme/docker
+
+    # switcheroo /var/lib/docker
+    service docker stop || true
+    rm -rf /var/lib/docker
+    mkdir -p /var/lib/docker
+    echo "/dev/nvme/docker /var/lib/docker ext4 defaults,nofail,discard 0 2" >> /etc/fstab
+    mount -a
+fi
+
+set -e
+
+chkconfig docker on
+
+# start docker in the background so we can move on to retrieving secrets straight away
+service docker start &
+
+# Get the names of the secrets we want from parameter store
+secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=${environment},shared" | jq -r ".Parameters[].Name")
+
+for secret in ${secrets}
+do
+    echo "Reading $secret"
+    src_path="/opt/buildteam/$(echo ${secret} | sed -e"s/__/\//g")"
+    dest_path=$(echo $src_path | sed -e"s/\/opt\/buildteam\/jenkins-worker\/${environment}\///" -e"s/\/opt\/buildteam\/jenkins-worker\/shared\///")
+    mkdir -p $(dirname $src_path)
+    aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${src_path}"
+    worker_args="-v ${src_path}:/home/couchbase/${dest_path} ${worker_args}"
+done
+
+echo "--restart always -d -p 4000:22 ${worker_args}" > /opt/buildteam/args
+
+# wait for docker to finish coming up
+while [ ! -f /var/run/docker.pid ]
+do
+  echo "Waiting for docker to start"
+  sleep 1
+done

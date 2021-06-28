@@ -1,0 +1,33 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+              "tag:GetResources"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ssm:GetParameter",
+            "Resource": "arn:aws:ssm:*:*:parameter/*",
+            "Condition": {
+                "StringEquals": {
+                    "ssm:ResourceTag/Consumer": "jenkins-worker"
+                },
+                "ForAnyValue:StringEquals": {
+                    "ssm:ResourceTag/Environment": [
+                        "${environment}",
+                        "shared"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ssm:DescribeParameters",
+            "Resource": "*"
+        }
+    ]
+}

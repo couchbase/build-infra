@@ -36,6 +36,12 @@ RUN set -x \
   && cd /tmp \
   && rm -rf deploy
 
+# disable password auth for ssh
+RUN set -x \
+    && grep -q "^[^#]*PasswordAuthentication" /etc/ssh/sshd_config \
+    && sed -i "/^[^#]*PasswordAuthentication[[:space:]]yes/c\PasswordAuthentication no" /etc/ssh/sshd_config \
+    || echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase

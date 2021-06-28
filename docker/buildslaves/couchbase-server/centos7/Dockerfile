@@ -15,11 +15,11 @@ ENV LANG=en_US.UTF-8
 USER root
 
 # Work around odd RPM database problems - some from https://github.com/moby/moby/issues/10180
-RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm
+RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm && yum clean all
 
 # Jenkins Swarm jar
 RUN yum install -y java-1.8.0-openjdk-headless curl && \
-    yum clean packages
+    yum clean all
 
 ARG SWARM_CLIENT_VER
 RUN curl --fail \
@@ -53,7 +53,8 @@ RUN yum install --setopt=keepcache=0 -y \
                 tar \
                 unzip \
                 which && \
-    ln -s /usr/bin/python2.7 /usr/bin/python2.6
+    ln -s /usr/bin/python2.7 /usr/bin/python2.6 \
+    && yum clean all
 
 # Set up for SSH daemon
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config && \
@@ -87,7 +88,7 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 # Install third-party build dependencies
-RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper
+RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper && yum clean all
 
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.
@@ -136,14 +137,15 @@ RUN curl https://packages.couchbase.com/cbdep/0.9.18/cbdep-0.9.18-linux -o /usr/
 # One of the benefits is: repo tool requires python 3.5+; the OS comes with python2.  miniconda3 is a flexible way
 # of installing python on a system
 RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
-    chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2
+    chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2 \
+    && /home/couchbase/miniconda3-4.9.2/bin/conda clean --all --force-pkgs-dirs -y
 
 # Still need paramiko in python2 for testrunner (necessary at least for simple-test,
 # which runs in the build image rather than the full CV image)
 RUN sudo yum install -y epel-release && sudo yum install -y python-pip && \
     pip install --upgrade "pip < 21.0" && \
     pip install paramiko && \
-    rm -rf /var/lib/apt/lists/*
+    yum clean all
 
 # Git
 ARG GIT_VER
@@ -156,7 +158,9 @@ RUN set -x \
     && cd git-${GIT_VER} \
     && make prefix=/usr/src all \
     && make prefix=/usr/local install \
-    && echo "export PATH=$PATH:/usr/local/bin" >> /etc/bashrc
+    && echo "export PATH=$PATH:/usr/local/bin" >> /etc/bashrc \
+    && rm -rf /usr/src/git-${GIT_VER} \
+    && yum clean all
 
 # Python 3 & pip
 ARG PYTHON3_MAJOR
@@ -175,11 +179,12 @@ RUN set -x \
     && update-alternatives --install /usr/local/bin/python3 python3 /usr/local/bin/python${PYTHON3_MAJOR}.${PYTHON3_MINOR} 1 \
     && curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
     && /usr/local/bin/python3 /tmp/get-pip.py \
-    && rm -f /tmp/get-pip.py
+    && rm -rf /tmp/get-pip.py /usr/src/Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH} \
+    && yum clean all
 
 # JNLP agent
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
-RUN yum install -y git-lfs && rm -rf /var/lib/apt/lists/*
+RUN yum install -y git-lfs && yum clean all
 
 ARG JNLP_AGENT_VER
 RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
@@ -194,7 +199,14 @@ RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
 # Fix locale
 RUN set -x \
     && sed -i "s/^override_install_langs=/#override_install_langs=/" /etc/yum.conf \
-    && yum reinstall -y glibc-common
+    && yum reinstall -y glibc-common \
+    && yum clean all
+
+# disable password auth for ssh
+RUN set -x \
+    && grep -q "^[^#]*PasswordAuthentication" /etc/ssh/sshd_config \
+    && sed -i "/^[^#]*PasswordAuthentication[[:space:]]yes/c\PasswordAuthentication no" /etc/ssh/sshd_config \
+    || echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
 
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
