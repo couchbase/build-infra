@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-amzn2-build
@@ -24,7 +24,6 @@ docker build \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
-  --build-arg TINI_VER=${TINI} \
   -t ${IMAGE}:${TAG}-${ARCH} .
 
 if [ "$1" = "--publish" ]

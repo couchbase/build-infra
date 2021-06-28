@@ -29,6 +29,7 @@ RUN yum install --setopt=keepcache=0 -y \
                 deltarpm \
                 ed \
                 git \
+                glib2-devel \
                 glibc-devel \
                 gzip \
                 make \
@@ -80,6 +81,14 @@ COPY --from=gcc-legacy /usr/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
+# Since there's no compiler other than gcc 10 in the aarch64 image, put
+# that one on the default PATH
+RUN if [ "$(uname -m)" == "aarch64" ]; then \
+      for prog in gcc g++; do \
+        ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; \
+      done; \
+    fi
+
 # Install autoconf and friends - necessary for building some third-party deps
 # from source, not for Couchbase.
 ARG AUTOCONF_VER
@@ -105,7 +114,6 @@ RUN set -x \
     && make install
 
 RUN set -x \
-    && if [ "$(uname -m)" == "aarch64" ]; then export PATH="/opt/gcc-${GCC_VER}/bin:${PATH}"; fi \
     && curl -L http://ftpmirror.gnu.org/libtool/libtool-${LIBTOOL_VER}.tar.gz -o /tmp/deploy/libtool-${LIBTOOL_VER}.tar.gz \
     && cd /tmp/deploy \
     && tar -xzf libtool-${LIBTOOL_VER}.tar.gz \
@@ -128,7 +136,6 @@ RUN mkdir /tmp/deploy && \
 # * ccache (from source)
 ARG CCACHE_VER
 RUN set -x \
-    && if [ "$(uname -m)" == "aarch64" ]; then export PATH="/opt/gcc-${GCC_VER}/bin:${PATH}"; fi \
     && mkdir /tmp/deploy && \
     curl -L https://www.samba.org/ftp/ccache/ccache-${CCACHE_VER}.tar.bz2 -o /tmp/deploy/ccache.tar.bz2 && \
     cd /tmp/deploy && tar -xjf ccache.tar.bz2 && \
