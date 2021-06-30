@@ -80,7 +80,7 @@ do
     worker_args="-v ${src_path}:/home/couchbase/${dest_path} ${worker_args}"
 done
 
-echo "--restart always -d -p 4000:22 ${worker_args}" > /opt/buildteam/args
+echo "--restart always -v /tmp/aws:/aws -d -p 4000:22 ${worker_args}" > /opt/buildteam/args
 
 # wait for docker to finish coming up
 while [ ! -f /var/run/docker.pid ]
