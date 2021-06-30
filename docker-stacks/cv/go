@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker --host 172.23.112.24 stack deploy --with-registry-auth -c cv-jenkins-agents.yml cv
