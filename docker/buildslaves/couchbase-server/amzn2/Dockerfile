@@ -82,9 +82,11 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 # Since there's no compiler other than gcc 10 in the aarch64 image, put
-# that one on the default PATH
+# that one on the default PATH. Also, for whatever reasons, pyinstaller
+# requires the "strip" binary to be in the same directory as the compiler.
 RUN if [ "$(uname -m)" == "aarch64" ]; then \
-      for prog in gcc g++; do \
+      ln -s "$(which strip)" /opt/gcc-${GCC_VER}/bin; \
+      for prog in gcc g++ strip; do \
         ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; \
       done; \
     fi

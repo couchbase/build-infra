@@ -29,4 +29,15 @@ docker build \
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:$TAG-${ARCH}
+
+  if [ "${ARCH}" == "aarch64" ]; then
+    # Also try to push to our ECR; this assumes
+    # ~/.aws/credentials is set up
+    ECR=284614897128.dkr.ecr.us-east-2.amazonaws.com
+    ECR_IMAGE=${ECR}/$(basename ${IMAGE}):${TAG}-${ARCH}
+    aws ecr get-login-password --region us-east-2 \
+      | docker login --username AWS --password-stdin ${ECR}
+    docker tag ${IMAGE}:${TAG}-${ARCH} ${ECR_IMAGE}
+    docker push ${ECR_IMAGE}
+  fi
 fi
