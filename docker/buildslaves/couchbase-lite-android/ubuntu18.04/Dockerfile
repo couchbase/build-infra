@@ -19,7 +19,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Install Couchbase Lite Android toolchain requirements
 RUN apt-get update && \
-    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-8-jdk gnupg2 zip rsync && \
+    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-8-jdk gnupg2 zip rsync wget && \
     apt-get clean
 
 # Swarm client jar - only needed until CBD-4101 is resolved
