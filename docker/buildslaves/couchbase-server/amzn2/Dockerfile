@@ -156,11 +156,11 @@ RUN curl https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/lo
 # One of the benefits is: repo tool requires python 3.5+; the OS comes with python2.  miniconda3 is a flexible way
 # of installing python on a system
 RUN set -x \
-    && cbdep install -d /home/couchbase miniconda3-py39 4.9.2 \
-    && chown -R couchbase:couchbase /home/couchbase/miniconda3-4.9.2 \
-    && ln -sf /home/couchbase/miniconda3-4.9.2/bin/python /usr/bin/python3 \
+    && cbdep install -d /opt miniconda3-py39 4.9.2 \
+    && chown -R couchbase:couchbase /opt/miniconda3-4.9.2 \
+    && ln -sf /opt/miniconda3-4.9.2/bin/python /usr/bin/python3 \
     && rm -rf /root/.cbdepcache \
-    && /home/couchbase/miniconda3-4.9.2/bin/conda clean --all --force-pkgs-dirs -y
+    && /opt/miniconda3-4.9.2/bin/conda clean --all --force-pkgs-dirs -y
 
 
 ARG JNLP_AGENT_VER
