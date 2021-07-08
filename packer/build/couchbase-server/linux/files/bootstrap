@@ -56,6 +56,10 @@ then
     service docker stop || true
     rm -rf /var/lib/docker
     mkdir -p /var/lib/docker
+
+    # Instance/Secondary EBS storage is mounted at /var/lib/docker. Later
+    # we create a /var/lib/docker/cb-home, which is mounted into the
+    # container at /home/couchbase
     echo "/dev/nvme/docker /var/lib/docker ext4 defaults,nofail,discard 0 2" >> /etc/fstab
     mount -a
 fi
@@ -73,14 +77,26 @@ secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --param
 for secret in ${secrets}
 do
     echo "Reading $secret"
-    src_path="/opt/buildteam/$(echo ${secret} | sed -e"s/__/\//g")"
-    dest_path=$(echo $src_path | sed -e"s/\/opt\/buildteam\/jenkins-worker\/${environment}\///" -e"s/\/opt\/buildteam\/jenkins-worker\/shared\///")
-    mkdir -p $(dirname $src_path)
-    aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${src_path}"
-    worker_args="-v ${src_path}:/home/couchbase/${dest_path} ${worker_args}"
+    # We're composing filenames from parameters like: jenkins-worker__server__.ssh__config
+    # where each __ is replaced with a / to construct the path.
+    #
+    # The first two components of the path specify what the parameter's purpose is and the
+    # environment it belongs to, with environment always being either ${environment} or
+    # 'shared.' We know everything we're reading here belongs to this container though, so
+    # we can just strip out the leading jenkins-worker/${environment}/ and use whatever
+    # remains as the path.
+    #
+    # e.g:
+    #   jenkins-worker__server__.ssh__config = [/var/lib/docker/cb-home/].ssh/config
+    #   jenkins-worker__shared__.ssh__authorized_keys = [/var/lib/docker/cb-home/].ssh/authorized_keys
+    secret_path="/var/lib/docker/cb-home/$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
+    mkdir -p $(dirname $secret_path)
+    aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
 done
 
-echo "--restart always -v /tmp/aws:/aws -d -p 4000:22 ${worker_args}" > /opt/buildteam/args
+echo "--restart always -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -d -p 4000:22 " > /opt/buildteam/args
+
+chown -R 1000:1000 /var/lib/docker/cb-home
 
 # wait for docker to finish coming up
 while [ ! -f /var/run/docker.pid ]
