@@ -62,7 +62,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_environment" {
 }
 
 resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_id_ns_codereview" {
-  name  = "jenkins-worker__cv__id_ns-codereview"
+  name  = "jenkins-worker__cv__.ssh__id_ns-codereview"
   type  = "SecureString"
   value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/id_ns-codereview")
   tags = {
