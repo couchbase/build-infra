@@ -204,6 +204,27 @@ class BuildInfo:
         except IndexError:
             return 0
 
+    def get_last_complete(self, product, release, version):
+        """
+        Find the most recent build from a given version of a product
+        that is "complete" (as per http://server.jenkins.couchbase.com/job/check_builds/)
+        """
+
+        q_str = (f"product='{product}' and release='{release}' "
+                 f"and version='{version}' "
+                 f"and {self.check_missing('metadata.builds_complete')}='complete'")
+
+        results = self.query_documents(
+            'build', where_clause=q_str, doc_keys=['build_num'],
+            order_by='build_num', desc=True, limit=1
+        )
+
+        # Just return the build number, or 0 if none was found
+        try:
+            return list(results)[0]['build_num']
+        except IndexError:
+            return 0
+
     def get_last_qe(self, product, release, version):
         """
         Find the most recent build from a given version of a product

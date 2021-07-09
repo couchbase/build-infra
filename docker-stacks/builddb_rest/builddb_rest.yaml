@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.9'
 
 # Suggested deployment command:
 #  docker --host build-db-01.build.couchbase.com stack deploy --with-registry-auth -c builddb_rest.yaml builddb_rest
@@ -8,9 +8,11 @@ version: '3.5'
 services:
 
   server:
-    image: couchbasebuild/builddb_rest:20200901
+    image: couchbasebuild/builddb_rest:20210709
     deploy:
       replicas: 3
+      placement:
+        max_replicas_per_node: 1
     ports:
       - "8000:6543"
     volumes:
