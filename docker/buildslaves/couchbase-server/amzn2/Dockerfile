@@ -29,7 +29,6 @@ RUN yum install --setopt=keepcache=0 -y \
                 deltarpm \
                 ed \
                 git \
-                glib2-devel \
                 glibc-devel \
                 gzip \
                 make \

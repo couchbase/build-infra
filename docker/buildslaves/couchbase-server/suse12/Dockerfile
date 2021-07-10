@@ -39,6 +39,7 @@ RUN zypper -n install \
                 ccache \
                 ed \
                 git \
+                glib2-devel \
                 libffi48-devel \
                 libnuma-devel \
                 libopenssl-devel \

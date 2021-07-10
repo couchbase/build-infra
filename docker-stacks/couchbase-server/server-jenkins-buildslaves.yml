@@ -111,7 +111,7 @@ x-node-product:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20210708-x86_64
+    image: couchbasebuild/server-amzn2-build:20210710-x86_64
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"
@@ -244,7 +244,7 @@ services:
     <<: *default-jenkins-one-agent
 
   suse12:
-    image: build-docker.couchbase.com/internal/server-suse12-build:20210505
+    image: build-docker.couchbase.com/internal/server-suse12-build:20210710
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-suse12"
