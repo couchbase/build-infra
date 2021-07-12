@@ -1,23 +1,10 @@
 # Add localbin to PATH
 export PATH=/usr/local/bin:$PATH
 
-# Add homebrew to PATH
+# Make Homebrew’s completions available in zsh
+# When getting “zsh compinit: insecure directories”, enable the chmod below.
+# chmod -R go-w "$(brew --prefix)/share"
 if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi
-
-# Add ruby to PATH
-if [ -f /usr/bin/ruby ]; then
-  export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
-elif [ -f /usr/local/opt/ruby/bin/ruby ]; then
-  ruby_ver=$(/usr/local/opt/ruby/bin/ruby -e 'print "#{RUBY_VERSION}"')
-  export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/${ruby_ver}/bin:$HOME/.gem/ruby/${ruby_ver}/bin:$PATH"
-fi
-
-# Add Java to PATH
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home"
-export PATH="$JAVA_HOME/bin:$PATH"
-
-# Add Python Lib to PATH
-export PATH="/Users/couchbase/Library/Python/2.7/bin:$PATH"
 
 # Ensure LANG can handle UTF-8 filenames
 export LANG=en_US.UTF-8

@@ -5,6 +5,5 @@ xxx.xx.xx.xxx
 ansible_connection=ssh
 ansible_ssh_user=couchbase
 ansible_ssh_pass=JENKINS_USER_PASSWORD
-ruby_version=2.6.0
 p12_cert_file=Certificates.p12
 p12_cert_password=P12_CERT_PASSWORD

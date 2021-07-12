@@ -1,6 +1,9 @@
 # Add localbin to PATH
 export PATH=/usr/local/bin:$PATH
 
+# Add homebrew to PATH
+export PATH=/opt/homebrew:$PATH
+
 # Make Homebrew’s completions available in zsh
 # When getting “zsh compinit: insecure directories”, enable the chmod below.
 # chmod -R go-w "$(brew --prefix)/share"

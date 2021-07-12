@@ -2,32 +2,59 @@
 - hosts: all
   user: "{{ ansible_ssh_user }}"
 
+  vars:
+    azul_jdk_name: "{{ 'zulu16.30.15-ca-jdk16.0.1-macosx_aarch64' if ansible_architecture == 'arm64' else 'zulu16.30.15-ca-jdk16.0.1-macosx_x64' }}"
+
+  tasks:
+    - debug: msg="Installing homebrew packages {{ ansible_architecture }} {{my_var}}"
+
   pre_tasks:
     - name: add passwordless sudoer
       copy:
         src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
       become: true
 
-
-  vars_files:
-    - vars/main.yml
-
-  roles:
-    - geerlingguy.homebrew
-
   tasks:
-    - name: Check if ruby is already installed
-      stat:
-        path: /usr/bin/ruby
-      register: ruby_installed
 
-    - name: Install ruby
-      homebrew_cask: name=ruby@{{ ruby_version }} state=linked
-      when: not ruby_installed.stat.exists
+    - name: creates homebrew directory
+      file:
+          path: /Users/{{ ansible_ssh_user }}/homebrew
+          state: directory
+          owner: "{{ ansible_ssh_user }}"
+      become: yes
 
-    - name: Install ruby-completion
-      homebrew_cask: name=ruby-completion state=linked
-      when: not ruby_installed.stat.exists
+    - debug: msg="Installing homebrew.  This will take a while"
+
+    - name: install homebrew
+      shell: |
+        yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    - debug: msg="Installing homebrew packages "
+
+    - name: Install homebrew packages
+      community.general.homebrew: name={{ item }} state=latest
+      with_items:
+          - bash-completion
+          - carthage
+          - ccache
+          - cmake
+          - coreutils
+          - doxygen
+          - git
+          - openssl
+          - pass
+          - python
+          - ssh-copy-id
+          - wget
+
+    #as of today, SGW builds still uses python 2.7.
+    - name: set python3 as default
+      shell: ln -s /usr/local/bin/python3 /usr/local/bin/python
+      when: SGW is not defined and {{ ansible_architecture }} == "x86_64"
+
+    - name: set python3 as default
+      shell: ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
+      when: SGW is not defined and {{ ansible_architecture }} == "arm64"
 
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
@@ -36,11 +63,22 @@
     - name: Add .zshenv
       copy:
         src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
+      when {{ ansible_architecture }} == "x86_64"
+
+    - name: Add .zshenv for m1
+      copy:
+        src=./files/zshenv_m1 dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
+      when {{ ansible_architecture }} == "arm64"
 
     - name: Add SGW .zshenv
       copy:
         src=./files/zshenv_sgw dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
-      when: SGW is defined
+      when: SGW is defined and {{ ansible_architecture }} == "x86_64"
+
+    - name: Add SGW .zshenv for m1
+      copy:
+        src=./files/zshenv_sgw_m1 dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
+      when: SGW is defined and {{ ansible_architecture }} == "arm64"
 
     # SGW require pkg
     - name: install pip
@@ -56,8 +94,8 @@
           - xcpretty
           - slather
 
-    # instlall xcversion, which is used to manage xcode installation from command line
-    - name: Install gem packages
+    # instlall xcversion, which can be used to manage xcode installation from command line
+    - name: Install xcversion
       gem: name={{ item }} state=latest
       with_items:
           - xcode-install
@@ -85,34 +123,32 @@
       copy:
           src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/{{ ansible_ssh_user }}/Downloads/jenkins-appledeveloper.developerprofile  owner="{{ ansible_ssh_user }}" group=staff mode=0644
 
-    - name: Check Codesign Cert exist
-      local_action: stat path={{ playbook_dir }}/files/{{ p12_cert_file }}
-      register:
-        cert_exist
-
-    - name: Copy certificate to remote for import
+    - name: Copy Codesign Cert
       copy:
-          src="./files/{{ p12_cert_file }}" dest="/tmp/{{ p12_cert_file }}" owner="{{ ansible_ssh_user }}" group=staff mode=0644
-      with_items:
-          - "{{ p12_cert_file }}"
-      when: cert_exist.stat.exists == true
+        src=./files/{{ p12_cert_file }}
+        dest=/Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }}
 
     - name: Import certificate
       shell: |
         security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
-        security import /tmp/{{ p12_cert_file }} -k /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain -P {{ p12_cert_password }} -A
-        rm -f /tmp/{{ p12_cert_file }}
+        security import /Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }} -k /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain -P {{ p12_cert_password }} -A
+        rm -f /Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }}
       args:
         executable: /bin/bash
-      when: cert_exist.stat.exists == true
-
-    # Open xcode to import profile, need a fix for this
-    - debug: msg="Open xcode app -> preferences -> import /Users/couchbase/Download/jenkins-appledeveloper.developerprofile"
-
-    - debug: msg="Password for /Users/couchbase/Download/jenkins-appledeveloper.developerprofile, should be the same as VM's password"
-
-    - debug: msg="Also sign-in to developer account; required for xcode signing during the build"
 
     # Run command to enable xcode codesign to access keychain
-    - debug:
-        msg: "Run on command line: security set-key-partition-list -S apple-tool:,apple: -s -k KEYCHAIN_PASS  ~/Library/Keychains/login.keychain-db"
+    - name: Enable keychain Acess
+      shell: |
+        security set-key-partition-list -S apple-tool:,apple: -s -k {{ ansible_ssh_user }}  ~/Library/Keychains/login.keychain-db
+      args:
+        executable: /bin/bash
+
+    - name: Install jdk
+      shell: |
+        cd /usr/local
+        curl -OL https://cdn.azul.com/zulu/bin/{{ azul_jdk_name }}.tar.gz
+        tar -xzf {{ azul_jdk_name }}.tar.gz
+        rm -rf {{ azul_jdk_name }}.tar.gz
+        ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
+        ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
+      become: true
