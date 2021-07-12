@@ -18,11 +18,20 @@ sudo yum install -y \
 # start_worker needs to parse our yaml stackfiles
 sudo pip3 install pyyaml
 
+# Enable IPv6 in docker daemon
+sudo mkdir -p /etc/docker
+cat << EOF | sudo tee /etc/docker/daemon.json
+{
+    "ipv6": true,
+    "fixed-cidr-v6": "fde1:ebe3:498b:5707::/64"
+}
+EOF
+
+
 sudo mv /tmp/bootstrap /usr/bin
 sudo chmod a+x /usr/bin/bootstrap
 
 sudo mkdir /opt/buildteam
 
 echo "${REGION}" | sudo tee /opt/buildteam/region
-
 echo "region: $(</opt/buildteam/region)"
