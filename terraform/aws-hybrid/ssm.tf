@@ -199,7 +199,7 @@ resource "aws_ssm_parameter" "server_ssh_id_cb_robot" {
 }
 
 resource "aws_ssm_parameter" "server_ssh_id_ns_codereview" {
-  name  = "jenkins-worker__server__.ssh__id_ns_codereview"
+  name  = "jenkins-worker__server__.ssh__id_ns-codereview"
   type  = "SecureString"
   value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/id_ns-codereview")
   tags = {
