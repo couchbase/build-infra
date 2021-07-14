@@ -151,7 +151,31 @@ services:
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=litec-debian10-raspbian9"
-      - "JENKINS_SLAVE_LABELS=litec"
+      - "JENKINS_SLAVE_LABELS=litec litec-raspbian9"
+      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    secrets:
+      - source: jenkins_master_username
+      - source: jenkins_master_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  litec-debian10-raspios10:
+    image: couchbasebuild/debian10-litec-raspios10-build:20210708
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=litec-debian10-raspios10"
+      - "JENKINS_SLAVE_LABELS=litec litec-raspios10"
       - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
     volumes:
       - "/etc/localtime:/etc/localtime"
