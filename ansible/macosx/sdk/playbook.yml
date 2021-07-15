@@ -11,25 +11,7 @@
   vars_files:
     - vars/main.yml
 
-  roles:
-    - elliotweiser.osx-command-line-tools
-    - geerlingguy.homebrew
-
   tasks:
-    - name: Install cbdep tool
-      get_url:
-        url: http://downloads.build.couchbase.com/cbdep/cbdep.darwin
-        dest: /usr/local/bin/cbdep
-        mode: 0755
-      become: true
-
-    - name: Create cbdeps install directory
-      file:
-        path: /opt/cbdeps
-        state: directory
-        owner: couchbase
-        mode: 0755
-      become: true
 
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
@@ -53,3 +35,59 @@
         - ns-buildbot.rsa
         - patch_via_gerrit.ini
       tags: sshkey
+
+    - name: Create localbin directory
+      file:
+        path: /usr/local/bin
+        state: directory
+        owner: couchbase
+        mode: 0755
+      become: true
+
+    - name: Install cbdep tool
+      get_url:
+        url: http://downloads.build.couchbase.com/cbdep/cbdep.darwin
+        dest: /usr/local/bin/cbdep
+        mode: 0755
+      become: true
+
+    - name: Create cbdeps install directory
+      file:
+        path: /opt/cbdeps
+        state: directory
+        owner: couchbase
+        mode: 0755
+      become: true
+
+    - debug: msg="Installing homebrew.  This will take a while"
+
+    - name: install homebrew
+      shell: |
+        yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    - name: Disable analytics (brew)
+      shell: ./brew analytics off
+      args:
+        chdir: "{{ homebrew_dir }}/bin"
+
+    - name: Install jdk
+      shell: |
+        cd /usr/local
+        curl -OL https://cdn.azul.com/zulu/bin/{{ azul_jdk_name }}.tar.gz
+        tar -xzf {{ azul_jdk_name }}.tar.gz
+        rm -rf {{ azul_jdk_name }}.tar.gz
+        ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
+        ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
+      become: true
+      tags: here
+
+    - name: Install CLI tools
+      shell: |
+        xcode-select --install > /dev/null 2>&1
+        if [ 0 == $? ]; then
+          sleep 1
+          osascript -e 'tell application "System Events"' -e 'tell process "Install Command Line Developer Tools"' -e 'keystroke return' -e 'click button "Agree" of window "License Agreement"' -e 'end tell' -e 'end tell'
+        else
+          echo "Command Line Developer Tools are already installed!"
+        fi
+      become: true
