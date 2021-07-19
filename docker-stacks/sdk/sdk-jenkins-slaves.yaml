@@ -28,6 +28,11 @@ x-default-jenkins-slave: &default-jenkins-slave
       uid: '1000'
       gid: '1000'
       mode: 0400
+    - source: docker_config_20210719
+      target: /home/couchbase/.docker/config.json
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
     - source: sdk_jenkins_master_username
       target: jenkins_master_username
     - source: sdk_jenkins_master_password
@@ -215,6 +220,8 @@ secrets:
   sdk_signing_public_key.gpgkey:
     external: true
   id_ns-codereview_20181212:
+    external: true
+  docker_config_20210719:
     external: true
 
 configs:
