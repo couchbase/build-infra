@@ -1,4 +1,11 @@
 ---
+- name: Ensure buildteam directory is present
+  file:
+    path: "/opt/buildteam"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: staff
+
 - name: Ensure user ssh directory is present
   file:
     path: "/Users/{{ ansible_ssh_user }}/.ssh"

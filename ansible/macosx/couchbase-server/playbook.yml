@@ -12,6 +12,8 @@
     when: "SSH_KEY is not defined"
 
 - hosts: all
+  vars:
+    homebrew_dir: "{{ '/usr/local' if ansible_architecture == 'x86_64' else '/opt/homebrew' }}"
   roles:
     - { role: 'roles/testrunner', tags: 'testrunner' }
     - { role: '../common/roles/profile', tags: 'profile' }

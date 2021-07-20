@@ -21,5 +21,5 @@ Deploy tools via ansible
 6. Run the playbook and enter sudo password
     % ansible-playbook -i inventory playbook.yml  --ask-become-pass
    SGW mac uses python 2.x, hence skip python 3.x install
-    % ansible-playbook -i inventory playbook.yml  --ask-become-pass -e SGW=true
+    % ansible-playbook -i inventory playbook.yml  --ask-become-pass
 7. Follow and run instructions from the ansible-playbook's post-install output message

@@ -4,9 +4,7 @@
 
   vars:
     azul_jdk_name: "{{ 'zulu16.30.15-ca-jdk16.0.1-macosx_aarch64' if ansible_architecture == 'arm64' else 'zulu16.30.15-ca-jdk16.0.1-macosx_x64' }}"
-
-  tasks:
-    - debug: msg="Installing homebrew packages {{ ansible_architecture }} {{my_var}}"
+    homebrew_dir: "{{ '/usr/local' if ansible_architecture == 'x86_64' else '/opt/homebrew' }}"
 
   pre_tasks:
     - name: add passwordless sudoer
@@ -16,18 +14,16 @@
 
   tasks:
 
-    - name: creates homebrew directory
-      file:
-          path: /Users/{{ ansible_ssh_user }}/homebrew
-          state: directory
-          owner: "{{ ansible_ssh_user }}"
-      become: yes
-
     - debug: msg="Installing homebrew.  This will take a while"
 
     - name: install homebrew
       shell: |
         yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    - name: Disable analytics
+      shell: ./brew analytics off
+      args:
+        chdir: "{{ homebrew_dir }}/bin"
 
     - debug: msg="Installing homebrew packages "
 
@@ -47,44 +43,31 @@
           - ssh-copy-id
           - wget
 
-    #as of today, SGW builds still uses python 2.7.
     - name: set python3 as default
-      shell: ln -s /usr/local/bin/python3 /usr/local/bin/python
-      when: SGW is not defined and {{ ansible_architecture }} == "x86_64"
-
-    - name: set python3 as default
-      shell: ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
-      when: SGW is not defined and {{ ansible_architecture }} == "arm64"
+      file:
+        src: "{{ homebrew_dir }}/bin/python3"
+        dest: "{{ homebrew_dir }}/bin/python"
+        state: link
 
     - name: set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
 
+    - name: Disable user screensaver
+      shell: defaults -currentHost write com.apple.screensaver idleTime 0
+
+    - name: Disable logon screensaver
+      shell: defaults -currentHost write com.apple.screensaver loginWindowIdleTime 0
+      become: true
+
     - name: Add .zshenv
       copy:
         src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
-      when {{ ansible_architecture }} == "x86_64"
-
-    - name: Add .zshenv for m1
-      copy:
-        src=./files/zshenv_m1 dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
-      when {{ ansible_architecture }} == "arm64"
-
-    - name: Add SGW .zshenv
-      copy:
-        src=./files/zshenv_sgw dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
-      when: SGW is defined and {{ ansible_architecture }} == "x86_64"
-
-    - name: Add SGW .zshenv for m1
-      copy:
-        src=./files/zshenv_sgw_m1 dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
-      when: SGW is defined and {{ ansible_architecture }} == "arm64"
 
     # SGW require pkg
     - name: install pip
-      shell: "curl 'https://bootstrap.pypa.io/get-pip.py' -o get-pip.py; python2 get-pip.py; pip2 intall pyinstaller"
+      shell: "curl 'https://bootstrap.pypa.io/get-pip.py' -o get-pip.py; python get-pip.py; pip intall pyinstaller"
       ignore_errors: yes
-      when: SGW is defined
 
     # Required for CBL iOS doc generation
     - name: Install gem packages

@@ -10,19 +10,23 @@
 # Ensure LANG can handle UTF-8 filenames
 export LANG=en_US.UTF-8
 
-# Add homebrew to PATH
-if type brew &>/dev/null
-then
-  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
-  # autoload is a zsh builtin, skip for bash
-  command -v autoload && autoload -Uz compinit && compinit
+# Add homebrew and localbin to PATH
+# homebrew is installed under /usr/local on x86_64
+# under /opt/homebrew on M1
+if [ -d "/opt/homebrew" ]; then
+  export homebrew_dir=/opt/homebrew
+  export PATH=$homebrew_dir/bin:/usr/local/bin:$homebrew_dir/opt/ccache/libexec:$PATH
+else
+  export homebrew_dir=/usr/local
+  export PATH=$homebrew_dir/bin:$homebrew_dir/opt/ccache/libexec:$PATH
 fi
+gem_paths=$(gem env | grep "INSTALLATION DIRECTORY" | sed 's/.*: //g'  | sed 's/$/\/bin/g' | paste -sd ":" -)
+export PATH="${gem_paths}:$PATH"
 
-gem_paths=$(/usr/local/opt/ruby@{{ ruby_version }}/bin/gem env | grep "INSTALLATION DIRECTORY" | sed 's/.*: //g'  | sed 's/$/\/bin/g' | paste -sd ":" -)
-export PATH="/usr/local/opt/ruby@{{ ruby_version }}/bin:${gem_paths}:$PATH"
-
-# Add Java to PATH
-export PATH="/usr/local/opt/java/bin:$PATH"
+# Make Homebrew’s completions available in zsh
+# When getting “zsh compinit: insecure directories”, enable the chmod below.
+# chmod -R go-w "$(brew --prefix)/share"
+if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi
 
 # Add other locations to PATH
-export PATH=~/bin:/usr/local/bin:/usr/local/opt/ccache/libexec:$PATH
+export PATH=~/bin:$PATH

@@ -2,27 +2,15 @@
   block:
   - name: Check if installed (brew)
     stat:
-      path: /usr/local/bin/brew
+      path: "{{ homebrew_dir }}"
     register: brew
 
-  - name: Copy required files (brew)
-    copy:
-      src: files/{{ item }}
-      dest: /tmp/{{ item }}
-      owner: couchbase
-      group: staff
-      mode: "0700"
-    when: brew.stat.exists == False
-    become: true
-    with_items:
-      - askpass.sh
-      - install_brew.sh
+  - debug: msg="Installing homebrew.  This will take a while"
 
-  - name: Install (brew)
-    # See: https://stackoverflow.com/a/59849154
-    shell: cd /tmp && export KEYCHAIN_PASSWORD="{{ansible_ssh_pass}}" && ./install_brew.sh
+  - name: install homebrew
+    shell: |
+      yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     when: brew.stat.exists == False
-    no_log: true
 
   ### begin check license acceptance
   # We can potentially end up in a situation where we can't disable brew analytics because
@@ -33,24 +21,17 @@
     register: xcode
 
   - name: Reset to default CLI tools path (brew)
-    shell: xcode-select -r
-    become: true
-    when: xcode.stat.exists == true
-
-  - name: Accept XCode License (brew)
-    shell: xcodebuild -license accept
+    shell: |
+      xcode-select -r
+      xcodebuild -license accept
     become: true
     when: xcode.stat.exists == true
   ### end check license acceptance ###
 
   - name: Disable analytics (brew)
-    shell: /usr/local/bin/brew analytics off
-
-  # java11 cask install prompts for a password half way through, we need a fresh sudo timestamp to work around it
-  - name: Add casks (brew)
-    shell: echo "{{ ansible_ssh_pass }}" | sudo -S -v && /usr/local/bin/brew cask install "{{ item }}"
-    with_items: "{{homebrew_cask_apps}}"
-    no_log: true
+    shell: ./brew analytics off
+    args:
+      chdir: "{{ homebrew_dir }}/bin"
 
   - name: Add formulae (brew)
     homebrew:
@@ -60,7 +41,7 @@
   # errors start happening when you run /bin/zsh
   - name: Fix directory permissions
     file:
-      path: /usr/local/share/zsh
+      path: "{{ homebrew_dir }}/share/zsh"
       state: directory
       recurse: yes
       owner: couchbase
@@ -70,11 +51,11 @@
 
   - name: Link libtoolize (brew)
     file:
-      src: "/usr/local/bin/glibtoolize"
-      dest: "/usr/local/bin/libtoolize"
+      src: "{{ homebrew_dir }}/bin/glibtoolize"
+      dest: "{{ homebrew_dir }}/bin/libtoolize"
       state: link
 
   - name: Install gems
-    shell: command -v xcode-install || /usr/local/opt/ruby@{{ ruby_version }}/bin/gem install xcode-install
+    shell: command -v xcode-install || {{ homebrew_dir }}/opt/ruby@{{ ruby_version }}/bin/gem install xcode-install
     become: true
   tags: brew

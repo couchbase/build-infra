@@ -1,3 +1,9 @@
+- name: add passwordless sudoer
+  copy:
+    src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
+  become: true
+- include_vars: vars/main.yml
 - include: components/brew.yml
 - include: components/repo.yml
+- include: components/jdk.yml
 - include: components/xcode.yml

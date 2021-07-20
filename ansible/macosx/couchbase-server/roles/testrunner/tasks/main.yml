@@ -22,5 +22,5 @@
       - jsonpickle==1.3
       - docker==4.2.0
       - decorator==4.4.2
-    executable: /usr/local/bin/pip3
+    executable: "{{ homebrew_dir }}/bin/pip3"
   when: NODE_CLASS == "cv"

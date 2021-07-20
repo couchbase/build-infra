@@ -8,6 +8,6 @@ Prereq
 Deploy tools via ansible
 1. git clone https://github.com/couchbase/build-infra.git
 2. cd build-infra/ansible/macosx/couchbase-server
-3. Run the playbook, passing the profile_sync key contents, certificate password and node class (e.g. build/cv) and product (e.g. couchbase-server) and optionally xcode_version (9.3.1 or default: 11.3.1) as extra vars on the command line or via the inventory, and enter sudo password
+3. Run the playbook, passing the profile_sync key contents, certificate password and node class (e.g. build/cv) and product (e.g. couchbase-server), and enter sudo password
 
     `$ ansible-playbook -i inventory playbook.yml -e "ansible_ssh_pass=<jenkins_password> p12_cert_password=<cert_password> SSH_KEY='$(cat <profile_sync_key_file>)' NODE_CLASS=cv NODE_PRODUCT=couchbase-server" --ask-become-pass`

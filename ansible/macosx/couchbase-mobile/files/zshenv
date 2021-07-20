@@ -1,5 +1,10 @@
-# Add localbin to PATH
+# Add homebrew and localbin to PATH
+# homebrew is installed under /usr/local on x86_64
+# under /opt/homebrew on M1
 export PATH=/usr/local/bin:$PATH
+if [ -d "/opt/homebrew" ]; then
+  export PATH=/opt/homebrew/bin:$PATH
+fi
 
 # Make Homebrew’s completions available in zsh
 # When getting “zsh compinit: insecure directories”, enable the chmod below.
