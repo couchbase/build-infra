@@ -22,7 +22,8 @@ x-default-jenkins-slave: &default-jenkins-slave
 
   secrets:
     - source: jenkins_master_username
-    - source: jenkins_master_password
+    - source: jenkins_master_password.20210721
+      target: /run/secrets/jenkins_master_password
     - source: id_cb-robot_20191031
       target: /home/couchbase/.ssh/id_cb-robot
       uid: '1000'
@@ -34,12 +35,14 @@ x-default-jenkins-slave-environment:
 services:
 
   centos6:
-    image: couchbasebuild/python-centos6-build:20200211
+    image: couchbasebuild/python-centos6-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=python-centos6"
       - "JENKINS_SLAVE_LABELS=linux python3 x86_64"
       - *default-jenkins-slave-environment-master
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=couchbase-server"
     <<: *default-jenkins-slave
 
 configs:
@@ -49,7 +52,7 @@ configs:
 secrets:
   jenkins_master_username:
     external: true
-  jenkins_master_password:
+  jenkins_master_password.20210721:
     external: true
   id_cb-robot_20191031:
     external: true

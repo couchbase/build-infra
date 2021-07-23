@@ -49,9 +49,11 @@ RUN curl --fail https://storage.googleapis.com/git-repo-downloads/repo -o /usr/l
 
 # FPM packaging tool
 # Need this before install clang as it will override c++
+RUN yum install -y ruby-devel gcc make rpm-build rubygems
+
 # Need to lock some versions because newer ones require higher versions of ruby
-RUN yum install -y ruby-devel gcc make rpm-build rubygems && \
-    gem install ffi:1.12.2 fpm:1.11.0
+RUN gem install ffi:1.12.2 && \
+    gem install fpm:1.11.0
 
 # Install Clang from Fedora Copr
 RUN curl --fail -o /etc/yum.repos.d/alonid.repo \

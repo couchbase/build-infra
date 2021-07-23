@@ -32,9 +32,10 @@ then
     cp -a /ssh/* /home/couchbase/.ssh
 fi
 
-sudo chown -R couchbase:couchbase /home/couchbase/.ssh
-chmod -R 600 /home/couchbase/.ssh/*
-chmod 700 /home/couchbase/.ssh
+# We need to let these fall through to a noop in case we hit mounts
+sudo chown -R couchbase:couchbase /home/couchbase/.ssh || :
+chmod -R 600 /home/couchbase/.ssh/* || :
+chmod 700 /home/couchbase/.ssh || :
 
 if [ -f /ssh/aws-credentials ]
 then
@@ -131,26 +132,46 @@ command -v gpg >/dev/null 2>&1 && {
 
     AGENT_MODE=${AGENT_MODE:-exclusive}
     jenkins_user=$(echo -n ${jenkins_user:-$(cat /run/secrets/jenkins_master_username)} | xargs)
-    jenkins_password=$(echo -n ${jenkins_password:-$(cat /run/secrets/jenkins_master_password)} | xargs)
     shift
 
-    exec sudo -u couchbase --set-home --preserve-env \
-       env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
-       PATH=/usr/local/bin:/usr/bin:/bin \
-       java $JAVA_OPTS \
-       -jar /usr/local/lib/swarm-client.jar \
-       -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
-       -master "${JENKINS_MASTER}" \
-       -mode ${AGENT_MODE} \
-       -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
-       -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
-       -disableClientsUniqueId \
-       -deleteExistingClients \
-       -labels "${JENKINS_SLAVE_LABELS}" \
-       -retry 5 \
-       -noRetryAfterConnected \
-       -username "${jenkins_user}" \
-       -password "${jenkins_password}"
+    if $(sudo --help &>/dev/null && :)
+    then
+      exec sudo -u couchbase --set-home --preserve-env \
+        env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
+        PATH=/usr/local/bin:/usr/bin:/bin \
+        java $JAVA_OPTS \
+        -jar /usr/local/lib/swarm-client.jar \
+        -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
+        -master "${JENKINS_MASTER}" \
+        -mode ${AGENT_MODE} \
+        -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
+        -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
+        -disableClientsUniqueId \
+        -deleteExistingClients \
+        -labels "${JENKINS_SLAVE_LABELS}" \
+        -retry 5 \
+        -noRetryAfterConnected \
+        -username "${jenkins_user}" \
+        -password @/run/secrets/jenkins_master_password
+    else
+      exec sudo -u couchbase -H \
+        env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
+        PATH=/usr/local/bin:/usr/bin:/bin \
+        java $JAVA_OPTS \
+        -jar /usr/local/lib/swarm-client.jar \
+        -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
+        -master "${JENKINS_MASTER}" \
+        -mode ${AGENT_MODE} \
+        -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
+        -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
+        -disableClientsUniqueId \
+        -deleteExistingClients \
+        -labels "${JENKINS_SLAVE_LABELS}" \
+        -retry 5 \
+        -noRetryAfterConnected \
+        -username "${jenkins_user}" \
+        -password @/run/secrets/jenkins_master_password
+    fi
     exit
 }
 

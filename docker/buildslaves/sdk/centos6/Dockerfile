@@ -11,6 +11,8 @@ USER root
 RUN curl http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 USER couchbase
 
+COPY build/couchbuilder_start.sh /usr/sbin/
+
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}

@@ -55,7 +55,7 @@ command -v gpg >/dev/null 2>&1 && {
        -labels "${JENKINS_SLAVE_LABELS}" \
        -retry 5 \
        -username "$(cat /run/secrets/jenkins_master_username)" \
-       -password "$(cat /run/secrets/jenkins_master_password)"
+       -password @/run/secrets/jenkins_master_password
 }
 
 # If argument is not 'swarm', assume user want to run their own process,

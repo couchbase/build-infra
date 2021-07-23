@@ -1,16 +1,16 @@
-# Docker container for Ubuntu 16.04
+# Docker container for Debian 8
 
-FROM ubuntu:16.04
+FROM debian:8.2
 MAINTAINER build-team@couchbase.com
 
 USER root
 
-# Install Couchbase build dependencies
+# Install Couchbase build dependencies (jessie-backports needed for OpenJDK)
 RUN apt-get update && \
-    apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release openjdk-8-jdk sudo tar && \
-    apt-get install -y groff-base python-dev python-pip python-virtualenv gdb gnupg2 && \
-    apt-get install -y libuv-dev libev-dev libevent-dev libbz2-dev libffi-dev && \
-    apt-get install -y libunwind8 libicu55 && \
+    apt-get install -y build-essential curl git libssl-dev lsb-release sudo tar && \
+    apt-get install -y groff-base python-dev python-pip python-virtualenv && \
+    apt-get install -y libuv0.10-dev libev-dev libevent-dev libbz2-dev libffi-dev && \
+    apt-get install -y libunwind8 libicu52 libssl1.0.0 && \
     apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give
@@ -39,6 +39,18 @@ RUN mkdir /tmp/deploy && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy
 
+# Oracle JDK (for Jenkins).
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
+    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/jdk.tgz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
+ENV JAVA_HOME=/usr/local/java
+
 # Jenkins Swarm client jar
 RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar
 
@@ -46,23 +58,6 @@ RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-clien
 RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
     chmod 755 /opt/cbdeps
-
-# Build tools
-RUN apt-get update && \
-    apt-get install -y apt-transport-https unzip && \
-    echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 && \
-    apt-get update && \
-    apt-get install -y sbt && \
-    apt-get clean
-RUN mkdir /tmp/deploy && \
-    curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
-    cd /usr/local && \
-    unzip /tmp/deploy/gradle.zip && \
-    unzip /tmp/deploy/maven.zip && \
-    ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin && \
-    rm -rf /tmp/deploy
 
 # libcouchbase
 RUN mkdir /tmp/deploy && \

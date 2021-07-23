@@ -18,7 +18,8 @@ x-default-jenkins-agent: &default-jenkins-agent
 
   secrets:
     - source: jenkins_master_username
-    - source: jenkins_master_password
+    - source: jenkins_master_password.20210721
+      target: /run/secrets/jenkins_master_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
     - source: nsbuildbot-docker-config.json
@@ -30,7 +31,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   ubuntu18:
-    image: couchbasebuild/analytics-ubuntu18-cv:20210505
+    image: couchbasebuild/analytics-ubuntu18-cv:20210715
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -58,7 +59,7 @@ services:
 secrets:
   jenkins_master_username:
     external: true
-  jenkins_master_password:
+  jenkins_master_password.20210721:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true

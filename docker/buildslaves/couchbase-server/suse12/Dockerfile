@@ -10,7 +10,7 @@ USER root
 ARG REGCODE
 RUN zypper ref -s
 RUN zypper install -y SUSEConnect
-RUN SUSEConnect -r ${REGCODE} -e kenneth.lareau@couchbase.com
+RUN SUSEConnect -r ${REGCODE} -e staff_qe@couchbase.com
 RUN SUSEConnect -p sle-sdk/12.2/x86_64
 RUN zypper ref -s
 RUN zypper -n in vim

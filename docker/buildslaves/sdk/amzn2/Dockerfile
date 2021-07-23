@@ -78,7 +78,7 @@ RUN mkdir /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
 # Build tools
-RUN curl https://bintray.com/sbt/rpm/rpm > /etc/yum.repos.d/bintray-sbt-rpm.repo && \
+RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo && \
     sudo yum install -y --setopt=keepcache=0 sbt
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \

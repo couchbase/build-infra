@@ -29,7 +29,7 @@ RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
 ### Install Couchbase build dependencies ######################################
 # Add EPEL
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm dnf-plugins-core && \
-    dnf config-manager --set-enabled PowerTools
+    dnf config-manager --set-enabled powertools
 
 # * Packages from the base CentOS repository and EPEL
 RUN dnf install -y \
@@ -95,7 +95,7 @@ RUN mkdir /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
 # Build tools
-RUN curl https://bintray.com/sbt/rpm/rpm > /etc/yum.repos.d/bintray-sbt-rpm.repo && \
+RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo && \
     sudo yum install -y --setopt=keepcache=0 sbt
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \

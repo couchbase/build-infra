@@ -10,7 +10,7 @@ version: "3.8"
 
 services:
   operator:
-    image: couchbasebuild/ubuntu-2004-operator-build:20210505
+    image: couchbasebuild/ubuntu-2004-operator-build:20210721
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=operator-build"
@@ -24,7 +24,8 @@ services:
       - "/etc/timezone:/etc/timezone"
     secrets:
       - source: jenkins_master_username
-      - source: jenkins_master_password
+      - source: jenkins_master_password.20210721
+        target: /run/secrets/jenkins_master_password
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
       - source: operator.config.docker.20210115
@@ -42,7 +43,7 @@ services:
 secrets:
   jenkins_master_username:
     external: true
-  jenkins_master_password:
+  jenkins_master_password.20210721:
     external: true
   operator.config.docker.20210115:
     external: true

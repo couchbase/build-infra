@@ -7,9 +7,10 @@
 FROM couchbasebuild/server-suse11-build:20180713
 
 ADD build/swarm-client-3.17.jar /usr/local/lib/swarm-client.jar
+
 # Also need to update repo
-RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
-    chmod a+x /usr/local/bin/repo
+ADD https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo /usr/local/bin/repo
+RUN chmod a+x /usr/local/bin/repo
 
 RUN zypper install -y rsync && zypper clean
 
@@ -17,10 +18,8 @@ RUN rm -rf /home/couchbase/.ssh
 
 ENV AGENT_VERSION=4.3
 
-# RUN zypper install -y git-lfs && zypper clean
-
-RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar http://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
-  && chmod 755 /usr/share/jenkins \
+ADD http://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar /usr/share/jenkins/agent.jar
+RUN chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
 

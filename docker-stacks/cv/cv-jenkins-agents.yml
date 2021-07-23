@@ -16,7 +16,8 @@ x-default-jenkins-agent: &default-jenkins-agent
 
   secrets:
     - source: jenkins_master_username
-    - source: jenkins_master_password
+    - source: jenkins_master_password.20210721
+      target: /run/secrets/jenkins_master_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
     - source: dockerhub_nsbuildbot_password
@@ -32,7 +33,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20210505
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20210715
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -68,7 +69,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210505
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210715
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -103,7 +104,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210505
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210715
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -177,7 +178,7 @@ services:
 secrets:
   jenkins_master_username:
     external: true
-  jenkins_master_password:
+  jenkins_master_password.20210721:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true

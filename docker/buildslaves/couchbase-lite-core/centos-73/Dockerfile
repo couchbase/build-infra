@@ -49,8 +49,10 @@ RUN curl --fail https://storage.googleapis.com/git-repo-downloads/repo -o /usr/l
 
 # FPM packaging tool
 # Need to lock some versions because newer ones require higher versions of ruby
-RUN yum install -y ruby-devel gcc make rpm-build rubygems && \
-    gem install ffi:1.12.2 fpm:1.11.0
+RUN yum install -y ruby-devel gcc make rpm-build rubygems
+
+RUN gem install ffi:1.12.2 && \
+    gem install fpm:1.11.0
 
 # GCC (from couchbasebuild/centos-7-gcc)
 COPY build/local /usr/local

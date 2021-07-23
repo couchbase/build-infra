@@ -5,7 +5,7 @@ TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/ubuntu1604-sgw-build
 
 mkdir -p build
-cp -a -u ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 docker build -t ${IMAGE}:$TAG .
 docker tag ${IMAGE}:$TAG ${IMAGE}:latest
 if [ "$1" = "--publish" ]

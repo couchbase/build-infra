@@ -35,8 +35,8 @@ x-default-jenkins-slave: &default-jenkins-slave
       mode: 0400
     - source: sdk_jenkins_master_username
       target: jenkins_master_username
-    - source: sdk_jenkins_master_password
-      target: jenkins_master_password
+    - source: jenkins_master_password.20210721
+      target: /run/secrets/jenkins_master_password
   configs:
     - source: jenkins_slave_ssh_config_20200422
       target: /home/couchbase/.ssh/config
@@ -60,7 +60,7 @@ x-default-jenkins-slave-environment:
 services:
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20200813
+    image: couchbasebuild/sdk-amzn2-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
@@ -69,7 +69,7 @@ services:
     <<: *default-jenkins-slave
 
   centos6:
-    image: couchbasebuild/sdk-centos6-build:20200813
+    image: couchbasebuild/sdk-centos6-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-centos6"
       - "JENKINS_SLAVE_LABELS=sdk centos6"
@@ -78,7 +78,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20201008
+    image: couchbasebuild/sdk-centos7-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"
@@ -87,7 +87,7 @@ services:
     <<: *default-jenkins-slave
 
   centos8:
-    image: couchbasebuild/sdk-centos8-build:20200813
+    image: couchbasebuild/sdk-centos8-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-centos8"
       - "JENKINS_SLAVE_LABELS=sdk centos8"
@@ -96,7 +96,7 @@ services:
     <<: *default-jenkins-slave
 
   debian8:
-    image: couchbasebuild/sdk-debian8-build:20200813
+    image: couchbasebuild/sdk-debian8-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-debian8"
       - "JENKINS_SLAVE_LABELS=sdk debian8"
@@ -105,7 +105,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/sdk-debian9-build:20200813
+    image: couchbasebuild/sdk-debian9-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-debian9"
       - "JENKINS_SLAVE_LABELS=sdk debian9"
@@ -114,7 +114,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu14:
-    image: couchbasebuild/sdk-ubuntu14-build:20200813
+    image: couchbasebuild/sdk-ubuntu14-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu14"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu14 ubuntu14.04"
@@ -123,7 +123,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu16:
-    image: couchbasebuild/sdk-ubuntu16-build:20200813
+    image: couchbasebuild/sdk-ubuntu16-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu16"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu16 ubuntu16.04"
@@ -132,7 +132,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu20:
-    image: couchbasebuild/sdk-ubuntu20-build:20200820
+    image: couchbasebuild/sdk-ubuntu20-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
@@ -141,7 +141,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7-signing:
-    image: couchbasebuild/sdk-centos7-signing:20200506
+    image: couchbasebuild/sdk-centos7-signing:20210721
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"
@@ -170,11 +170,11 @@ services:
         mode: 0400
       - source: sdk_jenkins_master_username
         target: jenkins_master_username
-      - source: sdk_jenkins_master_password
-        target: jenkins_master_password
+      - source: jenkins_master_password.20210721
+        target: /run/secrets/jenkins_master_password
 
   debian10-signing:
-    image: couchbasebuild/sdk-debian10-signing:20200506
+    image: couchbasebuild/sdk-debian10-signing:20210721
     environment:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
       - "JENKINS_SLAVE_LABELS=debian10-signing"
@@ -203,8 +203,8 @@ services:
         mode: 0400
       - source: sdk_jenkins_master_username
         target: jenkins_master_username
-      - source: sdk_jenkins_master_password
-        target: jenkins_master_password
+      - source: jenkins_master_password.20210721
+        target: /run/secrets/jenkins_master_password
 
 
 secrets:
@@ -213,7 +213,7 @@ secrets:
     external: true
   sdk_jenkins_master_username:
     external: true
-  sdk_jenkins_master_password:
+  jenkins_master_password.20210721:
     external: true
   sdk_signing_private_key.gpgkey:
     external: true
