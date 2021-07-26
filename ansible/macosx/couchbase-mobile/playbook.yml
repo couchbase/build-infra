@@ -66,7 +66,7 @@
 
     # SGW require pkg
     - name: install pip
-      shell: "curl 'https://bootstrap.pypa.io/get-pip.py' -o get-pip.py; python get-pip.py; pip intall pyinstaller"
+      shell: "{{ homebrew_dir }}/bin/pip3 install pyinstaller"
       ignore_errors: yes
 
     # Required for CBL iOS doc generation
