@@ -28,7 +28,7 @@ services:
         target: /run/secrets/jenkins_master_password
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-      - source: operator.config.docker.20210115
+      - source: operator.config.docker.20210730
         target: /home/couchbase/.docker/config.json
         mode: 0600
         uid: "1000"
@@ -45,7 +45,7 @@ secrets:
     external: true
   jenkins_master_password.20210721:
     external: true
-  operator.config.docker.20210115:
+  operator.config.docker.20210730:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true
