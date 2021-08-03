@@ -1,4 +1,4 @@
-# Docker container for Centos 7.4
+# Docker container for Centos 7
 
 # This has to be first - define the GCC version to use and
 # the image to pull it from
@@ -34,6 +34,7 @@ RUN chmod +x /tini
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repositories
 RUN yum install --setopt=keepcache=0 -y \
+                binutils \
                 ed \
                 glibc-devel \
                 make \
