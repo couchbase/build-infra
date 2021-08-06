@@ -4,6 +4,9 @@
 FROM debian:buster
 MAINTAINER build-team@couchbase.com
 
+# The cross compilers installed here are used for generic OS (like Ubuntu Core)
+# Model specific cross compilation toolchains, such as Raspberry Pi, will be
+# acquired dynamically in a running container.
 RUN apt-get update && apt-get install -y \
     unzip \
     wget \
@@ -14,6 +17,10 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     rsync \
+    ruby \
+    devscripts \
+    g++-arm-linux-gnueabihf \
+    g++-aarch64-linux-gnu \
 && rm -rf /var/lib/apt/lists
 
 RUN pip3 install progressbar
