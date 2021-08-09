@@ -2,7 +2,7 @@
 172.23.96.171  name=mega4-01.sc.couchbase.com
 172.23.96.173  name=mega4-02.sc.couchbase.com
 172.23.96.176  name=mega4-03.sc.couchbase.com
-172.23.96.177  name=mega4-04.sc.couchbase.com
+172.23.96.218  name=mega4-04.sc.couchbase.com
 172.23.96.208  name=mega4-05.sc.couchbase.com
 172.23.96.211  name=mega4-06.sc.couchbase.com
 172.23.96.249  name=mega4-07.sc.couchbase.com
@@ -12,7 +12,7 @@
 172.23.121.99  name=mega4-11.sc.couchbase.com
 172.23.121.104 name=mega4-12.sc.couchbase.com
 172.23.120.91  name=mega4-13.sc.couchbase.com
-172.23.121.106 name=mega4-14.sc.couchbase.com
+172.23.120.111 name=mega4-14.sc.couchbase.com
 172.23.121.109 name=mega4-15.sc.couchbase.com
 172.23.121.110 name=mega4-16.sc.couchbase.com
 172.23.121.111 name=mega4-17.sc.couchbase.com

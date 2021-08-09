@@ -122,7 +122,7 @@ services:
     <<: *default-jenkins-two-agent
 
   centos6:
-    image: couchbasebuild/server-centos6-build:20210721
+    image: couchbasebuild/server-centos6-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=server-centos6"
       - "JENKINS_SLAVE_LABELS=server centos6 vulcan alice mad-hatter x86_64"
@@ -235,7 +235,7 @@ services:
     <<: *default-jenkins-one-agent
 
   suse11:
-    image: couchbasebuild/server-suse11-build:20210721
+    image: couchbasebuild/server-suse11-build:20210722
     environment:
       - "JENKINS_SLAVE_NAME=server-suse11"
       - "JENKINS_SLAVE_LABELS=server suse11 vulcan alice mad-hatter master x86_64"
