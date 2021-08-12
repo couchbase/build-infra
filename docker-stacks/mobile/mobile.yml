@@ -151,13 +151,14 @@ services:
       - jenkins
 
   litec-the-ark:
-    image: couchbasebuild/litec-the-ark:20210806
+    image: couchbasebuild/litec-the-ark:20210811
     init: true
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=mobile-litec-the-ark"
       - "JENKINS_SLAVE_LABELS=litec litec-the-ark"
       - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_SLAVE_EXECUTORS=3"
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "/etc/timezone:/etc/timezone"
