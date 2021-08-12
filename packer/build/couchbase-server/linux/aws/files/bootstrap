@@ -1,0 +1,144 @@
+#!/bin/bash
+
+# This script is called via userdata on the instance by way of the cloud config
+# in jenkins it removes /var/lib/cloud/instances/*/sem/config_scripts_user as a
+# final step to ensure it will be triggered on every boot (so the ephemeral
+# volumes can be provisioned and docker can start up once complete)
+#
+# Any changes made to this script should be made on the understanding that
+# it will be triggered on every boot. If you want to do something only on first
+# boot, check for the existence of /persistent/.booted
+
+set -x
+set +e
+environment="${1:-none}"
+image="${2}"
+
+function provision_disk() {
+  if lsblk -o NAME,FSTYPE -dsn | grep ${1}n1
+  then
+    if nvme list | grep ${1} | grep "Elastic Block Store"
+    then
+      name=persistent # EBS volume
+    else
+      name=ephemeral  # Instance volume
+    fi
+
+    # We need to ensure the ephemeral storage is configured at each boot, we'll
+    # skip persistent vol if it already exists though
+    if ! lvs | grep ${name}
+    then
+      DISKSIZE_STRING=$(lsblk | grep "${1}n1" | awk '{print $4}')
+      case $DISKSIZE_STRING in
+        *G)
+          DISK_UNIT=G
+          ;;
+        *T)
+          DISK_UNIT=T
+          ;;
+      esac
+      DISKSIZE_RAW=$(echo $DISKSIZE_STRING | cut -f1 -d$DISK_UNIT)
+
+      if [ $DISK_UNIT = "G" ]
+      then
+        DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.1" | bc)
+      else
+        DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.001" | bc)
+      fi
+
+      pvcreate /dev/${1}n1
+      vgcreate ${name} /dev/${1}n1
+      lvcreate --name disk1 --size ${DISKSIZE_RAW}${DISK_UNIT} ${name}
+      mkfs.ext4 /dev/${name}/disk1
+    fi
+  fi
+}
+
+# I don't know if the EBS/persistent devices can be different from one
+# instance to the next. We just call with the device names here and
+# figure out what they are via `nvme list` in provision_disk()
+provision_disk nvme1
+provision_disk nvme2
+
+# Update fstab
+for disk in ephemeral persistent
+do
+  if ! grep ${disk} /etc/fstab
+  then
+    mkdir -p /${disk}
+    echo "/dev/${disk}/disk1 /${disk} ext4 defaults,nofail,discard 0 2" >> /etc/fstab
+  fi
+done
+
+mount -a
+
+# switcheroo /var/lib/docker if currently unswitcherooed
+if [ ! -d /persistent/var/lib/docker ]
+then
+  rm -rf /var/lib/docker
+  mkdir -p /persistent/var/lib/docker
+  ln -s /persistent/var/lib/docker/ /var/lib/docker
+fi
+set -e
+
+# Start docker in the background so we can move on to retrieving secrets
+# straight away
+# Note: We don't set the docker service to come up automatically at boot,
+# because we need to ensure the disks are ready before the container is
+# --restart=always'd on subsequent boots
+service docker start &
+
+# Get secrets and set up initial container args (only on first boot)
+if [ ! -f /persistent/.booted ]
+then
+  # Get the names of the secrets we want from parameter store
+  secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=${environment},shared" | jq -r ".Parameters[].Name")
+
+  for secret in ${secrets}
+  do
+      echo "Reading $secret"
+      # We're composing filenames from parameters like: jenkins-worker__server__.ssh__config
+      # where each __ is replaced with a / to construct the path.
+      #
+      # The first two components of the path specify what the parameter's purpose is and the
+      # environment it belongs to, with environment always being either ${environment} or
+      # 'shared.' We know everything we're reading here belongs to this container though, so
+      # we can just strip out the leading jenkins-worker/${environment}/ and use whatever
+      # remains as the path.
+      #
+      # e.g:
+      #   jenkins-worker__server__.ssh__config = [/var/lib/docker/cb-home/].ssh/config
+      #   jenkins-worker__shared__.ssh__authorized_keys = [/var/lib/docker/cb-home/].ssh/authorized_keys
+      secret_path="/var/lib/docker/cb-home/$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
+      mkdir -p $(dirname $secret_path)
+      aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
+  done
+
+  # Compile args we'll be passing to `docker run`
+  echo "--name worker --restart always -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 " > /opt/buildteam/args
+  if [ "${environment}" = "cv" ]
+  then
+    echo "-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh " >> /opt/buildteam/args
+  fi
+  chown -R 1000:1000 /var/lib/docker/cb-home
+fi
+
+# wait for docker to finish coming up
+while [ ! -f /var/run/docker.pid ]
+do
+  echo "Waiting for docker to start"
+  sleep 1
+done
+
+# Allow this script to run at next boot
+rm /var/lib/cloud/instances/*/sem/config_scripts_user
+
+# Run build container (on first boot)
+if [ ! -f /persistent/.booted ]
+then
+  aws_acct=$(aws sts get-caller-identity | jq -r ".Account")
+  aws ecr get-login-password --region $(</opt/buildteam/region) | docker login --username AWS --password-stdin ${aws_acct}.dkr.ecr.$(</opt/buildteam/region).amazonaws.com
+  docker run $(</opt/buildteam/args) ${image} default
+fi
+
+touch /persistent/.booted

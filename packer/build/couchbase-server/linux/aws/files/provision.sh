@@ -12,6 +12,7 @@ sudo yum install -y \
     jq \
     lvm2 \
     nano \
+    nvme-cli \
     python3 \
     python3-pip
 
@@ -28,10 +29,14 @@ cat << EOF | sudo tee /etc/docker/daemon.json
 EOF
 
 
+sudo mkdir -p /opt/buildteam/hooks
+
 sudo mv /tmp/bootstrap /usr/bin
 sudo chmod a+x /usr/bin/bootstrap
 
-sudo mkdir /opt/buildteam
+sudo mv /tmp/cv-hook.sh /opt/buildteam/hooks
+
+sudo chmod a+x /opt/buildteam/hooks/*
 
 echo "${REGION}" | sudo tee /opt/buildteam/region
 echo "region: $(</opt/buildteam/region)"
