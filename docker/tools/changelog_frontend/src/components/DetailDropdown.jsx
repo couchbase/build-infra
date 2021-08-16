@@ -28,6 +28,7 @@ export default function DetailDropdown(props) {
     }
     return text;
   }
+
   const detailList = (items, direction) => {
     let sorted;
     if(items && items.length > 0 && items.every(e => e.match(/^[0-9]+\.[0-9]+\.[0-9]+$/g)))  {
@@ -37,16 +38,30 @@ export default function DetailDropdown(props) {
         sorted = semverRSort(items);
     } else {
       if(direction === 'asc')
-        sorted = items.sort((a, b) => a.localeCompare(b))
-      else
-        sorted = items.sort((a, b) => b.localeCompare(a))
+        sorted = items.sort((a, b) => {
+          if(isNaN(a) && isNaN(b)) {
+            return a.localeCompare(b)
+          } else {
+            return parseFloat(a) - parseFloat(b)
+          }
+        })
+      else {
+        sorted = items.sort((a, b) => {
+          if(isNaN(a) && isNaN(b)) {
+            return b.localeCompare(a)
+          } else {
+            return parseFloat(b) - parseFloat(a)
+          }
+        })
+      }
     }
     if(sorted && sorted[0] === "1006.5.1") {
       const mover = sorted[0]
       sorted = sorted.slice(1, sorted.length)
       sorted.push(mover)
     }
-    return sorted.map(x => 
+
+    return sorted.map(x =>
       <DropdownItem
         key={x}
         onClick={() => {

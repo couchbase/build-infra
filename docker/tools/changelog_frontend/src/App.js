@@ -46,7 +46,6 @@ function App() {
 
   const [filters, setFilters] = useState({});
   useEffect(() => {
-    console.log('selectedOptions:', selectedOptions)
     for (let [k, v] of Object.entries(selectedOptions)) {
       if (k.startsWith('f_')) {
         filters[k.substr(2)] = v
@@ -143,7 +142,7 @@ function App() {
       setLoadingToBuilds(true)
       if (toVersion === fromVersion) {
         if (fromBuild !== heading['fromBuild']) {
-          fromBuilds && setToBuilds(fromBuilds.filter(x => x > fromBuild))
+          fromBuilds && setToBuilds(fromBuilds.filter(x => parseFloat(x) > parseFloat(fromBuild)))
         } else {
           fromBuilds && setToBuilds(fromBuilds)
         }
@@ -184,7 +183,7 @@ function App() {
     if (optionsChanged) {
       setToBuild(heading['toBuild'])
       if(toVersion === fromVersion) {
-        setToBuilds(fromBuilds.filter(x => x > fromBuild))
+        setToBuilds(fromBuilds.filter(x => parseFloat(x) > parseFloat(fromBuild)))
       }
     }
   }, [fromBuild])

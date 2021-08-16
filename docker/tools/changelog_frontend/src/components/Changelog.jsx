@@ -160,7 +160,6 @@ export default function Changelog(props) {
     if (Array.isArray(text)) {
       return text.map(t => linkReviews(t))
     } else if(typeof text === 'string') {
-      console.log("TEXT:", text);
       gerritURLs.forEach((prefix) => {
         if (text.includes(`${prefix}/`)) {
           const textParts = text.split(new RegExp(`(${prefix}/[0-9]+\/*)`, "ig"));
@@ -190,7 +189,7 @@ export default function Changelog(props) {
           if (textPart.toLowerCase().startsWith(`${prefix.toLowerCase()}-`)) {
             return (
               <a
-                key={`${textPart}`}
+                key={`${textPart}-${i}`}
                 href={`https://issues.couchbase.com/browse/${textPart}`}
               >
                 {textPart}
