@@ -1,0 +1,88 @@
+[server]
+172.23.96.171  name=mega4-01.sc.couchbase.com labels=role=build manager=true
+172.23.96.173  name=mega4-02.sc.couchbase.com labels=role=build
+172.23.96.176  name=mega4-03.sc.couchbase.com labels=role=build
+172.23.96.218  name=mega4-04.sc.couchbase.com labels=role=build
+172.23.96.208  name=mega4-05.sc.couchbase.com labels=role=build
+172.23.96.211  name=mega4-06.sc.couchbase.com labels=role=build
+172.23.96.249  name=mega4-07.sc.couchbase.com labels=role=build
+172.23.121.103 name=mega4-08.sc.couchbase.com labels=role=build manager=true
+172.23.121.98  name=mega4-09.sc.couchbase.com labels=role=build
+172.23.121.100 name=mega4-10.sc.couchbase.com labels=role=serverbuild-asan
+172.23.121.99  name=mega4-11.sc.couchbase.com labels=role=build
+172.23.121.104 name=mega4-12.sc.couchbase.com labels=role=build manager=true
+172.23.120.91  name=mega4-13.sc.couchbase.com labels=role=build
+172.23.120.111 name=mega4-14.sc.couchbase.com labels=role=build
+172.23.121.109 name=mega4-15.sc.couchbase.com labels=role=build
+172.23.121.110 name=mega4-16.sc.couchbase.com labels=role=build
+172.23.121.111 name=mega4-17.sc.couchbase.com labels=role=build
+172.23.121.112 name=mega4-18.sc.couchbase.com labels=role=build
+172.23.121.113 name=mega4-19.sc.couchbase.com labels=role=build
+172.23.120.19  name=mega4-20.sc.couchbase.com labels=role=build
+172.23.113.28  name=mega4-21.sc.couchbase.com labels=role=build manager=true
+172.23.113.44  name=mega4-22.sc.couchbase.com labels=role=build
+172.23.113.49  name=mega4-23.sc.couchbase.com labels=role=build manager=true
+172.23.113.41  name=mega4-24.sc.couchbase.com labels=role=build
+172.23.113.42  name=mega4-25.sc.couchbase.com labels=role=build
+172.23.113.43  name=mega4-26.sc.couchbase.com labels=role=build
+172.23.113.46  name=mega4-27.sc.couchbase.com labels=role=build
+172.23.113.50  name=mega4-28.sc.couchbase.com labels=role=build
+172.23.113.48  name=mega4-29.sc.couchbase.com labels=role=build
+172.23.113.45  name=mega4-30.sc.couchbase.com labels=role=build
+172.23.113.47  name=mega4-31.sc.couchbase.com labels=role=build
+172.23.113.40  name=mega4-32.sc.couchbase.com labels=role=infrastructure
+172.23.96.52   name=mega4-33.sc.couchbase.com labels=role=infrastructure
+
+[sdk]
+172.23.97.81   name=sdk-swarm-01.build.couchbase.com manager=true
+172.23.97.95   name=sdk-swarm-02.build.couchbase.com manager=true
+172.23.97.97   name=sdk-swarm-03.build.couchbase.com manager=true
+172.23.96.70   name=sdk-swarm-04.build.couchbase.com
+
+[builddb]
+172.23.96.69   name=build-db-01.build.couchbase.com manager=true
+172.23.112.8   name=build-db-02.build.couchbase.com manager=true
+172.23.96.73   name=build-db-03.build.couchbase.com manager=true
+
+[analytics]
+172.23.104.54  name=analytics-01.build.couchbase.com labels=cvtype=ubuntu18 manager=true
+172.23.104.51  name=analytics-02.build.couchbase.com labels=cvtype=ubuntu18 manager=true
+172.23.104.56  name=analytics-03.build.couchbase.com labels=cvtype=ubuntu18 manager=true
+172.23.104.50  name=analytics-04.build.couchbase.com labels=cvtype=ubuntu18
+172.23.104.55  name=analytics-05.build.couchbase.com labels=cvtype=ubuntu18
+172.23.104.57  name=analytics-06.build.couchbase.com labels=cvtype=ubuntu18
+172.23.113.30  name=analytics-09.build.couchbase.com labels=cvtype=ubuntu18
+172.23.113.31  name=analytics-10.build.couchbase.com labels=cvtype=ubuntu18
+172.23.113.32  name=analytics-11.build.couchbase.com labels=cvtype=ubuntu18
+172.23.107.124 name=analytics-12.build.couchbase.com labels=cvtype=ubuntu18
+172.23.107.130 name=analytics-13.build.couchbase.com labels=cvtype=ubuntu18
+172.23.107.138 name=analytics-14.build.couchbase.com labels=cvtype=ubuntu18
+172.23.107.144 name=analytics-15.build.couchbase.com labels=cvtype=ubuntu18
+
+[cv]
+172.23.98.49   name=ubuntu12-cv-10        labels=cvtype=ubuntu12-small manager=true
+172.23.98.159  name=ubuntu16-cv-01        labels=cvtype=ubuntu16-small manager=true
+172.23.96.227  name=ubuntu18-cv-11        labels=cvtype=ubuntu18-small manager=true
+172.23.96.230  name=ubuntu18-cv-12        labels=cvtype=ubuntu18-small manager=true
+172.23.96.233  name=ubuntu18-cv-13        labels=cvtype=ubuntu18-small manager=true
+172.23.96.235  name=ubuntu18-cv-14        labels=cvtype=ubuntu18-small
+172.23.96.234  name=ubuntu18-cv-15        labels=cvtype=ubuntu18-small
+172.23.112.254 name=ubuntu18-cv-16        labels=cvtype=ubuntu18-small
+172.23.97.2    name=ubuntu18-cv-docker-01 labels=cvtype=docker
+172.23.113.18  name=ubuntu18-cv-docker-02 labels=cvtype=docker
+172.23.113.22  name=ubuntu18-cv-large-01  labels=cvtype=ubuntu18-large
+172.23.97.139  name=ubuntu18-cv-large-02  labels=cvtype=ubuntu18-large
+172.23.97.91   name=ubuntu18-cv-large-03  labels=cvtype=ubuntu18-large
+172.23.112.24  name=ubuntu18-cv-large-04  labels=cvtype=ubuntu18-large
+172.23.96.209  name=ubuntu18-cv-large-05  labels=cvtype=ubuntu18-large
+172.23.107.26  name=ubuntu18-cv-large-06  labels=cvtype=ubuntu18-large
+172.23.107.80  name=ubuntu18-cv-large-07  labels=cvtype=ubuntu18-large
+172.23.107.81  name=ubuntu18-cv-large-08  labels=cvtype=ubuntu18-large
+172.23.107.82  name=ubuntu18-cv-large-09  labels=cvtype=ubuntu18-large
+172.23.107.83  name=ubuntu18-cv-large-10  labels=cvtype=ubuntu18-large
+
+[all:vars]
+ansible_user=couchbase
+ansible_password=couchbase
+ansible_become_password=couchbase
+ansible_python_interpreter=/usr/bin/python3

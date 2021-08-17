@@ -1,0 +1,45 @@
+---
+- hosts: all
+  tasks:
+  # Uncomment this if you intend to tear down an existing swarm first
+  - name: Teardown
+    shell: "docker info | grep 'Swarm: inactive' || docker swarm leave --force"
+    when: teardown is defined
+
+  - name: Check if swarm exists
+    shell: "docker info | grep 'Swarm: active'"
+    when: inventory_hostname == groups[ansible_limit][0]
+    failed_when: (existing_swarm.rc not in [0, 1])
+    register: existing_swarm
+
+  - name: Exit if swarm present and not tearing down - to recreate swarm add `-e teardown=true`
+    meta: end_play
+    when: hostvars[groups[ansible_limit][0]]['existing_swarm']['rc'] == 0
+
+  - name: Create new swarm
+    shell: "docker swarm init"
+    when: inventory_hostname == groups[ansible_limit][0] and existing_swarm.rc is defined and existing_swarm.rc == 1
+
+  - name: Get manager join token
+    command: docker swarm join-token -q --rotate manager
+    when: inventory_hostname == groups[ansible_limit][0]
+    register: manager_join_token
+
+  - name: Get worker join token
+    command: docker swarm join-token -q --rotate worker
+    when: inventory_hostname == groups[ansible_limit][0]
+    register: worker_join_token
+
+  - name: Join managers
+    shell: "docker info | grep 'Swarm: inactive' && docker swarm join --token {{ hostvars[groups[ansible_limit][0]]['manager_join_token']['stdout'] }} {{ groups[ansible_limit][0] }} || docker info | grep 'Swarm: active'"
+    when: manager is defined
+
+  - name: Join workers
+    shell: "docker info | grep 'Swarm: inactive' && docker swarm join --token {{ hostvars[groups[ansible_limit][0]]['worker_join_token']['stdout'] }} {{ groups[ansible_limit][0] }} || docker info | grep 'Swarm: active'"
+    when: manager is not defined
+
+  - name: Add labels
+    shell: docker node update {{ ansible_hostname }} --label-add {{ item }}
+    loop: "{{ labels.split(',') }}"
+    when: labels is defined
+    delegate_to: "{{ groups[ansible_limit][0] }}"
