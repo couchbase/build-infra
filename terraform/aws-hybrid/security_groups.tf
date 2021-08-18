@@ -33,3 +33,26 @@ resource "aws_security_group" "allow_ssh" {
     Consumer = "jenkins-worker"
   }
 }
+
+resource "aws_security_group" "go_proxy" {
+  name        = "jenkins-go-proxy"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description = "App"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "TCP"
+    security_groups = [aws_security_group.allow_ssh.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "jenkins-go-proxy"
+  }
+}

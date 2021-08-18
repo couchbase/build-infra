@@ -13,3 +13,29 @@ module jenkins_worker {
     ecr_pull_policy_arn = aws_iam_policy.ecr_pull.arn
     vpc = module.vpc
 }
+
+data "aws_iam_policy_document" "ecs_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "go_proxy" {
+  name               = "go-proxy"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
+}
+
+resource "aws_iam_role" "ecs" {
+  name               = "jenkins-ecs"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_exec" {
+  role       = aws_iam_role.ecs.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
