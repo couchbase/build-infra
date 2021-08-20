@@ -129,7 +129,10 @@ class BuildInfo:
             'build',
             where_clause=f"product='{product}' and release='{release}' "
                          f"and build_num IS NOT NULL",
-            doc_keys=['build_num'], order_by='build_num', desc=True, limit=1
+            doc_keys=['build_num'],
+            order_by='tonumber(build_num)',
+            desc=True,
+            limit=1
         )
 
         return [result['build_num'] for result in results]
@@ -195,7 +198,7 @@ class BuildInfo:
 
         results = self.query_documents(
             'build', where_clause=q_str, doc_keys=['build_num'],
-            order_by='build_num', desc=True, limit=1
+            order_by='tonumber(build_num)', desc=True, limit=1
         )
 
         # Just return the build number, or 0 if none was found
@@ -216,7 +219,7 @@ class BuildInfo:
 
         results = self.query_documents(
             'build', where_clause=q_str, doc_keys=['build_num'],
-            order_by='build_num', desc=True, limit=1
+            order_by='tonumber(build_num)', desc=True, limit=1
         )
 
         # Just return the build number, or 0 if none was found
@@ -237,7 +240,7 @@ class BuildInfo:
 
         results = self.query_documents(
             'build', where_clause=q_str, doc_keys=['build_num'],
-            order_by='build_num', desc=True, limit=1
+            order_by='to_number(build_num)', desc=True, limit=1
         )
 
         # Just return the build number, or 0 if none was found
