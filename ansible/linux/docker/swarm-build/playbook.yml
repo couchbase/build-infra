@@ -1,5 +1,7 @@
 ---
 - hosts: all
+  vars:
+    task_history_limit: 1
   tasks:
   # Uncomment this if you intend to tear down an existing swarm first
   - name: Teardown
@@ -17,7 +19,7 @@
     when: hostvars[groups[ansible_limit][0]]['existing_swarm']['rc'] == 0
 
   - name: Create new swarm
-    shell: "docker swarm init"
+    shell: "docker swarm init --task-history-limit {{ task_history_limit }}"
     when: inventory_hostname == groups[ansible_limit][0] and existing_swarm.rc is defined and existing_swarm.rc == 1
 
   - name: Get manager join token
