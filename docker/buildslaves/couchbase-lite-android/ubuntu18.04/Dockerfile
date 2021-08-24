@@ -19,7 +19,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Install Couchbase Lite Android toolchain requirements
 RUN apt-get update && \
-    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-8-jdk gnupg2 zip rsync wget && \
+    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-11-jdk gnupg2 zip rsync wget && \
     apt-get clean
 
 # Swarm client jar - only needed until CBD-4101 is resolved
@@ -39,26 +39,29 @@ ENV LANG=en_US.UTF-8
 # Android SDK
 USER couchbase
 
-# Download and untar Android SDK tools
-# https://developer.android.com/studio/index.html#downloads (under sdk-tool-linux)
-ENV SDK_TOOLS_LINUX_VERSION=4333796
-RUN mkdir -p /home/couchbase/jenkins/tools && \
-    cd /home/couchbase/jenkins/tools && \
-    curl --fail https://dl.google.com/android/repository/sdk-tools-linux-${SDK_TOOLS_LINUX_VERSION}.zip -o android-sdk.zip && \
-    unzip android-sdk.zip -d android-sdk  && \
-    rm android-sdk.zip && \
-    chown -R couchbase:couchbase android-sdk && \
-    chmod 755 android-sdk
+# Download and untar Android CommandLine Tools
+# It is a little messy.  It needs to go under /home/couchbase/jenkins/tools/android-sdk/cmdline-tools/latest
+
+ENV CMDTOOLS_LINUX_VERSION=7302050
+
+RUN mkdir -p /home/couchbase/jenkins/tools/android-sdk && \
+    cd /home/couchbase/jenkins/tools/android-sdk && \
+    curl --fail https://dl.google.com/android/repository/commandlinetools-linux-${CMDTOOLS_LINUX_VERSION}_latest.zip -o commandlinetools.zip && \
+    unzip commandlinetools.zip -d cmdline-tools  && \
+    mv cmdline-tools/cmdline-tools cmdline-tools/latest && \
+    rm commandlinetools.zip && \
+    chown -R couchbase:couchbase /home/couchbase/jenkins/tools && \
+    chmod 755 /home/couchbase/jenkins/tools/android-sdk
 
 # Set environment variable
 ENV ANDROID_HOME /home/couchbase/jenkins/tools/android-sdk
-ENV PATH ${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools:${ANDROID_HOME}/tools/bin:$PATH
+ENV PATH ${ANDROID_HOME}/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:${ANDROID_HOME}/tools/bin:$PATH
+ENV SDK_CMD $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 
 # Android SDK License
 RUN yes 'y' | sdkmanager --licenses >/dev/null
 
 # Update and install using sdkmanager
-ENV SDK_CMD $ANDROID_HOME/tools/bin/sdkmanager
 RUN $SDK_CMD "tools" "platform-tools" && \
     $SDK_CMD "build-tools;28.0.3" && \
     $SDK_CMD "build-tools;29.0.0" && \
@@ -73,6 +76,9 @@ RUN cd /home/couchbase/jenkins/tools && \
 
 # Revert so CMD will run as root.
 USER root
+
+# CBD-4280: set openjdk-11-jdk as default
+RUN update-java-alternatives -s java-1.11.0-openjdk-amd64
 
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

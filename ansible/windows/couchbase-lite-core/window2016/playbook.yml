@@ -23,7 +23,7 @@
         - curl
         - docfx
         - git
-        - jdk8
+        - openjdk11
         - ninja
         - wget
         - wixtoolset
