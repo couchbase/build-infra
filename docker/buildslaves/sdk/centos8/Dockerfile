@@ -87,7 +87,7 @@ RUN mkdir /tmp/deploy && \
     rm -rf /tmp/deploy
 
 # Jenkins Swarm client jar
-RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar
+RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.24/swarm-client-3.24.jar -o /usr/local/lib/swarm-client.jar
 
 # Ensure /opt/cbdeps is writable
 RUN mkdir /opt/cbdeps && \
