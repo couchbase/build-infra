@@ -10,7 +10,7 @@ version: "3.8"
 
 services:
   operator:
-    image: couchbasebuild/ubuntu-2004-operator-build:20210721
+    image: couchbasebuild/ubuntu-2004-operator-build:20210824
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=operator-build"
@@ -36,7 +36,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.role==build
+          - node.labels.role==operator
       update_config:
         parallelism: 1000
 

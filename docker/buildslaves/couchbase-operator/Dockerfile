@@ -20,6 +20,10 @@ RUN set -x \
 RUN addgroup --gid 999 docker && \
     usermod -a -G docker couchbase
 
+RUN set -x \
+    && mkdir -p /home/couchbase/.docker \
+    && chown couchbase:couchbase /home/couchbase/.docker
+
 # cbdep (used to install Go)
 ARG CACHEBUST=1
 RUN curl --fail https://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
