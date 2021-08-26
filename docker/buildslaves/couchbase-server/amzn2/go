@@ -2,7 +2,7 @@
 
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-amzn2-build
-source ../versions
+. ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -14,6 +14,7 @@ ARCH=$(uname -m)
 docker build \
   --build-arg ARCH=${ARCH} \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg ASCIIDOCTOR_VER=${ASCIIDOCTOR} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \
   --build-arg AUTOMAKE_VER=${AUTOMAKE} \
   --build-arg CCACHE_VER=${CCACHE} \
@@ -23,6 +24,12 @@ docker build \
   --build-arg GCC_VER=${GCC} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
+  --build-arg RUBY_MAJOR=${RUBY_MAJOR} \
+  --build-arg RUBY_MINOR=${RUBY_MINOR} \
+  --build-arg RUBY_PATCH=${RUBY_PATCH} \
+  --build-arg RUBY_INSTALL_MAJOR=${RUBY_INSTALL_MAJOR} \
+  --build-arg RUBY_INSTALL_MINOR=${RUBY_INSTALL_MINOR} \
+  --build-arg RUBY_INSTALL_PATCH=${RUBY_INSTALL_PATCH} \
   --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   -t ${IMAGE}:${TAG}-${ARCH} .
 

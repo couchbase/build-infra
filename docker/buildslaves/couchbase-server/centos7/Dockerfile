@@ -48,7 +48,6 @@ RUN yum install --setopt=keepcache=0 -y \
                 redhat-lsb-core \
                 rpm-build \
                 rsync \
-                ruby rubygems rubygem-rake \
                 sqlite-devel \
                 sudo \
                 tar \
@@ -196,6 +195,30 @@ RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-
 ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
+
+# Ruby-install
+ARG RUBY_INSTALL_MINOR
+ARG RUBY_INSTALL_MAJOR
+ARG RUBY_INSTALL_PATCH
+ARG RUBY_INSTALL_VER="${RUBY_INSTALL_MAJOR}.${RUBY_INSTALL_MINOR}.${RUBY_INSTALL_PATCH}"
+RUN set -x \
+    && cd /tmp \
+    && curl -Lfo ruby-install-${RUBY_INSTALL_VER}.tar.gz https://github.com/postmodern/ruby-install/archive/v${RUBY_INSTALL_VER}.tar.gz \
+    && tar -xzvf ruby-install-${RUBY_INSTALL_VER}.tar.gz \
+    && cd ruby-install-${RUBY_INSTALL_VER}/ \
+    && sudo make install \
+    && cd / && rm -rf /tmp/ruby-install-${RUBY_INSTALL_VER}
+
+# Ruby
+ARG RUBY_MAJOR
+ARG RUBY_MINOR
+ARG RUBY_PATCH
+RUN set -x \
+    && ruby-install --system ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH}
+
+# Install asciidoctor
+ARG ASCIIDOCTOR_VER
+RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 
 # Fix locale
 RUN set -x \

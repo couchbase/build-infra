@@ -163,6 +163,10 @@ ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
 
+# Install asciidoc
+ARG ASCIIDOCTOR_VER
+RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 

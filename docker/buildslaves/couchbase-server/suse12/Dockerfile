@@ -153,6 +153,12 @@ ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
 
+# Install asciidoctor
+ARG ASCIIDOCTOR_VER
+RUN set -x \
+    && gem install asciidoctor -v ${ASCIIDOCTOR_VER} \
+    && ln -s /usr/bin/asciidoctor.ruby2.1 /usr/local/bin/asciidoctor
+
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22
 COPY build/couchbuilder_start.sh /usr/sbin/

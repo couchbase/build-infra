@@ -112,7 +112,7 @@ x-node-product:
 services:
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20210715-x86_64
+    image: couchbasebuild/server-amzn2-build:20210826-x86_64
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"
@@ -133,7 +133,7 @@ services:
     <<: *default-jenkins-one-agent
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20210803
+    image: couchbasebuild/server-centos7-build:20210826
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=server centos7 vulcan alice mad-hatter cheshire-cat neo master x86_64"
@@ -143,7 +143,7 @@ services:
     <<: *default-jenkins-three-agent
 
   centos7-asan:
-    image: couchbasebuild/server-centos7-build:20210803
+    image: couchbasebuild/server-centos7-build:20210826
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
       - "JENKINS_SLAVE_LABELS=server centos7-asan cheshire-cat neo x86_64"
@@ -165,7 +165,7 @@ services:
     <<: *default-jenkins-secrets
 
   centos8:
-    image: couchbasebuild/server-centos8-build:20210715
+    image: couchbasebuild/server-centos8-build:20210820
     environment:
       - "JENKINS_SLAVE_NAME=server-centos8"
       - "JENKINS_SLAVE_LABELS=server centos8 mad-hatter x86_64"
@@ -195,7 +195,7 @@ services:
     <<: *default-jenkins-two-agent
 
   debian9:
-    image: couchbasebuild/server-debian9-build:20210715
+    image: couchbasebuild/server-debian9-build:20210820
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=server debian9 vulcan alice mad-hatter cheshire-cat neo master x86_64"
@@ -205,7 +205,7 @@ services:
     <<: *default-jenkins-two-agent
 
   debian10:
-    image: couchbasebuild/server-debian10-build:20210715
+    image: couchbasebuild/server-debian10-build:20210820
     environment:
       - "JENKINS_SLAVE_NAME=server-debian10"
       - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter cheshire-cat neo master x86_64"
@@ -245,7 +245,7 @@ services:
     <<: *default-jenkins-one-agent
 
   suse12:
-    image: build-docker.couchbase.com/internal/server-suse12-build:20210722
+    image: build-docker.couchbase.com/internal/server-suse12-build:20210820
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-suse12"
@@ -266,7 +266,7 @@ services:
     <<: *default-jenkins-two-agent
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20210715
+    image: couchbasebuild/server-suse15-build:20210820
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat neo master x86_64"
@@ -306,7 +306,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20210715
+    image: couchbasebuild/server-ubuntu18-build:20210820
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat neo master x86_64"
@@ -336,7 +336,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20210715
+    image: couchbasebuild/server-ubuntu20-build:20210820
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
@@ -357,7 +357,7 @@ services:
     <<: *default-jenkins-one-agent
 
   centos7_unittests:
-    image: couchbasebuild/server-centos7-build:20210803
+    image: couchbasebuild/server-centos7-build:20210826
     environment:
       - "JENKINS_SLAVE_NAME=unit-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
@@ -367,7 +367,7 @@ services:
     <<: *default-jenkins-two-agent-with-ipv6
 
   ubuntu20_unittests:
-    image: couchbasebuild/server-ubuntu20-build:20210715
+    image: couchbasebuild/server-ubuntu20-build:20210820
     environment:
       - "JENKINS_SLAVE_NAME=unit-ubuntu20"
       - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"

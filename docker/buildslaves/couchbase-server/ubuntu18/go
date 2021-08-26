@@ -2,7 +2,7 @@
 
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-ubuntu18-build
-source ../versions
+. ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -11,6 +11,7 @@ cp -a ../../util/healthcheck.sh build
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg ASCIIDOCTOR_VER=${ASCIIDOCTOR} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \
   --build-arg AUTOMAKE_VER=${AUTOMAKE} \
   --build-arg CMAKE_MAJOR=${CMAKE_MAJOR} \

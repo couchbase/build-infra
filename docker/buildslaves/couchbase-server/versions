@@ -5,23 +5,34 @@
 # are the same, e.g. some do not include all tooling, some install whatever
 # is available in their package manager, etc.
 
-# Cmake
-CMAKE_MAJOR=3   # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
-CMAKE_MINOR=20  # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
-CMAKE_PATCH=1   # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+# Cmake # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+CMAKE_MAJOR=3
+CMAKE_MINOR=20
+CMAKE_PATCH=1
 
-# Python3
-PYTHON3_MAJOR=3  # centos7
-PYTHON3_MINOR=9  # centos7
-PYTHON3_PATCH=2  # centos7
+# Python3 # centos7
+PYTHON3_MAJOR=3
+PYTHON3_MINOR=9
+PYTHON3_PATCH=2
+
+# Ruby # amzn2, centos7
+RUBY_MAJOR=2
+RUBY_MINOR=7
+RUBY_PATCH=4
+
+# Ruby-install # amzn2, centos7
+RUBY_INSTALL_MAJOR=0
+RUBY_INSTALL_MINOR=8
+RUBY_INSTALL_PATCH=2
 
 # Build tooling
-AUTOCONF=2.69    # amzn2, centos7, suse12, ubuntu18
-AUTOMAKE=1.15.1  # amzn2, centos7, suse12, ubuntu18
-CCACHE=3.1.9     # amzn2, centos7, rhel8
-GCC=10.2.0       # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
-GIT=2.9.5        # centos7
-LIBTOOL=2.4.6    # amzn2, centos7, suse12, ubuntu18
+AUTOCONF=2.69       # amzn2, centos7, suse12, ubuntu18
+AUTOMAKE=1.15.1     # amzn2, centos7, suse12, ubuntu18
+CCACHE=3.1.9        # amzn2, centos7, rhel8
+GCC=10.2.0          # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
+GIT=2.9.5           # centos7
+LIBTOOL=2.4.6       # amzn2, centos7, suse12, ubuntu18
+ASCIIDOCTOR=2.0.16  # amzn2, centos6, centos7, centos8, debian10, debian8, debian9, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
 
 # Other
 JNLP_AGENT=4.3     # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20

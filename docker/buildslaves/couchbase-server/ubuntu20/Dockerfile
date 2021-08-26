@@ -121,6 +121,10 @@ ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
 
+# Install asciidoc
+ARG ASCIIDOCTOR_VER
+RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
+
 # GCC - need to redundantly declare GCC_ARG here
 ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
