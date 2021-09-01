@@ -226,12 +226,6 @@ RUN set -x \
     && yum reinstall -y glibc-common \
     && yum clean all
 
-# disable password auth for ssh
-RUN set -x \
-    && grep -q "^[^#]*PasswordAuthentication" /etc/ssh/sshd_config \
-    && sed -i "/^[^#]*PasswordAuthentication[[:space:]]yes/c\PasswordAuthentication no" /etc/ssh/sshd_config \
-    || echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
-
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh

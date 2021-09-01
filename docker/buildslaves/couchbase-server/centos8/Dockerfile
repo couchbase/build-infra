@@ -45,5 +45,15 @@ RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
+# Install sshd
+RUN yum install -y openssh-server && yum clean all
+RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+
+# Copy swarm properties and entrypoint script
 COPY build/swarm*.properties /
 COPY build/couchbuilder_start.sh /usr/sbin/
+
+# Keep this stuff at the end, because the ARG declaration breaks
+# Docker build caching
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}

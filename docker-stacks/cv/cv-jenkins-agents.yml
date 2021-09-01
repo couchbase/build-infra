@@ -24,6 +24,16 @@ x-default-jenkins-agent: &default-jenkins-agent
       target: /tmp/dockerhub_nsbuildbot_password
 
 services:
+  # Placeholder service for aarch64
+  # Note: this should always have zero replicas, and its LAUNCH_IMAGE should
+  # always be kept current. Its presence here is required to allow EC2
+  # instances to discover the correct image.
+  amzn2_aarch64:
+    image: alpine
+    environment:
+      LAUNCH_IMAGE: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20210831-aarch64
+    deploy:
+      replicas: 0
 
   ubuntu18_docker:
     image: couchbasebuild/swarm-launcher:20210209
@@ -33,7 +43,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20210715
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20210831
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -69,7 +79,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210715
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210831
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -104,7 +114,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210715
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210831
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"

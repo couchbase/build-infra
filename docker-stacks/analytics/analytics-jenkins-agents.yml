@@ -31,7 +31,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   ubuntu18:
-    image: couchbasebuild/analytics-ubuntu18-cv:20210826
+    image: couchbasebuild/analytics-ubuntu18-cv:20210901
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

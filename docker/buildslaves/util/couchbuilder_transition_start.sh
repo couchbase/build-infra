@@ -184,6 +184,23 @@ command -v gpg >/dev/null 2>&1 && {
     then
       ssh-keygen -A
     fi
+
+    # Ensure password auth disabled
+    if grep -q "^[^#]*PasswordAuthentication" /etc/ssh/sshd_config
+    then
+      sed -i "/^[^#]*PasswordAuthentication[[:space:]]yes/c\PasswordAuthentication no" /etc/ssh/sshd_config
+    else
+      echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+      echo >> /etc/ssh/sshd_config
+    fi
+    if grep -q "^[^#]*ChallengeResponseAuthentication" /etc/ssh/sshd_config
+    then
+      sed -i "/^[^#]*ChallengeResponseAuthentication[[:space:]]yes/c\ChallengeResponseAuthentication no" /etc/ssh/sshd_config
+    else
+      echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config
+      echo >> /etc/ssh/sshd_config
+    fi
+
     exec /usr/sbin/sshd -D
     exit
 }

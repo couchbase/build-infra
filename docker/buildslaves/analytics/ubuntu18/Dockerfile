@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04 analytics.jenkins agent
 
-FROM couchbasebuild/server-ubuntu18-build:20210715
+FROM couchbasebuild/server-ubuntu18-build:20210827
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval - analytics is basically CV
@@ -35,12 +35,6 @@ RUN set -x \
   && cp -a docker/docker /usr/local/bin \
   && cd /tmp \
   && rm -rf deploy
-
-# disable password auth for ssh
-RUN set -x \
-    && grep -q "^[^#]*PasswordAuthentication" /etc/ssh/sshd_config \
-    && sed -i "/^[^#]*PasswordAuthentication[[:space:]]yes/c\PasswordAuthentication no" /etc/ssh/sshd_config \
-    || echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
 
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS

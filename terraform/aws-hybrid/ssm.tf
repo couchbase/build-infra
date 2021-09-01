@@ -13,6 +13,131 @@ resource "aws_ssm_parameter" "shared_ssh_authorized_keys" {
   }
 }
 
+resource "aws_ssm_parameter" "host_docker_config" {
+  name  = "jenkins-worker__host__.docker__config.json"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/host/.docker/config.json")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "host"
+  }
+}
+
+#############
+# Analytics #
+#############
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_docker_config" {
+  name  = "jenkins-worker__analytics__.docker__config.json"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/host/.docker/config.json")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_gitconfig" {
+  name  = "jenkins-worker__analytics__.gitconfig"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.gitconfig")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_config" {
+  name  = "jenkins-worker__analytics__.ssh__config"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/config")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_known_hosts" {
+  name  = "jenkins-worker__analytics__.ssh__known_hosts"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/known_hosts")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_environment" {
+  name  = "jenkins-worker__analytics__.ssh__environment"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/environment")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_id_ns_codereview" {
+  name  = "jenkins-worker__analytics__.ssh__id_ns-codereview"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/id_ns-codereview")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_ns_buildbot_rsa" {
+  name  = "jenkins-worker__analytics__.ssh__ns-buildbot.rsa"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/ns-buildbot.rsa")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_patch_via_gerrit_ini" {
+  name  = "jenkins-worker__analytics__.ssh__patch_via_gerrit.ini"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/patch_via_gerrit.ini")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_id_buildbot" {
+  name  = "jenkins-worker__analytics__.ssh__id_buildbot"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/id_buildbot")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_buildbot_id_dsa" {
+  name  = "jenkins-worker__analytics__.ssh__buildbot_id_dsa"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.ssh/buildbot_id_dsa")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "analytics"
+  }
+}
+
 ######
 # CV #
 ######

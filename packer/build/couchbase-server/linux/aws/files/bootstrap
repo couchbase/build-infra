@@ -1,18 +1,24 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # This script is called via userdata on the instance by way of the cloud config
-# in jenkins it removes /var/lib/cloud/instances/*/sem/config_scripts_user as a
-# final step to ensure it will be triggered on every boot (so the ephemeral
-# volumes can be provisioned and docker can start up once complete)
+# in jenkins and runs at every boot so the ephemeral volumes can be provisioned
+# and docker can start up once complete
 #
 # Any changes made to this script should be made on the understanding that
-# it will be triggered on every boot. If you want to do something only on first
-# boot, check for the existence of /persistent/.booted
+# it will be triggered on every boot. It touches /persistent/.booted at the end
+# so if you want to do something only on first boot, check for that file.
 
 set -x
 set +e
 environment="${1:-none}"
-image="${2}"
+service="${2}"
+
+declare -A stackfiles
+stackfiles["analytics"]="analytics/analytics-jenkins-agents.yml"
+stackfiles["cv"]="cv/cv-jenkins-agents.yml"
+stackfiles["server"]="couchbase-server/server-jenkins-buildslaves.yml"
+
+curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/master/docker-stacks/${stackfiles[${environment}]}"
 
 function provision_disk() {
   if lsblk -o NAME,FSTYPE -dsn | grep ${1}n1
@@ -48,7 +54,10 @@ function provision_disk() {
 
       pvcreate /dev/${1}n1
       vgcreate ${name} /dev/${1}n1
+      # lvcreate seems to exit a split second before the disk is ready sometimes,
+      # we need to create the filesystem after a short delay to work around this.
       lvcreate --name disk1 --size ${DISKSIZE_RAW}${DISK_UNIT} ${name}
+      sleep 2
       mkfs.ext4 /dev/${name}/disk1
     fi
   fi
@@ -57,6 +66,9 @@ function provision_disk() {
 # I don't know if the EBS/persistent devices can be different from one
 # instance to the next. We just call with the device names here and
 # figure out what they are via `nvme list` in provision_disk()
+#
+# Note: there's an assumption here that we're on a <= 8xlarge instance type
+# with a single (non-OS) EBS volume, and thus only have 2 disks to consider.
 provision_disk nvme1
 provision_disk nvme2
 
@@ -81,6 +93,14 @@ then
 fi
 set -e
 
+# Set timezone
+if [ ! -f /persistent/.booted ]
+then
+  sed -i '/.*ZONE.*/c\ZONE="America/Los_Angeles"' /etc/sysconfig/clock
+  mv /etc/localtime /etc/localtime.org
+  ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+fi
+
 # Start docker in the background so we can move on to retrieving secrets
 # straight away
 # Note: We don't set the docker service to come up automatically at boot,
@@ -88,7 +108,7 @@ set -e
 # --restart=always'd on subsequent boots
 service docker start &
 
-# Get secrets and set up initial container args (only on first boot)
+# Get _agent_ secrets and set up initial container args (only on first boot)
 if [ ! -f /persistent/.booted ]
 then
   # Get the names of the secrets we want from parameter store
@@ -109,18 +129,39 @@ then
       # e.g:
       #   jenkins-worker__server__.ssh__config = [/var/lib/docker/cb-home/].ssh/config
       #   jenkins-worker__shared__.ssh__authorized_keys = [/var/lib/docker/cb-home/].ssh/authorized_keys
-      secret_path="/var/lib/docker/cb-home/$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
+      secret_path="/var/lib/docker/cb-home$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
       mkdir -p $(dirname $secret_path)
       aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
   done
 
   # Compile args we'll be passing to `docker run`
-  echo "--name worker --restart always -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 " > /opt/buildteam/args
+  echo "--rm --name worker --pull always -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 " > /opt/buildteam/args
   if [ "${environment}" = "cv" ]
   then
     echo "-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh " >> /opt/buildteam/args
   fi
   chown -R 1000:1000 /var/lib/docker/cb-home
+fi
+
+# Get _host_ secrets
+if [ ! -f /persistent/.booted ]
+then
+  # This all works the same as the agent secrets above (minus container-specific parts)
+  secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=host" | jq -r ".Parameters[].Name")
+
+  for secret in ${secrets}
+  do
+      echo "Reading $secret"
+      secret_path="/root$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
+      mkdir -p $(dirname $secret_path)
+      aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
+  done
+fi
+
+# Mount docker socket for analytics builders
+if [ ! -f /persistent/.booted -a "${environment}" = "analytics" ]
+then
+    echo "-v /var/run/docker.sock:/var/run/docker.sock " >> /opt/buildteam/args
 fi
 
 # wait for docker to finish coming up
@@ -133,12 +174,19 @@ done
 # Allow this script to run at next boot
 rm /var/lib/cloud/instances/*/sem/config_scripts_user
 
-# Run build container (on first boot)
-if [ ! -f /persistent/.booted ]
+aws_acct=$(aws sts get-caller-identity | jq -r ".Account")
+aws ecr get-login-password --region $(</opt/buildteam/region) | docker login --username AWS --password-stdin ${aws_acct}.dkr.ecr.$(</opt/buildteam/region).amazonaws.com
+
+# Determine container image for specified service
+if [ "${environment}" = "cv" ]
 then
-  aws_acct=$(aws sts get-caller-identity | jq -r ".Account")
-  aws ecr get-login-password --region $(</opt/buildteam/region) | docker login --username AWS --password-stdin ${aws_acct}.dkr.ecr.$(</opt/buildteam/region).amazonaws.com
-  docker run $(</opt/buildteam/args) ${image} default
+  # CV nodes use swarm-launcher, we need to grab the image from an environment var
+  image=$(yq e ".services.${service}.environment.LAUNCH_IMAGE" /opt/buildteam/stackfile.yml)
+else
+  image=$(yq e ".services.${service}.image" /opt/buildteam/stackfile.yml)
 fi
+
+# Run build container
+docker run $(</opt/buildteam/args) ${image} default
 
 touch /persistent/.booted

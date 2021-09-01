@@ -118,12 +118,16 @@ ENV LANG=en_US.UTF-8
 # Set AWS credentials file environmental variable
 ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 
-# Docker Swarm properties - keep this towards end of Dockerfile
-COPY build/swarm*.properties /
-
 # Install asciidoc
 ARG ASCIIDOCTOR_VER
 RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
+
+# Install openssh
+RUN set -x \
+    && apt update \
+    && apt install -y openssh-server \
+    && mkdir /run/sshd \
+    && apt clean
 
 # GCC - need to redundantly declare GCC_ARG here
 ARG GCC_VER
@@ -141,6 +145,9 @@ RUN set -x \
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
 
 # Expose SSH daemon and run our builder startup script
 EXPOSE 22

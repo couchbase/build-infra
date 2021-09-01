@@ -19,6 +19,7 @@
                 "ForAnyValue:StringEquals": {
                     "ssm:ResourceTag/Environment": [
                         "${environment}",
+                        "host",
                         "shared"
                     ]
                 }

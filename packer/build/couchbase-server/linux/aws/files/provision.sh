@@ -19,6 +19,19 @@ sudo yum install -y \
 # start_worker needs to parse our yaml stackfiles
 sudo pip3 install pyyaml
 
+# yq for parsing stackfiles to discover image names
+arch=$(uname -m)
+case $arch in
+x86_64)
+  arch=amd64
+  ;;
+aarch64)
+  arch=arm64
+  ;;
+esac
+sudo curl -fLo /usr/bin/yq "https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_${arch}"
+sudo chmod a+x /usr/bin/yq
+
 # Enable IPv6 in docker daemon
 sudo mkdir -p /etc/docker
 cat << EOF | sudo tee /etc/docker/daemon.json
@@ -27,7 +40,6 @@ cat << EOF | sudo tee /etc/docker/daemon.json
     "fixed-cidr-v6": "fde1:ebe3:498b:5707::/64"
 }
 EOF
-
 
 sudo mkdir -p /opt/buildteam/hooks
 
