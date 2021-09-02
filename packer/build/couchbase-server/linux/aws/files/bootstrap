@@ -99,6 +99,7 @@ then
   sed -i '/.*ZONE.*/c\ZONE="America/Los_Angeles"' /etc/sysconfig/clock
   mv /etc/localtime /etc/localtime.org
   ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+  echo "America/Los_Angeles" > /etc/timezone
 fi
 
 # Start docker in the background so we can move on to retrieving secrets
@@ -135,7 +136,7 @@ then
   done
 
   # Compile args we'll be passing to `docker run`
-  echo "--rm --name worker --pull always -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 " > /opt/buildteam/args
+  echo "--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 " > /opt/buildteam/args
   if [ "${environment}" = "cv" ]
   then
     echo "-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh " >> /opt/buildteam/args
