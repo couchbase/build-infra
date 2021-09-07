@@ -52,3 +52,5 @@ sudo chmod a+x /opt/buildteam/hooks/*
 
 echo "${REGION}" | sudo tee /opt/buildteam/region
 echo "region: $(</opt/buildteam/region)"
+
+sudo rm -rf /var/lib/cloud/*

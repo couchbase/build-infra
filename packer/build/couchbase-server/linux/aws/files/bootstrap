@@ -5,20 +5,91 @@
 # and docker can start up once complete
 #
 # Any changes made to this script should be made on the understanding that
-# it will be triggered on every boot. It touches /persistent/.booted at the end
+# it will be triggered on every boot. It touches /.booted at the end
 # so if you want to do something only on first boot, check for that file.
 
 set -x
 set +e
-environment="${1:-none}"
-service="${2}"
 
-declare -A stackfiles
-stackfiles["analytics"]="analytics/analytics-jenkins-agents.yml"
-stackfiles["cv"]="cv/cv-jenkins-agents.yml"
-stackfiles["server"]="couchbase-server/server-jenkins-buildslaves.yml"
+positional_params=()
+while [[ $# -gt 0 ]]; do
+  key="$1"
 
-curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/master/docker-stacks/${stackfiles[${environment}]}"
+  case $key in
+    --timezone)
+      timezone="$2"
+      shift
+      shift
+      ;;
+    --ssh-pubkey)
+      ssh_pubkey="$2"
+      shift
+      shift
+      ;;
+    *)
+      positional_params+=("$1")
+      shift
+      ;;
+  esac
+done
+
+environment="${environment:-${positional_params[0]}}"
+service="${service:-${positional_params[1]}}"
+timezone="${timezone:-America/Los_Angeles}"
+
+function set_timezone() {
+  # Configures timezone, should only run on first boot
+  if [ ! -f /.booted ]
+  then
+    sed -i '/.*ZONE.*/c\ZONE="${timezone}"' /etc/sysconfig/clock
+    mv /etc/localtime /etc/localtime.org
+    ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
+    echo "${timezone}" > /etc/timezone
+  fi
+}
+
+function create_var_lib_docker() {
+  # If we don't have a (non-root) persistent EBS volume, put /var/lib/docker
+  # on the instance store volume
+  if [ ! -L /dev/persistent/disk1 ]
+  then
+    docker_disk="ephemeral"
+  else
+    docker_disk="persistent"
+  fi
+
+  # switcheroo /var/lib/docker if currently unswitcherooed
+  if [ ! -d /${docker_disk}/var/lib/docker ]
+  then
+    rm -rf /var/lib/docker
+    mkdir -p /${docker_disk}/var/lib/docker
+    ln -s /${docker_disk}/var/lib/docker/ /var/lib/docker
+  fi
+  mkdir -p /var/lib/docker/cb-home
+}
+
+function update_fstab() {
+  for disk in ephemeral persistent
+  do
+    if ! grep ${disk} /etc/fstab
+    then
+      if [ -L "/dev/${disk}/disk1" ]
+      then
+        mkdir -p /${disk}
+        echo "/dev/${disk}/disk1 /${disk} ext4 defaults,nofail,discard 0 2" >> /etc/fstab
+      fi
+    fi
+  done
+}
+
+function get_stackfile() {
+  declare -A stackfiles
+  stackfiles["analytics"]="analytics/analytics-jenkins-agents.yml"
+  stackfiles["cv"]="cv/cv-jenkins-agents.yml"
+  stackfiles["server"]="couchbase-server/server-jenkins-buildslaves.yml"
+
+  curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/master/docker-stacks/${stackfiles[${environment}]}"
+}
 
 function provision_disk() {
   if lsblk -o NAME,FSTYPE -dsn | grep ${1}n1
@@ -63,55 +134,7 @@ function provision_disk() {
   fi
 }
 
-# I don't know if the EBS/persistent devices can be different from one
-# instance to the next. We just call with the device names here and
-# figure out what they are via `nvme list` in provision_disk()
-#
-# Note: there's an assumption here that we're on a <= 8xlarge instance type
-# with a single (non-OS) EBS volume, and thus only have 2 disks to consider.
-provision_disk nvme1
-provision_disk nvme2
-
-# Update fstab
-for disk in ephemeral persistent
-do
-  if ! grep ${disk} /etc/fstab
-  then
-    mkdir -p /${disk}
-    echo "/dev/${disk}/disk1 /${disk} ext4 defaults,nofail,discard 0 2" >> /etc/fstab
-  fi
-done
-
-mount -a
-
-# switcheroo /var/lib/docker if currently unswitcherooed
-if [ ! -d /persistent/var/lib/docker ]
-then
-  rm -rf /var/lib/docker
-  mkdir -p /persistent/var/lib/docker
-  ln -s /persistent/var/lib/docker/ /var/lib/docker
-fi
-set -e
-
-# Set timezone
-if [ ! -f /persistent/.booted ]
-then
-  sed -i '/.*ZONE.*/c\ZONE="America/Los_Angeles"' /etc/sysconfig/clock
-  mv /etc/localtime /etc/localtime.org
-  ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-  echo "America/Los_Angeles" > /etc/timezone
-fi
-
-# Start docker in the background so we can move on to retrieving secrets
-# straight away
-# Note: We don't set the docker service to come up automatically at boot,
-# because we need to ensure the disks are ready before the container is
-# --restart=always'd on subsequent boots
-service docker start &
-
-# Get _agent_ secrets and set up initial container args (only on first boot)
-if [ ! -f /persistent/.booted ]
-then
+function get_agent_secrets() {
   # Get the names of the secrets we want from parameter store
   secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=${environment},shared" | jq -r ".Parameters[].Name")
 
@@ -134,19 +157,10 @@ then
       mkdir -p $(dirname $secret_path)
       aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
   done
-
-  # Compile args we'll be passing to `docker run`
-  echo "--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 " > /opt/buildteam/args
-  if [ "${environment}" = "cv" ]
-  then
-    echo "-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh " >> /opt/buildteam/args
-  fi
   chown -R 1000:1000 /var/lib/docker/cb-home
-fi
+}
 
-# Get _host_ secrets
-if [ ! -f /persistent/.booted ]
-then
+function get_host_secrets() {
   # This all works the same as the agent secrets above (minus container-specific parts)
   secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=host" | jq -r ".Parameters[].Name")
 
@@ -157,13 +171,77 @@ then
       mkdir -p $(dirname $secret_path)
       aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
   done
-fi
+}
 
-# Mount docker socket for analytics builders
-if [ ! -f /persistent/.booted -a "${environment}" = "analytics" ]
-then
-    echo "-v /var/run/docker.sock:/var/run/docker.sock " >> /opt/buildteam/args
-fi
+function docker_run_args() {
+  # Compile args we'll be passing to `docker run`
+  args="--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 "
+  if [ "${environment}" = "cv" ]
+  then
+    args="${args}-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh "
+  fi
+
+  # Mount docker socket for analytics builders
+  if [ "${environment}" = "analytics" ]
+  then
+      args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+  fi
+  echo "${args}"
+}
+
+function ecr_login() {
+  # Login so we can pull images from ECR
+  aws_acct=$(aws sts get-caller-identity | jq -r ".Account")
+  aws ecr get-login-password --region $(</opt/buildteam/region) | docker login --username AWS --password-stdin ${aws_acct}.dkr.ecr.$(</opt/buildteam/region).amazonaws.com
+}
+
+function container_image() {
+  get_stackfile
+  # Determine container image for specified service
+  if [ "${environment}" = "cv" ]
+  then
+    # CV nodes use swarm-launcher, we need to grab the image from an environment var
+    yq e ".services.${service}.environment.LAUNCH_IMAGE" /opt/buildteam/stackfile.yml
+  else
+    yq e ".services.${service}.image" /opt/buildteam/stackfile.yml
+  fi
+}
+
+# Configure timezone based on --timezone flag (or use America/Los_Angeles if not provided)
+set_timezone
+
+# Provision disks...
+# I don't know if the EBS/persistent devices can be different from one
+# instance to the next. We just call with the device names here and
+# figure out what they are via `nvme list` in provision_disk()
+#
+# Note: there's an assumption here that we're on a <= 8xlarge instance type
+# with a single (non-OS) EBS volume, and thus only have 2 disks to consider.
+provision_disk nvme1
+provision_disk nvme2
+
+# More basic disk stuff
+update_fstab
+mount -a
+create_var_lib_docker
+
+set -e
+# Start docker in the background so we can move on to retrieving secrets
+# straight away
+# Note: We don't set the docker service to come up automatically at boot,
+# because we need to ensure the disks are ready before the container
+# comes up (and we don't set the container to come up automatically because
+# we want to ensure we're running from the current image in the stackfile)
+service docker start &
+
+# Get secrets from parameter store
+get_agent_secrets
+get_host_secrets
+
+# If we're passing in an ssh key (for self service), ensure it's present in container's authorized_keys
+[ "${ssh_pubkey}" != "" ] \
+  && mkdir -p "/var/lib/docker/cb-home/.ssh/" \
+  && echo "${ssh_pubkey}" >> /var/lib/docker/cb-home/.ssh/authorized_keys
 
 # wait for docker to finish coming up
 while [ ! -f /var/run/docker.pid ]
@@ -172,22 +250,13 @@ do
   sleep 1
 done
 
+# Authenticate for pulling images from ECR
+ecr_login
+
+# Run build container
+docker run $(docker_run_args) $(container_image) default
+
 # Allow this script to run at next boot
 rm /var/lib/cloud/instances/*/sem/config_scripts_user
 
-aws_acct=$(aws sts get-caller-identity | jq -r ".Account")
-aws ecr get-login-password --region $(</opt/buildteam/region) | docker login --username AWS --password-stdin ${aws_acct}.dkr.ecr.$(</opt/buildteam/region).amazonaws.com
-
-# Determine container image for specified service
-if [ "${environment}" = "cv" ]
-then
-  # CV nodes use swarm-launcher, we need to grab the image from an environment var
-  image=$(yq e ".services.${service}.environment.LAUNCH_IMAGE" /opt/buildteam/stackfile.yml)
-else
-  image=$(yq e ".services.${service}.image" /opt/buildteam/stackfile.yml)
-fi
-
-# Run build container
-docker run $(</opt/buildteam/args) ${image} default
-
-touch /persistent/.booted
+touch /.booted
