@@ -144,7 +144,7 @@ services:
     image: couchbasebuild/server-centos7-build:20210827
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=server centos7 vulcan alice mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7 linux all vulcan alice mad-hatter cheshire-cat neo master x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
@@ -154,7 +154,7 @@ services:
     image: couchbasebuild/server-centos7-build:20210827
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
-      - "JENKINS_SLAVE_LABELS=server centos7-asan cheshire-cat neo x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7-asan linux all cheshire-cat neo x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
@@ -327,7 +327,7 @@ services:
     image: couchbasebuild/server-ubuntu18-clang9-build:20210831
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18-clang9"
-      - "JENKINS_SLAVE_LABELS=clang9 ubuntu18 ubuntu18.04"
+      - "JENKINS_SLAVE_LABELS=clang9 ubuntu18 ubuntu18.04 x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
@@ -337,7 +337,7 @@ services:
     image: couchbasebuild/server-ubuntu20-clang9-build:20210831
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20-clang9"
-      - "JENKINS_SLAVE_LABELS=clang9 ubuntu20 ubuntu20.04"
+      - "JENKINS_SLAVE_LABELS=clang9 ubuntu20 ubuntu20.04 x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
