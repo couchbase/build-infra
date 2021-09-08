@@ -134,42 +134,42 @@ function provision_disk() {
   fi
 }
 
-function get_agent_secrets() {
-  # Get the names of the secrets we want from parameter store
-  secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=${environment},shared" | jq -r ".Parameters[].Name")
+function retrieve_secrets() {
+  local environment=${1}
+  local target_dir=${2}
 
-  for secret in ${secrets}
+  for encoding in none base64
   do
-      echo "Reading $secret"
-      # We're composing filenames from parameters like: jenkins-worker__server__.ssh__config
-      # where each __ is replaced with a / to construct the path.
-      #
-      # The first two components of the path specify what the parameter's purpose is and the
-      # environment it belongs to, with environment always being either ${environment} or
-      # 'shared.' We know everything we're reading here belongs to this container though, so
-      # we can just strip out the leading jenkins-worker/${environment}/ and use whatever
-      # remains as the path.
-      #
-      # e.g:
-      #   jenkins-worker__server__.ssh__config = [/var/lib/docker/cb-home/].ssh/config
-      #   jenkins-worker__shared__.ssh__authorized_keys = [/var/lib/docker/cb-home/].ssh/authorized_keys
-      secret_path="/var/lib/docker/cb-home$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
-      mkdir -p $(dirname $secret_path)
-      aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
-  done
-  chown -R 1000:1000 /var/lib/docker/cb-home
-}
+    # Get the names of the secrets we want from parameter store
+    secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=${environment},shared" "Key=tag:Encoding,Values=${encoding}" | jq -r ".Parameters[].Name")
 
-function get_host_secrets() {
-  # This all works the same as the agent secrets above (minus container-specific parts)
-  secrets=$(aws ssm --region $(</opt/buildteam/region) describe-parameters --parameter-filters "Key=tag:Consumer,Values=jenkins-worker" "Key=tag:Environment,Values=host" | jq -r ".Parameters[].Name")
-
-  for secret in ${secrets}
-  do
-      echo "Reading $secret"
-      secret_path="/root$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
-      mkdir -p $(dirname $secret_path)
-      aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value" > "${secret_path}"
+    for secret in ${secrets}
+    do
+        echo "Reading $secret"
+        # We're composing filenames from parameters like: jenkins-worker__server__.ssh__config
+        # where each __ is replaced with a / to construct the path.
+        #
+        # The first two components of the path specify what the parameter's purpose is and the
+        # environment it belongs to, with environment always being either ${environment} or
+        # 'shared.' We know everything we're reading here belongs to this container though, so
+        # we can just strip out the leading jenkins-worker/${environment}/ and use whatever
+        # remains as the path.
+        #
+        # e.g:
+        #   jenkins-worker__server__.ssh__config = [/var/lib/docker/cb-home/].ssh/config
+        #   jenkins-worker__shared__.ssh__authorized_keys = [/var/lib/docker/cb-home/].ssh/authorized_keys
+        secret_path="${target_dir}$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
+        mkdir -p $(dirname $secret_path)
+        param=$(aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value")
+        case $encoding in
+        none)
+          echo "${param}" > "${secret_path}"
+          ;;
+        base64)
+          echo "${param}" | base64 --decode > "${secret_path}"
+          ;;
+        esac
+    done
   done
 }
 
@@ -235,8 +235,9 @@ set -e
 service docker start &
 
 # Get secrets from parameter store
-get_agent_secrets
-get_host_secrets
+retrieve_secrets "host" "/root"
+retrieve_secrets "${environment}" "/var/lib/docker/cb-home"
+chown -R 1000:1000 /var/lib/docker/cb-home
 
 # If we're passing in an ssh key (for self service), ensure it's present in container's authorized_keys
 [ "${ssh_pubkey}" != "" ] \

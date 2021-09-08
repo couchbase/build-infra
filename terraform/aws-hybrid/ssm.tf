@@ -10,6 +10,7 @@ resource "aws_ssm_parameter" "shared_ssh_authorized_keys" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "shared"
+    Encoding = "none"
   }
 }
 
@@ -21,6 +22,7 @@ resource "aws_ssm_parameter" "host_docker_config" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "host"
+    Encoding = "none"
   }
 }
 
@@ -36,6 +38,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_docker_config" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -47,6 +50,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_gitconfig" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -58,6 +62,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_config" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -69,6 +74,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_known_hosts" 
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -80,6 +86,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_environment" 
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -91,6 +98,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_id_ns_coderev
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -102,6 +110,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_ns_buildbot_r
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -113,6 +122,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_patch_via_ger
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -124,6 +134,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_id_buildbot" 
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -135,6 +146,7 @@ resource "aws_ssm_parameter" "couchbase_server_analytics_linux_ssh_buildbot_id_d
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "analytics"
+    Encoding = "none"
   }
 }
 
@@ -150,6 +162,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_gitconfig" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -161,6 +174,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_config" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -172,6 +186,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_known_hosts" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -183,6 +198,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_environment" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -194,6 +210,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_id_ns_codereview" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -205,6 +222,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_ns_buildbot_rsa" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -216,6 +234,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_patch_via_gerrit_ini
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -227,6 +246,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_id_buildbot" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -238,6 +258,7 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_buildbot_id_dsa" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "cv"
+    Encoding = "none"
   }
 }
 
@@ -254,6 +275,7 @@ resource "aws_ssm_parameter" "server_ssh_config" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -265,6 +287,7 @@ resource "aws_ssm_parameter" "server_ssh_known_hosts" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -276,6 +299,7 @@ resource "aws_ssm_parameter" "server_ssh_environment" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -287,17 +311,19 @@ resource "aws_ssm_parameter" "server_gitconfig" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
 resource "aws_ssm_parameter" "server_gpg_rpm_signing" {
-  name  = "jenkins-worker__server__rpm_signing"
+  name  = "jenkins-worker__server__.gpg__rpm_signing"
   type  = "SecureString"
-  value = file("~/aws-ssh/couchbase-server/build/linux/.gpg/rpm_signing")
+  value = filebase64("~/aws-ssh/couchbase-server/build/linux/.gpg/rpm_signing")
   tags = {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "base64"
   }
 }
 
@@ -309,6 +335,7 @@ resource "aws_ssm_parameter" "server_ssh_id_buildbot" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -320,6 +347,7 @@ resource "aws_ssm_parameter" "server_ssh_id_cb_robot" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -331,6 +359,7 @@ resource "aws_ssm_parameter" "server_ssh_id_ns_codereview" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -342,6 +371,7 @@ resource "aws_ssm_parameter" "server_ssh_ns_buildbot_rsa" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
 
@@ -353,5 +383,6 @@ resource "aws_ssm_parameter" "server_ssh_patch_via_gerrit_ini" {
     Owner = "build-team"
     Consumer = "jenkins-worker"
     Environment = "server"
+    Encoding = "none"
   }
 }
