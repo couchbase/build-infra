@@ -120,8 +120,11 @@ command -v gpg >/dev/null 2>&1 && {
     shopt -s nullglob
     for gpgkey in /home/couchbase/.gpg/* /run/secrets/*.gpgkey
     do
-        echo Importing ${gpgkey} ...
-        sudo -u couchbase -H gpg --import ${gpgkey}
+        key_name=$(gpg --list-packets "${gpgkey}" | grep ":user ID packet:" | sed "s/:user ID packet: //" | sed "s/\"//g")
+        sudo -u couchbase -H gpg --list-keys | grep "${key_name}" &>/dev/null || (
+          echo Importing ${gpgkey} ...
+          sudo -u couchbase -H gpg --import ${gpgkey}
+        )
     done
     shopt -u nullglob
 }
