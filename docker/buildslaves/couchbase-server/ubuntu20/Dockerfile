@@ -102,6 +102,12 @@ RUN set -x \
 
 RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
 
+# Add lxmllint
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y libxml2-utils \
+    && apt-get clean
+
 ARG JNLP_AGENT_VER
 RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JNLP_AGENT_VER}/remoting-${JNLP_AGENT_VER}.jar \
   && chmod 755 /usr/share/jenkins \
