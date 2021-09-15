@@ -15,10 +15,10 @@ export LANG=en_US.UTF-8
 # under /opt/homebrew on M1
 if [ -d "/opt/homebrew" ]; then
   export homebrew_dir=/opt/homebrew
-  export PATH=$homebrew_dir/bin:/usr/local/bin:$homebrew_dir/opt/ccache/libexec:$PATH
+  export PATH=$homebrew_dir/bin:$homebrew_dir/opt/autoconf@2.69/bin:/usr/local/bin:$homebrew_dir/opt/ccache/libexec:$PATH
 else
   export homebrew_dir=/usr/local
-  export PATH=$homebrew_dir/bin:$homebrew_dir/opt/ccache/libexec:$PATH
+  export PATH=$homebrew_dir/bin:$homebrew_dir/opt/autoconf@2.69/bin:$homebrew_dir/opt/ccache/libexec:$PATH
 fi
 gem_paths=$(gem env | grep "INSTALLATION DIRECTORY" | sed 's/.*: //g'  | sed 's/$/\/bin/g' | paste -sd ":" -)
 export PATH="${gem_paths}:$PATH"

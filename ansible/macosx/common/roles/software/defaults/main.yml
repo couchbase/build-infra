@@ -6,7 +6,7 @@ homebrew_cask_apps:
    - homebrew/cask-versions/java11
 
 homebrew_installed_packages:
-   - autoconf
+   - autoconf@2.69
    - automake
    - bison
    - ccache
