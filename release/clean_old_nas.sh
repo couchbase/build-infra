@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 LATESTBUILDS=${1-/latestbuilds}
 
@@ -10,13 +10,21 @@ remove_glob() {
 }
 
 echo @@@@@@@@@
+echo Clean up cbdeps builds
+echo @@@@@@@@@
+cd ${LATESTBUILDS}/cbdeps
+
+remove_glob "*.tgz" 45
+remove_glob "*.md5" 45
+find . -empty -type d -print -delete
+
+echo @@@@@@@@@
 echo Clean up Couchbase Server toy builds
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-server/toybuilds
 
 remove_glob "*.*" 30
-echo "Removing empty toy build directories - ignore errors"
-rmdir * || true
+find . -empty -type d -print -delete
 
 echo @@@@@@@@@
 echo Clean up Couchbase Server
