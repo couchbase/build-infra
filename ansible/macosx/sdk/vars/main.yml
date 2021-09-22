@@ -1,6 +1,8 @@
 ---
 azul_jdk_name: "{{ 'zulu11.48.21-ca-jdk11.0.11-macosx_aarch64' if ansible_architecture == 'arm64' else 'zulu11.48.21-ca-jdk11.0.11-macosx_x64' }}"
 homebrew_dir: "{{ '/usr/local' if ansible_architecture == 'x86_64' else '/opt/homebrew' }}"
+cbdep_version: "1.0.4"
+cbdep_url: "https://packages.couchbase.com/cbdep/{{ cbdep_version }}/cbdep-{{ cbdep_version }}-darwin-{{ ansible_architecture }}"
 
 homebrew_cask_appdir: /Applications
 
@@ -30,7 +32,7 @@ homebrew_installed_packages:
   - { name: libcouchbase, state: linked }
   - { name: ruby-install, state: linked }
   - { name: chruby, state: linked }
-  - { name: gcc@10, state: linked }
+  - { name: gcc@11, state: linked }
   - { name: automake, state: linked }
   - { name: bison, state: linked }
   - { name: readline, state: linked }

@@ -46,9 +46,10 @@
 
     - name: Install cbdep tool
       get_url:
-        url: http://downloads.build.couchbase.com/cbdep/cbdep.darwin
+        url: "{{ cbdep_url }}"
         dest: /usr/local/bin/cbdep
         mode: 0755
+        force: yes
       become: true
 
     - name: Create cbdeps install directory
@@ -70,12 +71,21 @@
       args:
         chdir: "{{ homebrew_dir }}/bin"
 
+    - name: Ensure required homebrew packages are installed.
+      homebrew:
+        name: "{{ item.name | default(item) }}"
+        install_options: "{{ item.install_options | default(omit) }}"
+        state: present
+      loop: "{{ homebrew_installed_packages }}"
+
     - name: Install jdk
       shell: |
         cd /usr/local
         curl -OL https://cdn.azul.com/zulu/bin/{{ azul_jdk_name }}.tar.gz
         tar -xzf {{ azul_jdk_name }}.tar.gz
         rm -rf {{ azul_jdk_name }}.tar.gz
+        rm /usr/local/bin/java
+        rm /usr/local/bin/javac
         ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
         ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
       become: true
