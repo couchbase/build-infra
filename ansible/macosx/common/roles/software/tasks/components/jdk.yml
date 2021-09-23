@@ -1,0 +1,17 @@
+- name: Check if installed (brew)
+  stat:
+    path: "/usr/local/{{ azul_jdk_name }}"
+  register: azul_jdk
+
+- name: Install jdk
+  shell: |
+    cd /usr/local
+    curl -OL https://cdn.azul.com/zulu/bin/{{ azul_jdk_name }}.tar.gz
+    tar -xzf {{ azul_jdk_name }}.tar.gz
+    rm -rf {{ azul_jdk_name }}.tar.gz
+    rm -f /usr/local/bin/java
+    rm -f /usr/local/bin/javac
+    ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
+    ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
+  become: true
+  when: azul_jdk.stat.exists == False
