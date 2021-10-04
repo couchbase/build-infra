@@ -15,8 +15,11 @@
     url: "https://aka.ms/vs/16/release/vs_professional.exe"
     dest: C:\vs2019\vs_professional.exe
 
+# As of 10-04-2021, Microsoft.VisualStudio.Workload.Universal is broken from command line install.
+# We need to install it via gui for now.
+# In the future, we need to revisit this to see we can add it back into the automation.
 - name: Install Visual Studio Professional 2019 and dotnet tools
-  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Workload.Universal --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\vs2019\vs_professional.exe --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --quiet --productKey "{{ vs2019_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
   args:
     chdir: C:\vs2019
   register: install_output

@@ -1,0 +1,228 @@
+---
+- hosts: all
+
+  tasks:
+    - name: Disable Windows antivirus during setup
+      win_shell: Add-MpPreference -ExclusionPath "C:"
+
+    - name: Install Dot Net Framework 3.5
+      win_shell: Enable-WindowsOptionalFeature -Online -FeatureName "NetFx3"
+      become: yes
+      become_user: Administrator
+      become_method: runas
+
+    - name: Copy patch_via_gerrit
+      include_role:
+        name: ../../../common/roles/patch_via_gerrit
+
+    - name: Make temp dir
+      win_file:
+        path: C:\Temp
+        state: directory
+
+    - name: "Install OpenSSL"
+      win_chocolatey:
+        name: openssl
+        version: 1.1.1.800
+      tags: python3
+
+    # Have to do this first so that the later python2 ends up
+    # earlier on PATH (ie, we want python2 to be default)
+    - name: "Install Python 3"
+      win_chocolatey:
+        name: python3
+        version: 3.7.7
+        force: yes
+      tags: python3
+
+    - name: "Provide python3 alias"
+      win_shell: copy C:\Python37\python.exe C:\Python37\python3.exe
+      args:
+        creates: C:\Python37\python3.exe
+      tags: python3
+
+    - name: "Provide python3.7 alias"
+      win_shell: copy C:\Python37\python.exe C:\Python37\python3.7.exe
+      args:
+        creates: C:\Python37\python3.7.exe
+      tags: python3
+
+    - name: "Install tools"
+      win_chocolatey:
+        name: "{{ item }}"
+        allow_empty_checksums: "yes"
+      with_items:
+        - git
+        - clamwin
+        - cmake
+        - curl
+        - nasm
+        - ninja
+        - MinGW
+        - ruby
+        - 7zip.commandline
+        - insted
+        - pandoc
+        - vscode
+        - wixtoolset
+
+    - name: Install JDK for Jenkins
+      win_chocolatey:
+        name: openjdk
+        version: 11.0.2.01
+
+    - name: Install googlechrome
+      win_chocolatey:
+        name: googlechrome
+        ignore_checksums: true
+
+    - name: Create download area for Ansible
+      win_file:
+        path: "{{ targetvolume | default('c') }}:\\ansible_files"
+        state: directory
+      tags:
+        - setup
+
+    - name: Create required "[vol]:\\Program Files (x86)\\Common Files\\Merge Modules" directory
+      win_file:
+          path: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules"
+          state: directory
+
+    - name: Create [targetvolume] bin directory
+      win_file:
+        path: "{{ targetvolume | default('c') }}:\\bin"
+        state: directory
+
+    - name: Create C bin directory
+      win_file:
+        path: "c:\\bin"
+        state: directory
+
+    - name: "Install repo"
+      win_get_url:
+        url: "https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo"
+        dest: "{{ targetvolume | default('c') }}:\\bin\\repo"
+      tags:
+        - repo
+
+    # This repo.exe was built using the "py-wrapper" source code here:
+    # https://github.com/couchbase/build-tools/tree/master/py-wrapper
+    - name: "Install repo wrapper"
+      win_copy:
+        src: repo.exe
+        dest: "{{ targetvolume | default('c') }}:\\bin\\"
+
+    # Due to a silly bug in ESRlabs' Repo port, git's core.pager setting MUST
+    # be set, and moreover it MUST be set to a command that exists as a .exe.
+    # more is actually "more.com", and while setting core.pager to "more.com"
+    # works well from a command prompt, it throws a Python error when invoked
+    # via Jenkins "Gerrit Repo" source-control plugin. So, we use MSYS's
+    # "cat.exe", which requires that we copy both that file and a few MSYS
+    # DLLs onto the PATH.
+    - name: "Copy MSYS tools to [vol]:\\bin for repo"
+      win_copy:
+        src: "c:\\Program Files\\Git\\usr\\bin\\{{ item }}"
+        dest: "{{ targetvolume | default('c') }}:\\bin\\"
+        remote_src: yes
+      loop:
+        - cat.exe
+        - msys-2.0.dll
+        - msys-iconv-2.dll
+        - msys-intl-8.dll
+      tags:
+        - repo
+
+    - name: Get Current PATH
+      raw: $ENV:PATH
+      register: path_out
+
+    - debug: var=path_out.stdout_lines
+
+    - name: Add tools to PATH.
+      win_path:
+          elements:
+          - "{{ targetvolume | default('c') }}:\\bin"
+          - C:\Program Files\CMake\bin
+          - C:\Program Files\git\cmd
+          - C:\Program Files\NASM
+          - C:\Program Files\OpenSSH-Win64
+          - C:\Program Files (x86)\WiX Toolset v3.11\bin
+
+    - name: Install Windows SDK version 10.1.17134.12
+      win_chocolatey:
+        name: windows-sdk-10.1
+        version: "10.1.17134.12"
+      tags: v8_sdk
+
+    - name: "Enable Remote Desktop"
+      win_regedit:
+        key: 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+        name: fDenyTSConnections
+        data: "0"
+        type: dword
+        state: present
+
+    - name: "Open Remote Desktop in firewall"
+      win_firewall_rule:
+        name: "remote desktop"
+        enable: yes
+        state: present
+        localport: "3389"
+        action: allow
+        direction: in
+        protocol: TCP
+
+    - name: Restore basic Windows antivirus
+      win_shell: Remove-MpPreference -ExclusionPath "C:"
+
+    - name: Exclude Jenkins from Windows antivirus
+      win_shell: Add-MpPreference -ExclusionPath "{{ targetvolume | default('c') }}:\Jenkins" -ExclusionExtension "exe"
+
+    - name: install vs2019
+      include_role:
+        name: "../../roles/vs2019"
+        apply:
+          tags:
+            - visualstudio
+      vars:
+        PRODUCT: "{{ NODE_PRODUCT }}"
+      tags:
+        - visualstudio
+
+    # Do OpenSSH last so the service has the latest version of the path
+    - name: Install OpenSSH (for Jenkins)
+      win_chocolatey:
+        name: openssh
+        params: /SSHServerFeature
+        state: latest
+
+    - name: Ensure OpenSSH executables are pathed
+      win_path:
+        name: PATH
+        elements: C:\Program Files\OpenSSH-Win64
+        scope: machine
+        state: present
+      tags:
+        - path
+
+    - name: Ensure OpenSSH executables are pathed
+      win_path:
+        name: PATH
+        elements: C:\Program Files\OpenSSH-Win64
+        scope: user
+        state: present
+      tags:
+        - path
+
+    - name: Configure profile synchronization
+      include_role:
+        name: "../../roles/profile"
+        apply:
+          tags:
+            - profile
+      tags:
+        - profile
+
+    - name: Install cygwin
+      include_role:
+        name: ../../roles/cygwin
