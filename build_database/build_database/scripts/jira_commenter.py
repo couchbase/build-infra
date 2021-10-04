@@ -26,7 +26,7 @@ class JiraCommenter:
         self.db = cbdatabase_db.CouchbaseDB(db_info)
         self.jira = JIRA({'server': 'https://issues.couchbase.com/'})
         self.dryrun = dryrun
-        self.ticket_re = re.compile(r'(\b[A-Z]+-\d+\b)')
+        self.ticket_re = re.compile(r'(\b[A-Z][A-Z0-9]+-\d+\b)')
 
     def get_tickets(self, commit):
         """Returns list of ticket IDs named by commit"""

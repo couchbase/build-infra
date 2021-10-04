@@ -4,7 +4,7 @@ TAG=$(date "+%Y%m%d")
 IMAGE="couchbasebuild/load-build-database"
 
 mkdir -p build
-cp -a -u ../../../build_database build
+cp -a ../../../build_database build
 
 docker build --no-cache -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
