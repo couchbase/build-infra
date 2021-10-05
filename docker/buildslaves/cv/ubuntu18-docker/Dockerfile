@@ -16,13 +16,13 @@ WORKDIR /tmp
 # Needed to ensure LANG is set correctly when ssh'ing into agent
 COPY ssh_environment /home/couchbase/.ssh/environment
 RUN set -x \
-        && sed -ri 's/#PermitUserEnvironment no/PermitUserEnvironment yes/g' /etc/ssh/sshd_config \
-        && chown -R couchbase:couchbase /home/couchbase/.ssh
+    && sed -ri 's/#PermitUserEnvironment no/PermitUserEnvironment yes/g' /etc/ssh/sshd_config \
+    && chown -R couchbase:couchbase /home/couchbase/.ssh
 
 # Install patch_via_gerrit tool
 RUN set -x \
-        && curl -L https://packages.couchbase.com/patch_via_gerrit/1.0.0/patch_via_gerrit-1.0.0-linux -o /usr/local/bin/patch_via_gerrit \
-        && chmod 755 /usr/local/bin/patch_via_gerrit
+    && curl -L https://packages.couchbase.com/patch_via_gerrit/1.0.0/patch_via_gerrit-1.0.0-linux -o /usr/local/bin/patch_via_gerrit \
+    && chmod 755 /usr/local/bin/patch_via_gerrit
 
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
@@ -30,13 +30,19 @@ RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 
 # Install docker static binary for running docker command-line
 RUN set -x \
-  && mkdir /tmp/deploy \
-  && cd /tmp/deploy \
-  && curl -o docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
-  && tar xf docker.tgz \
-  && cp -a docker/docker /usr/local/bin \
-  && cd /tmp \
-  && rm -rf deploy
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -o docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
+    && tar xf docker.tgz \
+    && cp -a docker/docker /usr/local/bin \
+    && cd /tmp \
+    && rm -rf deploy
+
+# Add aspell
+RUN set -x \
+    && apt update \
+    && apt install -y aspell \
+    && apt clean
 
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS
