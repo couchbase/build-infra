@@ -101,3 +101,9 @@
           echo "Command Line Developer Tools are already installed!"
         fi
       become: true
+
+    - name: Update Rosetta2
+      shell: |
+        softwareupdate --install-rosetta --agree-to-license
+      become: true
+      when: ansible_architecture == "arm64"
