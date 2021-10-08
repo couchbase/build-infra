@@ -10,6 +10,7 @@ cp -a ../../util/swarm*.properties build
 cp -a ../../util/healthcheck.sh build
 
 docker build \
+  --pull \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   --build-arg ASCIIDOCTOR_VER=${ASCIIDOCTOR} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \

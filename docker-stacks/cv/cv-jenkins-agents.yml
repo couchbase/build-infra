@@ -43,7 +43,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20211005
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20211007
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -79,7 +79,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210831
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20211007
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -114,7 +114,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210831
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20211007
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
@@ -149,7 +149,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20210831
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20211007
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"

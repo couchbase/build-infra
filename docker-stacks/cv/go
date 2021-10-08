@@ -1,3 +1,9 @@
-#!/bin/bash
+#!/bin/bash -ex
+
+# Because of the weird way cv agents are deployed, it's best
+# to forcibly remove the stack entirely rather than just
+# redeploying it.
+docker --host 172.23.112.24 stack rm cv || true
+sleep 15
 
 docker --host 172.23.112.24 stack deploy --with-registry-auth -c cv-jenkins-agents.yml cv
