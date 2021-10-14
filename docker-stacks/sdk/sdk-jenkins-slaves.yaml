@@ -149,6 +149,9 @@ services:
     <<: *default-jenkins-slave
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.role==build
     secrets:
       - source: sdk_signing_private_key.gpgkey
         uid: '1000'
@@ -182,6 +185,9 @@ services:
     <<: *default-jenkins-slave
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.role==build
     secrets:
       - source: sdk_signing_private_key.gpgkey
         uid: '1000'

@@ -33,6 +33,7 @@
 172.23.113.40  name=mega4-32.sc.couchbase.com labels=role=infrastructure
 172.23.96.52   name=mega4-33.sc.couchbase.com labels=role=infrastructure
 172.23.97.147  name=mega4-34.sc.couchbase.com labels=role=operator
+172.23.113.9   name=monster-01.sc.couchbase.com labels=role=monster
 
 [sdk]
 172.23.97.81   name=sdk-swarm-01.build.couchbase.com manager=true

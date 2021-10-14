@@ -1,0 +1,18 @@
+#!/bin/sh -ex
+
+# Things you might want to adjust:
+IMAGE=couchbasebuild/server-deb-sidecar
+
+# You can probably ignore the rest of this
+
+TAG=$(date +%Y%m%d)
+
+docker build --pull \
+  --tag ${IMAGE}:${TAG} \
+  --tag ${IMAGE}:latest \
+  .
+
+if [ "$1" = "--publish" ]; then
+  docker push ${IMAGE}:$TAG
+  docker push ${IMAGE}:latest
+fi

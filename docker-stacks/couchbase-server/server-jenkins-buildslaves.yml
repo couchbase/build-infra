@@ -144,17 +144,64 @@ services:
     image: couchbasebuild/server-centos7-build:20210909
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=server centos7 linux all vulcan alice mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat neo master x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-three-agent
 
+  linux-single:
+    image: couchbasebuild/server-linux-build:20211005
+    environment:
+      - "JENKINS_SLAVE_NAME=server-linux"
+      - "JENKINS_SLAVE_LABELS=server linux all monster neo master x86_64"
+      - *server-jenkins-master
+      - *server-jenkins-node-class
+      - *node-product
+    volumes:
+      - type: volume
+        source: optcouchbase
+        target: /opt/couchbase
+      - type: volume
+        source: rpmdb
+        target: /var/lib/rpm
+      - type: volume
+        source: workspace
+        target: /home/couchbase/jenkins/workspace
+      - type: volume
+        source: cbdepscache
+        target: /home/couchbase/.cbdepscache
+      - type: volume
+        source: cbdepcache
+        target: /home/couchbase/.cbdepcache
+      - type: volume
+        source: ccache
+        target: /home/couchbase/.ccache
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /home/couchbase/.docker/config.json
+        target: /home/couchbase/.docker/config.json
+    deploy:
+      resources:
+        reservations:
+          memory: 28GB
+      placement:
+        constraints:
+          - node.labels.role==monster
+      replicas: 2
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+    <<: *default-jenkins-secrets
+
   centos7-asan:
     image: couchbasebuild/server-centos7-build:20210827
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
-      - "JENKINS_SLAVE_LABELS=server centos7-asan linux all cheshire-cat neo x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat neo x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
@@ -394,3 +441,11 @@ secrets:
 
 networks:
   jenkins:
+
+volumes:
+  optcouchbase:
+  rpmdb:
+  workspace:
+  cbdepscache:
+  cbdepcache:
+  ccache:
