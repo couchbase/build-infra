@@ -2,8 +2,11 @@
 - hosts: all
 
   tasks:
-    - name: Disable Windows antivirus during setup
+    - name: Disable Windows Defender on main disk
       win_shell: Add-MpPreference -ExclusionPath "C:"
+
+    - name: Enable running PowerShell scripts anywhere
+      win_shell:  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope LocalMachine -Force
 
     - name: Install Dot Net Framework 3.5
       win_shell: Enable-WindowsOptionalFeature -Online -FeatureName "NetFx3"
@@ -171,12 +174,6 @@
         action: allow
         direction: in
         protocol: TCP
-
-    - name: Restore basic Windows antivirus
-      win_shell: Remove-MpPreference -ExclusionPath "C:"
-
-    - name: Exclude Jenkins from Windows antivirus
-      win_shell: Add-MpPreference -ExclusionPath "{{ targetvolume | default('c') }}:\Jenkins" -ExclusionExtension "exe"
 
     - name: install vs2019
       include_role:
