@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c traefik.yaml traefik

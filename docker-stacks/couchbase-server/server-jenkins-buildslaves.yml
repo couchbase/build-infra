@@ -401,16 +401,6 @@ services:
       - *node-product
     <<: *default-jenkins-two-agent
 
-  clamav:
-    image: couchbasebuild/clamav-slave:20210721
-    environment:
-      - "JENKINS_SLAVE_NAME=clamav"
-      - "JENKINS_SLAVE_LABELS=clamav"
-      - *server-jenkins-master
-      - *server-jenkins-node-class
-      - *node-product
-    <<: *default-jenkins-one-agent
-
   centos7_unittests:
     image: couchbasebuild/server-centos7-build:20210827
     environment:

@@ -2,10 +2,7 @@
 
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
-IMAGE=couchbasebuild/clamav-slave
-
-mkdir -p build
-cp -a ../../buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+IMAGE=couchbasebuild/clamav-agent
 
 docker build -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
