@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  # api, frontend and worker all need to mount volumes so we can live reload in
+  # dev, the cmds in api and worker will also run watchdog if we have a dev env
+  # var set (we can't just use an env var to switch frontend to dev, it has to
+  # be done via a separate dockerfile)
+  api:
+    environment:
+      - dev=true
+    volumes:
+      - ./containers/api:/app
+  worker:
+    environment:
+      - dev=true
+    volumes:
+      - ./containers/worker:/app
+  frontend:
+    volumes:
+      - ./containers/frontend:/app
+    build:
+      # The frontend is built and served by nginx in prod, so we need a dev
+      # dockerfile to `yarn start` it
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    environment:
+      - REACT_APP_API=localhost:5000

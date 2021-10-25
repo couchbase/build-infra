@@ -1,0 +1,79 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: build-docker.couchbase.com/pathdiff/frontend:${TAG}
+    build:
+      context: ./containers/frontend
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.pathdiff.rule=Host(`pathdiff.build.couchbase.com`)"
+        - "traefik.http.services.pathdiff_frontend.loadbalancer.server.port=80"
+    init: true
+    networks:
+      - traefik_reverse-proxy
+  api:
+    image: build-docker.couchbase.com/pathdiff/api:${TAG}
+    build: ./containers/api
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
+    init: true
+    ports:
+      - 5000:5000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - database
+      - redis
+  worker:
+    image: build-docker.couchbase.com/pathdiff/worker:${TAG}
+    build: ./containers/worker
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
+    init: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  redis:
+    image: "redis:6.2.6-bullseye"
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
+  database:
+    image: mariadb:10.5.12-focal
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname==mega4-34
+    init: true
+    volumes:
+      - type: bind
+        source: ${DATADIR}
+        target: /var/lib/mysql
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "True"
+      MYSQL_DATABASE: pathdiff
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+
+networks:
+  traefik_reverse-proxy:
+    external: true

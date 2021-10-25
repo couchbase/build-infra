@@ -1,0 +1,8 @@
+# The 'live' dockerfile is a multistage build which drops static files into
+# an nginx container, we need to use a separate dockerfile for dev
+
+FROM node:slim
+
+WORKDIR /app
+
+CMD yarn start

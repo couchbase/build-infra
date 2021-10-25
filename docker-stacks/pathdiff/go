@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+export TAG=$(date '+%Y-%m-%d')
+export CURRENT_TAG=2021-10-21
+export DATADIR=/opt/pathdiff/data
+
+case "$1" in
+    "--dev")
+        export DATADIR=/tmp/pathdiff/dev
+        export TAG="dev"
+        # We do a bare build for dev - this applies the .override.yml
+        # automatically
+        docker compose build
+        docker compose up --remove-orphans
+        ;;
+    "--publish")
+        # Specifying files, override isn't used
+        docker compose -f docker-compose.yml build
+        docker compose push
+        ;;
+    "--deploy")
+        export TAG=${CURRENT_TAG}
+        docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c docker-compose.yml pathdiff
+        ;;
+esac
