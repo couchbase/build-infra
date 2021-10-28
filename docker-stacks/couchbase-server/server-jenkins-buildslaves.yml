@@ -381,7 +381,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu20-clang9:
-    image: couchbasebuild/server-ubuntu20-clang9-build:20210831
+    image: couchbasebuild/server-ubuntu20-clang9-build:20211027
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu20 ubuntu20.04 x86_64"
@@ -391,7 +391,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20210827
+    image: couchbasebuild/server-ubuntu20-build:20211027
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
@@ -412,7 +412,7 @@ services:
     <<: *default-jenkins-two-agent-with-ipv6
 
   ubuntu20_unittests:
-    image: couchbasebuild/server-ubuntu20-build:20210913
+    image: couchbasebuild/server-ubuntu20-build:20211027
     environment:
       - "JENKINS_SLAVE_NAME=unit-ubuntu20"
       - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"

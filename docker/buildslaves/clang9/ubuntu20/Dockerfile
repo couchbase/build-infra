@@ -1,4 +1,4 @@
-FROM couchbasebuild/server-ubuntu20-build:20210827
+FROM couchbasebuild/server-ubuntu20-build:20211027
 
 LABEL maintainer="build-team@couchbase.com"
 

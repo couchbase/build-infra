@@ -135,6 +135,12 @@ RUN set -x \
     && mkdir /run/sshd \
     && apt clean
 
+# Install libtinfo.so.5
+RUN set -x \
+    && apt update \
+    && apt install -y libtinfo5 \
+    && apt clean
+
 # GCC - need to redundantly declare GCC_ARG here
 ARG GCC_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
