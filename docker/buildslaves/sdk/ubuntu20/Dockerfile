@@ -36,7 +36,7 @@ RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
 
 # CMake
 RUN mkdir /tmp/deploy && \
-    curl -L https://cmake.org/files/v3.9/cmake-3.9.4-Linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl -L https://cmake.org/files/v3.21/cmake-3.21.4-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy

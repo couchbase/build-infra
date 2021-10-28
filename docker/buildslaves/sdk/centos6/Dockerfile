@@ -5,6 +5,14 @@
 
 FROM couchbasebuild/sdk-centos6-build:20191204
 
+# CMake
+USER root
+RUN mkdir /tmp/deploy && \
+    curl -L https://cmake.org/files/v3.21/cmake-3.21.4-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
+    rm /usr/local/bin/cmake-gui && \
+    rm -rf /tmp/deploy
+
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
 USER root
