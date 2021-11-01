@@ -59,6 +59,15 @@ x-default-jenkins-slave-environment:
 
 services:
 
+  alpine:
+    image: couchbasebuild/sdk-alpine-build:20211101
+    environment:
+      - "JENKINS_SLAVE_NAME=build-alpine"
+      - "JENKINS_SLAVE_LABELS=sdk alpine"
+      - *default-jenkins-slave-environment-master
+      - *default-jenkins-slave-lang
+    <<: *default-jenkins-slave
+
   amzn2:
     image: couchbasebuild/sdk-amzn2-build:20211028
     environment:

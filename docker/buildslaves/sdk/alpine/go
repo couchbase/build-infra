@@ -1,0 +1,25 @@
+#!/bin/sh -ex
+
+TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/sdk-alpine-build
+
+mkdir -p build
+INFRADIR=$(git rev-parse --show-toplevel)
+cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
+
+docker build \
+    --add-host downloads.build.couchbase.com:172.23.126.166 \
+    --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+    --build-arg CACHEBUST=$(date +%Y%m%d-%H%M%S) \
+    --build-arg CMAKE_VERSION=3.21.3 \
+    --build-arg GRADLE_VERSION=4.10 \
+    --build-arg MAVEN_VERSION=3.5.4 \
+    --build-arg SWARM_CLIENT_VERSION=3.24 \
+    -t ${IMAGE}:${TAG} \
+    .
+docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:$TAG
+  docker push ${IMAGE}:latest
+fi
