@@ -34,6 +34,17 @@ x-default-jenkins-slave-environment:
 
 services:
 
+  alpine:
+    image: couchbasebuild/python-alpine-build:20211101
+    environment:
+      - "JENKINS_SLAVE_NAME=python-alpine"
+      - "JENKINS_SLAVE_LABELS=alpine python3 x86_64"
+      - *default-jenkins-slave-environment-master
+      - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=couchbase-server"
+    <<: *default-jenkins-slave
+
   centos6:
     image: couchbasebuild/python-centos6-build:20210917
     environment:
