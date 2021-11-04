@@ -1,5 +1,12 @@
 # Docker container for Centos7
 
+ARG GCC_VER_MAJOR=10
+ARG GCC_VER_MINOR=2
+ARG GCC_VER_PATCH=0
+ARG ARCH=x86_64
+FROM couchbasebuild/amzn-2-gcc:${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}-${ARCH} AS gcc
+
+# This is the actual build agent base image
 FROM amazonlinux:2.0.20190228
 MAINTAINER build-team@couchbase.com
 
@@ -97,6 +104,15 @@ RUN mkdir /tmp/deploy && \
 #    yum install -y libcouchbase-devel libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
 #    cd /tmp && \
 #    rm -rf /tmp/deploy
+
+# GCC - need to redundantly declare GCC ARG here
+ARG GCC_VER_MAJOR
+ARG GCC_VER_MINOR
+ARG GCC_VER_PATCH
+# Copy gcc to /opt
+COPY --from=gcc /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH} /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}
+RUN ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/gcc /usr/local/bin/gcc${GCC_VER_MAJOR} && \
+    ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/g++ /usr/local/bin/g++${GCC_VER_MAJOR}
 
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1

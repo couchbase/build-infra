@@ -69,7 +69,7 @@ services:
     <<: *default-jenkins-slave
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20211028
+    image: couchbasebuild/sdk-amzn2-build:20211104
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
