@@ -24,8 +24,8 @@ RUN apk add --no-cache \
 
 # Create couchbase user with password-less sudo privs
 RUN set -x \
-    && addgroup couchbase \
-    && adduser couchbase -S -G couchbase \
+    && addgroup -g 1000 couchbase \
+    && adduser couchbase -u 1000 -S -G couchbase \
     && addgroup couchbase wheel \
     && echo 'couchbase:couchbase' | chpasswd \
     && sed -e 's;^# \(%wheel.*NOPASSWD.*\);\1;g' -i /etc/sudoers
