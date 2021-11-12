@@ -1,0 +1,34 @@
+#!/bin/bash -e
+
+if mount | grep /mnt/data &> /dev/null
+then
+    for volume in $(tr , " " </opt/build-team/vars/volumes)
+    do
+        if [ ! -e /mnt/data/${volume} ]
+        then
+            mkdir -p /mnt/data/${volume}
+            chown 1000:1000 /mnt/data/${volume}
+        fi
+    done
+
+    # Redirect container
+    docker run -d \
+        --name https-redirect \
+        --restart unless-stopped \
+        -v /opt/build-team/configs/nginx-https-redirect.conf:/etc/nginx/nginx.conf \
+        -p $(</opt/build-team/vars/redirect_port):80 \
+        nginx
+
+    # App container
+    docker run -d \
+        --name gerrit \
+        --restart unless-stopped \
+        -v /home/ec2-user/.ssh::/var/gerrit/.ssh \
+        -e CANONICAL_WEB_URL="$(</opt/build-team/vars/url)" \
+        $(</opt/build-team/vars/vol_mount_args) \
+        -p $(</opt/build-team/vars/web_port):$(</opt/build-team/vars/web_port) \
+        -p $(</opt/build-team/vars/git_port):$(</opt/build-team/vars/git_port) \
+        gerritcodereview/gerrit:3.1.3
+else
+    echo "FATAL: /mnt/data is not mounted"
+fi

@@ -1,0 +1,84 @@
+#!/bin/bash -ex
+TAG=$(date +%Y%m%d)
+
+# If an existing volume is present, we want to fail up front
+echo "Checking to ensure no backup volume is present"
+if [ "$(aws ec2 describe-volumes --region us-east-2 --filters Name=tag:Name,Values=gerrit-backup | jq -r '.Volumes[0]')" != "null" ]
+then
+  aws sns publish --topic-arn "$(</opt/build-team/vars/sns_arn)" --subject "Gerrit backup failed" --message "ERROR: Backup volume already exists (manually delete and try again)" --region $(</opt/build-team/vars/region)
+  exit 1
+fi
+
+# We'll trap EXIT and clean up the volume if it's been created
+function cleanup() {
+    for volume in $@
+    do
+        echo "Cleaning up ${volume}"
+        sleep 1
+        umount /mnt/{backup,scratch} &>/dev/null || true
+        aws ec2 detach-volume --volume-id ${volume} --force --region $(</opt/build-team/vars/region) || true
+        sleep 5
+        aws ec2 wait volume-available --volume-ids ${volume} --region $(</opt/build-team/vars/region)
+        aws ec2 delete-volume --volume-id ${volume} --region $(</opt/build-team/vars/region)
+    done
+}
+
+echo "Creating volumes"
+export SNAPSHOT=$(aws ec2 describe-snapshots --filters "Name=volume-id,Values=$(</opt/build-team/vars/volume)"  "Name=status,Values=completed" --region $(</opt/build-team/vars/region)  | jq -r '.[]|max_by(.StartTime)|.SnapshotId')
+export BACKUP_VOLUME=$(/usr/local/bin/aws ec2 create-volume \
+                --region $(</opt/build-team/vars/region) \
+                --volume-type gp3 \
+                --iops $(</opt/build-team/vars/backup_restore_volume_iops) \
+                --throughput $(</opt/build-team/vars/backup_restore_volume_throughput) \
+                --snapshot-id ${SNAPSHOT} \
+                --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=gerrit-backup},{Key=Owner,Value=build-team},{Key=Project,Value=gerrit},{Key=Purpose,Value=backup-restore}]' \
+                --availability-zone $(</opt/build-team/vars/region)a | jq -r '.VolumeId')
+export SCRATCH_VOLUME=$(/usr/local/bin/aws ec2 create-volume \
+                --region $(</opt/build-team/vars/region) \
+                --volume-type gp3 \
+                --iops $(</opt/build-team/vars/backup_restore_volume_iops) \
+                --throughput $(</opt/build-team/vars/backup_restore_volume_throughput) \
+                --size 120 \
+                --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=gerrit-scratch},{Key=Owner,Value=build-team},{Key=Project,Value=gerrit},{Key=Purpose,Value=backup-restore}]' \
+                --availability-zone $(</opt/build-team/vars/region)a | jq -r '.VolumeId')
+
+trap "cleanup ${BACKUP_VOLUME} ${SCRATCH_VOLUME}" EXIT
+
+# Check volumes
+if [[ "${BACKUP_VOLUME}" = "" || "${SCRATCH_VOLUME}" = "" ]]
+then
+    aws sns publish --topic-arn "$(</opt/build-team/vars/sns_arn)" --subject "Gerrit backup failed" --message "ERROR: Volume creation failed" --region $(</opt/build-team/vars/region)
+    exit 1
+fi
+
+echo "Attaching volumes"
+aws ec2 wait volume-available --volume-ids ${BACKUP_VOLUME} --region $(</opt/build-team/vars/region)
+aws ec2 wait volume-available --volume-ids ${SCRATCH_VOLUME} --region $(</opt/build-team/vars/region)
+aws ec2 attach-volume --volume-id ${BACKUP_VOLUME} --instance-id `cat /var/lib/cloud/data/instance-id` --device /dev/$(</opt/build-team/vars/backup_device) --region $(</opt/build-team/vars/region)
+aws ec2 attach-volume --volume-id ${SCRATCH_VOLUME} --instance-id `cat /var/lib/cloud/data/instance-id` --device /dev/$(</opt/build-team/vars/scratch_device) --region $(</opt/build-team/vars/region)
+aws ec2 wait volume-in-use --volume-ids ${BACKUP_VOLUME} --region $(</opt/build-team/vars/region)
+aws ec2 wait volume-in-use --volume-ids ${SCRATCH_VOLUME} --region $(</opt/build-team/vars/region)
+sleep 10
+mkfs -t ext4 /dev/$(</opt/build-team/vars/scratch_device)
+
+for vol in backup scratch
+do
+    if ! grep -qs "${vol}" /proc/mounts
+    then
+        mount /mnt/${vol}
+    fi
+done
+
+cd /mnt/backup
+
+echo "Backing up"
+if ! tar -czf /mnt/scratch/backup-${TAG}.tgz \
+    $(</opt/build-team/vars/vol_list)
+then
+    aws sns publish --topic-arn "$(</opt/build-team/vars/sns_arn)" --subject "Gerrit backup failed" --message "ERROR: Couldn't create tarball" --region $(</opt/build-team/vars/region)
+else
+    aws s3 cp /mnt/scratch/backup-${TAG}.tgz s3://cb-gerrit.backups/ || \
+        aws sns publish --topic-arn "$(</opt/build-team/vars/sns_arn)" --subject "Gerrit backup failed" --message "ERROR: S3 upload failed" --region $(</opt/build-team/vars/region)
+fi
+
+rm -rf /mnt/scratch/backup-${TAG}.tgz

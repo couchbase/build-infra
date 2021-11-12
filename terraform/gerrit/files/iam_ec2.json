@@ -1,0 +1,56 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AttachDetach",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DetachVolume",
+                "ec2:AttachVolume"
+            ],
+            "Resource": [
+                "arn:aws:ec2:*:*:instance/*",
+                "arn:aws:ec2:*:*:volume/*"
+            ],
+            "Condition": {
+                "ForAllValues:StringEquals": {
+                    "ec2:ResourceTag/Project": "gerrit",
+                    "aws:RequestTag/Project": "gerrit"
+                }
+            }
+        },
+        {
+            "Sid": "WaitVolume",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeSnapshots",
+                "ec2:DescribeVolumeStatus",
+                "ec2:DescribeVolumes"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CreateVolume",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateVolume",
+                "ec2:CreateTags"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "DeleteVolume",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DeleteVolume"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/Project": "gerrit",
+                    "ec2:ResourceTag/Purpose": "backup-restore"
+                }
+            }
+        }
+    ]
+}

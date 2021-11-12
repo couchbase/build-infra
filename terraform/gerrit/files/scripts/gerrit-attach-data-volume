@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+aws ec2 detach-volume --volume-id $(</opt/build-team/vars/volume) --force --region $(</opt/build-team/vars/region) || [[ $? -eq 255 || $? -eq 254 ]] || exit 1
+aws ec2 wait volume-available --volume-ids $(</opt/build-team/vars/volume) --region $(</opt/build-team/vars/region)
+aws ec2 attach-volume --volume-id $(</opt/build-team/vars/volume) --instance-id `cat /var/lib/cloud/data/instance-id` --device /dev/$(</opt/build-team/vars/data_device) --region $(</opt/build-team/vars/region)
+aws ec2 wait volume-in-use --volume-ids $(</opt/build-team/vars/volume) --region $(</opt/build-team/vars/region)
+sleep 5

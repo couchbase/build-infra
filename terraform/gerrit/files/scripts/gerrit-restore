@@ -1,0 +1,83 @@
+#!/bin/bash -ex
+
+if [ "$1" = "" ]
+then
+    echo "Usage: restore_data.sh [filename]"
+    exit
+fi
+
+# If an existing volume is present, we want to fail up front
+if [ "$(aws ec2 describe-volumes --region us-east-2 --filters Name=tag:Name,Values=gerrit-restore | jq -r '.Volumes[0]')" != "null" ]
+then
+  aws sns publish --topic-arn "$(</opt/build-team/vars/sns_arn)" --subject "Gerrit restore failed" --message "ERROR: Restore volume already exists (manually delete and try again)" --region $(</opt/build-team/vars/region)
+  exit 1
+fi
+
+function cleanup() {
+    volume=$1
+    echo "Cleaning up ${volume}"
+    sleep 1
+    umount /mnt/scratch || true
+    aws ec2 detach-volume --volume-id ${volume} --force --region $(</opt/build-team/vars/region) || true
+    sleep 5
+    aws ec2 wait volume-available --volume-ids ${volume} --region $(</opt/build-team/vars/region)
+    aws ec2 delete-volume --volume-id ${volume} --region $(</opt/build-team/vars/region)
+}
+
+echo "Creating scratch volume for restore"
+export RESTORE_VOLUME=$(/usr/local/bin/aws ec2 create-volume \
+                --region $(</opt/build-team/vars/region) \
+                --volume-type gp3 \
+                --throughput $(</opt/build-team/vars/backup_restore_volume_throughput) \
+                --size 120 \
+                --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=gerrit-restore},{Key=Owner,Value=build-team},{Key=Project,Value=gerrit},{Key=Purpose,Value=backup-restore}]' \
+                --availability-zone $(</opt/build-team/vars/region)a | jq -r '.VolumeId')
+
+# At this point we have stuff to clean up if an error occurs
+trap "cleanup ${RESTORE_VOLUME}" EXIT
+
+aws ec2 wait volume-available --volume-ids ${RESTORE_VOLUME} --region $(</opt/build-team/vars/region)
+aws ec2 attach-volume --volume-id ${RESTORE_VOLUME} --instance-id `cat /var/lib/cloud/data/instance-id` --device /dev/$(</opt/build-team/vars/scratch_device) --region $(</opt/build-team/vars/region)
+aws ec2 wait volume-in-use --volume-ids ${RESTORE_VOLUME} --region $(</opt/build-team/vars/region)
+sleep 10
+mkfs -t ext4 /dev/$(</opt/build-team/vars/scratch_device)
+
+if ! grep -qs '/mnt/scratch' /proc/mounts
+then
+    mount /mnt/scratch
+fi
+
+cd /mnt/scratch
+
+echo "Downloading backup file"
+aws s3 cp s3://cb-gerrit.backups/$1 .
+
+echo "Removing gerrit container"
+docker rm -f gerrit || true
+
+echo "Removing redirect container"
+docker rm -f https-redirect || true
+
+echo "Bringing up nginx container - this listens on our gerrit ports to ensure users are informed the service is unavailable and to prevent failing load balancer health checks from terminating this instance mid-restore"
+docker run --name restore-placeholder --rm -d \
+    -p $(</opt/build-team/vars/redirect_port):80 \
+    -p $(</opt/build-team/vars/web_port):80 \
+    -p $(</opt/build-team/vars/git_port):80 \
+    -v /opt/build-team/configs/nginx-service-unavailable.conf:/etc/nginx/conf.d/default.conf \
+    -v /opt/build-team/static/service-unavailable.html:/usr/share/nginx/html/index.html \
+    nginx
+
+echo "Removing existing data on EBS volume"
+for vol in $(</opt/build-team/vars/vol_list)
+do
+    rm -rf /mnt/data/$vol
+done
+
+echo "Extracting backup files"
+tar -zxf $1 -C /mnt/data
+
+echo "Removing nginx container"
+docker rm -f restore-placeholder
+
+echo "Starting gerrit"
+/usr/bin/gerrit-start
