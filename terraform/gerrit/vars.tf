@@ -1,3 +1,7 @@
+data "aws_caller_identity" "current" {}
+
+variable "datacenter_cidr" {}
+
 locals {
   project = "gerrit"
   region  = "us-east-2"

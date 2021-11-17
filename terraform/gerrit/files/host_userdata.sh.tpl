@@ -49,7 +49,6 @@ popd
 pushd /tmp
 git clone https://github.com/couchbase/build-infra
 cd build-infra
-git checkout work
 cp -a terraform/gerrit/files/configs /opt/build-team
 cp -a terraform/gerrit/files/static /opt/build-team
 cp -a terraform/gerrit/files/scripts/* /usr/bin
@@ -72,17 +71,6 @@ mount /mnt/data || (
     sudo mkfs -t ext4 /dev/${data_device}
     mount /mnt/data
 )
-
-
-###########################
-# Schedule weekly backups #
-###########################
-
-# Note: backups to s3 happen weekly on Sunday mornings
-# we separately take hourly snapshots for DR purposes
-echo "00 03 * * Sun \"gerrit-backup\"" >> /tmp/cron
-crontab /tmp/cron
-rm /tmp/cron
 
 
 ############################

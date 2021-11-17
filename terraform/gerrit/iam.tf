@@ -75,3 +75,39 @@ resource "aws_iam_role_policy_attachment" "ssm_read" {
   role       = aws_iam_role.gerrit.name
   policy_arn = aws_iam_policy.ssm.arn
 }
+
+# Backups
+
+resource "aws_iam_role" "backup" {
+  name               = "${local.project}-backup"
+  assume_role_policy = data.aws_iam_policy_document.ec2.json
+}
+
+resource "aws_iam_instance_profile" "backup" {
+  name = "${local.project}-backup"
+  role = aws_iam_role.backup.name
+}
+
+resource "aws_iam_policy" "backup" {
+  name   = "${local.project}-backup"
+  policy = templatefile("./files/iam_backups.json.tpl", {
+    bucket = local.backup_bucket_name
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "backup" {
+  role       = aws_iam_role.backup.name
+  policy_arn = aws_iam_policy.backup.arn
+}
+
+resource "aws_iam_policy" "backup-passrole" {
+  name   = "${local.project}-backup-passrole"
+  policy = templatefile("./files/iam_backups_passrole.json.tpl", {
+      account_id = data.aws_caller_identity.current.account_id
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "backup-passrole" {
+  user       = "cbd-4108_server_jenkins_workers"
+  policy_arn = aws_iam_policy.backup-passrole.arn
+}

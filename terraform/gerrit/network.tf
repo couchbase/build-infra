@@ -80,3 +80,32 @@ module "ec2-load-balancer-sg" {
     "Owner" = local.owner
   }
 }
+
+module "backup-sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "3.18.0"
+
+  name        = "${local.project}-backup-sg"
+  description = "Security group for ${local.project} backups"
+  vpc_id      = "vpc-00291041ad30ebce5"
+
+  ingress_with_cidr_blocks = [
+    {
+      rule        = "ssh-tcp"
+      cidr_blocks = var.datacenter_cidr
+    },
+    {
+      rule        = "ssh-tcp"
+      cidr_blocks = "3.16.146.0/29"
+    }
+  ]
+
+  egress_cidr_blocks = [
+    "0.0.0.0/0"
+  ]
+  egress_rules = ["all-tcp"]
+
+  tags = {
+    "Owner" = local.owner
+  }
+}
