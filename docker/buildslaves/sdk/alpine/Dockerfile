@@ -26,6 +26,7 @@ RUN apk add --no-cache \
         libffi-dev \
         libunwind \
         libuv-dev \
+        libxml2-dev \
         musl-dbg \
         musl-locales \
         musl-locales-lang \
