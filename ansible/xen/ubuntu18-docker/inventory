@@ -13,7 +13,8 @@
 # 172.23.105.159 network_name="Pool-wide network associated with eth0"
 # 172.23.104.59 sr_name="Local storage01" network_name="Pool-wide network associated with eth1"
 # 172.23.110.57 sr_name=VMStore1 network_name="Pool-wide network associated with eth3"
-172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
+# 172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
+172.23.110.75 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
 
 [newvms]
 # Don't put anything here; the playbook simply requires this group to exist

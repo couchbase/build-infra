@@ -1,0 +1,59 @@
+#!/bin/bash -e
+
+usage() {
+    echo "Usage: $(basename $0) -n NAME -p XEN_PASSWORD"
+    echo "    [-m MEMORY] [-c CPUS] [-d DISKSPACE]"
+    echo "    [-s SWARM_MANAGER] [-l SWARM_LABELS]"
+    echo "Defaults: memory 20GB; cpus 8; diskpace 200GB; no Swarm"
+    exit 1
+}
+
+
+while getopts ":n:p:m:c:d:s:l:" opt; do
+    case ${opt} in
+        n)
+            NAME=${OPTARG}
+            ;;
+        p)
+            XEN_PASSWORD=${OPTARG}
+            ;;
+        m)
+            MEMORY=${OPTARG}
+            ;;
+        m)
+            MEMORY=${OPTARG}
+            ;;
+        c)
+            CPUS=${OPTARG}
+            ;;
+        d)
+            DISKSPACE=${OPTARG}
+            ;;
+        s)
+            SWARM_MANAGER="-e swarm_manager=${OPTARG}"
+            ;;
+        l)
+            SWARM_LABELS="-e swarm_labels=${OPTARG}"
+            ;;
+        \?)
+            usage
+            ;;
+        :)
+            echo "-${OPTARG} requires an argument"
+            usage
+            ;;
+    esac
+done
+
+[ -z "${NAME}" ] && usage
+[ -z "${XEN_PASSWORD}" ] && usage
+MEMORY=${MEMORY:-20}
+CPUS=${CPUS:-8}
+DISKSPACE=${DISKSPACE:-200}
+
+docker run --rm -v $(pwd):/mnt couchbasebuild/ansible-playbook:2.9.4 \
+    -v -i inventory playbook.yml \
+    -e cmdline_password=${XEN_PASSWORD} \
+    -e vm_name=${NAME} -e memory=${MEMORY} \
+    -e vcpus=${CPUS} -e disksize=${DISKSPACE} \
+    ${SWARM_MANAGER} ${SWARM_LABELS}
