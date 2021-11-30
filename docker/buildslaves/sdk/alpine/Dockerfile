@@ -72,7 +72,7 @@ RUN set -x \
     && curl -fLOs https://cmake.org/files/v$(echo ${CMAKE_VERSION} | awk 'BEGIN{FS=OFS="."} NF--')/cmake-${CMAKE_VERSION}.tar.gz \
     && tar -zxf cmake-${CMAKE_VERSION}.tar.gz \
     && cd cmake-${CMAKE_VERSION}/ \
-    && ./bootstrap && make && make install \
+    && ./bootstrap && make -j8 && make install \
     && rm -rf /tmp/deploy
 
 # Jenkins Swarm client jar
@@ -108,6 +108,10 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Set LANG
 ENV LANG=en_US.UTF-8
+
+# Temp install step for "cbdep" tool
+ARG CACHEBUST=1
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux-x64-musl -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/

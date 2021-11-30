@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-for plat in amzn? centos? debian? ubuntu??
+for plat in alpine amzn? centos? debian? ubuntu??
 do (
     cd $plat
     ./go --publish
