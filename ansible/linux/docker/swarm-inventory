@@ -10,7 +10,7 @@
 172.23.120.91  name=mega4-13.sc.couchbase.com labels=role=build
 172.23.120.111 name=mega4-14.sc.couchbase.com labels=role=build
 172.23.121.109 name=mega4-15.sc.couchbase.com labels=role=build
-172.23.121.110 name=mega4-16.sc.couchbase.com labels=role=build
+172.23.120.253 name=mega4-16.sc.couchbase.com labels=role=build
 172.23.121.111 name=mega4-17.sc.couchbase.com labels=role=build
 172.23.121.112 name=mega4-18.sc.couchbase.com labels=role=build
 172.23.121.113 name=mega4-19.sc.couchbase.com labels=role=build
@@ -62,26 +62,21 @@
 172.23.107.144 name=analytics-15.build.couchbase.com labels=cvtype=ubuntu18
 
 [cv]
-172.23.98.49   name=ubuntu12-cv-10        labels=cvtype=ubuntu12-small manager=true
-172.23.98.159  name=ubuntu16-cv-01        labels=cvtype=ubuntu16-small manager=true
-172.23.96.227  name=ubuntu18-cv-11        labels=cvtype=ubuntu18-small manager=true
-172.23.96.230  name=ubuntu18-cv-12        labels=cvtype=ubuntu18-small manager=true
-172.23.96.233  name=ubuntu18-cv-13        labels=cvtype=ubuntu18-small manager=true
-172.23.96.235  name=ubuntu18-cv-14        labels=cvtype=ubuntu18-small
-172.23.96.234  name=ubuntu18-cv-15        labels=cvtype=ubuntu18-small
-172.23.112.254 name=ubuntu18-cv-16        labels=cvtype=ubuntu18-small
-172.23.97.2    name=ubuntu18-cv-docker-01 labels=cvtype=docker
-172.23.113.18  name=ubuntu18-cv-docker-02 labels=cvtype=docker
-172.23.113.22  name=ubuntu18-cv-large-01  labels=cvtype=ubuntu18-large
-172.23.97.139  name=ubuntu18-cv-large-02  labels=cvtype=ubuntu18-large
-172.23.97.91   name=ubuntu18-cv-large-03  labels=cvtype=ubuntu18-large
-172.23.112.24  name=ubuntu18-cv-large-04  labels=cvtype=ubuntu18-large
-172.23.96.209  name=ubuntu18-cv-large-05  labels=cvtype=ubuntu18-large
-172.23.107.26  name=ubuntu18-cv-large-06  labels=cvtype=ubuntu18-large
-172.23.107.80  name=ubuntu18-cv-large-07  labels=cvtype=ubuntu18-large
-172.23.107.81  name=ubuntu18-cv-large-08  labels=cvtype=ubuntu18-large
-172.23.107.82  name=ubuntu18-cv-large-09  labels=cvtype=ubuntu18-large
-172.23.107.83  name=ubuntu18-cv-large-10  labels=cvtype=ubuntu18-large
+172.23.113.26  name=ubuntu18-cv-small-01  labels=cvtype=ubuntu18-small manager=true
+172.23.97.161  name=ubuntu18-cv-small-02  labels=cvtype=ubuntu18-small
+172.23.97.107  name=ubuntu18-cv-small-03  labels=cvtype=ubuntu18-small manager=true
+172.23.97.156  name=ubuntu18-cv-small-04  labels=cvtype=ubuntu18-small
+172.23.108.43  name=ubuntu18-cv-large-11  labels=cvtype=ubuntu18-large manager=true
+172.23.108.59  name=ubuntu18-cv-large-12  labels=cvtype=ubuntu18-large
+172.23.104.134 name=ubuntu18-cv-large-13  labels=cvtype=ubuntu18-large
+172.23.97.171  name=ubuntu18-cv-large-14  labels=cvtype=ubuntu18-large
+172.23.97.172  name=ubuntu18-cv-large-15  labels=cvtype=ubuntu18-large
+172.23.97.173  name=ubuntu18-cv-large-16  labels=cvtype=ubuntu18-large
+172.23.108.124 name=ubuntu18-cv-large-17  labels=cvtype=ubuntu18-large
+172.23.108.126  name=ubuntu18-cv-large-18  labels=cvtype=ubuntu18-large
+172.23.108.87  name=ubuntu18-cv-docker-03 labels=cvtype=docker
+172.23.97.167  name=ubuntu18-cv-docker-04 labels=cvtype=docker
+
 
 [all:vars]
 ansible_user=couchbase
