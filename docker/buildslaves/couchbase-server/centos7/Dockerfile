@@ -35,6 +35,7 @@ RUN chmod +x /tini
 # * Packages from the base CentOS repositories
 RUN yum install --setopt=keepcache=0 -y \
                 binutils \
+                ca-certificates \
                 ed \
                 glibc-devel \
                 make \
@@ -142,7 +143,7 @@ RUN cbdep install -d /home/couchbase miniconda3-py39 4.9.2 && \
 
 # Still need paramiko in python2 for testrunner (necessary at least for simple-test,
 # which runs in the build image rather than the full CV image)
-RUN sudo yum install -y epel-release && sudo yum install -y python-pip && \
+RUN yum install -y epel-release && yum install -y python-pip && \
     pip install --upgrade "pip < 21.0" && \
     pip install paramiko && \
     yum clean all
