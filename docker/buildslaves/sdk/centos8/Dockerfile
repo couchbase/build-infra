@@ -1,7 +1,7 @@
 # Docker container for Centos8
 
 FROM centos:8
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
@@ -86,9 +86,6 @@ RUN mkdir /tmp/deploy && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy
 
-# Jenkins Swarm client jar
-RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.24/swarm-client-3.24.jar -o /usr/local/lib/swarm-client.jar
-
 # Ensure /opt/cbdeps is writable
 RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
@@ -108,7 +105,7 @@ RUN mkdir /tmp/deploy && \
 
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
-RUN curl http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/

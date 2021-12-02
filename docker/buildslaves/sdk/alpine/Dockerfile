@@ -7,7 +7,7 @@ ARG SWARM_CLIENT_VERSION
 ARG GRADLE_VERSION
 ARG MAVEN_VERSION
 
-LABEL maintainer=build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 ENV PATH="/usr/local/bin:${PATH}"
 
@@ -74,9 +74,6 @@ RUN set -x \
     && cd cmake-${CMAKE_VERSION}/ \
     && ./bootstrap && make -j8 && make install \
     && rm -rf /tmp/deploy
-
-# Jenkins Swarm client jar
-RUN curl -Lfs https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -o /usr/local/lib/swarm-client.jar
 
 # sbt
 RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing sbt

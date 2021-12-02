@@ -1,7 +1,7 @@
 
 # Docker container for Debian - testing tag is used for debootstrap freshness
 FROM debian:testing-20200720-slim
-LABEL maintainer=build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 ENV LANG=en_US.UTF-8
 
 USER root
@@ -46,9 +46,6 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
-
-# Jenkins Swarm client jar
-RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar
 
 COPY pbuilderrc /etc/pbuilderrc
 

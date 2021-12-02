@@ -6,10 +6,9 @@ IMAGE=couchbasebuild/sdk-ubuntu14-build
 
 mkdir -p build
 INFRADIR=$(git rev-parse --show-toplevel)
-cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
+cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 
-docker build \
-    --add-host downloads.build.couchbase.com:172.23.126.166 \
+docker build --pull \
     --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
     --build-arg CACHEBUST=$(date +%Y%m%d-%H%M%S) \
     -t ${IMAGE}:${TAG} \

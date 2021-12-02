@@ -62,7 +62,7 @@ add_hostkeys() {
 
 export -f add_hostkeys
 
-# Handle invocations by the ECS plugin
+# Prep for profiledata
 [[ "$1" == "-url" || "$1" == "swarm" ]] && {
   sudo mkdir -p /run/secrets
   if [ "${profiledata_key}" != "" -a ! -f /run/secrets/profile_sync ]
@@ -129,7 +129,7 @@ command -v gpg >/dev/null 2>&1 && {
     shopt -u nullglob
 }
 
-# if first argument is "swarm", run the (Jenkins) swarm jar with any arguments
+# if first argument is "swarm", download and run the Jenkins swarm jar with any arguments
 [[ "$1" == "swarm" ]] && {
     unset profiledata_key
 
@@ -137,13 +137,15 @@ command -v gpg >/dev/null 2>&1 && {
     jenkins_user=$(echo -n ${jenkins_user:-$(cat /run/secrets/jenkins_master_username)} | xargs)
     shift
 
+    curl --fail -o /tmp/swarm-client.jar ${JENKINS_MASTER}/swarm/swarm-client.jar
+
     if $(sudo --help &>/dev/null && :)
     then
       exec sudo -u couchbase --set-home --preserve-env \
         env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
         PATH=/usr/local/bin:/usr/bin:/bin \
         java $JAVA_OPTS \
-        -jar /usr/local/lib/swarm-client.jar \
+        -jar /tmp/swarm-client.jar \
         -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
         -master "${JENKINS_MASTER}" \
         -mode ${AGENT_MODE} \
@@ -161,7 +163,7 @@ command -v gpg >/dev/null 2>&1 && {
         env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
         PATH=/usr/local/bin:/usr/bin:/bin \
         java $JAVA_OPTS \
-        -jar /usr/local/lib/swarm-client.jar \
+        -jar /tmp/swarm-client.jar \
         -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
         -master "${JENKINS_MASTER}" \
         -mode ${AGENT_MODE} \

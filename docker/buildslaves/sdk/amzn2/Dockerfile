@@ -8,7 +8,7 @@ FROM couchbasebuild/amzn-2-gcc:${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH
 
 # This is the actual build agent base image
 FROM amazonlinux:2.0.20190228
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 RUN yum clean all && \
@@ -76,9 +76,6 @@ RUN mkdir /tmp/deploy && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy
 
-# Jenkins Swarm client jar
-RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.8/swarm-client-3.8.jar -o /usr/local/lib/swarm-client.jar
-
 # Ensure /opt/cbdeps is writable
 RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
@@ -116,7 +113,7 @@ RUN ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/gcc /
 
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
-RUN curl http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/

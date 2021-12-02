@@ -4,7 +4,7 @@
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/sdk-mock
 
-docker build --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+docker build --pull --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
     -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]

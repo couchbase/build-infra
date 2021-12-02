@@ -6,9 +6,9 @@ IMAGE=couchbasebuild/sdk-centos7-signing
 
 mkdir -p build
 INFRADIR=$(git rev-parse --show-toplevel)
-cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_start.sh build
+cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 
-docker build \
+docker build --pull \
     --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
     --build-arg CACHEBUST=$(date +%Y%m%d-%H%M%S) \
     -t ${IMAGE}:${TAG} .

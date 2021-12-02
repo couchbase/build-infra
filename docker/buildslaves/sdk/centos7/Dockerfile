@@ -1,7 +1,7 @@
 # Docker container for Centos7
 
 FROM centos:centos7.4.1708
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 RUN yum clean all && \
@@ -79,9 +79,6 @@ RUN mkdir /tmp/deploy && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm /usr/local/bin/cmake-gui && \
     rm -rf /tmp/deploy
-
-# Jenkins Swarm client jar
-RUN curl https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.24/swarm-client-3.24.jar -o /usr/local/lib/swarm-client.jar
 
 # Ensure /opt/cbdeps is writable
 RUN mkdir /opt/cbdeps && \
