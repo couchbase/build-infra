@@ -8,6 +8,7 @@ RUN yum clean all && yum swap -y fakesystemd systemd
 
 RUN yum install --setopt=keepcache=0 -y \
 		deltarpm \
+                ca-certificates \
 		git \
 		sudo \
 		which \

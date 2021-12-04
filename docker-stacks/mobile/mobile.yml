@@ -101,7 +101,7 @@ services:
       - jenkins
 
   litecore-centos72:
-    image: couchbasebuild/centos-72-litecore-build:20210722
+    image: couchbasebuild/centos-72-litecore-build:20211203
     init: true
     user: couchbase
     environment:
@@ -126,7 +126,7 @@ services:
       - jenkins
 
   litecore-centos73:
-    image: couchbasebuild/centos-73-litecore-build:20210722
+    image: couchbasebuild/centos-73-litecore-build:20211203
     init: true
     user: couchbase
     environment:
