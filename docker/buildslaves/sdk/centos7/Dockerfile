@@ -43,6 +43,7 @@ RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
                 man \
                 ncurses-devel \
                 numactl-devel \
+                oniguruma-devel \
                 openssl-devel \
                 openssh-clients \
                 perl-XML-XPath \

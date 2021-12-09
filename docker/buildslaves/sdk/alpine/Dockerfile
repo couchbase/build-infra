@@ -30,6 +30,7 @@ RUN apk add --no-cache \
         musl-dbg \
         musl-locales \
         musl-locales-lang \
+        oniguruma-dev \
         openjdk8 \
         openssh-client \
         openssl-dev \

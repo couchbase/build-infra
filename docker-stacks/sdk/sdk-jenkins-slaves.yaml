@@ -60,7 +60,7 @@ x-default-jenkins-slave-environment:
 services:
 
   alpine:
-    image: couchbasebuild/sdk-alpine-build:20211201
+    image: couchbasebuild/sdk-alpine-build:20211209
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine"
       - "JENKINS_SLAVE_LABELS=sdk alpine"
@@ -87,7 +87,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20211201
+    image: couchbasebuild/sdk-centos7-build:20211209
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"
