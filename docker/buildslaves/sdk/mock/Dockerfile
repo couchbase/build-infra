@@ -1,6 +1,6 @@
 # Docker container for Centos8
 
-FROM couchbasebuild/sdk-centos8-build:20211201
+FROM couchbasebuild/sdk-centos8-build:20211209
 LABEL maintainer="build-team@couchbase.com"
 
 USER root

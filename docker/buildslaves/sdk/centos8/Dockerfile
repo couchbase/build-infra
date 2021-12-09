@@ -33,21 +33,24 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.n
 
 # * Packages from the base CentOS repository and EPEL
 RUN dnf install -y \
-                ed \
-                glibc.i686 \
                 bzip2-devel \
-                libicu \
+                cmake \
+                ed \
+                git \
+                glibc.i686 \
                 libev-devel \
                 libevent-devel \
                 libffi-devel \
-                libxml2-devel \
+                libicu \
                 libunwind-devel \
-                openssl-devel \
+                libxml2-devel \
                 make \
                 man \
                 ncurses-devel \
                 numactl-devel \
-                openssh-clients openssl-devel \
+                oniguruma-devel \
+                openssh-clients \
+                openssl-devel \
                 python3-devel \
                 python3-pip \
                 python3-virtualenv \
@@ -57,8 +60,6 @@ RUN dnf install -y \
                 tar \
                 unzip \
                 which \
-                git \
-                cmake \
                 wget
 
 # Dev basic tools

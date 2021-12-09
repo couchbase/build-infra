@@ -96,7 +96,7 @@ services:
     <<: *default-jenkins-slave
 
   centos8:
-    image: couchbasebuild/sdk-centos8-build:20211201
+    image: couchbasebuild/sdk-centos8-build:20211209
     environment:
       - "JENKINS_SLAVE_NAME=build-centos8"
       - "JENKINS_SLAVE_LABELS=sdk centos8"
