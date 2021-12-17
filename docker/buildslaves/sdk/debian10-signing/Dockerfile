@@ -27,6 +27,11 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
+# Create "docker" group for gid 999 to match group on Swarm hosts,
+# and add "couchbase" user to that group
+RUN groupadd docker -g 999 && \
+    usermod -a -G docker couchbase
+
 # Update locale
 RUN apt-get update && \
     apt-get install -y locales && \

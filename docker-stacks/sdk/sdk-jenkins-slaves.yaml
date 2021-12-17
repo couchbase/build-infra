@@ -186,10 +186,10 @@ services:
         target: /run/secrets/jenkins_master_password
 
   debian10-signing:
-    image: couchbasebuild/sdk-debian10-signing:20211201
+    image: couchbasebuild/sdk-debian10-signing:20211216
     environment:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
-      - "JENKINS_SLAVE_LABELS=debian10-signing"
+      - "JENKINS_SLAVE_LABELS=debian10-signing docker"
       - *default-jenkins-slave-environment-master
     <<: *default-jenkins-slave
     deploy:
@@ -220,6 +220,15 @@ services:
         target: jenkins_master_username
       - source: jenkins_master_password.20210721
         target: /run/secrets/jenkins_master_password
+      - source: docker_config_20210719
+        target: /home/couchbase/.docker/config.json
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
 
 
 secrets:
