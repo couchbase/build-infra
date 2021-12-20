@@ -27,7 +27,7 @@ export default function Queue(props) {
         function getQueue() {
             fetch(`http://${process.env.REACT_APP_API}/api/v1/queue`).then(res => res.json().then(x => {
                 setQueue(x)
-            }))
+            })).catch(() => console.log("Queue empty"))
         }
 
         getQueue()

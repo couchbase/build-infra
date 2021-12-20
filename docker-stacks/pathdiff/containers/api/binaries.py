@@ -1,6 +1,7 @@
 import db
 import json
 import os
+import re
 import redis
 from ast import literal_eval
 from celery import Celery
@@ -36,7 +37,7 @@ def get_files(distro=None, product=None, edition=None, version=None, build=None,
             "version": version,
             "edition": edition,
             "build": build,
-            "files": sorted(json.loads(existing_listing[0][1])),
+            "files": [ f for f in sorted(json.loads(existing_listing[0][1])) if not re.search('\.so[0-9.]*$', f) ],
             "paths": sorted(set(os.path.dirname(binary) for binary in json.loads(existing_listing[0][1]))),
             "msg": existing_listing[0][2].decode("utf-8") if existing_listing[0][2] != None else ""
         }))

@@ -4,6 +4,7 @@ ENV REACT_APP_API=pathdiff.build.couchbase.com:5000
 
 COPY . /app
 WORKDIR /app
+
 RUN set -x \
     && yarn install \
     && yarn build

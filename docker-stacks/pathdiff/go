@@ -1,15 +1,17 @@
 #!/bin/bash -e
 
 export TAG=$(date '+%Y-%m-%d')
-export CURRENT_TAG=2021-10-21
+export PRODUCTION_TAG=2021-12-20
 export DATADIR=/opt/pathdiff/data
+export DOCKER_SOCKET=/var/run/docker.sock
 
 case "$1" in
     "--dev")
-        export DATADIR=/tmp/pathdiff/dev
-        export TAG="dev"
+        export DATADIR=/tmp/pathdiffdb
+        export TAG=dev
         # We do a bare build for dev - this applies the .override.yml
         # automatically
+        mkdir -p ${DATADIR}
         docker compose build
         docker compose up --remove-orphans
         ;;
@@ -19,7 +21,7 @@ case "$1" in
         docker compose push
         ;;
     "--deploy")
-        export TAG=${CURRENT_TAG}
+        export TAG=${PRODUCTION_TAG}
         docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c docker-compose.yml pathdiff
         ;;
 esac

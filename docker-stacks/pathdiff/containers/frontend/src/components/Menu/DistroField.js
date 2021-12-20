@@ -25,10 +25,10 @@ export default function MenuField(props) {
 
     useEffect(() => {
         const apiUrl = `http://${process.env.REACT_APP_API}/api/v1/distros`
-        fetch(apiUrl).then(res => res.json().then(json => {
-            if (!distro) setDistro(json[0])
-            setDistros(json)
-        }))
+            fetch(apiUrl)?.then(res => res?.json()?.then(json => {
+                if (!distro) setDistro(json[0])
+                setDistros(json)
+            })).catch(() => console.log("No distros found"))
     }, [distro, setDistro, setDistros])
 
     return (
