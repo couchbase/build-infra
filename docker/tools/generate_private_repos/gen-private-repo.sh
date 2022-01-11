@@ -5,7 +5,7 @@
 WORK_DIR=/home/couchbase
 cd ${WORK_DIR}
 rm -rf manifest
-git clone git://github.com/couchbase/manifest > /dev/null
+git clone ssh://git@github.com/couchbase/manifest > /dev/null
 
 # Run generate_private_repos program
 [[ "$1" == "default" ]] && {

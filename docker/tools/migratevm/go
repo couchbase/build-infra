@@ -6,7 +6,7 @@ IMAGE=couchbasebuild/migrate-vm
 if [ -e migrate-vm ]; then
   (cd migrate-vm; git pull)
 else
-  git clone git://github.com/djamps/migrate-vm
+  git clone ssh://git@github.com/djamps/migrate-vm
 fi
 
 docker build -t $IMAGE:$TAG .

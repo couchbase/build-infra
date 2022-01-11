@@ -94,7 +94,7 @@ RUN set -x \
 RUN set -x \
     && mkdir /tmp/deploy \
     && cd /tmp/deploy \
-    && git clone git://github.com/couchbase/libcouchbase.git \
+    && git clone ssh://git@github.com/couchbase/libcouchbase.git \
     && cd libcouchbase && mkdir build && cd build \
     && ../cmake/configure \
     && make \

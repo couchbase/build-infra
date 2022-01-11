@@ -11,6 +11,6 @@ The patterns are described in patterns.json. Environment variables can be passed
 
 These default to:
 
-MANIFEST_URL: git://github.com/couchbase/manifest
+MANIFEST_URL: ssh://git@github.com/couchbase/manifest
 MANIFEST_FILE: branch-master.xml
 MANIFEST_GROUPS: analytics,backup,build,cbgt,default,enterprise,kv,n1fty,packaging,query
