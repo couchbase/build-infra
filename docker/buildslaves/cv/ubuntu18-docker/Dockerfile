@@ -1,6 +1,6 @@
 # Docker-enabled container for CV
 
-FROM couchbasebuild/server-ubuntu18-build:20211007
+FROM couchbasebuild/server-ubuntu18-build:20220111
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION

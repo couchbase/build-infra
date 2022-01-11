@@ -361,7 +361,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20210827
+    image: couchbasebuild/server-ubuntu18-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat neo master x86_64"
@@ -371,7 +371,7 @@ services:
     <<: *default-jenkins-two-agent
 
   ubuntu18-clang9:
-    image: couchbasebuild/server-ubuntu18-clang9-build:20210831
+    image: couchbasebuild/server-ubuntu18-clang9-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu18 ubuntu18.04 x86_64"
