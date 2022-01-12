@@ -17,14 +17,9 @@ USER root
 # Work around odd RPM database problems - some from https://github.com/moby/moby/issues/10180
 RUN yum clean all && rpm --rebuilddb && yum install -y yum-plugin-ovl deltarpm && yum clean all
 
-# Jenkins Swarm jar
+# JDK for Jenkins
 RUN yum install -y java-1.8.0-openjdk-headless curl && \
     yum clean all
-
-ARG SWARM_CLIENT_VER
-RUN curl --fail \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER

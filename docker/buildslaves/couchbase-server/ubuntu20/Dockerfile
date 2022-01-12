@@ -25,16 +25,11 @@ RUN set -x \
     && echo 'couchbase:couchbase' | chpasswd \
     && sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# JDK and Jenkins Swarm jar
+# JDK for Jenkins
 RUN set -x \
     && apt-get update \
     && apt-get install -y openjdk-11-jre-headless \
     && apt-get clean
-
-ARG SWARM_CLIENT_VER
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # Install tzdata, telling it to skip user interaction
 RUN set -x \
@@ -78,7 +73,7 @@ RUN set -x \
     && mkdir /tmp/deploy \
     && curl -f https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh \
     && (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local \
-    && curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo \
+    && curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo \
     && cd /tmp && rm -rf /tmp/deploy
 

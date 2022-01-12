@@ -115,12 +115,12 @@ services:
   # be kept current. Its presence here is required to allow EC2 instances
   # to discover the correct image.
   amzn2_aarch64:
-    image: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20210909-aarch64
+    image: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20220111-aarch64
     deploy:
       replicas: 0
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20210909-x86_64
+    image: couchbasebuild/server-amzn2-build:20220111-x86_64
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"
@@ -141,7 +141,7 @@ services:
     <<: *default-jenkins-one-agent
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20211201
+    image: couchbasebuild/server-centos7-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat neo master x86_64"
@@ -198,7 +198,7 @@ services:
     <<: *default-jenkins-secrets
 
   centos7-asan:
-    image: couchbasebuild/server-centos7-build:20211201
+    image: couchbasebuild/server-centos7-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
       - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat neo x86_64"
@@ -381,7 +381,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu20-clang9:
-    image: couchbasebuild/server-ubuntu20-clang9-build:20211027
+    image: couchbasebuild/server-ubuntu20-clang9-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20-clang9"
       - "JENKINS_SLAVE_LABELS=clang9 ubuntu20 ubuntu20.04 x86_64"
@@ -391,7 +391,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20211027
+    image: couchbasebuild/server-ubuntu20-build:20220111
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
@@ -402,7 +402,7 @@ services:
     <<: *default-jenkins-two-agent
 
   centos7_unittests:
-    image: couchbasebuild/server-centos7-build:20211201
+    image: couchbasebuild/server-centos7-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=unit-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
@@ -412,7 +412,7 @@ services:
     <<: *default-jenkins-two-agent-with-ipv6
 
   ubuntu20_unittests:
-    image: couchbasebuild/server-ubuntu20-build:20211027
+    image: couchbasebuild/server-ubuntu20-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=unit-ubuntu20"
       - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"

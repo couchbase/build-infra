@@ -14,14 +14,9 @@ LABEL maintainer="build-team@couchbase.com"
 USER root
 RUN yum -y update; yum clean all
 
-# Jenkins Swarm jar
+# JDK for Jenkins
 RUN yum install -y java-1.8.0-openjdk-headless curl && \
     yum clean all
-
-ARG SWARM_CLIENT_VER
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base Amazon Linux 2 repositories
@@ -143,7 +138,7 @@ RUN set -x \
     rm -fr /tmp/deploy
 
 # * repo
-RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
 # * Install cbdep
