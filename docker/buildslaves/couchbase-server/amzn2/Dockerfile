@@ -190,6 +190,12 @@ RUN set -x \
 ARG ASCIIDOCTOR_VER
 RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 
+# Patchelf
+RUN set -x \
+    && amazon-linux-extras install epel -y \
+    && yum install -y patchelf \
+    && yum clean all
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 

@@ -115,12 +115,12 @@ services:
   # be kept current. Its presence here is required to allow EC2 instances
   # to discover the correct image.
   amzn2_aarch64:
-    image: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20220111-aarch64
+    image: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20220113-aarch64
     deploy:
       replicas: 0
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20220111-x86_64
+    image: couchbasebuild/server-amzn2-build:20220113-x86_64
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"
@@ -151,7 +151,7 @@ services:
     <<: *default-jenkins-three-agent
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20211005
+    image: couchbasebuild/server-linux-build:20220113
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
       - "JENKINS_SLAVE_LABELS=server linux all monster neo master x86_64"
