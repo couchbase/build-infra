@@ -3,12 +3,16 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-debian8-alice-build
+. ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 
-docker build -t ${IMAGE}:${TAG} .
+docker build -t ${IMAGE}:${TAG} \
+  --build-arg OPENSSH_VER=${OPENSSH} \
+  .
+
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then

@@ -130,7 +130,7 @@ services:
     <<: *default-jenkins-two-agent
 
   centos6:
-    image: couchbasebuild/server-centos6-build:20210722
+    image: couchbasebuild/server-centos6-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-centos6"
       - "JENKINS_SLAVE_LABELS=server centos6 vulcan alice mad-hatter x86_64"
@@ -230,7 +230,7 @@ services:
     <<: *default-jenkins-three-agent
 
   debian8-alice:
-    image: couchbasebuild/server-debian8-alice-build:20220114
+    image: couchbasebuild/server-debian8-alice-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8-alice"
       - "JENKINS_SLAVE_LABELS=server debian8 vulcan alice x86_64"
@@ -240,7 +240,7 @@ services:
     <<: *default-jenkins-one-agent
 
   debian8:
-    image: couchbasebuild/server-debian8-build:20220114
+    image: couchbasebuild/server-debian8-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
       - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter cheshire-cat neo master x86_64"
@@ -280,7 +280,7 @@ services:
     <<: *default-jenkins-one-agent
 
   suse11:
-    image: couchbasebuild/server-suse11-build:20220114
+    image: couchbasebuild/server-suse11-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-suse11"
       - "JENKINS_SLAVE_LABELS=server suse11 vulcan alice mad-hatter master x86_64"
@@ -321,7 +321,7 @@ services:
     <<: *default-jenkins-two-agent
 
   ubuntu14:
-    image: couchbasebuild/server-ubuntu14-build:20220114
+    image: couchbasebuild/server-ubuntu14-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu14"
       - "JENKINS_SLAVE_LABELS=server ubuntu14.04 ubuntu14 vulcan alice x86_64"

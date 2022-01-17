@@ -104,6 +104,19 @@ RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
 ARG ASCIIDOCTOR_VER
 RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 
+# OpenSSH
+ARG OPENSSH_VER
+RUN set -x \
+    && mkdir -p /tmp/src \
+    && cd /tmp/src \
+    && curl --fail -LO https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz \
+    && tar --strip-components=1 -xvf openssh-${OPENSSH_VER}.tar.gz \
+    && rm -f openssh-${OPENSSH_VER}.tar.gz \
+    && ./configure --prefix=/usr \
+    && make \
+    && make install \
+    && rm -rf /tmp/src
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 

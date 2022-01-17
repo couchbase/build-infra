@@ -38,6 +38,8 @@ ASCIIDOCTOR=2.0.16  # amzn2, centos6, centos7, centos8, debian10, debian8, debia
 JNLP_AGENT=4.3     # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
 TINI=0.18.0        # amzn2, centos7, debian8, debian9, debian10, rhel8, suse15, ubuntu16, ubuntu18
 DOCKER=20.10.8     # single
+OPENSSH=8.8p1      # centos6, debian8, debian8-alice, suse11, ubuntu14
+OPENSSL=1.1.1m     # suse11
 
 # Ours
 CBDEP=1.0.4

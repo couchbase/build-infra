@@ -9,6 +9,26 @@ FROM couchbasebuild/server-suse11-build:20180713
 ADD https://storage.googleapis.com/git-repo-downloads/repo /usr/local/bin/repo
 RUN chmod a+x /usr/local/bin/repo
 
+# OpenSSL
+ARG OPENSSL_VER
+ADD build/openssl-${OPENSSL_VER}.tar.gz /opt/src
+RUN set -x \
+    && cd /opt/src/openssl-${OPENSSL_VER} \
+    && ./config --prefix=/usr \
+    && make \
+    && make install \
+    && rm -rf /opt/src/openssl-${OPENSSL_VER}
+
+# OpenSSH
+ARG OPENSSH_VER
+ADD build/openssh-${OPENSSH_VER}.tar.gz /opt/src
+RUN set -x \
+    && cd /opt/src/openssh-${OPENSSH_VER} \
+    && ./configure --prefix=/usr \
+    && make \
+    && make install \
+    && rm -rf /opt/src/openssh-${OPENSSH_VER}
+
 RUN zypper install -y rsync && zypper clean
 
 RUN rm -rf /home/couchbase/.ssh

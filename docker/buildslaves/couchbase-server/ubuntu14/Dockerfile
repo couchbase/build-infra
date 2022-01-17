@@ -14,6 +14,19 @@ RUN set -x \
         && apt-get install rsync \
         && apt-get clean
 
+# OpenSSH
+ARG OPENSSH_VER
+RUN set -x \
+    && mkdir -p /tmp/src \
+    && cd /tmp/src \
+    && curl --fail -LO https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz \
+    && tar --strip-components=1 -xvf openssh-${OPENSSH_VER}.tar.gz \
+    && rm -f openssh-${OPENSSH_VER}.tar.gz \
+    && ./configure --prefix=/usr \
+    && make \
+    && make install \
+    && rm -rf /tmp/src
+
 RUN rm -rf /home/couchbase/.ssh
 
 COPY build/couchbuilder_start.sh /usr/sbin/

@@ -21,6 +21,19 @@ RUN set -x \
   && chmod 755 miniconda2.sh \
   && ./miniconda2.sh -b -f -p /home/couchbase/miniconda2
 
+# OpenSSH
+ARG OPENSSH_VER
+RUN set -x \
+    && mkdir -p /tmp/src \
+    && cd /tmp/src \
+    && curl --fail -LO https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz \
+    && tar --strip-components=1 -xvf openssh-${OPENSSH_VER}.tar.gz \
+    && rm -f openssh-${OPENSSH_VER}.tar.gz \
+    && ./configure --prefix=/usr \
+    && make \
+    && make install \
+    && rm -rf /tmp/src
+
 ENV AGENT_VERSION=4.3
 
 RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \

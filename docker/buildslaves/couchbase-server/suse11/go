@@ -3,6 +3,7 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-suse11-build
+. ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -34,8 +35,23 @@ then
     curl -o build/swarm-client-3.17.jar \
         https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar
 fi
+if [ ! -e build/openssh-${OPENSSH}.tar.gz ]
+then
+    curl -o build/openssh-${OPENSSH}.tar.gz \
+        https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH}.tar.gz
+fi
+if [ ! -e build/openssl-${OPENSSL}.tar.gz ]
+then
+    curl -o build/openssl-${OPENSSL}.tar.gz \
+        https://www.openssl.org/source/openssl-${OPENSSL}.tar.gz
+fi
 
-docker build -t ${IMAGE}:${TAG} .
+
+docker build -t ${IMAGE}:${TAG} \
+  --build-arg OPENSSL_VER=${OPENSSL} \
+  --build-arg OPENSSH_VER=${OPENSSH} \
+  .
+
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then

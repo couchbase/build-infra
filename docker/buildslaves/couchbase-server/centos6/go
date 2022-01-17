@@ -3,6 +3,7 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-centos6-build
+. ../versions
 
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
@@ -18,7 +19,10 @@ then
         couchbasebuild/centos-6-gcc:7.3.0 \
         cp -a /usr/local /output
 fi
-docker build -t ${IMAGE}:${TAG} .
+docker build -t ${IMAGE}:${TAG} \
+  --build-arg OPENSSH_VER=${OPENSSH} \
+  .
+
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then
