@@ -12,7 +12,7 @@ LABEL maintainer="build-team@couchbase.com"
 USER root
 
 # Install SSH server
-RUN apt-get update && \
+RUN apt-get update --allow-releaseinfo-change && \
     apt-get install -y openssh-server sudo curl && \
     rm -f /var/cache/apt/archives/*.deb && \
     mkdir /var/run/sshd # update 3
@@ -24,7 +24,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# Jenkins Swarm jar and JDK for Jenkins.
+# JDK for Jenkins.
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
     curl -Lf https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
@@ -33,11 +33,6 @@ RUN mkdir /tmp/deploy && \
     ln -s jdk* java && \
     for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
     rm -rf /tmp/deploy
-
-ARG SWARM_CLIENT_VER
-RUN curl -f \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER
@@ -92,7 +87,7 @@ ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
     curl -f https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
     (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
-    curl -f https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
+    curl -f https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo && \
     cd /tmp && rm -rf /tmp/deploy
 

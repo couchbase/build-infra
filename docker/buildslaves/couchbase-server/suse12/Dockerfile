@@ -123,14 +123,10 @@ ENV JAVA_HOME=/usr/java/latest
 ENV LANG=en_US.UTF-8
 
 # Swarm client
-ARG SWARM_CLIENT_VER
 RUN set -x \
         && cd /tmp \
         && curl -LO https://cdn.azul.com/zulu/bin/zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm \
-        && rpm -i ./zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm \
-        && curl \
-                https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-                -o /usr/local/lib/swarm-client.jar
+        && rpm -i ./zulu11.43.55-ca-jdk11.0.9.1-linux.x86_64.rpm
 
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

@@ -11,7 +11,6 @@ cp -a ../../util/swarm*.properties build
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
-  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   -t ${IMAGE}:${TAG} \
   -t ${IMAGE}:latest \
   .

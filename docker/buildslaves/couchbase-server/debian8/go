@@ -27,7 +27,6 @@ docker build \
   --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
-  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   --build-arg TINI_VER=${TINI} \
   -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest

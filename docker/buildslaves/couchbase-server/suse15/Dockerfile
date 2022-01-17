@@ -28,10 +28,6 @@ RUN chmod +x /tini
 
 # JDK for Jenkins
 RUN zypper -n install java-1_8_0-openjdk-headless && zypper clean
-ARG SWARM_CLIENT_VER
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
@@ -80,7 +76,7 @@ RUN ln -s /usr/bin/ccache /home/couchbase/bin/gcc && \
     ln -s /usr/bin/ccache /home/couchbase/bin/c++
 
 # * repo
-RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
 # * Install cbdep

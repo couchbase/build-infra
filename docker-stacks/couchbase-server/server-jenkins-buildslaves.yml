@@ -230,7 +230,7 @@ services:
     <<: *default-jenkins-three-agent
 
   debian8-alice:
-    image: couchbasebuild/server-debian8-alice-build:20210721
+    image: couchbasebuild/server-debian8-alice-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8-alice"
       - "JENKINS_SLAVE_LABELS=server debian8 vulcan alice x86_64"
@@ -240,7 +240,7 @@ services:
     <<: *default-jenkins-one-agent
 
   debian8:
-    image: couchbasebuild/server-debian8-build:20210827
+    image: couchbasebuild/server-debian8-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
       - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter cheshire-cat neo master x86_64"
@@ -250,7 +250,7 @@ services:
     <<: *default-jenkins-two-agent
 
   debian9:
-    image: couchbasebuild/server-debian9-build:20210909
+    image: couchbasebuild/server-debian9-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
       - "JENKINS_SLAVE_LABELS=server debian9 vulcan alice mad-hatter cheshire-cat neo master x86_64"
@@ -260,7 +260,7 @@ services:
     <<: *default-jenkins-two-agent
 
   debian10:
-    image: couchbasebuild/server-debian10-build:20210827
+    image: couchbasebuild/server-debian10-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-debian10"
       - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter cheshire-cat neo master x86_64"
@@ -268,16 +268,6 @@ services:
       - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
-
-  rhel8:
-    image: couchbasebuild/server-rhel8-build:20210715
-    environment:
-      - "JENKINS_SLAVE_NAME=server-rhel8"
-      - "JENKINS_SLAVE_LABELS=server rhel8 cheshire-cat neo master x86_64"
-      - *server-jenkins-master
-      - *server-jenkins-node-class
-      - *node-product
-    <<: *default-jenkins-one-agent
 
   rhel8-alice:
     image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20210721
@@ -290,7 +280,7 @@ services:
     <<: *default-jenkins-one-agent
 
   suse11:
-    image: couchbasebuild/server-suse11-build:20210722
+    image: couchbasebuild/server-suse11-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-suse11"
       - "JENKINS_SLAVE_LABELS=server suse11 vulcan alice mad-hatter master x86_64"
@@ -321,7 +311,7 @@ services:
     <<: *default-jenkins-two-agent
 
   suse15:
-    image: couchbasebuild/server-suse15-build:20210827
+    image: couchbasebuild/server-suse15-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
       - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat neo master x86_64"
@@ -331,7 +321,7 @@ services:
     <<: *default-jenkins-two-agent
 
   ubuntu14:
-    image: couchbasebuild/server-ubuntu14-build:20210721
+    image: couchbasebuild/server-ubuntu14-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu14"
       - "JENKINS_SLAVE_LABELS=server ubuntu14.04 ubuntu14 vulcan alice x86_64"
@@ -341,7 +331,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu16:
-    image: couchbasebuild/server-ubuntu16-build:20210715
+    image: couchbasebuild/server-ubuntu16-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu16"
       - "JENKINS_SLAVE_LABELS=server ubuntu16.04 ubuntu16 vulcan alice mad-hatter x86_64"
@@ -361,7 +351,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu18:
-    image: couchbasebuild/server-ubuntu18-build:20220111
+    image: couchbasebuild/server-ubuntu18-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
       - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat neo master x86_64"

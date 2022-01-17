@@ -214,13 +214,9 @@ ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
 
-# Jenkins Swarm jar
+# JDK for Jenkins.
 RUN yum install -y java-11-openjdk-headless rsync && \
     yum clean all
-ARG SWARM_CLIENT_VER
-RUN curl -Lf \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # patchelf
 RUN set -x \

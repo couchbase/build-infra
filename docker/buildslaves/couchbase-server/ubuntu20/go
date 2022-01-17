@@ -17,7 +17,6 @@ docker build \
   --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
-  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
 if [ "$1" = "--publish" ]
 then

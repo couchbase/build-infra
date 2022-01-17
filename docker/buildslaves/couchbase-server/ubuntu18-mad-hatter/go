@@ -19,7 +19,6 @@ docker build \
   --build-arg GCC_VER=${GCC} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
-  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   --build-arg TINI_VER=${TINI} \
   -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
 if [ "$1" = "--publish" ]

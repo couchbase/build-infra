@@ -24,14 +24,10 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# Jenkins Swarm jar
-ARG SWARM_CLIENT_VER
+# JDK for Jenkins.
 RUN apt-get update && \
     apt-get install -y openjdk-8-jre-headless && \
     apt-get clean
-RUN curl \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER

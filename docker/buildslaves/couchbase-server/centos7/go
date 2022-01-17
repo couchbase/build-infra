@@ -31,7 +31,6 @@ docker build \
   --build-arg RUBY_INSTALL_MAJOR=${RUBY_INSTALL_MAJOR} \
   --build-arg RUBY_INSTALL_MINOR=${RUBY_INSTALL_MINOR} \
   --build-arg RUBY_INSTALL_PATCH=${RUBY_INSTALL_PATCH} \
-  --build-arg SWARM_CLIENT_VER=${SWARM_CLIENT} \
   --build-arg TINI_VER=${TINI} \
   -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
 if [ "$1" = "--publish" ]

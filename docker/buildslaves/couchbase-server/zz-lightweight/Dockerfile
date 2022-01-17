@@ -48,12 +48,6 @@ RUN set -x \
     && apt-get install -y openjdk-11-jre-headless \
     && apt-get clean
 
-# Swarm client jar
-ARG SWARM_CLIENT_VER
-RUN curl --fail \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VER}/swarm-client-${SWARM_CLIENT_VER}.jar \
-    -o /usr/local/lib/swarm-client.jar
-
 # Install python3-dev and python3-apt
 RUN set -x \
     && apt-get update \
