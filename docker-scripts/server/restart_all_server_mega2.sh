@@ -14,7 +14,7 @@ ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/ubuntu-1604-c
 # Spock Debian 9.1 builder
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts ceejatec/debian-9-couchbase-build:20170911 spock-debian9 5230 server.jenkins.couchbase.com
 # Primary zz-server-lightweight running on mega2 (same port as backup on mega3)
-${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/zz-lightweight:20220117 zz-server-lightweight 5322 server.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/zz-lightweight:20220118 zz-server-lightweight 5322 server.jenkins.couchbase.com
 
 # Sonar Scanner slave
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/centos-73-sonar-scanner-build:latest sonarscanner-centos73-01 5240 server.jenkins.couchbase.com
