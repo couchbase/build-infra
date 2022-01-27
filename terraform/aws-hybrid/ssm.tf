@@ -26,6 +26,19 @@ resource "aws_ssm_parameter" "host_docker_config" {
   }
 }
 
+resource "aws_ssm_parameter" "shared_m2_settings" {
+  name  = "jenkins-worker__shared__.m2__settings.xml"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/shared/.m2/settings.xml")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "shared"
+    Encoding = "none"
+  }
+}
+
+
 #############
 # Analytics #
 #############

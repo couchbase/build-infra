@@ -7,7 +7,7 @@ resource "aws_iam_policy" "ecr_pull" {
 }
 
 module jenkins_worker {
-    for_each = toset( ["analytics", "cv", "server"] )
+    for_each = toset(var.environments)
     source = "./jenkins_worker"
     environment = each.key
     ecr_pull_policy_arn = aws_iam_policy.ecr_pull.arn
@@ -38,4 +38,9 @@ resource "aws_iam_role" "ecs" {
 resource "aws_iam_role_policy_attachment" "ecs_task_exec" {
   role       = aws_iam_role.ecs.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role" "maven-cache" {
+  name               = "maven-cache"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
 }

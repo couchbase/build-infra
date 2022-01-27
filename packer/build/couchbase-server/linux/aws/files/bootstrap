@@ -87,6 +87,7 @@ function get_stackfile() {
   stackfiles["analytics"]="analytics/analytics-jenkins-agents.yml"
   stackfiles["cv"]="cv/cv-jenkins-agents.yml"
   stackfiles["server"]="couchbase-server/server-jenkins-buildslaves.yml"
+  stackfiles["test"]="couchbase-server/server-jenkins-buildslaves.yml"
 
   curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/master/docker-stacks/${stackfiles[${environment}]}"
 }
@@ -160,6 +161,7 @@ function retrieve_secrets() {
         #   jenkins-worker__shared__.ssh__authorized_keys = [/var/lib/docker/cb-home/].ssh/authorized_keys
         secret_path="${target_dir}$(echo ${secret} | sed -e"s/__/\//g;s/^jenkins-worker\/[^\/]*//g")"
         mkdir -p $(dirname $secret_path)
+        set +x
         param=$(aws ssm get-parameter --region $(</opt/buildteam/region) --with-decryption --name ${secret} | jq -r ".Parameter.Value")
         case $encoding in
         none)
@@ -169,6 +171,7 @@ function retrieve_secrets() {
           echo "${param}" | base64 --decode > "${secret_path}"
           ;;
         esac
+        set -x
     done
   done
 }
@@ -255,7 +258,13 @@ done
 ecr_login
 
 # Run build container
-docker run $(docker_run_args) $(container_image) default
+
+while ! docker ps --format '{{.Names}}' | grep -w worker &> /dev/null
+do
+  echo "Attempting to start container..."
+  docker run $(docker_run_args) $(container_image) default
+  sleep 5
+done
 
 # Allow this script to run at next boot
 rm /var/lib/cloud/instances/*/sem/config_scripts_user
