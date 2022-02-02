@@ -14,28 +14,29 @@ homebrew_cask_apps:
    - homebrew/cask-versions/adoptopenjdk8
 
 homebrew_installed_packages:
-  - { name: ccache, state: linked }
-  - { name: coreutils, state: linked }
-  - { name: cmake, state: linked }
-  - { name: git, state: linked }
+  - { name: automake, state: linked }
   - { name: bash-completion, state: linked }
-  - { name: python, state: linked }
-  - { name: openssl, state: linked }
-  - { name: ssh-copy-id, state: linked }
-  - { name: pass, state: linked }
-  - { name: wget, state: linked }
-  - { name: node, state: linked }
-  - { name: npm, state: linked }
-  - { name: libuv, state: linked }
+  - { name: bison, state: linked }
+  - { name: ccache, state: linked }
+  - { name: chruby, state: linked }
+  - { name: cmake, state: linked }
+  - { name: coreutils, state: linked }
+  - { name: gcc@11, state: linked }
+  - { name: gdbm, state: linked }
+  - { name: git, state: linked }
+  - { name: libcouchbase, state: linked }
   - { name: libev, state: linked }
   - { name: libevent, state: linked }
-  - { name: libcouchbase, state: linked }
-  - { name: ruby-install, state: linked }
-  - { name: chruby, state: linked }
-  - { name: gcc@11, state: linked }
-  - { name: automake, state: linked }
-  - { name: bison, state: linked }
-  - { name: readline, state: linked }
-  - { name: libyaml, state: linked }
-  - { name: gdbm, state: linked }
   - { name: libffi, state: linked }
+  - { name: libuv, state: linked }
+  - { name: libyaml, state: linked }
+  - { name: node, state: linked }
+  - { name: npm, state: linked }
+  - { name: oniguruma, state: linked }
+  - { name: openssl, state: linked }
+  - { name: pass, state: linked }
+  - { name: python, state: linked }
+  - { name: readline, state: linked }
+  - { name: ruby-install, state: linked }
+  - { name: ssh-copy-id, state: linked }
+  - { name: wget, state: linked }
