@@ -512,6 +512,16 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.build_jira_json.20220213
+        target: /home/couchbase/mobile/build/linux/.ssh/build_jira.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.build_jira_pem.20220213
+        target: /home/couchbase/mobile/build/linux/.ssh/build_jira.pem
+        mode: 0600
+        uid: "901"
+        gid: "901"
 
 configs:
   #####################
@@ -618,4 +628,10 @@ secrets:
     external: true
   # jarsigning cert from digicert
   profiledata.digicert_jks.20211202:
+    external: true
+  # jira auth
+  profiledata.build_jira_json.20220213:
+    external: true
+  # jira auth pem
+  profiledata.build_jira_pem.20220213:
     external: true

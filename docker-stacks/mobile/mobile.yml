@@ -8,7 +8,7 @@ version: "3.8"
 
 services:
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20210715
+    image: couchbasebuild/zz-lightweight:20220118
     # Still need the next two lines since zz-lightweight image is shared
     # with Server, and thus far it's not in swarm there
     init: true
