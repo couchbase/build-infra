@@ -32,6 +32,12 @@
         - python2
         - curl
 
+    - name: "Install Python 3"
+      win_chocolatey:
+        name: python3
+        version: 3.10.2
+      tags: python3
+
     - name: "Install Chrome"
       win_chocolatey:
         name: googlechrome
@@ -124,10 +130,16 @@
         protocol: TCP
 
   # Should be done last as it requires choco kbxxx pkg to install first
+  # Selectively install MSVC based on product key(s) provided.
   roles:
-    - vs2015
-    - vs2017
-    - vs2019
+    - role: vs2015
+      when: vs2015_key is defined and vs2015_key != "PLEASE_REPLACE_FROM_COMMAND_LINE"
+    - role: vs2017
+      when: vs2017_key is defined and vs2017_key != "PLEASE_REPLACE_FROM_COMMAND_LINE"
+    - role: vs2019
+      when: vs2019_key is defined and vs2019_key != "PLEASE_REPLACE_FROM_COMMAND_LINE"
+    - role: vs2022
+      when: vs2022_key is defined and vs2022_key != "PLEASE_REPLACE_FROM_COMMAND_LINE"
 
   post_tasks:
     - name: Restore basic Windows antivirus
