@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+GERRIT_VERSION=3.5.0
+
 if mount | grep /mnt/data &> /dev/null
 then
     for volume in $(tr , " " </opt/build-team/vars/volumes)
@@ -28,7 +30,7 @@ then
         $(</opt/build-team/vars/vol_mount_args) \
         -p $(</opt/build-team/vars/web_port):$(</opt/build-team/vars/web_port) \
         -p $(</opt/build-team/vars/git_port):$(</opt/build-team/vars/git_port) \
-        gerritcodereview/gerrit:3.1.3
+        gerritcodereview/gerrit:${GERRIT_VERSION}
 else
     echo "FATAL: /mnt/data is not mounted"
 fi
