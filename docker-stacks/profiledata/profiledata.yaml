@@ -343,7 +343,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
         target: /home/couchbase/couchbase-server/build/macos/.ssh/buildbot_id_dsa
         mode: 0600
         uid: "901"
@@ -384,7 +384,7 @@ services:
       #############################
       # couchbase-server/cv/linux #
       #############################
-      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
         target: /home/couchbase/couchbase-server/cv/linux/.ssh/buildbot_id_dsa
         mode: 0600
         uid: "901"
@@ -412,7 +412,7 @@ services:
       ####################################
       # couchbase-server/cv-docker/linux #
       ####################################
-      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
         target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/buildbot_id_dsa
         mode: 0600
         uid: "901"
@@ -450,7 +450,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
         target: /home/couchbase/couchbase-server/cv/macos/.ssh/buildbot_id_dsa
         mode: 0600
         uid: "901"
@@ -492,7 +492,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.ssh_privkey.buildbot_id_dsa.20200417
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
         target: /home/couchbase/mobile/build/linux/.ssh/buildbot_id_dsa
         mode: 0600
         uid: "901"
@@ -590,7 +590,7 @@ secrets:
   # ssh keys
   profiledata.ini_file.patch_via_gerrit.20200417:
     external: true
-  profiledata.ssh_privkey.buildbot_id_dsa.20200417:
+  profiledata.ssh_privkey.buildbot_id_dsa.20220225:
     external: true
   profiledata.ssh_privkey.id_buildbot.20200417:
     external: true
