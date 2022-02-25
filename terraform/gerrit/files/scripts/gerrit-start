@@ -25,7 +25,7 @@ then
     docker run -d \
         --name gerrit \
         --restart unless-stopped \
-        -v /home/ec2-user/.ssh::/var/gerrit/.ssh \
+        -v /home/ec2-user/.ssh:/var/gerrit/.ssh \
         -e CANONICAL_WEB_URL="$(</opt/build-team/vars/url)" \
         $(</opt/build-team/vars/vol_mount_args) \
         -p $(</opt/build-team/vars/web_port):$(</opt/build-team/vars/web_port) \
