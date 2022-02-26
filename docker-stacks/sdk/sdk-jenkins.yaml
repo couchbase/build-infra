@@ -22,12 +22,6 @@ services:
       - type: bind
         source: /buildteam/jenkins/sdk-jenkins-home
         target: /var/jenkins_home
-    secrets:
-      - source: buildbot_id_dsa
-        target: /var/jenkins_home/.ssh/buildbot_id_dsa
-        uid: '1000'
-        gid: '1000'
-        mode: 0400
     networks:
       - jenkins
 
@@ -36,10 +30,6 @@ services:
 # for the reason behind -Dhudson.security.csrf.requestfield
     environment:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
-
-secrets:
-  buildbot_id_dsa:
-    external: true
 
 networks:
   jenkins:
