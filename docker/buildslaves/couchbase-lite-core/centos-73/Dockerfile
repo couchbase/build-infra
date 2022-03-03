@@ -85,6 +85,21 @@ RUN yum install -y --setopt=keepcache=0 perl-Digest-SHA
 # Add cbdep tool (used by cbl-java build, at least)
 RUN curl --fail http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
+# Python 3 & pip
+RUN set -x \
+    && yum groupinstall -y "Development Tools" \
+    && yum install -y openssl-devel libffi-devel bzip2-devel \
+    && cd /usr/src \
+    && curl --fail https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tgz | tar xzf - \
+    && cd Python-3.7.7 \
+    && ./configure --enable-optimizations \
+    && make altinstall \
+    && update-alternatives --install /usr/local/bin/python3 python3 /usr/local/bin/python3.7 1 \
+    && curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
+    && /usr/local/bin/python3 /tmp/get-pip.py \
+    && rm -rf /tmp/get-pip.py /usr/src/Python-3.7.7 \
+    && yum clean all
+
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh

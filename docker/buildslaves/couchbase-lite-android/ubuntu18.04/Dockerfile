@@ -33,6 +33,12 @@ RUN apt-get update && \
     apt-get clean && \
     locale-gen en_US.UTF-8
 
+#install Python 3.7.7
+RUN set -x \
+    && apt-get update \
+    && apt-get -y install python3.7 python3.7-dev \
+    && apt-get clean
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 
@@ -72,7 +78,7 @@ RUN $SDK_CMD "tools" "platform-tools" && \
 
 # Also install maven.
 RUN cd /home/couchbase/jenkins/tools && \
-    curl --fail https://mirrors.sonic.net/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz | tar xzf -
+    curl --fail https://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz | tar xzf -
 
 # Revert so CMD will run as root.
 USER root
