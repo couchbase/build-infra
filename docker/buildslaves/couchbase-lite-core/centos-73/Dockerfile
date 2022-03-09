@@ -12,7 +12,7 @@ RUN yum install --setopt=keepcache=0 -y \
 		git \
 		sudo \
 		which \
-    yum-plugin-ovl
+                yum-plugin-ovl
 
 # clean up nsswitch
 RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
@@ -26,18 +26,6 @@ RUN groupadd -g1000 couchbase && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
     chmod 440 /etc/sudoers.d/wheel_group
-
-# Oracle JDK (for Jenkins and Analytics).
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl --fail -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
-ENV JAVA_HOME=/usr/local/java
 
 # Swarm client jar - only needed until CBD-4101 is resolved
 RUN curl --fail \
@@ -61,7 +49,7 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
      mv /tmp/ld.so.conf /etc && ldconfig
 
 # Install Couchbase Lite Core toolchain requirements
-RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip
+RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip java-11-openjdk-devel
 
 # * ccache (from source)
 RUN mkdir /tmp/deploy && \
