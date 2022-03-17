@@ -69,6 +69,28 @@ remove_glob "*.msi*" 90
 remove_glob "*.deb*" 90
 
 echo @@@@@@@@@
+echo Clean up couchbase-lite-core
+echo @@@@@@@@@
+cd ${LATESTBUILDS}/couchbase-lite-core
+
+# older than 90 days
+remove_glob "*.zip" 90
+remove_glob "*.tgz" 90
+remove_glob "*.tar.gz" 90
+
+echo @@@@@@@@@
+echo Clean up couchbase-lite-c
+echo @@@@@@@@@
+cd ${LATESTBUILDS}/couchbase-lite-c
+
+# older than 90 days
+remove_glob "*.zip" 90
+remove_glob "*.tgz" 90
+remove_glob "*.tar.gz" 90
+remove_glob "*.deb" 90
+
+
+echo @@@@@@@@@
 echo Clean up couchbase-lite-android
 echo @@@@@@@@@
 cd ${LATESTBUILDS}/couchbase-lite-android
