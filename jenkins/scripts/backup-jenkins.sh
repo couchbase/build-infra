@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 set -e
 
@@ -11,9 +11,10 @@ function show_help {
     echo "         Full backups are not ftp-ed to NAS. If this option is not given"
     echo "         full backups are not made. (Optional)"
     echo "   -i :  Instance name (eg, server_jenkins, cv_jenkins, mobile_jenkins) (Required)"
+    echo "   -x :  Exclude builds/ directories"
 }
 
-while getopts :d:j:b:i:h ARG; do
+while getopts :d:j:b:i:xh ARG; do
     case ${ARG} in
         d) JENKINS_DATA="$OPTARG"
            ;;
@@ -22,6 +23,8 @@ while getopts :d:j:b:i:h ARG; do
         b) FULL_BACKUP_DIR="$OPTARG"
            ;;
         i) INSTANCE_NAME="$OPTARG"
+           ;;
+        x) EXCLUDE_BUILDS="--exclude=jobs/*/builds"
            ;;
         h) show_help
            exit 0
@@ -70,7 +73,9 @@ DUMP=jenkins_backup.${DAYOFWEEK}.tar.gz
 set +e
 SCRIPT_DIR=$(dirname $0)
 echo "Starting minimal backup at $(/bin/date)"
-nice -n 19 tar --exclude-from ${SCRIPT_DIR}/jenkins_backup_exclusions -zcf ${DUMP} ${JENKINS_DATA} ${JENKINS_JOBS}
+nice -n 19 tar \
+    --exclude-from ${SCRIPT_DIR}/jenkins_backup_exclusions ${EXCLUDE_BUILDS} \
+    -zcf ${DUMP} ${JENKINS_DATA} ${JENKINS_JOBS}
 echo "Return code was $?"
 echo "File size is $(du -sk ${DUMP} | awk '{print $1}')K"
 echo "Minimal backup finished at $(/bin/date)"

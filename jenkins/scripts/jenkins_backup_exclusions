@@ -4,4 +4,6 @@ fingerprints/*
 jobs/*/workspace*
 jobs/*/builds/*/log
 jobs/*/builds/*/archive
-
+jobs/*/builds/*/workflow
+caches/git-*
+config-history/nodes/*_deleted_*
