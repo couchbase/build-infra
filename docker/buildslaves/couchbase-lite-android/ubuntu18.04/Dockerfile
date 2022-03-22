@@ -36,8 +36,12 @@ RUN apt-get update && \
 #install Python 3.7.7
 RUN set -x \
     && apt-get update \
-    && apt-get -y install python3.7 python3.7-dev \
+    && apt-get -y install python3.7 python3.7-dev python3-venv python3.7-venv python3-pip \
     && apt-get clean
+
+#set python3.7 as default python3 instead of python3.6
+RUN rm -f /usr/bin/python3 \
+    && ln -s /usr/bin/python3.7 /usr/bin/python3
 
 # Set LANG
 ENV LANG=en_US.UTF-8

@@ -43,7 +43,7 @@ services:
       - nfs
 
   lite-android-ubuntu18:
-    image: couchbasebuild/ubuntu1804-mobile-lite-android:20220214
+    image: couchbasebuild/ubuntu1804-mobile-lite-android:20220322
     init: true
     user: couchbase
     environment:
