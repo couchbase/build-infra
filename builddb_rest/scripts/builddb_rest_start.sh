@@ -4,7 +4,7 @@
 # is available
 cd /home/couchbase
 rm -rf product-metadata
-git clone ssh://git@github.com/couchbase/product-metadata > /dev/null
+git clone https://github.com/couchbase/product-metadata > /dev/null
 
 # Start pserve (as new, long-running, foreground process)
 [[ "$1" == "default" ]] && {
