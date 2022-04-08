@@ -8,7 +8,8 @@
 # the following environment variables to be set (by the Dockerfile
 # or the service):
 #
-#   JENKINS_MASTER
+#   JENKINS_MASTER (url of Jenkins)
+#   JENKINS_TUNNEL (OPTIONAL; if specified, used as -tunnel arg to swarm jar)
 #   JENKINS_SLAVE_ROOT (defaults to /home/couchbase/jenkins)
 #   JENKINS_SLAVE_EXECUTORS (defaults to 1)
 #   JENKINS_SLAVE_NAME (base name; will have container ID appended)
@@ -139,6 +140,10 @@ command -v gpg >/dev/null 2>&1 && {
 
     curl --fail -o /tmp/swarm-client.jar ${JENKINS_MASTER}/swarm/swarm-client.jar
 
+    if [ ! -z "${JENKINS_TUNNEL}" ]; then
+        TUNNEL_ARG="-tunnel ${JENKINS_TUNNEL}"
+    fi
+
     if $(sudo --help &>/dev/null && :)
     then
       exec sudo -u couchbase --set-home --preserve-env \
@@ -148,6 +153,7 @@ command -v gpg >/dev/null 2>&1 && {
         -jar /tmp/swarm-client.jar \
         -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
         -master "${JENKINS_MASTER}" \
+        ${TUNNEL_ARG} \
         -mode ${AGENT_MODE} \
         -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
         -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
@@ -166,6 +172,7 @@ command -v gpg >/dev/null 2>&1 && {
         -jar /tmp/swarm-client.jar \
         -fsroot "${JENKINS_SLAVE_ROOT:-/home/couchbase/jenkins}" \
         -master "${JENKINS_MASTER}" \
+        ${TUNNEL_ARG} \
         -mode ${AGENT_MODE} \
         -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
         -name "${JENKINS_SLAVE_NAME}-$(hostname)" \

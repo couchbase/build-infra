@@ -31,7 +31,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   ubuntu18:
-    image: couchbasebuild/analytics-ubuntu18-cv:20220111
+    image: couchbasebuild/analytics-ubuntu18-cv:20220408
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -41,7 +41,8 @@ services:
     environment:
       - JENKINS_SLAVE_NAME=analytics
       - "JENKINS_SLAVE_LABELS=analytics server couchsterix-test"
-      - JENKINS_MASTER=http://mega2.build.couchbase.com:8081/
+      - JENKINS_MASTER=http://analytics.jenkins.couchbase.com/
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
       - NODE_CLASS=cv
       - NODE_PRODUCT=couchbase-server
       - COUCHBASE_DISABLED_UNIT_TESTS=ALL

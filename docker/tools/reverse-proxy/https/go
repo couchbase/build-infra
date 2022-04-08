@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ ! -e cert.key -o ! -e cert.crt ]; then
+    echo "Must put cert.key and cert.crt in pwd!"
+    exit 1
+fi
+docker rm -f redirect
+docker build -t redirect .
+docker run --restart=unless-stopped -d --name redirect -p 443:443 redirect
