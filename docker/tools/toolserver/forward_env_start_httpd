@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+env \
+  | grep "^CGI_ENV_"  \
+  | sed -e 's/^CGI_ENV_//g' \
+  | awk -F'=' '{print "SetEnv",$1,$2}' \
+  >> /usr/local/apache2/conf/httpd.conf
+
+httpd-foreground
+
+

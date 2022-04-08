@@ -1,0 +1,6 @@
+#!/bin/bash
+
+docker rm -f simplecgi
+docker run --name simplecgi -d -p 9090:80 build-docker.couchbase.com/couchbasebuild/toolserver
+docker exec simplecgi mkdir /run/secrets
+docker cp ~/.ssh/cloudfront-single-use.pem simplecgi:/run/secrets/

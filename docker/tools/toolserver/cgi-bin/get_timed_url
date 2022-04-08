@@ -1,0 +1,37 @@
+#!/bin/bash -e
+
+EXPIRE=$(( $(date +%s) + 7200 ))
+POLICYFILE=/tmp/policy$$.json
+cat <<EOF > ${POLICYFILE}
+{
+    "Statement": [
+        {
+            "Resource": "https://d1z70yoinuxp0u.cloudfront.net/*",
+            "Condition": {
+                "DateLessThan": {
+                    "AWS:EpochTime": ${EXPIRE}
+                }
+            }
+        }
+    ]
+}
+EOF
+
+# QUERY_STRING is expected to be exactly   url=https://packages......
+INPUT_URL=$(echo ${QUERY_STRING} | sed -e 's/^....//')
+policy=$(cat $POLICYFILE | tr -d '[:space:]')
+
+# https://stackoverflow.com/a/70560850/1425601
+: "${INPUT_URL//+/ }"; printf -v url '%b' "${_//%/\\x}"
+url=${url/packages.couchbase.com/d1z70yoinuxp0u.cloudfront.net}
+url="${url}?Policy=$(echo ${policy} | base64 -w0 | tr -- '+=/' '-_~')"
+url="${url}&Signature=$(echo ${policy} | openssl sha1 -sign /run/secrets/cloudfront-single-use.pem | base64 -w0 | tr -- '+=/' '-_~')"
+url="${url}&Key-Pair-Id=K303GCV4VMYFLV"
+
+cat <<EOF
+Content-type: text/html; charset=iso-8859-1
+
+<html><body>
+<a href="${url}">${url}</a>
+</body></html>
+EOF

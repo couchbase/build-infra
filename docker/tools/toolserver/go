@@ -1,0 +1,11 @@
+#!/bin/bash
+
+IMAGE=build-docker.couchbase.com/couchbasebuild/toolserver
+TAG=$(date +%Y%m%d)
+
+docker build -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
+if [ "$1" = "--publish" ]
+then
+  docker push ${IMAGE}:$TAG
+  docker push ${IMAGE}:latest
+fi

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  toolserver:
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==infrastructure
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.toolserver.rule=Host(`tools.build.couchbase.com`)"
+        - "traefik.http.services.toolserver_proxy.loadbalancer.server.port=80"
+    image: build-docker.couchbase.com/couchbasebuild/toolserver:20220404
+    networks:
+      - traefik_reverse-proxy
+    secrets:
+      - source: cloudfront-single-use.20220401
+        target: /run/secrets/cloudfront-single-use.pem
+
+networks:
+  traefik_reverse-proxy:
+    external: true
+
+secrets:
+  cloudfront-single-use.20220401:
+    external: true
