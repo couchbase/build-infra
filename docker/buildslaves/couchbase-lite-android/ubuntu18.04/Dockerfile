@@ -72,7 +72,13 @@ ENV SDK_CMD $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 RUN yes 'y' | sdkmanager --licenses >/dev/null
 
 # Update and install using sdkmanager
-RUN $SDK_CMD "tools" "platform-tools" && \
+# CBD-4752, sdkmanager behavior changed.  "Tools" also installs "platform-tools"
+# If "tools" and "platform-tools" are called at the same time, platform-tools will be installed into platform-tools-2
+# If they are called separately, "platform-tools" will skip the installation if "platform-tools" directory exists
+# Keep both target in case if the behavior changes again.
+
+RUN $SDK_CMD "tools" && \
+    $SDK_CMD "platform-tools" && \
     $SDK_CMD "build-tools;28.0.3" && \
     $SDK_CMD "build-tools;29.0.0" && \
     $SDK_CMD "build-tools;29.0.2" && \
