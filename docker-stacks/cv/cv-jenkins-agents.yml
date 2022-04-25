@@ -51,7 +51,6 @@ services:
         JENKINS_SLAVE_NAME=CV
         JENKINS_SLAVE_LABELS=docker@_@linux
         JENKINS_MASTER=http://cv.jenkins.couchbase.com/
-        "JENKINS_TUNNEL=mega4.build.couchbase.com:"
         NODE_CLASS=cv-docker
         NODE_PRODUCT=couchbase-server
         PARALLELISM=4
@@ -88,7 +87,6 @@ services:
         JENKINS_SLAVE_NAME=CV
         JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@7.0.0@_@mad-hatter@_@cheshire-cat@_@neo@_@master@_@ubuntu-18.04@_@small
         JENKINS_MASTER=http://cv.jenkins.couchbase.com/
-        "JENKINS_TUNNEL=mega4.build.couchbase.com:"
         NODE_CLASS=cv
         NODE_PRODUCT=couchbase-server
         PARALLELISM=4
@@ -124,7 +122,6 @@ services:
         JENKINS_SLAVE_NAME=CV
         JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@7.0.0@_@mad-hatter@_@cheshire-cat@_@neo@_@master@_@ubuntu-18.04@_@large
         JENKINS_MASTER=http://cv.jenkins.couchbase.com/
-        "JENKINS_TUNNEL=mega4.build.couchbase.com:"
         NODE_CLASS=cv
         NODE_PRODUCT=couchbase-server
         PARALLELISM=16

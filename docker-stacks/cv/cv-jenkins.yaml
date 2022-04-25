@@ -35,9 +35,15 @@ services:
 
 # See http://www.technowise.in/2016/10/fix-no-valid-crumb-was-included-in.html
 # and https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Nginx
-# for the reason behind -Dhudson.security.csrf.requestfield
+# for the reason behind -Dhudson.security.csrf.requestfield .
+# See https://stackoverflow.com/a/39965700/1425601 and
+# https://www.jenkins.io/doc/book/managing/system-properties/ for information
+# about hudson.TcpSlaveAgentListener.hostName .
     environment:
-      - "JAVA_OPTS=-Dhudson.model.ParametersAction.keepUndefinedParameters=true -Dhudson.security.csrf.requestfield=Jenkins-Crumb"
+      JAVA_OPTS: >-
+          -Dhudson.model.ParametersAction.keepUndefinedParameters=true
+          -Dhudson.security.csrf.requestfield=Jenkins-Crumb
+          -Dhudson.TcpSlaveAgentListener.hostName=mega4.build.couchbase.com
 
 networks:
   jenkins:
