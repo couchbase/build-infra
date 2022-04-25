@@ -12,7 +12,7 @@ RUN apt-get update && \
     apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release openjdk-8-jdk sudo tar && \
     apt-get install -y groff-base python3-dev python3-pip python3-virtualenv gdb gnupg2 && \
     apt-get install -y libuv1-dev libev-dev libevent-dev libbz2-dev libffi-dev && \
-    apt-get install -y libunwind8 libicu66 && \
+    apt-get install -y libunwind8 libicu66 libreadline-dev libsqlite3-dev && \
     apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give
@@ -57,7 +57,7 @@ RUN apt-get update && \
 
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
+    curl -L -o /tmp/deploy/maven.zip https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
     cd /usr/local && \
     unzip /tmp/deploy/gradle.zip && \
     unzip /tmp/deploy/maven.zip && \

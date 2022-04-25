@@ -141,7 +141,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu20:
-    image: couchbasebuild/sdk-ubuntu20-build:20220317
+    image: couchbasebuild/sdk-ubuntu20-build:20220425
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
