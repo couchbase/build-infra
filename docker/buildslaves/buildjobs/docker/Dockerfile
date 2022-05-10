@@ -21,9 +21,10 @@ RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchba
     chmod a+x /usr/local/bin/repo
 
 # Python3 updates and s3cmd
-RUN apt-get update && \
-    apt-get install -y python3-pip && \
-    apt-get clean
+RUN set -x \
+      && apt-get update \
+      && apt-get install -y python3-pip \
+      && apt-get clean
 
 # AWS CLI
 RUN set -x \
@@ -45,6 +46,12 @@ RUN mkdir /tmp/deploy && \
     cp -a docker/docker /usr/local/bin && \
     cd /tmp && \
     rm -rf deploy
+
+# Other useful tools - jq is used by at least the rebase-dockerhub job
+RUN set -x \
+      && apt-get update \
+      && apt-get install -y jq \
+      && apt-get clean
 
 # Create couchbase user with password-less sudo privs and
 # put in docker group
