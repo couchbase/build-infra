@@ -10,9 +10,12 @@ version: '3.8'
 # https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
 
 x-default-jenkins-secrets: &default-jenkins-secrets
-  secrets:
+  configs:
     - source: jenkins_master_username
-    - source: jenkins_master_password.20210721
+      target: /run/secrets/jenkins_master_username
+      mode: 0444
+  secrets:
+    - source: server_jenkins_ns-buildbot_api_key.20220510
       target: /run/secrets/jenkins_master_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
@@ -411,10 +414,12 @@ services:
       - *node-product
     <<: *default-jenkins-two-agent-with-ipv6
 
-secrets:
+configs:
   jenkins_master_username:
-    external: true
-  jenkins_master_password.20210721:
+    file: config/jenkins_master_username
+
+secrets:
+  server_jenkins_ns-buildbot_api_key.20220510:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true

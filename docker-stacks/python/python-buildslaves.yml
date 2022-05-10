@@ -19,10 +19,11 @@ x-default-jenkins-slave: &default-jenkins-slave
       target: /home/couchbase/.ssh/config
       uid: '1000'
       mode: 0400
-
-  secrets:
     - source: jenkins_master_username
-    - source: jenkins_master_password.20210721
+      target: /run/secrets/jenkins_master_username
+      mode: 0444
+  secrets:
+    - source: server_jenkins_ns-buildbot_api_key.20220510
       target: /run/secrets/jenkins_master_password
     - source: id_cb-robot_20191031
       target: /home/couchbase/.ssh/id_cb-robot
@@ -58,12 +59,12 @@ services:
 
 configs:
   couchbase_ssh_config_20191203:
-    file: conf/couchbase_ssh_config
+    file: config/couchbase_ssh_config
+  jenkins_master_username:
+    file: config/jenkins_master_username
 
 secrets:
-  jenkins_master_username:
-    external: true
-  jenkins_master_password.20210721:
+  server_jenkins_ns-buildbot_api_key.20220510:
     external: true
   id_cb-robot_20191031:
     external: true

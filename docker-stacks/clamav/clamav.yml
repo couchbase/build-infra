@@ -28,15 +28,20 @@ services:
     networks:
       - jenkins
       - traefik_reverse-proxy
-    secrets:
+    configs:
       - source: jenkins_master_username
-      - source: jenkins_master_password.20210721
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+    secrets:
+      - source: server_jenkins_ns-buildbot_api_key.20220510
         target: /run/secrets/jenkins_master_password
 
-secrets:
+configs:
   jenkins_master_username:
-    external: true
-  jenkins_master_password.20210721:
+    file: config/jenkins_master_username
+
+secrets:
+  server_jenkins_ns-buildbot_api_key.20220510:
     external: true
 
 networks:
