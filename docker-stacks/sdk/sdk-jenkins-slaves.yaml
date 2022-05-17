@@ -33,11 +33,12 @@ x-default-jenkins-slave: &default-jenkins-slave
       uid: '1000'
       gid: '1000'
       mode: 0400
-    - source: sdk_jenkins_master_username
-      target: jenkins_master_username
-    - source: jenkins_master_password.20210721
+    - source: sdk_jenkins_ns-buildbot_api_key.20220510
       target: /run/secrets/jenkins_master_password
   configs:
+    - source: jenkins_master_username
+      target: /run/secrets/jenkins_master_username
+      mode: 0444
     - source: jenkins_slave_ssh_config_20200422
       target: /home/couchbase/.ssh/config
       uid: '1000'
@@ -180,10 +181,12 @@ services:
         uid: '1000'
         gid: '1000'
         mode: 0400
-      - source: sdk_jenkins_master_username
-        target: jenkins_master_username
-      - source: jenkins_master_password.20210721
+      - source: sdk_jenkins_ns-buildbot_api_key.20220510
         target: /run/secrets/jenkins_master_password
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
 
   debian10-signing:
     image: couchbasebuild/sdk-debian10-signing:20220317
@@ -216,15 +219,17 @@ services:
         uid: '1000'
         gid: '1000'
         mode: 0400
-      - source: sdk_jenkins_master_username
-        target: jenkins_master_username
-      - source: jenkins_master_password.20210721
+      - source: sdk_jenkins_ns-buildbot_api_key.20220510
         target: /run/secrets/jenkins_master_password
       - source: docker_config_20210719
         target: /home/couchbase/.docker/config.json
         uid: '1000'
         gid: '1000'
         mode: 0400
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
     volumes:
       - type: bind
         source: /var/run/docker.sock
@@ -232,6 +237,8 @@ services:
 
 
 secrets:
+  sdk_jenkins_ns-buildbot_api_key.20220510:
+    external: true
   # SSH key which can read private GitHub repos
   ns-buildbot.rsa:
     external: true
@@ -249,6 +256,8 @@ secrets:
     external: true
 
 configs:
+  jenkins_master_username:
+    file: config/jenkins_master_username
   jenkins_slave_ssh_config_20200422:
     file: conf/jenkins_slave_ssh_config
 

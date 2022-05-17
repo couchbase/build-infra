@@ -9,7 +9,7 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.289.2
+    image: jenkins/jenkins:2.332.3
     deploy:
       replicas: 1
     ports:
@@ -30,6 +30,7 @@ services:
 # for the reason behind -Dhudson.security.csrf.requestfield
     environment:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
+      - "JENKINS_OPTS=--sessionTimeout=1440 --sessionEviction=14400"
 
 networks:
   jenkins:
