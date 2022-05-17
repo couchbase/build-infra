@@ -1,0 +1,85 @@
+version: '3.8'
+
+# Suggested deployment command:
+#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c unittest-agents.yml unittest
+# All services, networks, etc. will then get an "unittest_" prefix,
+# eg. "unittest_ubuntu20"
+
+# Default slave configurations. This is written using YAML anchors so
+# it can be substituted into all the slave declarations later. See
+# https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
+
+x-default-jenkins-secrets: &default-jenkins-secrets
+  configs:
+    - source: jenkins_master_username
+      target: /run/secrets/jenkins_master_username
+      mode: 0444
+  secrets:
+    - source: cv_jenkins_ns-buildbot_api_key.20220510
+      target: /run/secrets/jenkins_master_password
+    - source: profiledata.ssh_privkey.profile_sync.20200423
+      target: /run/secrets/profile_sync
+
+# Use this one for an agent with two replicas and IPv6 enabled.
+# Previously only CV unit tests agents had this, so to be
+# overly cautious, we'll continue only using this for CV.
+x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
+  deploy:
+    resources:
+      limits:
+        memory: 9G
+      reservations:
+        memory: 9G
+    placement:
+      constraints:
+        - node.labels.role==build
+    replicas: 2
+    update_config:
+      parallelism: 1000
+  networks:
+    - jenkins
+  <<: *default-jenkins-secrets
+  sysctls:
+    net.ipv6.conf.lo.disable_ipv6: 0
+
+x-cv-jenkins-environment:
+ - &cv-jenkins-master "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+x-cv-jenkins-node-class:
+ - &cv-jenkins-node-class "NODE_CLASS=cv"
+x-node-product:
+ - &node-product "NODE_PRODUCT=couchbase-server"
+
+services:
+
+  centos7:
+    image: couchbasebuild/server-centos7-build:20220111
+    environment:
+      - "JENKINS_SLAVE_NAME=unit-centos7"
+      - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
+      - *cv-jenkins-master
+      - *cv-jenkins-node-class
+      - *node-product
+    <<: *default-jenkins-two-agent-with-ipv6
+
+  ubuntu20:
+    image: couchbasebuild/server-ubuntu20-build:20220111
+    environment:
+      - "JENKINS_SLAVE_NAME=unit-ubuntu20"
+      - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"
+      - *cv-jenkins-master
+      - *cv-jenkins-node-class
+      - *node-product
+    <<: *default-jenkins-two-agent-with-ipv6
+
+configs:
+  jenkins_master_username:
+    file: config/jenkins_master_username
+
+secrets:
+  cv_jenkins_ns-buildbot_api_key.20220510:
+    external: true
+  profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
+
+networks:
+  jenkins:

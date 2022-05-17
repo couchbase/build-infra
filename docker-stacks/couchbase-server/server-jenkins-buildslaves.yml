@@ -100,15 +100,8 @@ x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
 # globally when necessary
 x-server-jenkins-environment:
  - &server-jenkins-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
-x-cv-jenkins-environment:
- - &cv-jenkins-master "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
-
 x-server-jenkins-node-class:
  - &server-jenkins-node-class "NODE_CLASS=build"
-x-cv-jenkins-node-class:
- - &cv-jenkins-node-class "NODE_CLASS=cv"
-
-# This one is still shared between server and cv
 x-node-product:
  - &node-product "NODE_PRODUCT=couchbase-server"
 
@@ -393,26 +386,6 @@ services:
       - *server-jenkins-node-class
       - *node-product
     <<: *default-jenkins-two-agent
-
-  centos7_unittests:
-    image: couchbasebuild/server-centos7-build:20220111
-    environment:
-      - "JENKINS_SLAVE_NAME=unit-centos7"
-      - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
-      - *cv-jenkins-master
-      - *cv-jenkins-node-class
-      - *node-product
-    <<: *default-jenkins-two-agent-with-ipv6
-
-  ubuntu20_unittests:
-    image: couchbasebuild/server-ubuntu20-build:20220111
-    environment:
-      - "JENKINS_SLAVE_NAME=unit-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"
-      - *cv-jenkins-master
-      - *cv-jenkins-node-class
-      - *node-product
-    <<: *default-jenkins-two-agent-with-ipv6
 
 configs:
   jenkins_master_username:
