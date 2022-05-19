@@ -150,7 +150,7 @@ services:
     image: couchbasebuild/server-linux-build:20220113
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
-      - "JENKINS_SLAVE_LABELS=server linux all monster neo morpheus master x86_64"
+      - "JENKINS_SLAVE_LABELS=server linux all monster neo elixir morpheus master x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
@@ -197,7 +197,7 @@ services:
     image: couchbasebuild/server-centos7-build:20220111
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
-      - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat neo morpheus x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat neo elixir morpheus x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
@@ -381,7 +381,7 @@ services:
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter cheshire-cat neo morpheus master x86_64"
+      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter cheshire-cat neo elixir morpheus master x86_64"
       - *server-jenkins-master
       - *server-jenkins-node-class
       - *node-product
