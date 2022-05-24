@@ -20,8 +20,10 @@ services:
         target: /etc/docker/registry/config.yml
         mode: 0664
     secrets:
-      - source: buildhub.crt
-      - source: buildhub.key
+      - source: buildhub.crt-2022
+        target: /run/secrets/buildhub.crt
+      - source: buildhub.key-2022
+        target: /run/secrets/buildhub.key
     volumes:
       - type: bind
         source: /buildteam/docker/registry
@@ -92,9 +94,9 @@ configs:
     file: conf/registry-config.yml
 
 secrets:
-  buildhub.crt:
+  buildhub.crt-2022:
     external: true
-  buildhub.key:
+  buildhub.key-2022:
     external: true
 
 networks:
