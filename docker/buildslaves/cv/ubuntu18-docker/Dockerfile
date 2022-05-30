@@ -5,6 +5,8 @@ LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
 
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+
 # ENV vars for profile data retrieval
 ENV NODE_CLASS=cv
 ENV NODE_PRODUCT=couchbase-server
@@ -43,6 +45,9 @@ RUN set -x \
     && apt update \
     && apt install -y aspell \
     && apt clean
+
+# Set up buildx driver
+RUN docker buildx create --use
 
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS

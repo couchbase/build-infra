@@ -377,7 +377,7 @@ services:
     <<: *default-jenkins-one-agent
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20220111
+    image: couchbasebuild/server-ubuntu20-build:20220527
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"

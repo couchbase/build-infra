@@ -1,9 +1,6 @@
-FROM couchbasebuild/server-ubuntu20-build:20220111
+FROM couchbasebuild/server-ubuntu20-build:20220527
 
 LABEL maintainer="build-team@couchbase.com"
-
-# Fix apt - we'll break it again when we re-link 7.5.0
-RUN grep -v /usr/local/lib64 /etc/ld.so.conf > /tmp/ld.so.conf && mv /tmp/ld.so.conf /etc && ldconfig
 
 RUN set -x \
         && apt update \
@@ -30,7 +27,3 @@ RUN set -x \
 RUN set -x \
         && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 100 \
         && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 100
-
-# Re-link gcc 7.5.0 libs (and break apt)
-RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
-     mv /tmp/ld.so.conf /etc && ldconfig

@@ -149,6 +149,15 @@ RUN set -x \
         && update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
         && update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 100
 
+# Fix apt
+COPY files/apt /usr/bin/_apt
+RUN set -x \
+    && for f in /usr/bin/apt*; \
+       do \
+         mv $f $f.bin && \
+         ln -s /usr/bin/_apt $f; \
+       done
+
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh

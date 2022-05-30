@@ -3,8 +3,10 @@
 # We'll inherit from the Couchbase Server build slave just to
 # avoid re-inventing the wheel and for Docker image cache sharing
 
-FROM couchbasebuild/server-ubuntu20-build:20201209
+FROM couchbasebuild/server-ubuntu20-build:20220527
 LABEL maintainer=build-team@couchbase.com
+
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # Docker; xmllint (used for parsing manifest); jq (used for parsing
 # output from builddb REST API)
@@ -23,6 +25,9 @@ RUN addgroup --gid 999 docker && \
 RUN set -x \
     && mkdir -p /home/couchbase/.docker \
     && chown couchbase:couchbase /home/couchbase/.docker
+
+# Set up buildx driver
+RUN docker buildx create --use
 
 # cbdep (used to install Go)
 ARG CACHEBUST=1
