@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-GCC_VER=${$1:-10.2.0}
+GCC_VER=10.2.0
 IMAGE=couchbasebuild/amzn-2-gcc
 
 ARCH=$(uname -m)
@@ -12,4 +12,10 @@ docker build \
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:${GCC_VER}-${ARCH}
+
+  # Assemble the multi-arch image
+  docker manifest create ${IMAGE}:${GCC_VER} \
+    --amend ${IMAGE}:${GCC_VER}-x86_64 \
+    --amend ${IMAGE}:${GCC_VER}-aarch64
+  docker manifest push ${IMAGE}:${GCC_VER}
 fi

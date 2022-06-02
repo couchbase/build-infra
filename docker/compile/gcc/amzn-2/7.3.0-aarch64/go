@@ -17,4 +17,10 @@ docker build \
 if [ "$1" = "--publish" ]
 then
   docker push ${IMAGE}:${GCC_VER}-${ARCH}
+
+  # Assemble the multi-arch image
+  docker manifest create ${IMAGE}:${GCC_VER} \
+    --amend ${IMAGE}:${GCC_VER}-x86_64 \
+    --amend ${IMAGE}:${GCC_VER}-aarch64
+  docker manifest push ${IMAGE}:${GCC_VER}
 fi
