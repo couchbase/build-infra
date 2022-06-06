@@ -26,6 +26,10 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --test)
+      is_test_image=1
+      shift
+      ;;
     *)
       positional_params+=("$1")
       shift
@@ -89,7 +93,12 @@ function get_stackfile() {
   stackfiles["server"]="couchbase-server/server-jenkins-buildslaves.yml"
   stackfiles["test"]="couchbase-server/server-jenkins-buildslaves.yml"
 
-  curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/master/docker-stacks/${stackfiles[${environment}]}"
+  if [ "${is_test_image}" = "1" ]; then
+    branch=aws-testing
+  else
+    branch=master
+  fi
+  curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/${branch}/docker-stacks/${stackfiles[${environment}]}"
 }
 
 function provision_disk() {
@@ -179,6 +188,14 @@ function retrieve_secrets() {
 function docker_run_args() {
   # Compile args we'll be passing to `docker run`
   args="--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 "
+
+  # Mount docker and special /opt/couchbase volume for server
+  # to enable rpm/deb packaging in sidecar containers
+  if [ "${environment}" = "server" ]
+  then
+    args="${args}-v /var/run/docker.sock:/var/run/docker.sock -v serverbuild_optcouchbase:/opt/couchbase -v rpmdb:/var/lib/rpm "
+  fi
+
   if [ "${environment}" = "cv" ]
   then
     args="${args}-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh "
@@ -187,7 +204,7 @@ function docker_run_args() {
   # Mount docker socket for analytics builders
   if [ "${environment}" = "analytics" ]
   then
-      args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+    args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
   fi
   echo "${args}"
 }

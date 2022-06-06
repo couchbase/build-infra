@@ -2,13 +2,11 @@
 # This has to be first - define the GCC version to use and
 # the image to pull it from
 ARG GCC_VER
-ARG ARCH
-FROM couchbasebuild/amzn-2-gcc:${GCC_VER}-${ARCH} AS gcc
-ARG ARCH
-FROM couchbasebuild/amzn-2-gcc:7.3.0-${ARCH} AS gcc-legacy
+FROM couchbasebuild/amzn-2-gcc:${GCC_VER} AS gcc
+FROM couchbasebuild/amzn-2-gcc:7.3.0 AS gcc-legacy
 
 # This is the actual build agent base image
-FROM amazonlinux:2
+FROM amazonlinux:2 AS mainbuild
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
@@ -195,6 +193,22 @@ RUN set -x \
     && amazon-linux-extras install epel -y \
     && yum install -y patchelf \
     && yum clean all
+
+# For the moment, we need "docker" in this image, and for the
+# "couchbase" user to have permissions to access docker.sock.
+# Additionally we require "pixz". This is all for single-linux support
+# on aarch64 (running in EC2), so only make those changes for that arch.
+ARG DOCKER_VER
+RUN if [ "$(uname -m)" == "aarch64" ]; then \
+        set -e; \
+        curl -Lf https://download.docker.com/linux/static/stable/aarch64/docker-${DOCKER_VER}.tgz \
+        | tar xz --strip-components=1 -C /usr/local/bin; \
+        groupadd -g 994 docker; \
+        usermod -a -G docker couchbase; \
+        yum install -y \
+            http://rpmfind.net/linux/opensuse/distribution/leap/15.3/repo/oss/aarch64/pixz-1.0.6-1.13.aarch64.rpm; \
+        yum clean all; \
+    fi
 
 # Set LANG
 ENV LANG=en_US.UTF-8

@@ -9,10 +9,22 @@ cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 cp -a ../../util/healthcheck.sh build
 
-ARCH=$(uname -m)
+ECR=284614897128.dkr.ecr.us-east-2.amazonaws.com
+ECR_IMAGE=${ECR}/$(basename ${IMAGE})
 
-docker build \
-  --build-arg ARCH=${ARCH} \
+if [ "$1" = "--publish" ]
+then
+  PUSH=--push
+  # Also push to our ECR; this assumes ~/.aws/credentials is set up
+  aws ecr get-login-password --region us-east-2 \
+    | docker login --username AWS --password-stdin ${ECR}
+fi
+
+docker buildx build --pull ${PUSH} \
+  --tag ${IMAGE}:${TAG} --tag ${ECR_IMAGE}:${TAG} \
+  --platform linux/amd64,linux/arm64 \
+  --target mainbuild \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   --build-arg ASCIIDOCTOR_VER=${ASCIIDOCTOR} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \
@@ -21,6 +33,7 @@ docker build \
   --build-arg CMAKE_MAJOR=${CMAKE_MAJOR} \
   --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
+  --build-arg DOCKER_VER=${DOCKER} \
   --build-arg GCC_VER=${GCC} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
@@ -30,20 +43,4 @@ docker build \
   --build-arg RUBY_INSTALL_MAJOR=${RUBY_INSTALL_MAJOR} \
   --build-arg RUBY_INSTALL_MINOR=${RUBY_INSTALL_MINOR} \
   --build-arg RUBY_INSTALL_PATCH=${RUBY_INSTALL_PATCH} \
-  -t ${IMAGE}:${TAG}-${ARCH} .
-
-if [ "$1" = "--publish" ]
-then
-  docker push ${IMAGE}:$TAG-${ARCH}
-
-  if [ "${ARCH}" == "aarch64" ]; then
-    # Also try to push to our ECR; this assumes
-    # ~/.aws/credentials is set up
-    ECR=284614897128.dkr.ecr.us-east-2.amazonaws.com
-    ECR_IMAGE=${ECR}/$(basename ${IMAGE}):${TAG}-${ARCH}
-    aws ecr get-login-password --region us-east-2 \
-      | docker login --username AWS --password-stdin ${ECR}
-    docker tag ${IMAGE}:${TAG}-${ARCH} ${ECR_IMAGE}
-    docker push ${ECR_IMAGE}
-  fi
-fi
+  .
