@@ -187,6 +187,11 @@ services:
       - source: jenkins_master_username
         target: /run/secrets/jenkins_master_username
         mode: 0444
+      - source: jenkins_slave_ssh_config_20200422
+        target: /home/couchbase/.ssh/config
+        uid: '1000'
+        gid: '1000'
+        mode: 0644
 
   debian10-signing:
     image: couchbasebuild/sdk-debian10-signing:20220317
@@ -230,6 +235,11 @@ services:
       - source: jenkins_master_username
         target: /run/secrets/jenkins_master_username
         mode: 0444
+      - source: jenkins_slave_ssh_config_20200422
+        target: /home/couchbase/.ssh/config
+        uid: '1000'
+        gid: '1000'
+        mode: 0644
     volumes:
       - type: bind
         source: /var/run/docker.sock
