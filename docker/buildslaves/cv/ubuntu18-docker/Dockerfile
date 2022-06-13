@@ -46,9 +46,6 @@ RUN set -x \
     && apt install -y aspell \
     && apt clean
 
-# Set up buildx driver
-RUN docker buildx create --use
-
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase
@@ -61,3 +58,5 @@ COPY ./build/couchbuilder_start.sh /usr/sbin/
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 RUN echo "CONTAINER_TAG=${CONTAINER_TAG}" >> /home/couchbase/.ssh/environment
+
+COPY build/buildx.sh /usr/sbin/couchhook.d/

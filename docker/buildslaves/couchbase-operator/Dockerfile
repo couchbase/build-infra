@@ -26,13 +26,10 @@ RUN set -x \
     && mkdir -p /home/couchbase/.docker \
     && chown couchbase:couchbase /home/couchbase/.docker
 
-# Set up buildx driver
-RUN docker buildx create --use
-
 # cbdep (used to install Go)
 ARG CACHEBUST=1
 RUN curl --fail https://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 COPY build/couchbuilder_start.sh /usr/sbin/
-
+COPY build/buildx.sh /usr/sbin/couchhook.d/
 COPY build/swarm*.properties /

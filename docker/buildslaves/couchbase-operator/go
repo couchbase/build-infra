@@ -7,6 +7,7 @@ IMAGE=couchbasebuild/ubuntu-2004-operator-build
 mkdir -p build
 
 cp ../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp ../util/hooks/buildx.sh build/buildx.sh
 cp ../util/swarm*.properties build
 
 docker build -t ${IMAGE}:${TAG} .

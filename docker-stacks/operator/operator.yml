@@ -10,7 +10,7 @@ version: "3.8"
 
 services:
   operator:
-    image: couchbasebuild/ubuntu-2004-operator-build:20220527
+    image: couchbasebuild/ubuntu-2004-operator-build:20220613
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=operator-build"

@@ -46,7 +46,7 @@ services:
       - "/tmp:/mnt"
 
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20220530
+      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20220613
       LAUNCH_PULL: "true"
       LAUNCH_EXT_NETWORKS: cv_jenkins
       LAUNCH_PRIVILEGED: "true"
