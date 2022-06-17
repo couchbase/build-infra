@@ -187,7 +187,7 @@ function retrieve_secrets() {
 
 function docker_run_args() {
   # Compile args we'll be passing to `docker run`
-  args="--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -d -p 4000:22 "
+  args="--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -v /ephemeral/tmp:/tmp -d -p 4000:22 "
 
   # Mount docker and special /opt/couchbase volume for server
   # to enable rpm/deb packaging in sidecar containers
@@ -274,8 +274,11 @@ done
 # Authenticate for pulling images from ECR
 ecr_login
 
-# Run build container
+# Ensure ephemeral /tmp exists and is world-writable
+mkdir -p /ephemeral/tmp
+chmod 1777 /ephemeral/tmp
 
+# Run build container
 while ! docker ps --format '{{.Names}}' | grep -w worker &> /dev/null
 do
   echo "Attempting to start container..."
