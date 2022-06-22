@@ -162,6 +162,13 @@ class Build(BuildBase):
                             md['product_version']
                         )
                     }
+                elif filter_name == 'last_cloud_ami':
+                    result = {
+                        'build_num': self.build_info.get_last_cloud_ami(
+                            md['product_name'], md['release_name'],
+                            md['product_version']
+                        )
+                    }
                 else:
                     return HTTPBadRequest(
                         f'Filter "{filter_name}" not supported for "builds"'
