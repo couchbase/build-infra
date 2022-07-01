@@ -67,7 +67,7 @@ RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
 RUN yum groupinstall -y --setopt=keepcache=0 "Development Tools"
 
 # JDK for Jenkins
-RUN yum install -y --setopt=keepcache=0 java-1.8.0-openjdk && yum clean packages
+RUN yum install -y --setopt=keepcache=0 java-11-openjdk && yum clean packages
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
@@ -91,7 +91,7 @@ RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo 
     sudo yum install -y --setopt=keepcache=0 sbt
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
+    curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
     cd /usr/local && \
     unzip /tmp/deploy/gradle.zip && \
     unzip /tmp/deploy/maven.zip && \
