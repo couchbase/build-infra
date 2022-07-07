@@ -1,20 +1,22 @@
 version: "3.8"
 
-# Suggested deployment command:
-#   docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c operator.yml operator
-# All services, networks, etc. will then get an "operator_" prefix,
-# eg. "operator_operator"
+# Stack for general-purpose agent capable of running "docker buildx build".
 #
 # Note: Post-deployment, log in as admin and add Repository Observer
 # permissions to the guest account for the internal and snapshot repos
 
 services:
-  operator:
-    image: couchbasebuild/ubuntu-2004-operator-build:20220613
+  buildx:
+    # Historically, this was the agent used for
+    # couchbase-k8s-microservice builds, so for the moment it's still
+    # using the "ubuntu-2004-operator-build" image, has
+    # operator-specific Jenkins labels, and runs on Swarm nodes with the
+    # role "operator". In future we may further divide this.
+    image: couchbasebuild/ubuntu-2004-operator-build:20220706
     user: couchbase
     environment:
-      - "JENKINS_SLAVE_NAME=operator-build"
-      - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices couchbase-operator master"
+      - "JENKINS_SLAVE_NAME=buildx"
+      - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices couchbase-operator master buildx"
       - "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
@@ -31,7 +33,7 @@ services:
         target: /run/secrets/jenkins_master_password
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-      - source: operator.config.docker.20210730
+      - source: buildx.config.docker.20220621
         target: /home/couchbase/.docker/config.json
         mode: 0600
         uid: "1000"
@@ -40,6 +42,7 @@ services:
       placement:
         constraints:
           - node.labels.role==operator
+      replicas: 2
       update_config:
         parallelism: 1000
 
@@ -50,7 +53,7 @@ configs:
 secrets:
   server_jenkins_ns-buildbot_api_key.20220510:
     external: true
-  operator.config.docker.20210730:
+  buildx.config.docker.20220621:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true

@@ -315,6 +315,11 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      - source: profiledata.aws_credentials.server.20220706
+        target: /home/couchbase/couchbase-server/build/linux/.aws/credentials
+        mode: 0444
+        uid: "1000"
+        gid: "1000"
       ################################
       # couchbase-server/build/macos #
       ################################
@@ -625,6 +630,8 @@ secrets:
     external: true
   # aws credentials
   profiledata.aws_credentials.mobile.20210512:
+    external: true
+  profiledata.aws_credentials.server.20220706:
     external: true
   # jarsigning cert from digicert
   profiledata.digicert_jks.20211202:

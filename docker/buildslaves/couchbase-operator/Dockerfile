@@ -26,6 +26,17 @@ RUN set -x \
     && mkdir -p /home/couchbase/.docker \
     && chown couchbase:couchbase /home/couchbase/.docker
 
+# AWS CLI
+RUN set -x \
+      && mkdir /tmp/deploy \
+      && cd /tmp/deploy \
+      && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+      && unzip awscliv2.zip \
+      && ./aws/install \
+      && cd /tmp \
+      && rm -rf deploy
+ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.aws/credentials
+
 # cbdep (used to install Go)
 ARG CACHEBUST=1
 RUN curl --fail https://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep

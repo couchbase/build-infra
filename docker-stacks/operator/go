@@ -1,3 +1,0 @@
-#!/bin/bash
-
-docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c operator.yml operator
