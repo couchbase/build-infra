@@ -8,12 +8,7 @@ version: "3.8"
 
 services:
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20220118
-    # Still need the next two lines since zz-lightweight image is shared
-    # with Server, and thus far it's not in swarm there
-    init: true
-    entrypoint: [ "/usr/sbin/couchbuilder_start.sh", "swarm" ]
-    user: couchbase
+    image: couchbasebuild/zz-lightweight:20220708
     environment:
       - "JENKINS_SLAVE_NAME=zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"

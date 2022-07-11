@@ -9,9 +9,6 @@ popd > /dev/null
 # Vulcan docker container for SuSE 11
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/server-suse11-build:20180713 vulcan-suse11 5229 server.jenkins.couchbase.com
 
-# Backup for zz-server-lightweight (same port as running on mega2)
-${SCRIPTPATH}/../restart_jenkinsdocker.py couchbasebuild/zz-lightweight:20220118 zz-server-lightweight-backup 5322 server.jenkins.couchbase.com
-
 # server.jenkins slave for running Ansible playbooks
 ${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/ansible-slave:20180312 ansible-slave-server 2999 server.jenkins.couchbase.com
 

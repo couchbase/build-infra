@@ -24,15 +24,13 @@ RUN apt-get update \
        apt-utils \
        build-essential \
        curl \
-       openssh-server \
        software-properties-common \
        sudo \
-       unzip -y \
-       zip -y \
+       unzip \
+       zip \
     && apt-get clean \
     && apt-get autoremove --purge -y \
-    && apt-get clean \
-    && mkdir /var/run/sshd
+    && apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -69,11 +67,8 @@ RUN set -x \
 RUN set -x \
     && curl --fail https://bootstrap.pypa.io/get-pip.py | python3 \
     && rm -f /usr/local/bin/pip /usr/local/bin/easy_install \
-    && pip3 install requests lxml oauthlib pycrypto boto3 pbr wheel filemagic pyjwt --upgrade\
+    && pip3 install requests lxml oauthlib pycrypto boto3 pbr wheel filemagic pyjwt --upgrade \
     && pip3 install jira
-
-# Set AWS credentials file environmental variable (probably used by jira, should use ~/.aws instead)
-ENV AWS_SHARED_CREDENTIALS_FILE=/home/couchbase/.ssh/aws-credentials
 
 # Utilities that are handy for zz-lightweight jobs and occasional interactive use
 RUN apt-get update \
@@ -119,18 +114,7 @@ RUN curl --fail "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "a
     && sudo ./aws/install \
     && rm -rf ./aws awscliv2.zip
 
-ENV AGENT_VERSION=4.3
-
 RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
-
-RUN curl --fail --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
-  && chmod 755 /usr/share/jenkins \
-  && chmod 644 /usr/share/jenkins/agent.jar \
-  && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
-
-ENV AGENT_WORKDIR=/home/couchbase/agent
-RUN mkdir -p ${AGENT_WORKDIR} \
-  && chown couchbase:couchbase ${AGENT_WORKDIR}
 
 # Set LANG
 ENV LANG=en_US.UTF-8
@@ -142,9 +126,8 @@ EXPOSE 22
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
-
-COPY cb-buildbot-config.sh /usr/sbin/couchhook.d/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
+CMD ["swarm"]
 
 # Avoid having to rebuild image chain for simple start script modifications
 COPY build/couchbuilder_start.sh /usr/sbin/

@@ -106,6 +106,23 @@ x-node-product:
  - &node-product "NODE_PRODUCT=couchbase-server"
 
 services:
+  zz-lightweight:
+    image: couchbasebuild/zz-lightweight:20220708
+    environment:
+      - "JENKINS_SLAVE_NAME=zz-lightweight"
+      - "JENKINS_SLAVE_LABELS=zz-lightweight"
+      - "JENKINS_SLAVE_EXECUTORS=10"
+      - *server-jenkins-master
+      - "NODE_CLASS=build zz"
+      - *node-product
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+      - "latestbuilds:/latestbuilds"
+      - "releases:/releases"
+      - "buildteam:/buildteam"
+    <<: *default-jenkins-one-agent
+
   amzn2:
     image: couchbasebuild/server-amzn2-build:20220601
     environment:
@@ -398,3 +415,24 @@ volumes:
   cbdepscache:
   cbdepcache:
   ccache:
+
+  latestbuilds:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/builds/latestbuilds"
+
+  releases:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/builds/releases"
+
+  buildteam:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/buildteam"

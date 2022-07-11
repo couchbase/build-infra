@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # Script intended to be ENTRYPOINT for Couchbase build containers
 # based on Jenkins Swarm and running on Docker Swarm, OR as a
@@ -80,11 +80,16 @@ then
 
   # Ensure the host where the profile data lives is in our known_hosts before synchronisation. We also
   # have to set permissions on directories here as we can only specify perms on files in the profile container
-  start_cmd="mkdir -p ~/.ssh \
-    && add_hostkeys \
-    && rsync --progress --archive --backup --executability --no-o --no-g -e \"ssh -p ${profile_port} -i /run/secrets/profile_sync -o StrictHostKeyChecking=no\" couchbase@${profile_host}:${NODE_PRODUCT}/${NODE_CLASS}/linux/ /home/couchbase/ \
-    && (if [ -d ~/.ssh ]; then chmod 00700 ~/.ssh; fi) \
-    && (if [ -d ~/.gpg ]; then chmod 00700 ~/.gpg; fi)"
+  start_cmd=" \
+    mkdir -p ~/.ssh \
+      && add_hostkeys \
+      && for node_class in ${NODE_CLASS}; do \
+           rsync --progress --archive --backup --executability --no-o --no-g \
+           -e \"ssh -p ${profile_port} -i /run/secrets/profile_sync -o StrictHostKeyChecking=no\" \
+           couchbase@${profile_host}:${NODE_PRODUCT}/\${node_class}/linux/ /home/couchbase/ ; \
+         done \
+      && (if [ -d ~/.ssh ]; then chmod 00700 ~/.ssh; fi) \
+      && (if [ -d ~/.gpg ]; then chmod 00700 ~/.gpg; fi)"
 
   # we could concievably be running the container as root or couchbase, let's try
   # to populate the profile data correctly either way
@@ -92,7 +97,7 @@ then
   then
     sudo chmod 600 /run/secrets/profile_sync || :
     sudo chown couchbase:couchbase /run/secrets/profile_sync || :
-    eval $start_cmd || exit 1
+    eval "$start_cmd" || exit 1
   else
     chmod 600 /run/secrets/profile_sync || :
     chown couchbase:couchbase /run/secrets/profile_sync || :

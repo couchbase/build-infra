@@ -57,6 +57,15 @@ services:
         uid: "901"
         gid: "901"
       ################################
+      # couchbase-server/zz/linux    #
+      ################################
+      # This one overwrites the .ssh/config from couchbase-server/build/linux
+      - source: couchbase_server_linux_ssh_zz_config
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      ################################
       # couchbase-server/build/macos #
       ################################
       - source: couchbase_server_shared_gitconfig
@@ -295,11 +304,6 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.ssh_privkey.id_cb-robot.20200417
-        target: /home/couchbase/couchbase-server/build/linux/.ssh/id_cb-robot
-        mode: 0600
-        uid: "901"
-        gid: "901"
       - source: profiledata.ssh_privkey.id_ns-codereview.20200417
         target: /home/couchbase/couchbase-server/build/linux/.ssh/id_ns-codereview
         mode: 0600
@@ -318,8 +322,36 @@ services:
       - source: profiledata.aws_credentials.server.20220706
         target: /home/couchbase/couchbase-server/build/linux/.aws/credentials
         mode: 0444
-        uid: "1000"
-        gid: "1000"
+        uid: "901"
+        gid: "901"
+      ################################
+      # couchbase-server/zz/linux    #
+      ################################
+      - source: profiledata.ssh_privkey.id_cb-robot.20200417
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/id_cb-robot
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.jenkins_api_token.server_job_automation.20220708
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/ns-buildbot-server-jenkins-token
+        mode: 0444
+        uid: "901"
+        gid: "901"
+      - source: profiledata.blackduck.credentials_json.20220708
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/blackduck-creds.json
+        mode: 0444
+        uid: "901"
+        gid: "901"
+      - source: profiledata.build_jira_json.20220213
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/build_jira.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.build_jira_pem.20220213
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/build_jira.pem
+        mode: 0600
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/macos #
       ################################
@@ -537,6 +569,8 @@ configs:
     file: config/couchbase-server/linux/.ssh/config
   couchbase_server_linux_ssh_cv_config:
     file: config/couchbase-server/linux/.ssh/cv_config
+  couchbase_server_linux_ssh_zz_config:
+    file: config/couchbase-server/linux/.ssh/zz_config
   # macos
   couchbase_server_macos_ssh_build_config:
     file: config/couchbase-server/macos/.ssh/build_config
@@ -641,4 +675,10 @@ secrets:
     external: true
   # jira auth pem
   profiledata.build_jira_pem.20220213:
+    external: true
+  # jenkins tokens (for user ns-buildbot)
+  profiledata.jenkins_api_token.server_job_automation.20220708:
+    external: true
+  # black duck
+  profiledata.blackduck.credentials_json.20220708:
     external: true

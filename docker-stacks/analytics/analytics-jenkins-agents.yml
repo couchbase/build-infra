@@ -34,6 +34,25 @@ x-default-jenkins-agent: &default-jenkins-agent
 
 services:
 
+  zz-lightweight:
+    image: couchbasebuild/zz-lightweight:20220708
+    environment:
+      - "JENKINS_SLAVE_NAME=zz-analytics-lightweight"
+      - "JENKINS_SLAVE_LABELS=zz-lightweight"
+      - "JENKINS_SLAVE_EXECUTORS=15"
+      - "JENKINS_MASTER=http://analytics.jenkins.couchbase.com/"
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
+      - "NODE_CLASS=cv zz"
+      - "NODE_PRODUCT=couchbase-server"
+      - "COUCHBASE_DISABLED_UNIT_TESTS=ALL"
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu18"
+        max_replicas_per_node: 1
+      replicas: 1
+
   ubuntu18:
     image: couchbasebuild/analytics-ubuntu18-cv:20220408
 

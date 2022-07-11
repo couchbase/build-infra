@@ -27,6 +27,17 @@ x-default-jenkins-agent: &default-jenkins-agent
       target: /tmp/dockerhub_nsbuildbot_password
 
 services:
+  zz-lightweight:
+    image: couchbasebuild/zz-lightweight:20220708
+    environment:
+      - "JENKINS_SLAVE_NAME=cv-zz-lightweight"
+      - "JENKINS_SLAVE_LABELS=zz-lightweight"
+      - "JENKINS_SLAVE_EXECUTORS=10"
+      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+    <<: *default-jenkins-agent
+
   # Placeholder service for aarch64
   # Note: this should always have zero replicas, and its LAUNCH_IMAGE should
   # always be kept current. Its presence here is required to allow EC2
