@@ -1,6 +1,6 @@
 # Docker container for Python/Alpine
 
-FROM python:3.9.6-alpine
+FROM python:3.9.10-alpine
 LABEL maintainer="build-team@couchbase.com"
 
 ARG SWARM_CLIENT_VERSION
@@ -34,9 +34,6 @@ RUN set -x \
 RUN set -x \
     && curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo \
     && chmod a+rx /usr/bin/repo
-
-# Jenkins Swarm client jar
-RUN curl -Lfs https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -o /usr/local/lib/swarm-client.jar
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /

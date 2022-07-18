@@ -12,7 +12,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
       - "JENKINS_SLAVE_EXECUTORS=10"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=mobile"
@@ -48,7 +48,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=lite-android-ubuntu18"
       - "JENKINS_SLAVE_LABELS=android cobalt mobile-lite-android"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=mobile"
     volumes:
@@ -81,7 +81,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=sgw-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 mobile mobile-sgw-centos7 sgw"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=mobile"
     volumes:
@@ -114,7 +114,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=litecore-centos72"
       - "JENKINS_SLAVE_LABELS=cbl-java cbl-log cblite centos7 centos72 litecore"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "/etc/timezone:/etc/timezone"
@@ -143,7 +143,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=litecore-centos73"
       - "JENKINS_SLAVE_LABELS=cbl-java cbl-log cblite centos73 litecore"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "/etc/timezone:/etc/timezone"
@@ -172,7 +172,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=mobile-litec-the-ark"
       - "JENKINS_SLAVE_LABELS=litec litec-the-ark"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8080/"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
       - "JENKINS_SLAVE_EXECUTORS=3"
     volumes:
       - "/etc/localtime:/etc/localtime"

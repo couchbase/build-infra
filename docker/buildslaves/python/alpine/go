@@ -7,7 +7,7 @@ mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 
-docker build . \
+docker build --pull . \
     -t ${IMAGE}:${TAG} \
     -t ${IMAGE}:latest \
     --build-arg SWARM_CLIENT_VERSION=3.24

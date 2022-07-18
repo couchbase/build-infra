@@ -17,7 +17,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=buildx"
       - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices couchbase-operator master buildx"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
+      - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
     volumes:

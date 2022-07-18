@@ -1,4 +1,4 @@
-FROM couchbasebuild/server-linux-build:20211005
+FROM couchbasebuild/server-linux-build:20220113
 
 LABEL maintainer=build-team@couchbase.com
 

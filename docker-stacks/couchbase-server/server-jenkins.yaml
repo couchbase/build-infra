@@ -1,0 +1,43 @@
+version: '3.5'
+
+# Suggested deployment command:
+#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c server-jenkins.yaml server
+# All services, networks, etc. will then get an "server_" prefix,
+# eg. "server_jenkins"
+
+services:
+
+  # server.jenkins.couchbase.com
+  jenkins:
+    image: jenkins/jenkins:2.346.2
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.server_jenkins.rule=Host(`server.jenkins.couchbase.com`)"
+        - "traefik.http.services.server_jenkins.loadbalancer.server.port=8080"
+    ports:
+      - "50001:50001"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /buildteam/jenkins/server-jenkins-home
+        target: /var/jenkins_home
+    networks:
+      - jenkins
+      - traefik_reverse-proxy
+
+# See http://www.technowise.in/2016/10/fix-no-valid-crumb-was-included-in.html
+# and https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Nginx
+# for the reason behind -Dhudson.security.csrf.requestfield
+    environment:
+      - "JAVA_OPTS=-Dhudson.model.ParametersAction.keepUndefinedParameters=true -Dhudson.security.csrf.requestfield=Jenkins-Crumb -Dhudson.TcpSlaveAgentListener.hostName=mega4.build.couchbase.com"
+      - "JENKINS_OPTS=--sessionTimeout=1440 --sessionEviction=14400"
+
+networks:
+  jenkins:
+  traefik_reverse-proxy:
+    external: true

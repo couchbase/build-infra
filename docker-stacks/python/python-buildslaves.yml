@@ -30,28 +30,30 @@ x-default-jenkins-slave: &default-jenkins-slave
       uid: '1000'
       mode: 0400
 
-x-default-jenkins-slave-environment:
- - &default-jenkins-slave-environment-master "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
-
+x-default-jenkins-environment:
+ - &server-jenkins-master "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
+ - &server-jenkins-tunnel "JENKINS_TUNNEL=mega4.build.couchbase.com:"
 services:
 
   alpine:
-    image: couchbasebuild/python-alpine-build:20211109
+    image: couchbasebuild/python-alpine-build:20220717
     environment:
       - "JENKINS_SLAVE_NAME=python-alpine"
       - "JENKINS_SLAVE_LABELS=linux python3 x64-musl"
-      - *default-jenkins-slave-environment-master
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
     <<: *default-jenkins-slave
 
   centos6:
-    image: couchbasebuild/python-centos6-build:20210917
+    image: couchbasebuild/python-centos6-build:20220717
     environment:
       - "JENKINS_SLAVE_NAME=python-centos6"
       - "JENKINS_SLAVE_LABELS=linux python3 x86_64"
-      - *default-jenkins-slave-environment-master
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"

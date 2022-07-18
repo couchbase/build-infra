@@ -8,11 +8,11 @@ version: '3.8'
 services:
 
   clamav:
-    image: couchbasebuild/clamav-agent:20211022
+    image: couchbasebuild/clamav-agent:20220717
     environment:
       - "JENKINS_SLAVE_NAME=clamav"
       - "JENKINS_SLAVE_LABELS=clamav"
-      - "JENKINS_MASTER=http://mega1.build.couchbase.com:8082/"
+      - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
     deploy:
       placement:
         constraints:
