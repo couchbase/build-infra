@@ -65,6 +65,11 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      - source: couchbase_server_linux_zz_update_manifest_released
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/update_manifest_released.ini
+        mode: 0644
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/macos #
       ################################
@@ -576,6 +581,8 @@ configs:
     file: config/couchbase-server/linux/.ssh/cv_config
   couchbase_server_linux_ssh_zz_config:
     file: config/couchbase-server/linux/.ssh/zz_config
+  couchbase_server_linux_zz_update_manifest_released:
+    file: config/couchbase-server/linux/.ssh/update_manifest_released.ini
   # macos
   couchbase_server_macos_ssh_build_config:
     file: config/couchbase-server/macos/.ssh/build_config
