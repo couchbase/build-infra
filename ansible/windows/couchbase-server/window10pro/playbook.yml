@@ -223,3 +223,9 @@
     - name: Install cygwin
       include_role:
         name: ../../roles/cygwin
+
+    - name: Install asciidoctor
+      gem:
+        name: asciidoctor
+        user_install: no
+        state: latest

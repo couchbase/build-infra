@@ -18,3 +18,11 @@
     - { role: 'roles/testrunner', tags: 'testrunner' }
     - { role: '../common/roles/profile', tags: 'profile' }
     - { role: 'roles/cv', tags: 'cv' }
+
+- hosts: all
+  tasks:
+  - name: Install asciidoctor
+    gem:
+      name: asciidoctor
+      user_install: no
+      state: latest

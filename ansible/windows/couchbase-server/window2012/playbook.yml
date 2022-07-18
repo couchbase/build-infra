@@ -197,3 +197,9 @@
             - profile
       tags:
       - profile
+
+    - name: Install asciidoctor
+      gem:
+        name: asciidoctor
+        user_install: no
+        state: latest
