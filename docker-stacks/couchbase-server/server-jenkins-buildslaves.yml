@@ -320,7 +320,7 @@ services:
     <<: *default-jenkins-one-agent
 
   suse15-mad-hatter:
-    image: couchbasebuild/server-suse15-mad-hatter-build:20210721
+    image: couchbasebuild/server-suse15-mad-hatter-build:20220718
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15-mad-hatter"
       - "JENKINS_SLAVE_LABELS=server suse15 mad-hatter x86_64"
@@ -328,7 +328,7 @@ services:
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
   suse15:
     image: couchbasebuild/server-suse15-build:20220114

@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/server-suse15-mad-hatter-build
