@@ -210,6 +210,9 @@ RUN if [ "$(uname -m)" == "aarch64" ]; then \
         yum clean all; \
     fi
 
+# glib2 and friends - annoyingly needed by v8 build.
+RUN yum install -y glib2-devel && yum clean all
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 

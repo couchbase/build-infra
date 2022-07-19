@@ -228,6 +228,9 @@ RUN set -x \
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
+# glib2 and friends - annoyingly needed by v8 build.
+RUN yum install -y glib2-devel && yum clean all
+
 # Our tools
 ARG CBDEP_VER
 ARG PATCH_VIA_GERRIT_VER
