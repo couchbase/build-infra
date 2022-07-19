@@ -550,7 +550,7 @@ services:
         uid: "901"
         gid: "901"
       - source: profiledata.aws_credentials.mobile.20210512
-        target: /home/couchbase/mobile/build/linux/.ssh/aws-credentials
+        target: /home/couchbase/mobile/build/linux/.aws/credentials
         mode: 0600
         uid: "901"
         gid: "901"
