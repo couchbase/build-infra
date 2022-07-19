@@ -173,9 +173,6 @@ services:
         source: optcouchbase
         target: /opt/couchbase
       - type: volume
-        source: rpmdb
-        target: /var/lib/rpm
-      - type: volume
         source: workspace
         target: /home/couchbase/jenkins/workspace
       - type: volume

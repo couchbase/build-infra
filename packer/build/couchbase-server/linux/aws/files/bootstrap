@@ -193,7 +193,7 @@ function docker_run_args() {
   # to enable rpm/deb packaging in sidecar containers
   if [ "${environment}" = "server" ]
   then
-    args="${args}-v /var/run/docker.sock:/var/run/docker.sock -v serverbuild_optcouchbase:/opt/couchbase -v rpmdb:/var/lib/rpm "
+    args="${args}-v /var/run/docker.sock:/var/run/docker.sock -v serverbuild_optcouchbase:/opt/couchbase "
   fi
 
   if [ "${environment}" = "cv" ]

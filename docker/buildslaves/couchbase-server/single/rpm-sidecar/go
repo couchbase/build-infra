@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 # Things you might want to adjust:
 IMAGE=couchbasebuild/server-rpm-sidecar
@@ -10,7 +10,34 @@ if [ "$1" = "--publish" ]; then
   PUSH=--push
 fi
 
+# Figure out the right image:tag to use per-architecture - either
+# in the environment (passed by a different 'go' script), or else
+# computed from the stackfile
+get_img() {
+  arch=$1
+
+  env_var="SINGLE_LINUX_IMAGE_${arch}"
+  env_image=${!env_var}
+  if [ ! -z "${env_image}" ]; then
+    echo ${env_image}
+    return
+  fi
+
+  stackfile=$(git rev-parse --show-toplevel)/docker-stacks/couchbase-server/server-jenkins-buildslaves.yml
+  case ${arch} in
+    arm64)
+      base_os=amzn2
+      ;;
+    amd64)
+      base_os=linux-single
+      ;;
+  esac
+  echo $(docker run --rm -i mikefarah/yq ".services.${base_os}.image" < "${stackfile}")
+}
+
 docker buildx build --pull $PUSH \
   --tag ${IMAGE}:${TAG} --tag ${IMAGE}:latest \
   --platform linux/amd64,linux/arm64 \
+  --build-arg SINGLE_LINUX_IMAGE_amd64=$(get_img amd64) \
+  --build-arg SINGLE_LINUX_IMAGE_arm64=$(get_img arm64) \
   .

@@ -44,3 +44,7 @@ docker buildx build --pull ${PUSH} \
   --build-arg RUBY_INSTALL_MINOR=${RUBY_INSTALL_MINOR} \
   --build-arg RUBY_INSTALL_PATCH=${RUBY_INSTALL_PATCH} \
   .
+
+# Also ensure the RPM sidecar is updated appropriately
+cd ../single/rpm-sidecar
+SINGLE_LINUX_IMAGE_arm64=${IMAGE}:${TAG} ./go $1
