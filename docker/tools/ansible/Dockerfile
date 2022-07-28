@@ -1,17 +1,22 @@
 # Dockerfile for building Ansible image, with as little additional software as possible.
 
 # pull base image
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
-MAINTAINER Couchbase Build Team <build-team@couchbase.com>
+LABEL maintainer="Couchbase Build Team <build-team@couchbase.com>"
 
 ARG ANSIBLE_VERSION
 
-RUN apt-get update                                       && \
-    apt-get install -y python3-pip sshpass openssh-client rsync && \
-    apt-get clean
-RUN pip3 install --upgrade ansible==${ANSIBLE_VERSION}   && \
-    pip3 install --upgrade pywinrm
+RUN set -x \
+      && apt-get update \
+      && apt-get install -y python-is-python3 python3-venv sshpass openssh-client rsync \
+      && apt-get clean
+RUN set -x \
+      && python -m venv /venv \
+      && . /venv/bin/activate \
+      && pip install --upgrade pip \
+      && pip install --upgrade ansible==${ANSIBLE_VERSION} \
+      && pip install --upgrade pywinrm
 
 ADD entrypoint.sh /
 # Need to save this arg in an environment variable, because ENTRYPOINT

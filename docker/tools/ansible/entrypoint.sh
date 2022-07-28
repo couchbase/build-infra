@@ -18,7 +18,10 @@ fi
 
 export ANSIBLE_HOST_KEY_CHECKING=false
 
-# If there's a requirements.txt, assume it's for ansible-galaxy tools that
+# Activate the pre-created venv
+. /venv/bin/activate
+
+# If there's a requirements.yml, assume it's for ansible-galaxy tools that
 # we need to have
 
 if [ -e requirements.yml ]; then

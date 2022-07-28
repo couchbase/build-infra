@@ -1,11 +1,11 @@
 #!/bin/sh -e
 
-VERSION=2.9.6
+VERSION=6.1.0
 
 for command in ansible ansible-playbook
 do
   IMAGE=couchbasebuild/${command}
-  docker build \
+  docker build --pull \
     --build-arg ANSIBLE_COMMAND=${command} \
     --build-arg ANSIBLE_VERSION=${VERSION} \
     --tag $IMAGE:$VERSION .
@@ -16,4 +16,3 @@ do
     docker push $IMAGE:latest
   fi
 done
-
