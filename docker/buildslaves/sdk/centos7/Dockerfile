@@ -4,8 +4,8 @@ FROM centos:centos7.4.1708
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
-RUN yum clean all && \
-    yum install --setopt=keepcache=0 -y sudo deltarpm
+RUN yum install --setopt=keepcache=0 -y sudo deltarpm && \
+    yum clean all
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -61,13 +61,16 @@ RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
                 llvm-toolset-7.0-clang-analyzer \
                 llvm-toolset-7.0-clang-tools-extra \
                 llvm-toolset-7.0-git-clang-format \
-                devtoolset-9-gcc-c++
+                devtoolset-9-gcc-c++ && \
+    yum clean all
 
 # Dev basic tools
-RUN yum groupinstall -y --setopt=keepcache=0 "Development Tools"
+RUN yum groupinstall -y --setopt=keepcache=0 "Development Tools" && \
+    yum clean all
 
 # JDK for Jenkins
-RUN yum install -y --setopt=keepcache=0 java-11-openjdk && yum clean packages
+RUN yum install -y --setopt=keepcache=0 java-11-openjdk && \
+    yum clean all
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
@@ -88,7 +91,8 @@ RUN mkdir /opt/cbdeps && \
 
 # Build tools
 RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo && \
-    sudo yum install -y --setopt=keepcache=0 sbt
+    sudo yum install -y --setopt=keepcache=0 sbt && \
+    yum clean all
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
     curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
@@ -104,12 +108,17 @@ RUN mkdir /tmp/deploy && \
     curl -L -o couchbase-release.rpm http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-x86_64.rpm && \
     rpm -iv couchbase-release.rpm && \
     yum install -y --setopt=keepcache=0 libcouchbase-devel libcouchbase2-libevent libcouchbase2-libev libcouchbase2-bin && \
+    yum clean all && \
     cd /tmp && \
     rm -rf /tmp/deploy
 
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
 RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+
+# Enable disk/memory healthchecks
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
