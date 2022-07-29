@@ -1,0 +1,112 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: "fully-auto"
+    password: "$6$YmOLYvz9Vi$llUlv4UTxifLTwxxBFisAY1cQ4lwLqCYF2QqWKJ8S3QSAE.luZ2nNorftuIcxFmu24V4rgV94TU.CDyDgeD3D0"
+    username: couchbase
+    realname: "Couchbase Build Team"
+  storage:
+    layout:
+      name: direct
+  locale: en_US.UTF-8
+  ssh:
+    allow-pw: true
+    install-server: true
+  keyboard:
+    layout: us
+  apt:
+    sources:
+      docker.list:
+        source: "deb https://download.docker.com/linux/ubuntu/ $RELEASE stable"
+        keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+      netdata.list:
+        source: "deb https://packagecloud.io/netdata/netdata-repoconfig/ubuntu/ $RELEASE main"
+        key: |
+          -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+          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
+          pdcjU1X52uTLGIeyw5yAIuEvr3lvyEsgLA==
+          =ItGA
+          -----END PGP PUBLIC KEY BLOCK-----
+
+  packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - docker-ce
+    - netdata
+    - net-tools
+    - nfs-common
+    - python-is-python3
+    - software-properties-common
+    - zsh
+    - /cdrom/xe-guest-utilities.deb
+  package_update: true
+  package_upgrade: true
+  late-commands:
+    - curtin in-target --target /target -- timedatectl set-timezone America/Los_Angeles
+    - curtin in-target --target /target -- apt-mark hold xe-guest-utilities
+    - 'sed -i -e "s,^\(\s*bind\),#\1," /target/etc/netdata/netdata.conf'
+    - mkdir -p /target/etc/systemd/system/docker.service.d
+    - cp /cdrom/docker-service.conf /target/etc/systemd/system/docker.service.d
+    - 'echo "couchbase ALL=(ALL:ALL) NOPASSWD: ALL" > /target/etc/sudoers.d/couchbase'

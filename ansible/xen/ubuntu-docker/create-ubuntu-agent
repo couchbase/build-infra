@@ -3,13 +3,14 @@
 usage() {
     echo "Usage: $(basename $0) -n NAME -p XEN_PASSWORD"
     echo "    [-m MEMORY] [-c CPUS] [-d DISKSPACE]"
+    echo "    [-r ROLES] [-e ROLE_ARG=VALUE]"
     echo "    [-s SWARM_MANAGER] [-l SWARM_LABELS]"
     echo "Defaults: memory 20GB; cpus 8; diskpace 200GB; no Swarm"
     exit 1
 }
 
 
-while getopts ":n:p:m:c:d:s:l:" opt; do
+while getopts ":n:p:m:c:d:s:l:r:e:" opt; do
     case ${opt} in
         n)
             NAME=${OPTARG}
@@ -29,11 +30,17 @@ while getopts ":n:p:m:c:d:s:l:" opt; do
         d)
             DISKSPACE=${OPTARG}
             ;;
+        r)
+            ROLES=${OPTARG}
+            ;;
+        e)
+            ARGS="-e ${OPTARG} ${ARGS}"
+            ;;
         s)
-            SWARM_MANAGER="-e swarm_manager=${OPTARG}"
+            ARGS="-e swarm_manager=${OPTARG} ${ARGS}"
             ;;
         l)
-            SWARM_LABELS="-e swarm_labels=${OPTARG}"
+            ARGS="-e swarm_labels=${OPTARG} ${ARGS}"
             ;;
         \?)
             usage
@@ -51,9 +58,13 @@ MEMORY=${MEMORY:-20}
 CPUS=${CPUS:-8}
 DISKSPACE=${DISKSPACE:-200}
 
-docker run --rm -v $(pwd):/mnt couchbasebuild/ansible-playbook:2.9.4 \
+docker run --rm \
+    -v $(pwd):/mnt \
+    -v $(git rev-parse --show-toplevel)/ansible:/roledir \
+    -e ANSIBLE_ROLES_PATH=/roledir/common/roles:/roledir/linux/common/roles \
+    couchbasebuild/ansible-playbook:6.1.0 \
     -v -i inventory playbook.yml \
     -e cmdline_password=${XEN_PASSWORD} \
-    -e vm_name=${NAME} -e memory=${MEMORY} \
-    -e vcpus=${CPUS} -e disksize=${DISKSPACE} \
-    ${SWARM_MANAGER} ${SWARM_LABELS}
+    -e vm_name=${NAME} -e role_list=${ROLES} \
+    -e memory=${MEMORY} -e vcpus=${CPUS} -e disksize=${DISKSPACE} \
+    ${ARGS}

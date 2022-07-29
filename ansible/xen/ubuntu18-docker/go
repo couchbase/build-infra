@@ -1,2 +1,0 @@
-docker run --rm -v $(pwd):/mnt couchbasebuild/ansible-playbook:2.9.4 \
-    -v -i inventory playbook.yml $@

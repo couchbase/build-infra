@@ -1,0 +1,1 @@
+circleci_runner_name: "{{ vm_name }}"

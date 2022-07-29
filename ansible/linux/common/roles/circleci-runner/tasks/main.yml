@@ -1,0 +1,56 @@
+---
+- name: Create /opt/circleci
+  file:
+    path: /opt/circleci
+    state: directory
+    mode: "0755"
+    owner: couchbase
+    group: couchbase
+  become: true
+
+- name: Install CircleCI Launch Agent
+  script:
+    chdir: /tmp
+    cmd: files/download-launch-agent.sh
+    creates: /opt/circleci/circleci-launch-agent
+
+- name: Add launch-agent-config
+  template:
+    src: launch-agent-config.yaml.j2
+    dest: /opt/circleci/launch-agent-config.yaml
+    owner: root
+    mode: "0600"
+  become: true
+
+- name: Add circleci systemd service file
+  copy:
+    src: circleci.service
+    dest: /etc/systemd/system/circleci.service
+    owner: root
+    mode: "0644"
+  become: true
+
+- name: Enable and Start circleci systemd service
+  systemd:
+    name: circleci
+    enabled: true
+
+- name: Add additional packages
+  apt:
+    name: [unzip, docker-compose-plugin, build-essential]
+    state: present
+    update_cache: yes
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required_file
+
+- name: Reboot if required
+  reboot:
+  when: reboot_required_file.stat.exists
+
+- name: Start circleci systemd service
+  systemd:
+    name: circleci
+    state: started

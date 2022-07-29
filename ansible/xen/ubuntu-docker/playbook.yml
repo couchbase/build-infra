@@ -74,6 +74,9 @@
         name: "{{ vmip.stdout }}"
         groups: newvms
 
+    - name: Eject CD
+      command: xe vm-cd-eject uuid={{ vmuuid.stdout }}
+
 - name: Do stuff on new VMs
   gather_facts: False
   hosts: newvms
@@ -86,6 +89,11 @@
     ansible_python_interpreter: /usr/bin/python3
 
   tasks:
+
+    - name: Wait for new VM to be connectable
+      wait_for_connection:
+        timeout: 300
+        sleep: 3
 
     # The space in " yes" is important due to the way 'cut' works
     - name: Wait for clock to synchronize
@@ -101,11 +109,6 @@
         regexp: '^127\.0\.1\.1'
         line: "127.0.1.1 {{ vm_name }}"
 
-    - name: Apt Update
-      apt:
-        update_cache: yes
-        upgrade: dist
-
     - name: Enable coredumps in /tmp
       sysctl:
         name: kernel.core_pattern
@@ -114,45 +117,11 @@
       tags: core
       changed_when: true
 
-    - name: Reboot to get new kernel
-      shell: sleep 2 && shutdown -r now "Ansible updates triggered"
-      async: 5
-      poll: 0
-
-    - name: Wait for server to finish rebooting
-      become: no
-      connection: local
-      wait_for:
-        host: "{{ inventory_hostname }}"
-        port: 22
-        state: started
-        delay: 60
-        timeout: 300
-
     - name: Clean unused packages
       apt:
         update_cache: yes
         autoremove: yes
         purge: yes
-
-    - name: Get distro codename
-      shell: lsb_release -sc
-      register: distro_codename
-
-    - name: Get kernel version
-      shell: uname -r
-      register: uname
-      changed_when: false
-
-    - name: Install additional packages for Docker and NFS
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - software-properties-common
-          - curl
-          - nfs-common
-          - zsh
 
     - name: Mount NAS directories
       tags: mount
@@ -169,27 +138,6 @@
           nasserver: nas.build.couchbase.com
           naspath: /data/buildteam
 
-    - name: Add docker key
-      shell: >
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      args:
-        warn: False
-
-    - name: Add docker apt repository
-      shell: >
-        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ distro_codename.stdout }} stable"
-
-    - name: Install Docker
-      apt:
-        name: docker-ce
-        update_cache: yes
-
-    - name: Add couchbase user to docker group
-      user:
-        name: couchbase
-        group: docker
-        append: yes
-
     - name: Create /home/couchbase/.docker directory
       file:
         path: /home/couchbase/.docker
@@ -204,32 +152,14 @@
         mode: 0600
         owner: couchbase
 
-    - name: Create docker systemd drop-in directory
-      file:
-        path: /etc/systemd/system/docker.service.d
-        state: directory
-        mode: 0755
-
-    - name: Create jenkins directory
-      tags: tmp
-      file:
-        path: /home/couchbase/jenkins
-        state: directory
-        mode: '0755'
-        owner: couchbase
-        group: couchbase
-
-    - name: Create docker systemd drop-in config file
-      copy:
-        src: docker-service.conf
-        dest: /etc/systemd/system/docker.service.d/docker-service.conf
-        backup: yes
-
-    - name: Restart docker systemd service
-      systemd:
-        daemon_reload: yes
-        name: docker
-        state: restarted
+    # This unfortunately can't be done easily in the Subiquity config from
+    # fully_automated_iso - the default "couchbase" user doesn't get created
+    # before the late-commands are run
+    - name: Add couchbase user to docker group
+      user:
+        name: couchbase
+        groups: docker
+        append: yes
 
     - name: Disable automatic updates
       apt:
@@ -237,61 +167,10 @@
         state: absent
         purge: yes
 
-    - name: Add apt key for netdata
-      become: true
-      apt_key:
-        url: https://packagecloud.io/netdata/netdata/gpgkey
-        state: present
-
-    - name: Add netdata apt repository
-      become: true
-      apt_repository:
-        repo: deb https://packagecloud.io/netdata/netdata/ubuntu/ {{ distro_codename.stdout }} main
-        state: present
-        filename: netdata
-
-    - name: Install netdata
-      become: true
-      apt:
-        name: netdata
-        state: latest
-        update_cache: yes
-
-    - name: Create netdata cache dir
-      become: true
-      file:
-        path: /var/cache/netdata
-        state: directory
-        mode: '0755'
-        owner: netdata
-        group: netdata
-
-    - name: Create netdata log dir
-      become: true
-      file:
-        path: /var/log/netdata
-        state: directory
-        mode: '0755'
-        owner: netdata
-        group: adm
-
-    - name: Expose netdata port
-      replace:
-        path: /etc/netdata/netdata.conf
-        regexp: 'bind to = localhost'
-        replace: '# bind to = localhost'
-
-    - name: Start netdata
-      become: true
-      service:
-        name: netdata
-        state: started
-
-    - name: Start netdata at boot
-      become: true
-      service:
-        name: "netdata"
-        enabled: yes
+    - name: Process VM-specific roles
+      include_role:
+        name: "{{ item }}"
+      loop: "{{ role_list.split(',') }}"
 
     - name: Get Docker Swarm token
       when: swarm_manager is defined
