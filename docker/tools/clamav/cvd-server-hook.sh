@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Update to get the initial database
-cvd config set --dbdir /var/clamav/database
-echo "Running cvd update to get initial Clamav database, please wait"
-cvd update
+# Create config dif
+mkdir -p /var/clamav/database
 
-# Run the mirror server
+# Set config dir
+cvd config set --dbdir /var/clamav/database
+
+# Start the mirror server
 nohup cvd serve >& /tmp/cvd-serve.log &
