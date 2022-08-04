@@ -16,6 +16,13 @@ then
     cd /mnt
 fi
 
+# If any dirs look like /role*, add them to Ansible role path
+shopt -s nullglob
+ROLEDIRS=$(echo /role*)
+if [ ! -z "${ROLEDIRS}" ]; then
+    export ANSIBLE_ROLES_PATH=${ANSIBLE_ROLES_PATH}:${ROLEDIRS// /:}
+fi
+
 export ANSIBLE_HOST_KEY_CHECKING=false
 
 # Activate the pre-created venv

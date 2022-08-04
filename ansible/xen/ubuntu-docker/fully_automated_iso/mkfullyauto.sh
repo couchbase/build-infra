@@ -2,11 +2,11 @@
 
 # Modify these as necessary
 UBUNTUVER=${1-22.04}
-XEVER=7.10.0
+XEVER=7.4.0-1
 
 # Derived values - probably don't modify these
 UBUNTUCD=ubuntu-${UBUNTUVER}-live-server-amd64.iso
-XEUTIL=xe-guest-utilities_${XEVER}-0ubuntu1_amd64.deb
+XEUTIL=xe-guest-utilities_${XEVER}_amd64.deb
 AUTOISO=ubuntu-${UBUNTUVER}-fully-automated.iso
 
 bigecho() {
@@ -18,9 +18,8 @@ bigecho() {
 }
 # Check for existence of required files first
 if [ ! -e ${XEUTIL} ]; then
-  bigecho "Downloading xe-guest-utilities"
-  curl --fail -L -o ${XEUTIL} \
-    http://archive.ubuntu.com/ubuntu/pool/main/x/xe-guest-utilities/${XEUTIL}
+  echo "Please copy ${XEUTIL} into current working directory and try again."
+  exit 1
 fi
 if [ ! -e ${UBUNTUCD} ]; then
   bigecho "Downloading Stock Ubuntu ${UBUNTUVER}"

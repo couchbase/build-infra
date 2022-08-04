@@ -1,0 +1,6 @@
+---
+- name: Download cbdep
+  get_url:
+    url: "https://packages.couchbase.com/cbdep/cbdep-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+    dest: /usr/local/bin/cbdep
+    mode: "0755"

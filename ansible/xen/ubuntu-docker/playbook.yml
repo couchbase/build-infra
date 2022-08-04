@@ -75,7 +75,7 @@
         groups: newvms
 
     - name: Eject CD
-      command: xe vm-cd-eject uuid={{ vmuuid.stdout }}
+      shell: "xe vm-cd-eject uuid={{ vmuuid.stdout }} || true"
 
 - name: Do stuff on new VMs
   gather_facts: False
@@ -166,6 +166,30 @@
         name: unattended-upgrades
         state: absent
         purge: yes
+
+    - name: Wait for cloud-init post-boot updates to complete
+      command: cloud-init status --wait
+
+    - name: Disable cloud-init for future reboots
+      file:
+        path: /etc/cloud/cloud-init.disabled
+        state: touch
+        owner: root
+
+    - name: Reboot to be sure
+      reboot:
+
+    - name: Purge cloud-init
+      apt:
+        name: cloud-init
+        state: absent
+        purge: yes
+
+    - name: Purge cloud-init leftover config
+      file:
+        name: "{{ item }}"
+        state: absent
+      loop: [ /etc/cloud, /var/lib/cloud ]
 
     - name: Process VM-specific roles
       include_role:

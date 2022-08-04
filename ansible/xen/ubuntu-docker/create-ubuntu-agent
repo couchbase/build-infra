@@ -60,8 +60,8 @@ DISKSPACE=${DISKSPACE:-200}
 
 docker run --rm \
     -v $(pwd):/mnt \
-    -v $(git rev-parse --show-toplevel)/ansible:/roledir \
-    -e ANSIBLE_ROLES_PATH=/roledir/common/roles:/roledir/linux/common/roles \
+    -v $(git rev-parse --show-toplevel)/ansible/common/roles:/rolescommon \
+    -v $(git rev-parse --show-toplevel)/ansible/linux/common/roles:/roleslinux \
     couchbasebuild/ansible-playbook:6.1.0 \
     -v -i inventory playbook.yml \
     -e cmdline_password=${XEN_PASSWORD} \
