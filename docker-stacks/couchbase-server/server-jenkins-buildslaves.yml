@@ -375,7 +375,7 @@ services:
     image: couchbasebuild/server-ubuntu18-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
-      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04-windowscrosscompile ubuntu18 cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04 ubuntu18 cheshire-cat neo master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
