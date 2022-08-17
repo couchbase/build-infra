@@ -3,6 +3,11 @@
 
   tasks:
 
+    - name: Check VS_VERSION
+      fail:
+        msg: "VS_VERSION variable is required (e.g. vs2017 or vs2019)"
+      when: "VS_VERSION is not defined"
+
     - name: "Install Python 3"
       win_chocolatey:
         name: python3
@@ -97,10 +102,17 @@
     - name: Install OpenSSH (for Jenkins)
       script: openssh.ps1
 
-    - name: Create SSH directory
-      win_file:
-        path: C:\Users\{{ ansible_user }}\.ssh
-        state: directory
+    - name: Copy SSH config files
+      win_copy:
+        src: "./ssh/{{ item }}"
+        dest: C:\Users\{{ ansible_user }}\.ssh\{{ item }}
+      with_items:
+        - authorized_keys
+        - buildbot_id_dsa
+        - config
+        - environment
+        - id_rsa
+        - known_hosts
 
     - name: Enable Remote Desktop
       win_regedit:
@@ -124,9 +136,18 @@
     - name: Exclude Jenkins from windows antivirus
       win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins" -ExclusionExtension "exe"
 
-    #base vs2017 install role from ../../roles/vs2017_mobile/
+    #install role from ../roles/vs2017_mobile/
     - name: install vs2017_mobile
       include_role:
         name: "vs2017_mobile"
       vars:
         PRODUCT: "couchbase-lite-core"
+      when: VS_VERSION == "vs2017"
+
+    #install role from ../roles/vs2022/
+    - name: install vs2022
+      include_role:
+        name: "vs2022"
+      vars:
+        PRODUCT: "couchbase-lite-core"
+      when: VS_VERSION == "vs2022"
