@@ -61,7 +61,7 @@ x-default-jenkins-slave-environment:
 services:
 
   alpine:
-    image: couchbasebuild/sdk-alpine-build:20220317
+    image: couchbasebuild/sdk-alpine-build:20220427
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine"
       - "JENKINS_SLAVE_LABELS=sdk alpine"
@@ -70,7 +70,7 @@ services:
     <<: *default-jenkins-slave
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20220317
+    image: couchbasebuild/sdk-amzn2-build:20220427
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
@@ -88,7 +88,7 @@ services:
     <<: *default-jenkins-slave
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20220729
+    image: couchbasebuild/sdk-centos7-build:20220819
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"
@@ -115,7 +115,7 @@ services:
     <<: *default-jenkins-slave
 
   debian9:
-    image: couchbasebuild/sdk-debian9-build:20220317
+    image: couchbasebuild/sdk-debian9-build:20220427
     environment:
       - "JENKINS_SLAVE_NAME=build-debian9"
       - "JENKINS_SLAVE_LABELS=sdk debian9"
@@ -142,7 +142,7 @@ services:
     <<: *default-jenkins-slave
 
   ubuntu20:
-    image: couchbasebuild/sdk-ubuntu20-build:20220425
+    image: couchbasebuild/sdk-ubuntu20-build:20220427
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"

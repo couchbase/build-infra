@@ -27,12 +27,13 @@ RUN yum install --setopt=keepcache=0 -y \
                 libevent-devel \
                 libffi-devel \
                 libxml2-devel \
-                openssl-devel \
+                openssl11-devel \
+                openssl11-static \
                 make \
                 man \
                 ncurses-devel \
                 numactl-devel \
-                openssh-clients openssl-devel \
+                openssh-clients \
                 python-devel \
                 python-pip \
                 python-virtualenv \
@@ -46,7 +47,8 @@ RUN yum install --setopt=keepcache=0 -y \
                 cmake \
                 python-pip \
                 wget \
-                python-pip
+                python-pip \
+                ccache
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -86,7 +88,7 @@ RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo 
     sudo yum install -y --setopt=keepcache=0 sbt
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
+    curl -L -o /tmp/deploy/maven.zip https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
     cd /usr/local && \
     unzip /tmp/deploy/gradle.zip && \
     unzip /tmp/deploy/maven.zip && \

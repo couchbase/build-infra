@@ -41,7 +41,8 @@ RUN apk add --no-cache \
         rsync \
         sudo \
         tar \
-        unzip
+        unzip \
+        ccache
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -83,7 +84,7 @@ RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/te
 RUN set -x \
     && mkdir /tmp/deploy \
     && curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
-    && curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-$(echo ${MAVEN_VERSION} | awk 'BEGIN{FS=OFS="."} NF=1')/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.zip \
+    && curl -L -o /tmp/deploy/maven.zip https://archive.apache.org/dist/maven/maven-$(echo ${MAVEN_VERSION} | awk 'BEGIN{FS=OFS="."} NF=1')/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.zip \
     && cd /usr/local \
     && unzip /tmp/deploy/gradle.zip \
     && unzip /tmp/deploy/maven.zip \
@@ -94,7 +95,7 @@ RUN set -x \
 RUN set -x \
     && mkdir /tmp/deploy \
     && cd /tmp/deploy \
-    && git clone ssh://git@github.com/couchbase/libcouchbase.git \
+    && git clone https://github.com/couchbase/libcouchbase.git \
     && cd libcouchbase && mkdir build && cd build \
     && ../cmake/configure \
     && make \

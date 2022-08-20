@@ -45,6 +45,7 @@ RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
                 numactl-devel \
                 oniguruma-devel \
                 openssl-devel \
+                openssl-libs \
                 openssh-clients \
                 perl-XML-XPath \
                 python-devel \
@@ -61,7 +62,8 @@ RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
                 llvm-toolset-7.0-clang-analyzer \
                 llvm-toolset-7.0-clang-tools-extra \
                 llvm-toolset-7.0-git-clang-format \
-                devtoolset-9-gcc-c++ && \
+                devtoolset-9-gcc-c++ \
+                ccache && \
     yum clean all
 
 # Dev basic tools
@@ -102,6 +104,29 @@ RUN mkdir /tmp/deploy && \
     ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin && \
     rm -rf /tmp/deploy
 
+# add OpenSSL 1.1.1
+ARG OPENSSL_VERSION=1.1.1l
+ARG OPENSSL_PATH=/usr/local/openssl
+RUN yum install -y pcre-devel zlib-devel gd-devel perl-ExtUtils-Embed libxslt-devel perl-Test-Simple && \
+    yum clean all
+RUN cd /tmp && \
+    curl -L -o openssl-$OPENSSL_VERSION.tar.gz https://www.openssl.org/source/old/1.1.1/openssl-$OPENSSL_VERSION.tar.gz && \
+    tar -xvf openssl-$OPENSSL_VERSION.tar.gz && \
+    mv openssl-$OPENSSL_VERSION openssl && \
+    cd openssl && \
+    ./config --prefix=$OPENSSL_PATH --openssldir=$OPENSSL_PATH shared zlib-dynamic && \
+    make -j4 && \
+    make install && \
+    rm -rf /tmp/openssl && \
+    rm -f /tmp/openssl-1.1.1l.tar.gz
+ENV CPPFLAGS=-I$OPENSSL_PATH/include/openssl
+ENV LDFLAGS="$LDFLAGS -Wl,-rpath,$OPENSSL_PATH"
+ENV LD_LIBRARY_PATH=$OPENSSL_PATH/lib:$LD_LIBRARY_PATH
+
+# install pyenv dependencies
+RUN yum install -y zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel tk-devel libffi-devel xz-devel patch && \
+    yum clean all
+
 # libcouchbase
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
@@ -115,6 +140,7 @@ RUN mkdir /tmp/deploy && \
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
 RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+ENV PATH=$PATH:/usr/local/bin
 
 # Enable disk/memory healthchecks
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

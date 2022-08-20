@@ -9,10 +9,36 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release openjdk-8-jdk sudo tar && \
-    apt-get install -y groff-base python3-dev python3-pip python3-virtualenv gdb gnupg2 && \
-    apt-get install -y libuv1-dev libev-dev libevent-dev libbz2-dev libffi-dev && \
-    apt-get install -y libunwind8 libicu66 libreadline-dev libsqlite3-dev && \
+    apt-get install -y \
+        build-essential \
+        curl \
+        git \
+        libc6-dbg \
+        libssl-dev \
+        lsb-release \
+        openjdk-8-jdk \
+        sudo \
+        groff-base \
+        python3-dev \
+        python3-pip \
+        python3-virtualenv \
+        gdb \
+        libuv1-dev \
+        libev-dev \
+        libevent-dev \
+        libbz2-dev \
+        libffi-dev \
+        libunwind8 \
+        libicu66 \
+        libreadline-dev \
+        libsqlite3-dev \
+        clang \
+        clang-format \
+        clang-tidy \
+        clang-tools \
+        libc++-dev \
+        libc++abi-dev \
+        ccache && \
     apt-get clean
 
 # Create couchbase user with password-less sudo privs, and give
