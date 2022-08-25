@@ -1,9 +1,40 @@
-#!/bin/bash
+#!/bin/bash -e
 
 MIN_FREE_GB=20
 WORKSPACE=/home/couchbase/jenkins/workspace
 
+# Load some useful files (swarm mode only)
+if [ -e /var/run/jenkins_agent_name ]; then
+    SWARM_MODE=true
+    JENKINS_URL=$(cat /var/run/jenkins_master_url)
+    JENKINS_AGENT_NAME=$(cat /var/run/jenkins_agent_name)
+    JENKINS_AGENT_PID=$(cat /var/run/jenkins_agent_pid)
+    JENKINS_USERNAME=$(cat /run/secrets/jenkins_master_username)
+    JENKINS_PASSWORD=$(cat /run/secrets/jenkins_master_password)
+else
+    SWARM_MODE=false
+fi
+
+function node_online {
+    ${SWARM_MODE} || return 0
+
+    curl --silent --fail \
+        -u "${JENKINS_USERNAME}:${JENKINS_PASSWORD}" \
+        "${JENKINS_URL}/computer/${JENKINS_AGENT_NAME}/api/xml?tree=offline" \
+        | fgrep -q 'offline>false<'
+}
+
+function node_busy {
+    ${SWARM_MODE} || return 0
+
+    curl --silent --fail \
+        -u "${JENKINS_USERNAME}:${JENKINS_PASSWORD}" \
+        "${JENKINS_URL}/computer/${JENKINS_AGENT_NAME}/api/xml?tree=executors[idle],oneOffExecutors[idle]" \
+        | fgrep -q 'idle>false<'
+}
+
 function free_space_ok {
+    test -d "${WORKSPACE}" || return 0
     local free_kb=$(df -k --output=avail "${WORKSPACE}" | tail -1)
     local min_free_kb=$((MIN_FREE_GB*1024*1024))
 
@@ -37,18 +68,38 @@ function remove_workspaces {
     # (which should be the oldest workspace directory). If this
     # results in no entries, there's nothing safe for us to remove,
     # so mark the container unhealthy.
-    if [[ -d "${WORKSPACE}" ]]; then
-        pushd "${WORKSPACE}"
-        oldest=$(ls -1t | tail -n +2 | tail -n -1)
+    test -d "${WORKSPACE}" || return 0
+    pushd "${WORKSPACE}"
+    while ! free_space_ok; do
+        oldest=$(ls -1t | grep -v workspaces.txt | tail -n +2 | tail -n -1)
         if [[ -z "$oldest" ]]; then
             return 1
         fi
 
-        time rm -rf "$oldest"
-        popd "${WORKSPACE}"
-        return $(free_space_ok)
-    fi
+        rm -rf "$oldest"
+    done
+    popd
+    return 0
 }
+
+# This isn't really a "healthcheck" as we'll shoot ourselves in the head
+# if it fails twice in a row.
+if node_online; then
+    rm -f /var/run/node-offline
+else
+    test -e /var/run/node-offline && sudo kill -9 1
+    touch /var/run/node-offline
+fi
+
+# Likewise, not a healthcheck. Shoot the agent in the head if we've been
+# requested to shut down and we're not currently executing any jobs.
+if [ -f /var/run/jenkins_agent_stop_requested ]; then
+    if ! node_busy; then
+        echo "Healthcheck: Killing idle agent ${JENKINS_AGENT_NAME} per request"
+        kill -TERM ${JENKINS_AGENT_PID}
+        exit
+    fi
+fi
 
 free_space_ok || docker_prune || remove_workspaces || exit 1
 memory_ok || exit 1

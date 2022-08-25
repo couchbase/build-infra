@@ -218,13 +218,7 @@ function ecr_login() {
 function container_image() {
   get_stackfile
   # Determine container image for specified service
-  if [ "${environment}" = "cv" ]
-  then
-    # CV nodes use swarm-launcher, we need to grab the image from an environment var
-    yq e ".services.${service}.environment.LAUNCH_IMAGE" /opt/buildteam/stackfile.yml
-  else
-    yq e ".services.${service}.image" /opt/buildteam/stackfile.yml
-  fi
+  yq e ".services.${service}.image" /opt/buildteam/stackfile.yml
 }
 
 # Configure timezone based on --timezone flag (or use America/Los_Angeles if not provided)

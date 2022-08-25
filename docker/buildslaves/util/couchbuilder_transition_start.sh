@@ -15,13 +15,20 @@
 #   JENKINS_SLAVE_NAME (base name; will have container ID appended)
 #   JENKINS_SLAVE_LABELS
 #
-# The following environment variables are also used to compose the
-# path profile data will be synchronised from
+# In addition it expects the following Docker secrets to exist:
+#
+#   /run/secrets/jenkins_master_username
+#   /run/secrets/jenkins_master_password
+#
+#
+# Regardless of how it is invoked, if the following environment
+# variables are set, they will be used to compose the path from which
+# profile data will be pulled to configure the node
 #
 #   NODE_CLASS   (e.g. build, cv)
 #   NODE_PRODUCT (e.g. couchbase-server)
 #
-# In addition it expects the following Docker secret to exist:
+# In that case, it expects the following Docker secret to exist:
 #
 #   /run/secrets/profile_ssh_key
 
@@ -146,12 +153,30 @@ command -v gpg >/dev/null 2>&1 && {
     curl --fail -o /tmp/swarm-client.jar ${JENKINS_MASTER}/swarm/swarm-client.jar
 
     if [ ! -z "${JENKINS_TUNNEL}" ]; then
-        TUNNEL_ARG="-tunnel ${JENKINS_TUNNEL}"
+      TUNNEL_ARG="-tunnel ${JENKINS_TUNNEL}"
     fi
 
+    # Save some information about the agent for the healthcheck script
+    # or anything else that might want it
+    AGENT_NAME="${JENKINS_SLAVE_NAME}-$(hostname)"
+    echo "${AGENT_NAME}" > /var/run/jenkins_agent_name
+    echo "${JENKINS_MASTER}" > /var/run/jenkins_master_url
+    echo "${JENKINS_SLAVE_LABELS}" > /var/run/jenkins_agent_labels
+
+    # We don't want the child to immediately die when the container is
+    # stopped, so intercept SIGTERM and then run the healthcheck to see
+    # if it's OK to die
+    keepalive() {
+      echo "Agent ${AGENT_NAME} stop requested!"
+      touch /var/run/jenkins_agent_stop_requested
+      /usr/sbin/healthcheck.sh
+    }
+    trap keepalive TERM
+
+    echo "Agent ${AGENT_NAME} starting up..."
     if $(sudo --help &>/dev/null && :)
     then
-      exec sudo -u couchbase --set-home --preserve-env \
+      sudo -u couchbase --set-home --preserve-env \
         env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
         PATH=/usr/local/bin:/usr/bin:/bin \
         java $JAVA_OPTS \
@@ -161,17 +186,17 @@ command -v gpg >/dev/null 2>&1 && {
         ${TUNNEL_ARG} \
         -mode ${AGENT_MODE} \
         -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
-        -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
+        -name "${AGENT_NAME}" \
         -disableClientsUniqueId \
         -deleteExistingClients \
-        -labels "${JENKINS_SLAVE_LABELS}" \
+        -labels "${JENKINS_SLAVE_LABELS} ${CONTAINER_TAG//\//_}" \
         -retry 5 \
         -noRetryAfterConnected \
         -username "${jenkins_user}" \
-        -password @/run/secrets/jenkins_master_password 2>&1 \
-        | sudo tee /var/log/swarm-client.log
+        -password @/run/secrets/jenkins_master_password \
+        >& /var/log/swarm-client.log &
     else
-      exec sudo -u couchbase -H \
+      sudo -u couchbase -H \
         env -u jenkins_user -u jenkins_password -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND \
         PATH=/usr/local/bin:/usr/bin:/bin \
         java $JAVA_OPTS \
@@ -181,16 +206,32 @@ command -v gpg >/dev/null 2>&1 && {
         ${TUNNEL_ARG} \
         -mode ${AGENT_MODE} \
         -executors "${JENKINS_SLAVE_EXECUTORS:-1}" \
-        -name "${JENKINS_SLAVE_NAME}-$(hostname)" \
+        -name "${AGENT_NAME}" \
         -disableClientsUniqueId \
         -deleteExistingClients \
-        -labels "${JENKINS_SLAVE_LABELS}" \
+        -labels "${JENKINS_SLAVE_LABELS} ${CONTAINER_TAG//\//_}" \
         -retry 5 \
         -noRetryAfterConnected \
         -username "${jenkins_user}" \
-        -password @/run/secrets/jenkins_master_password 2>&1 \
-        | sudo tee /var/log/swarm-client.log
+        -password @/run/secrets/jenkins_master_password \
+        >& /var/log/swarm-client.log &
     fi
+
+    # Save PID of child for healthcheck/reaping
+    PID=$!
+    echo "${PID}" > /var/run/jenkins_agent_pid
+
+    # Send logs to stdout for "docker service logs"
+    tail -f /var/log/swarm-client.log &
+
+    # Also, we no longer want to exit THIS script on any error
+    set +e
+
+    # Loop forever, until the child process is actually gone
+    while test -d /proc/${PID}; do
+       wait $PID
+    done
+    echo "Agent ${AGENT_NAME} exiting"
     exit
 }
 

@@ -102,6 +102,7 @@ RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 
 # Avoid having to rebuild image chain for simple start script modifications
 COPY ./build/couchbuilder_start.sh /usr/sbin/
+COPY ./build/healthcheck.sh /usr/sbin/
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG

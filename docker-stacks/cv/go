@@ -1,10 +1,4 @@
 #!/bin/bash -ex
 
 LEADER=172.23.108.43
-# Because of the weird way cv agents are deployed, it's best
-# to forcibly remove the stack entirely rather than just
-# redeploying it.
-docker --host ${LEADER} stack rm cv || true
-sleep 15
-
 docker --host ${LEADER} stack deploy --with-registry-auth -c cv-jenkins-agents.yml cv

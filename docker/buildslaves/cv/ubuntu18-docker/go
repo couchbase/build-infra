@@ -5,7 +5,8 @@ IMAGE=couchbasebuild/server-ubuntu18-docker-cv
 
 mkdir -p build
 cp ../../util/couchbuilder_transition_start.sh ./build/couchbuilder_start.sh
-cp ../../util/hooks/buildx.sh build/buildx.sh
+cp ../../util/healthcheck.sh ./build/
+cp ../../util/hooks/buildx.sh ./build/
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \

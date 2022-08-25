@@ -25,8 +25,12 @@ x-default-jenkins-agent: &default-jenkins-agent
       target: /run/secrets/profile_sync
     - source: dockerhub_nsbuildbot_password
       target: /tmp/dockerhub_nsbuildbot_password
+  cap_add:
+    - ALL
+  stop_grace_period: 60m
 
 services:
+
   zz-lightweight:
     image: couchbasebuild/zz-lightweight:20220708
     environment:
@@ -50,33 +54,22 @@ services:
       replicas: 0
 
   ubuntu18_docker:
-    image: couchbasebuild/swarm-launcher:20210209
-
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/tmp:/mnt"
-
+    image: couchbasebuild/server-ubuntu18-docker-cv:20220825
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-docker-cv:20220613
-      LAUNCH_PULL: "true"
-      LAUNCH_EXT_NETWORKS: cv_jenkins
-      LAUNCH_PRIVILEGED: "true"
-      LAUNCH_ENVIRONMENTS: >-
-        JENKINS_SLAVE_NAME=CV
-        JENKINS_SLAVE_LABELS=docker@_@linux
-        JENKINS_MASTER=http://cv.jenkins.couchbase.com/
-        NODE_CLASS=cv-docker
-        NODE_PRODUCT=couchbase-server
-        PARALLELISM=4
-      LAUNCH_VOLUMES: "/var/run/docker.sock:/var/run/docker.sock:rw"
-      LAUNCH_SYSCTLS: "net.ipv6.conf.lo.disable_ipv6=0"
-      LAUNCH_HOSTNAME_FROM_HOST: "true"
-
-      LOGIN_USER: "nsbuildbot"
-      LOGIN_PASSWORD_FILE: "/tmp/dockerhub_nsbuildbot_password"
-
+      - "JENKINS_SLAVE_NAME=cv-ubuntu18-docker"
+      - "JENKINS_SLAVE_LABELS=docker linux"
+      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=4"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
     <<: *default-jenkins-agent
     deploy:
+      resources:
+        reservations:
+          # Docker nodes have 16GB RAM
+          memory: 12G
       placement:
         constraints:
           - "node.labels.cvtype==docker"
@@ -84,34 +77,23 @@ services:
       replicas: 2
       update_config:
         parallelism: 100
+        delay: 0s
 
   ubuntu18_small:
-    image: couchbasebuild/swarm-launcher:20210209
-
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/tmp:/mnt"
-
+    image: couchbasebuild/server-ubuntu18-cv:20220823
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20220423
-      LAUNCH_PULL: "true"
-      LAUNCH_EXT_NETWORKS: cv_jenkins
-      LAUNCH_PRIVILEGED: "true"
-      LAUNCH_ENVIRONMENTS: >-
-        JENKINS_SLAVE_NAME=CV
-        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@7.0.0@_@mad-hatter@_@cheshire-cat@_@neo@_@master@_@ubuntu-18.04@_@small
-        JENKINS_MASTER=http://cv.jenkins.couchbase.com/
-        NODE_CLASS=cv
-        NODE_PRODUCT=couchbase-server
-        PARALLELISM=4
-      LAUNCH_SYSCTLS: "net.ipv6.conf.lo.disable_ipv6=0"
-      LAUNCH_HOSTNAME_FROM_HOST: "true"
-
-      LOGIN_USER: "nsbuildbot"
-      LOGIN_PASSWORD_FILE: "/tmp/dockerhub_nsbuildbot_password"
-
+      - "JENKINS_SLAVE_NAME=cv-ubuntu18-small"
+      - "JENKINS_SLAVE_LABELS=u18-docker-slave vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small"
+      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=4"
     <<: *default-jenkins-agent
     deploy:
+      resources:
+        reservations:
+          # Small nodes have 8GB RAM
+          memory: 6G
       placement:
         constraints:
           - "node.labels.cvtype==ubuntu18-small"
@@ -119,34 +101,23 @@ services:
       replicas: 10
       update_config:
         parallelism: 100
+        delay: 0s
 
   ubuntu18_large:
-    image: couchbasebuild/swarm-launcher:20210209
-
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/tmp:/mnt"
-
+    image: couchbasebuild/server-ubuntu18-cv:20220823
     environment:
-      LAUNCH_IMAGE: couchbasebuild/server-ubuntu18-cv:20220423
-      LAUNCH_PULL: "true"
-      LAUNCH_EXT_NETWORKS: cv_jenkins
-      LAUNCH_PRIVILEGED: "true"
-      LAUNCH_ENVIRONMENTS: >-
-        JENKINS_SLAVE_NAME=CV
-        JENKINS_SLAVE_LABELS=u18-docker-slave@_@vulcan@_@6.5.0@_@6.5.1@_@6.5.2@_@6.6.0@_@7.0.0@_@mad-hatter@_@cheshire-cat@_@neo@_@master@_@ubuntu-18.04@_@large
-        JENKINS_MASTER=http://cv.jenkins.couchbase.com/
-        NODE_CLASS=cv
-        NODE_PRODUCT=couchbase-server
-        PARALLELISM=16
-      LAUNCH_SYSCTLS: "net.ipv6.conf.lo.disable_ipv6=0"
-      LAUNCH_HOSTNAME_FROM_HOST: "true"
-
-      LOGIN_USER: "nsbuildbot"
-      LOGIN_PASSWORD_FILE: "/tmp/dockerhub_nsbuildbot_password"
-
+      - "JENKINS_SLAVE_NAME=cv-ubuntu18-large"
+      - "JENKINS_SLAVE_LABELS=u18-docker-slave vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 large"
+      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=16"
     <<: *default-jenkins-agent
     deploy:
+      resources:
+        reservations:
+          # Large nodes have 24GB RAM
+          memory: 20G
       placement:
         constraints:
           - "node.labels.cvtype==ubuntu18-large"
@@ -154,6 +125,7 @@ services:
       replicas: 10
       update_config:
         parallelism: 1000
+        delay: 0s
 
 configs:
   jenkins_master_username:

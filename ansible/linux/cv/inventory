@@ -5,7 +5,7 @@ cvdockerworkers
 
 [cvsmallworkers]
 172.23.113.26  manager=true # ubuntu18-cv-small-01
-172.23.97.161               # ubuntu18-cv-small-02
+#172.23.97.161               # ubuntu18-cv-small-02 - offline
 172.23.97.107               # ubuntu18-cv-small-03
 172.23.97.156  manager=true # ubuntu18-cv-small-04
 
@@ -14,14 +14,14 @@ cvdockerworkers
 172.23.108.59               # ubuntu18-cv-large-12
 172.23.104.134              # ubuntu18-cv-large-13
 172.23.97.171               # ubuntu18-cv-large-14
-172.23.97.172               # ubuntu18-cv-large-15
+172.23.96.72                # ubuntu18-cv-large-15
 172.23.97.173               # ubuntu18-cv-large-16
 172.23.108.124              # ubuntu18-cv-large-17
 172.23.108.126              # ubuntu18-cv-large-18
 172.23.108.130              # ubuntu18-cv-large-19
 172.23.108.131              # ubuntu18-cv-large-20
 
-[cvsdockerworkers]
+[cvdockerworkers]
 172.23.108.87               # ubuntu18-cv-docker-03
 172.23.97.167               # ubuntu18-cv-docker-04
 
