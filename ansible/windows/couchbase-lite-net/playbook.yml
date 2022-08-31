@@ -14,6 +14,12 @@
         name: "NET-Framework-Core"
         state: present
 
+    - name: "Install Python 3"
+      win_chocolatey:
+        name: python3
+        version: 3.7.7
+      tags: python3
+
     - name: Install tools
       win_chocolatey:
         name: "{{ item }}"
@@ -32,6 +38,7 @@
         - dotnetcore
         - git
         - jdk8
+        - openjdk11
         - ninja
         - python2
         - wget
@@ -65,8 +72,9 @@
           - C:\Program Files\git\cmd
           - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
+    # windows server 2019+ comes with its own openssh.
     - name: Install OpenSSH (for Jenkins)
-      script: openssh.ps1
+      script: openssh.ps1 -Verbose
 
     - name: Copy SSH config files
       win_copy:
@@ -119,3 +127,11 @@
       vars:
         PRODUCT: "couchbase-lite-net"
       when: VS_VERSION == "vs2019"
+
+    #install role from ../roles/vs2022/
+    - name: install vs2022
+      include_role:
+        name: "vs2022"
+      vars:
+        PRODUCT: "couchbase-lite-net"
+      when: VS_VERSION == "vs2022"
