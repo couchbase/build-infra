@@ -54,7 +54,7 @@ services:
       replicas: 0
 
   ubuntu18_docker:
-    image: couchbasebuild/server-ubuntu18-docker-cv:20220825
+    image: couchbasebuild/server-ubuntu18-docker-cv:20220901
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-docker"
       - "JENKINS_SLAVE_LABELS=docker linux"

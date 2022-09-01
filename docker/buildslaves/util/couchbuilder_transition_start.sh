@@ -40,6 +40,8 @@ then
     cp -a /ssh/* /home/couchbase/.ssh
 fi
 
+active_user=$(whoami)
+
 # We need to let these fall through to a noop in case we hit mounts
 sudo chown -R couchbase:couchbase /home/couchbase/.ssh || :
 chmod -R 600 /home/couchbase/.ssh/* || :
@@ -100,7 +102,7 @@ then
 
   # we could concievably be running the container as root or couchbase, let's try
   # to populate the profile data correctly either way
-  if [ "$(whoami)" = "couchbase" ]
+  if [ "${active_user}" = "couchbase" ]
   then
     sudo chmod 600 /run/secrets/profile_sync || :
     sudo chown couchbase:couchbase /run/secrets/profile_sync || :
@@ -159,19 +161,26 @@ command -v gpg >/dev/null 2>&1 && {
     # Save some information about the agent for the healthcheck script
     # or anything else that might want it
     AGENT_NAME="${JENKINS_SLAVE_NAME}-$(hostname)"
-    echo "${AGENT_NAME}" > /var/run/jenkins_agent_name
-    echo "${JENKINS_MASTER}" > /var/run/jenkins_master_url
-    echo "${JENKINS_SLAVE_LABELS}" > /var/run/jenkins_agent_labels
+    echo "${AGENT_NAME}" | sudo tee /var/run/jenkins_agent_name
+    echo "${JENKINS_MASTER}" | sudo tee /var/run/jenkins_master_url
+    echo "${JENKINS_SLAVE_LABELS}" | sudo tee /var/run/jenkins_agent_labels
 
     # We don't want the child to immediately die when the container is
     # stopped, so intercept SIGTERM and then run the healthcheck to see
     # if it's OK to die
     keepalive() {
       echo "Agent ${AGENT_NAME} stop requested!"
-      touch /var/run/jenkins_agent_stop_requested
+      sudo touch /var/run/jenkins_agent_stop_requested
       /usr/sbin/healthcheck.sh
     }
     trap keepalive TERM
+
+
+    # We can sometimes get here before the logfile has been created
+    # which results in the tail failing and no logs being streamed
+    # so we get around this by ensuring it's present before the tail
+    sudo touch /var/log/swarm-client.log
+    sudo chown couchbase:couchbase /var/log/swarm-client.log
 
     echo "Agent ${AGENT_NAME} starting up..."
     if $(sudo --help &>/dev/null && :)
@@ -219,7 +228,7 @@ command -v gpg >/dev/null 2>&1 && {
 
     # Save PID of child for healthcheck/reaping
     PID=$!
-    echo "${PID}" > /var/run/jenkins_agent_pid
+    echo "${PID}" | sudo tee /var/run/jenkins_agent_pid
 
     # Send logs to stdout for "docker service logs"
     tail -f /var/log/swarm-client.log &

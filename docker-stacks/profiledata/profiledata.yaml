@@ -319,6 +319,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.ssh_privkey.buildx.20220901
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/buildx
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.digicert_jks.20211202
         target: /home/couchbase/couchbase-server/build/linux/.digicert.jks
         mode: 0644
@@ -481,6 +486,11 @@ services:
         gid: "901"
       - source: profiledata.ssh_privkey.ns-buildbot.rsa.20200417
         target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/ns-buildbot.rsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.ssh_privkey.buildx.20220901
+        target: /home/couchbase/couchbase-server/cv-docker/linux/.ssh/buildx
         mode: 0600
         uid: "901"
         gid: "901"
@@ -652,6 +662,8 @@ secrets:
   profiledata.ssh_privkey.ns-buildbot.rsa.20200417:
     external: true
   profiledata.ssh_pubkey.profile_sync.20200417:
+    external: true
+  profiledata.ssh_privkey.buildx.20220901:
     external: true
   # host privkeys
   profiledata.ssh_host_privkey.ssh_host_dsa_key.20200417:

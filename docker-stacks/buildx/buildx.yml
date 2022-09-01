@@ -1,9 +1,6 @@
 version: "3.8"
 
 # Stack for general-purpose agent capable of running "docker buildx build".
-#
-# Note: Post-deployment, log in as admin and add Repository Observer
-# permissions to the guest account for the internal and snapshot repos
 
 services:
   buildx:
@@ -12,7 +9,7 @@ services:
     # using the "ubuntu-2004-operator-build" image, has
     # operator-specific Jenkins labels, and runs on Swarm nodes with the
     # role "operator". In future we may further divide this.
-    image: couchbasebuild/ubuntu-2004-operator-build:20220706
+    image: couchbasebuild/ubuntu-2004-operator-build:20220901
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=buildx"
