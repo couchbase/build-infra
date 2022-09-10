@@ -57,7 +57,7 @@ services:
     image: couchbasebuild/server-ubuntu18-docker-cv:20220901
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-docker"
-      - "JENKINS_SLAVE_LABELS=docker linux"
+      - "JENKINS_SLAVE_LABELS=docker linux {{.Node.Hostname}}"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -83,7 +83,7 @@ services:
     image: couchbasebuild/server-ubuntu18-cv:20220823
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-small"
-      - "JENKINS_SLAVE_LABELS=u18-docker-slave vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small"
+      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -107,7 +107,7 @@ services:
     image: couchbasebuild/server-ubuntu18-cv:20220823
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-large"
-      - "JENKINS_SLAVE_LABELS=u18-docker-slave vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 large"
+      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 large"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
