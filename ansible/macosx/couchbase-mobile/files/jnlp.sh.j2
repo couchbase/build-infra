@@ -1,0 +1,9 @@
+#!/bin/bash -ex
+
+source ~/.zshenv
+
+cd /Users/couchbase/jenkins
+jnlp_url=https://mobile.jenkins.couchbase.com/computer/{{ jenkins_node_name }}/jenkins-agent.jnlp
+
+curl -LO http://mobile.jenkins.couchbase.com/jnlpJars/agent.jar
+java -jar agent.jar -jnlpUrl ${jnlp_url} -secret @secret-file -workDir "/Users/couchbase/jenkins"

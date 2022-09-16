@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>mobile.jenkins.jnlp</string>
+    <key>UserName</key>
+    <string>couchbase</string>
+    <key>SessionCreate</key>
+    <true/>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/couchbase/jenkins/jnlp.sh</string>
+    </array>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/couchbase/jenkins/stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/couchbase/jenkins/error.log</string>
+</dict>
+</plist>

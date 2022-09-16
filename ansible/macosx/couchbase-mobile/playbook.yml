@@ -7,16 +7,26 @@
     homebrew_dir: "{{ '/usr/local' if ansible_architecture == 'x86_64' else '/opt/homebrew' }}"
 
   pre_tasks:
-    - name: add passwordless sudoer
+    - name: Add passwordless sudoer
       copy:
         src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
       become: true
 
   tasks:
 
+    - name: Check jenkins_jnlp_secret
+      fail:
+        msg: "'jenkins_jnlp_secret' is not defined or empty"
+      when: (jenkins_jnlp_secret is not defined) or (jenkins_jnlp_secret|length == 0)
+
+    - name: Check jenkins_node_name
+      fail:
+        msg: "'jenkins_node_name' is not defined or empty"
+      when: (jenkins_node_name is not defined) or (jenkins_node_name|length == 0)
+
     - debug: msg="Installing homebrew.  This will take a while"
 
-    - name: install homebrew
+    - name: Install homebrew
       shell: |
         yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -43,18 +53,19 @@
           - ssh-copy-id
           - wget
 
-    - name: set python3 as default
+    - name: Set python3 as default
       file:
         src: "{{ homebrew_dir }}/bin/python3"
         dest: "{{ homebrew_dir }}/bin/python"
         state: link
 
-    - name: set energy saving to zero
+
+    - name: Set energy saving to zero
       shell: systemsetup -setcomputersleep Never
       become: true
 
-    - name: Disable user screensaver
-      shell: defaults -currentHost write com.apple.screensaver idleTime 0
+    - name: Set user screensaver
+      shell: defaults -currentHost write com.apple.screensaver idleTime 5
 
     - name: Disable logon screensaver
       shell: defaults -currentHost write com.apple.screensaver loginWindowIdleTime 0
@@ -65,7 +76,7 @@
         src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
 
     # SGW require pkg
-    - name: install pip
+    - name: Install pip
       shell: "{{ homebrew_dir }}/bin/pip3 install pyinstaller"
       ignore_errors: yes
 
@@ -134,4 +145,27 @@
         rm -rf {{ azul_jdk_name }}.tar.gz
         ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
         ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
+      become: true
+
+    - name: Creates jenkins directory
+      file:
+        path: /Users/{{ ansible_ssh_user }}/jenkins
+        state: directory
+
+    - name: Install jenkins startup script
+      template:
+        src=./files/jnlp.sh.j2 dest=/Users/{{ ansible_ssh_user }}/jenkins/jnlp.sh owner={{ ansible_ssh_user }} group=staff mode=0755
+
+    - name: Write secret file
+      shell: echo {{ jenkins_jnlp_secret }} > /Users/{{ ansible_ssh_user }}/jenkins/secret-file
+
+    - name: Install jenkins autolaunch plist
+      copy:
+        src=./files/mobile.jenkins.plist dest=/Library/LaunchAgents/mobile.jenkins.plist
+      become: true
+
+    - name: Enable autologin for couchbase user
+      script: 
+        cmd: ./files/autologin.py --username {{ ansible_ssh_user }} --password {{ ansible_ssh_pass }}
+        executable: python3
       become: true
