@@ -1,0 +1,23 @@
+#!/bin/bash -x
+
+TAG=$(date +%Y%m%d)
+IMAGE=couchbasebuild/ubuntu1804-sgw-build
+
+mkdir -p build
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/swarm*.properties build
+cp -a ../../util/healthcheck.sh build
+
+if [ "$1" = "--publish" ]
+then
+  PLATFORM=linux/amd64,linux/arm64
+  PUSH=--push
+else
+  PLATFORM=linux/amd64
+  PUSH=--load
+fi
+
+docker buildx build . ${PUSH} \
+                    --platform ${PLATFORM} \
+                    -t ${IMAGE}:${TAG} \
+                    -t ${IMAGE}:latest

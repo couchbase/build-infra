@@ -107,6 +107,39 @@ services:
     networks:
       - jenkins
 
+  sgw-ubuntu18:
+    image: couchbasebuild/ubuntu1804-sgw-build:20220923
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=sgw-ubuntu18"
+      - "JENKINS_SLAVE_LABELS=ubuntu18 mobile mobile-sgw-ubuntu18 sgw"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+    secrets:
+      - source: mobile_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_master_password
+        mode: 0444
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
   litecore-centos72:
     image: couchbasebuild/centos-72-litecore-build:20211203
     init: true
