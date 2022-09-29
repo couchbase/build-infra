@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ./env
+
+docker -H mega4 stack deploy --with-registry-auth -c defectdojo.yml defectdojo

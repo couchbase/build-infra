@@ -1,0 +1,26 @@
+export DJANGO_VERSION='2.14.3@sha256:4b6d2a48df5ef351ed19292378661b819a8a6a506d09eb138bed328270cf0a89'
+export MYSQL_VERSION='5.7.39@sha256:b92fae25c5d06050380903a38adb5965f8f19f1fb8f426b5940a34310e5498f6'
+export NGINX_VERSION='2.14.3@sha256:0008cf8d1e02c7bb2f7842acfaff098e738bf9919efbd7d42a3c6b4452c52101'
+export REDIS_VERSION='7.0.4-alpine@sha256:22917daa8528a6834aae0637935724bea4f485f0a9a1c438ff3376e3d18dcd57'
+
+export DD_HOSTNAME='defectdojo.build.couchbase.com'
+export DD_WEB_PORT='8080'
+
+export DD_DATABASE_ENGINE='django.db.backends.mysql'
+export DD_DATABASE_HOST='mysql'
+export DD_DATABASE_PORT='3306'
+export DD_DATABASE_NAME='defectdojo'
+export DD_DATABASE_USER='defectdojo'
+
+export NGINX_METRICS_ENABLED='false'
+export DD_DJANGO_METRICS_ENABLED='False' # note: that capital F isn't a typo
+export DD_INITIALIZE='true'
+
+export DD_ALLOWED_HOSTS='*'
+export DD_MEDIA_ROOT='/app/media'
+
+export DD_CELERY_BROKER_URL='redis://redis:6379/0'
+
+export DD_ADMIN_FIRST_NAME='Build'
+export DD_ADMIN_LAST_NAME='Team'
+export DD_ADMIN_USER='build-team@couchbase.com'

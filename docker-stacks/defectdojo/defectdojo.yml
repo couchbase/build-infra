@@ -1,0 +1,173 @@
+---
+version: '3.8'
+services:
+
+  nginx:
+    image: "defectdojo/defectdojo-nginx:${NGINX_VERSION}"
+    depends_on:
+      - uwsgi
+    environment:
+      NGINX_METRICS_ENABLED: "${NGINX_METRICS_ENABLED}"
+    volumes:
+      - /buildteam/defectdojo/nginx:/usr/share/nginx/html/media
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.defectdojo.rule=Host(`${DD_HOSTNAME}`)"
+        - "traefik.http.services.defectdojo.loadbalancer.server.port=${DD_WEB_PORT}"
+    networks:
+      - default
+      - traefik_reverse-proxy
+
+  uwsgi:
+    image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
+    depends_on:
+      - mysql
+    entrypoint: ['bash', '-c',
+                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} -t 30 &&
+                 export DD_SECRET_KEY="$$(cat /run/secrets/defectdojo_secret_key)" &&
+                 export DD_CREDENTIAL_AES_256_KEY="$$(cat /run/secrets/defectdojo_credential_aes_256_key)" &&
+                 export DD_DATABASE_PASSWORD="$$(cat /run/secrets/defectdojo_database_password)" &&
+                 export DD_DATABASE_URL="$$(cat /run/secrets/defectdojo_database_url)" &&
+                 /entrypoint-uwsgi.sh']
+    environment:
+      DD_DEBUG: 'False'
+      DD_DJANGO_METRICS_ENABLED: "${DD_DJANGO_METRICS_ENABLED}"
+      DD_ALLOWED_HOSTS: "${DD_ALLOWED_HOSTS}"
+      DD_CELERY_BROKER_URL: ${DD_CELERY_BROKER_URL}
+    volumes:
+        - "/buildteam/defectdojo/uwsgi:${DD_MEDIA_ROOT}"
+    secrets:
+      - source: defectdojo_credential_aes_256_key
+      - source: defectdojo_database_password
+      - source: defectdojo_database_url
+      - source: defectdojo_secret_key
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+  celerybeat:
+    image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
+    depends_on:
+      - mysql
+    entrypoint: ['bash', '-c',
+                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} -t 30 &&
+                 export DD_SECRET_KEY="$$(cat /run/secrets/defectdojo_secret_key)" &&
+                 export DD_CREDENTIAL_AES_256_KEY="$$(cat /run/secrets/defectdojo_credential_aes_256_key)" &&
+                 export DD_DATABASE_PASSWORD="$$(cat /run/secrets/defectdojo_database_password)" &&
+                 export DD_DATABASE_URL="$$(cat /run/secrets/defectdojo_database_url)" &&
+                 /entrypoint-celery-beat.sh']
+    environment:
+      DD_CELERY_BROKER_URL: ${DD_CELERY_BROKER_URL}
+    secrets:
+      - source: defectdojo_credential_aes_256_key
+      - source: defectdojo_database_password
+      - source: defectdojo_database_url
+      - source: defectdojo_secret_key
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+  celeryworker:
+    image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
+    depends_on:
+      - mysql
+      - redis
+    entrypoint: ['bash', '-c',
+                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} -t 30 &&
+                 export DD_SECRET_KEY="$$(cat /run/secrets/defectdojo_secret_key)" &&
+                 export DD_CREDENTIAL_AES_256_KEY="$$(cat /run/secrets/defectdojo_credential_aes_256_key)" &&
+                 export DD_DATABASE_PASSWORD="$$(cat /run/secrets/defectdojo_database_password)" &&
+                 export DD_DATABASE_URL="$$(cat /run/secrets/defectdojo_database_url)" &&
+                 /entrypoint-celery-worker.sh']
+    environment:
+      DD_CELERY_BROKER_URL: ${DD_CELERY_BROKER_URL}
+    volumes:
+        - "/buildteam/defectdojo/celeryworker:${DD_MEDIA_ROOT}"
+    secrets:
+      - source: defectdojo_credential_aes_256_key
+      - source: defectdojo_database_password
+      - source: defectdojo_database_url
+      - source: defectdojo_secret_key
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+  initializer:
+    image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
+    depends_on:
+      - mysql
+    entrypoint: ['bash', '-c',
+                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} &&
+                 export DD_SECRET_KEY=$$(cat /run/secrets/defectdojo_secret_key) &&
+                 export DD_CREDENTIAL_AES_256_KEY=$$(cat /run/secrets/defectdojo_credential_aes_256_key) &&
+                 export DD_DATABASE_URL=$$(cat /run/secrets/defectdojo_database_url) &&
+                 /entrypoint-initializer.sh']
+    environment:
+      DD_ADMIN_USER: "${DD_ADMIN_USER}"
+      DD_ADMIN_MAIL: "${DD_ADMIN_USER}"
+      DD_ADMIN_FIRST_NAME: "${DD_ADMIN_FIRST_NAME}"
+      DD_ADMIN_LAST_NAME: "${DD_ADMIN_LAST_NAME}"
+      DD_INITIALIZE: "${DD_INITIALIZE}"
+    secrets:
+      - source: defectdojo_credential_aes_256_key
+      - source: defectdojo_database_url
+      - source: defectdojo_secret_key
+    deploy:
+      restart_policy:
+          condition: none
+          max_attempts: 0
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+  mysql:
+    image: mysql:${MYSQL_VERSION}
+    user: 1000:1000
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: ${DD_DATABASE_NAME}
+      MYSQL_USER: ${DD_DATABASE_USER}
+      MYSQL_PASSWORD_FILE: /run/secrets/defectdojo_database_password
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - /buildteam/defectdojo/mysql:/var/lib/mysql
+    secrets:
+      - source: defectdojo_database_password
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+  redis:
+    image: redis:${REDIS_VERSION}
+    user: 1000:1000
+    volumes:
+      - /buildteam/defectdojo/redis:/data
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+secrets:
+  defectdojo_credential_aes_256_key:
+    external: true
+  defectdojo_database_password:
+    external: true
+  defectdojo_database_url:
+    external: true
+  defectdojo_secret_key:
+    external: true
+
+networks:
+  default:
+  traefik_reverse-proxy:
+    external: true
