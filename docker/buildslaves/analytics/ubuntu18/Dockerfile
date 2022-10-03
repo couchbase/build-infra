@@ -13,7 +13,7 @@ WORKDIR /tmp
 
 # Install patch_via_gerrit tool
 RUN set -x \
-        && curl -L https://packages.couchbase.com/patch_via_gerrit/1.0.0/patch_via_gerrit-1.0.0-linux -o /usr/local/bin/patch_via_gerrit \
+        && curl -L https://packages.couchbase.com/patch_via_gerrit/1.1.1/patch_via_gerrit-1.1.1-linux -o /usr/local/bin/patch_via_gerrit \
         && chmod 755 /usr/local/bin/patch_via_gerrit
 
 # Install Ninja for faster builds

@@ -54,7 +54,7 @@ services:
       replicas: 1
 
   ubuntu18:
-    image: couchbasebuild/analytics-ubuntu18-cv:20220408
+    image: couchbasebuild/analytics-ubuntu18-cv:20221003
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
