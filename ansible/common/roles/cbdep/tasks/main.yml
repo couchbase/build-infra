@@ -1,6 +1,20 @@
 ---
-- name: Download cbdep
+- name: "Ensure bin directory present"
+  win_file:
+    path: C:\bin
+    state: directory
+  when: ansible_os_family == "Windows"
+
+- name: "Download cbdep (Windows)"
+  win_get_url:
+    url: https://packages.couchbase.com/cbdep/cbdep-{{ ansible_os_family | lower }}-{{ ansible_architecture2 or ansible_architecture }}.exe
+    dest: 'C:\bin\cbdep.exe'
+  when: ansible_os_family == "Windows"
+
+- name: "Download cbdep (Linux/MacOS)"
   get_url:
-    url: "https://packages.couchbase.com/cbdep/cbdep-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+    url: https://packages.couchbase.com/cbdep/cbdep-{{ ansible_system | lower }}-{{ ansible_architecture }}
     dest: /usr/local/bin/cbdep
     mode: "0755"
+  become: true
+  when: ansible_system == "Linux" or ansible_os_family == "Darwin"

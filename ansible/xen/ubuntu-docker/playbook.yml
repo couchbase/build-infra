@@ -78,7 +78,7 @@
       shell: "xe vm-cd-eject uuid={{ vmuuid.stdout }} || true"
 
 - name: Do stuff on new VMs
-  gather_facts: False
+  gather_facts: True
   hosts: newvms
 
   vars:
@@ -133,10 +133,17 @@
         dump: "0"
         passno: "0"
         state: mounted
-      with_items:
+      loop:
         - mountpoint: /buildteam
           nasserver: nas.build.couchbase.com
           naspath: /data/buildteam
+
+    - name: Create /home/couchbase/.local/bin directory
+      file:
+        path: /home/couchbase/.local/bin
+        state: directory
+        mode: 0755
+        owner: couchbase
 
     - name: Create /home/couchbase/.docker directory
       file:
@@ -193,8 +200,10 @@
 
     - name: Process VM-specific roles
       include_role:
-        name: "{{ item }}"
+        name: "{{ rolename }}"
       loop: "{{ role_list.split(',') }}"
+      loop_control:
+        loop_var: rolename
 
     - name: Get Docker Swarm token
       when: swarm_manager is defined

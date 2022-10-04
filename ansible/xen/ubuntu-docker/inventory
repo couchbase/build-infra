@@ -6,15 +6,16 @@
 # 172.23.110.9 sr_name=VMStore network_name="Pool-wide network associated with eth0"
 # 172.23.123.45 sr_name="Local Storage 01" network_name="Pool-wide network associated with eth0"
 # 172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
-# 172.23.104.32 network_name="Pool-wide network associated with eth5"
+# 172.23.104.32 name=xcp-s126 network_name="Pool-wide network associated with eth5"
 # 172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
 # 172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
 # 172.23.97.234 sr_name=VMStore1
-# 172.23.105.159 name=xcp-sd24 network_name="Pool-wide network associated with eth2"
+172.23.105.159 name=xcp-sd24 network_name="Pool-wide network associated with eth2"
 # 172.23.104.59 sr_name="Local storage01" network_name="Pool-wide network associated with eth1"
 # 172.23.110.57 name=xcp-sd20 sr_name=VMStore1 network_name="Pool-wide network associated with eth3"
-172.23.112.26 name=xcp-se29 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
+# 172.23.112.26 name=xcp-se29 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
 # 172.23.110.75 name=xcp-se27 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
+# 172.23.110.82 name=xcp-se23 sr_name=VMStore2 network_name="Pool-wide network associated with eth0"
 
 [newvms]
 # Don't put anything here; the playbook simply requires this group to exist

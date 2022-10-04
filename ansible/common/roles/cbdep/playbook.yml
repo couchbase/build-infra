@@ -3,5 +3,9 @@
 - hosts: all
   gather_facts: True
 
-  roles:
-    - cbdep
+  tasks:
+    - include_role:
+        name: "{{ rolename }}"
+      loop: [ cbdep ]
+      loop_control:
+        loop_var: rolename

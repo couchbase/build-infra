@@ -1,7 +1,26 @@
 ---
 - name: Install CircleCI self-hosted launcher
-  become: true
   block:
+    - name: Ensure ~/.ssh exists
+      file:
+        path: /home/couchbase/.ssh
+        state: directory
+        mode: "0700"
+        owner: couchbase
+        group: couchbase
+      tags: ssh
+
+    - name: Create couchbase-cloud .ssh config
+      copy:
+        src: ".ssh/{{ item }}"
+        dest: /home/couchbase/.ssh
+        owner: couchbase
+        group: couchbase
+        directory_mode: "0700"
+        mode: "0600"
+      loop: [ id_rsa, id_rsa.pub, known_hosts ]
+      tags: ssh
+
     - name: Create /opt/circleci
       file:
         path: /opt/circleci
@@ -9,12 +28,14 @@
         mode: "0755"
         owner: couchbase
         group: couchbase
+      become: true
 
     - name: Install CircleCI Launch Agent
       script:
         chdir: /tmp
         cmd: files/download-launch-agent.sh
         creates: /opt/circleci/circleci-launch-agent
+      become: true
 
     - name: Add launch-agent-config
       template:
@@ -22,6 +43,7 @@
         dest: /opt/circleci/launch-agent-config.yaml
         owner: root
         mode: "0600"
+      become: true
 
     - name: Add circleci systemd service file
       copy:
@@ -29,28 +51,42 @@
         dest: /etc/systemd/system/circleci.service
         owner: root
         mode: "0644"
+      become: true
 
     - name: Enable and Start circleci systemd service
       systemd:
         name: circleci
         enabled: true
+      become: true
 
     - name: Add additional packages
       apt:
-        name: [unzip, docker-compose-plugin, build-essential, jq]
+        name:
+          - unzip
+          - docker-compose-plugin
+          - build-essential
+          - jq
+          - python3-pip
         state: present
         update_cache: yes
+      become: true
+      tags: pkgs
 
     - name: Check if reboot is required
       stat:
         path: /var/run/reboot-required
       register: reboot_required_file
+      become: true
+      tags: pkgs
 
     - name: Reboot if required
       reboot:
       when: reboot_required_file.stat.exists
+      become: true
+      tags: pkgs
 
     - name: Start circleci systemd service
       systemd:
         name: circleci
         state: started
+      become: true

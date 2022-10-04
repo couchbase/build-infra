@@ -1,0 +1,27 @@
+[all]
+172.23.113.54 vm_name=circleci-linux-large-1
+172.23.112.255 vm_name=circleci-linux-large-2
+172.23.113.55 vm_name=circleci-linux-large-3
+172.23.97.195 vm_name=circleci-linux-large-4
+172.23.105.79 vm_name=circleci-linux-large-5
+172.23.108.195 vm_name=circleci-linux-large-6
+172.23.108.191 vm_name=circleci-linux-large-7
+172.23.104.224 vm_name=circleci-linux-large-8
+172.23.104.142 vm_name=circleci-linux-large-9
+172.23.106.44 vm_name=circleci-linux-large-10
+172.23.106.169 vm_name=circleci-linux-large-11
+172.23.105.250 vm_name=circleci-linux-large-12
+172.23.104.192 vm_name=circleci-linux-large-13
+172.23.104.193 vm_name=circleci-linux-large-14
+172.23.106.172 vm_name=circleci-linux-large-15
+172.23.106.173 vm_name=circleci-linux-large-16
+172.23.106.174 vm_name=circleci-linux-large-17
+172.23.106.175 vm_name=circleci-linux-large-18
+172.23.104.233 vm_name=circleci-linux-large-19
+172.23.106.179 vm_name=circleci-linux-large-20
+
+[all:vars]
+ansible_user=couchbase
+ansible_password=couchbase
+ansible_become=true
+ansible_become_password=couchbase

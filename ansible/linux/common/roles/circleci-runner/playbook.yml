@@ -1,7 +1,0 @@
-# sample playbook for testing and manual runs
----
-- hosts: all
-  gather_facts: True
-
-  roles:
-    - circleci-runner
