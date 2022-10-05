@@ -30,7 +30,7 @@ services:
         target: /run/secrets/jenkins_master_password
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-      - source: buildx.config.docker.20220621
+      - source: buildx.config.docker.20221004
         target: /home/couchbase/.docker/config.json
         mode: 0600
         uid: "1000"
@@ -50,7 +50,7 @@ configs:
 secrets:
   server_jenkins_ns-buildbot_api_key.20220510:
     external: true
-  buildx.config.docker.20220621:
+  buildx.config.docker.20221004:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true
