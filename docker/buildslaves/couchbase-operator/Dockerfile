@@ -1,11 +1,24 @@
 # Jenkins buildslave container for building couchbase-operator
 
+FROM ubuntu:20.04 as skopeo
+ENV GOPATH=/tmp/gopath
+ENV PATH=/usr/local/go/bin:$PATH
+RUN set -x \
+  && apt update \
+  && DEBIAN_FRONTEND=noninteractive apt install -y curl gcc git libgpgme-dev libassuan-dev libbtrfs-dev libdevmapper-dev make pkg-config \
+  && curl -Lf https://go.dev/dl/go1.19.2.linux-amd64.tar.gz > /tmp/go.tar.gz \
+  && tar -C /usr/local -xzf /tmp/go.tar.gz \
+  && git clone https://github.com/containers/skopeo $GOPATH/src/github.com/containers/skopeo \
+  && cd $GOPATH/src/github.com/containers/skopeo && make bin/skopeo
+
 # We'll inherit from the Couchbase Server build slave just to
 # avoid re-inventing the wheel and for Docker image cache sharing
 
 FROM couchbasebuild/server-ubuntu20-build:20220527
 LABEL maintainer=build-team@couchbase.com
 
+COPY --from=skopeo /tmp/gopath/src/github.com/containers/skopeo/bin/skopeo /usr/local/bin/skopeo
+COPY --from=skopeo /tmp/gopath/src/github.com/containers/skopeo/default-policy.json /etc/containers/policy.json
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # Docker; xmllint (used for parsing manifest); jq (used for parsing

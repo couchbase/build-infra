@@ -9,7 +9,7 @@ services:
     # using the "ubuntu-2004-operator-build" image, has
     # operator-specific Jenkins labels, and runs on Swarm nodes with the
     # role "operator". In future we may further divide this.
-    image: couchbasebuild/ubuntu-2004-operator-build:20220913
+    image: couchbasebuild/ubuntu-2004-operator-build:20221012
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=buildx"
