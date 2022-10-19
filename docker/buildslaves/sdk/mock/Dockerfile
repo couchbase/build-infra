@@ -1,18 +1,11 @@
 # Docker container for Centos8
 
-FROM couchbasebuild/sdk-centos8-build:20211209
+FROM couchbasebuild/sdk-ubi8-build:20221017
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
-# Not at all sure about this workaround
-RUN rpm --rebuilddb || ( \
-        rm -rf /var/lib/rpm && \
-        mv /var/lib/rpmrebuild* /var/lib/rpm \
-)
-
-RUN yum clean all && \
-    yum install --setopt=keepcache=0 -y mock
+RUN yum install -y --enablerepo centos8-appstream,centos8-baseos mock && yum clean all
 RUN usermod -a -G mock couchbase
 
 USER couchbase
