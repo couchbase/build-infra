@@ -16,6 +16,11 @@ while [[ $# -gt 0 ]]; do
   key="$1"
 
   case $key in
+    --parallelism)
+      parallelism="$2"
+      shift
+      shift
+      ;;
     --timezone)
       timezone="$2"
       shift
@@ -188,6 +193,12 @@ function retrieve_secrets() {
 function docker_run_args() {
   # Compile args we'll be passing to `docker run`
   args="--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -v /ephemeral/tmp:/tmp -d -p 4000:22 "
+
+  # CV PARALLELISM env var
+  if [ ! -z "${parallelism}" ]
+  then
+    args="${args}-e PARALLELISM=${parallelism} "
+  fi
 
   # Mount docker and special /opt/couchbase volume for server
   # to enable rpm/deb packaging in sidecar containers

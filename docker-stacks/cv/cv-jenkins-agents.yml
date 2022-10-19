@@ -47,9 +47,7 @@ services:
   # always be kept current. Its presence here is required to allow EC2
   # instances to discover the correct image.
   amzn2_aarch64:
-    image: alpine
-    environment:
-      LAUNCH_IMAGE: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20210831-aarch64
+    image: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20221019
     deploy:
       replicas: 0
 
