@@ -61,7 +61,7 @@ services:
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
-      - "PARALLELISM=4"
+      - "PARALLELISM=3"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
     <<: *default-jenkins-agent
@@ -87,7 +87,7 @@ services:
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
-      - "PARALLELISM=4"
+      - "PARALLELISM=3"
     <<: *default-jenkins-agent
     deploy:
       resources:
