@@ -2,6 +2,9 @@
 
 # This hook is used to ensure we are using a multi-arch capable builder
 
+# First be sure dockerd is available and writable by 'couchbase' user
+[ ! -z "$(find /var/run/docker.sock -writable -user couchbase)" ] || exit 0
+
 sudo -u couchbase --set-home --preserve-env \
   bash -c '
   set -ex;

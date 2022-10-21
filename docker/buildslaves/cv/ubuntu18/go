@@ -6,9 +6,15 @@ IMAGE=couchbasebuild/server-ubuntu18-cv
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh ./build/couchbuilder_start.sh
 cp -a ../../util/healthcheck.sh build
+cp ../../util/hooks/buildx.sh ./build/
+
+. ../versions
 
 docker build \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg VALGRIND_VERSION=${VALGRIND_VERSION} \
+  --build-arg DOCKER_VERSION=${DOCKER_VERSION} \
+  --build-arg JYTHON_VERSION=${JYTHON_VERSION} \
   -t ${IMAGE}:${TAG} \
   -t ${IMAGE}:latest \
   .

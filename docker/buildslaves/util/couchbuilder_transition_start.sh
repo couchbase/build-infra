@@ -84,7 +84,7 @@ export -f add_hostkeys
 if [ -f /run/secrets/profile_sync -a ! -e "${NODE_CLASS}" -a ! -e "${NODE_PRODUCT}" ]
 then
   echo "###########################"
-  echo "# Populating profile data #"
+  echo "# Populating profile data #"
   echo "###########################"
 
   # Ensure the host where the profile data lives is in our known_hosts before synchronisation. We also
