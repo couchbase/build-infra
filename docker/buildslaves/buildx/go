@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 TAG=$(date +%Y%m%d)
-IMAGE=couchbasebuild/ubuntu-2004-operator-build
+IMAGE=couchbasebuild/buildx
 
 mkdir -p build
 

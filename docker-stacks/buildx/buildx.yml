@@ -5,11 +5,9 @@ version: "3.8"
 services:
   buildx:
     # Historically, this was the agent used for
-    # couchbase-k8s-microservice builds, so for the moment it's still
-    # using the "ubuntu-2004-operator-build" image, has
-    # operator-specific Jenkins labels, and runs on Swarm nodes with the
-    # role "operator". In future we may further divide this.
-    image: couchbasebuild/ubuntu-2004-operator-build:20221012
+    # couchbase-k8s-microservice builds, so it still has
+    # operator-specific Jenkins labels.
+    image: couchbasebuild/buildx:20221024
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=buildx"
@@ -35,10 +33,15 @@ services:
         mode: 0600
         uid: "1000"
         gid: "1000"
+      - source: buildx.config.rhcc_metadata.20221024
+        target: /home/couchbase/.docker/rhcc-metadata.json
+        mode: 0600
+        uid: "1000"
+        gid: "1000"
     deploy:
       placement:
         constraints:
-          - node.labels.role==operator
+          - node.labels.role==docker-buildx
       replicas: 2
       update_config:
         parallelism: 1000
@@ -51,6 +54,8 @@ secrets:
   server_jenkins_ns-buildbot_api_key.20220510:
     external: true
   buildx.config.docker.20221004:
+    external: true
+  buildx.config.rhcc_metadata.20221024:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true
