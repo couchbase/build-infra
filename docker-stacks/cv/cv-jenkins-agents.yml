@@ -52,7 +52,7 @@ services:
       replicas: 0
 
   ubuntu18_docker:
-    image: couchbasebuild/server-ubuntu18-cv:20221020
+    image: couchbasebuild/server-ubuntu18-cv:20221025
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-docker"
       - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small docker linux"
