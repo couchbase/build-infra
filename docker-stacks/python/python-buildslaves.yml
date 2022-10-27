@@ -45,6 +45,7 @@ services:
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-slave
 
   centos6:
@@ -57,6 +58,7 @@ services:
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-slave
 
 configs:

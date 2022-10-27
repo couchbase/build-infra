@@ -45,6 +45,7 @@ services:
       - "NODE_CLASS=cv zz"
       - "NODE_PRODUCT=couchbase-server"
       - "COUCHBASE_DISABLED_UNIT_TESTS=ALL"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-agent
     deploy:
       placement:
@@ -69,6 +70,7 @@ services:
       - NODE_CLASS=cv
       - NODE_PRODUCT=couchbase-server
       - COUCHBASE_DISABLED_UNIT_TESTS=ALL
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
 
     <<: *default-jenkins-agent
     deploy:

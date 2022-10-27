@@ -57,6 +57,7 @@ x-default-jenkins-slave-environment:
 # means you can attach these agents temporarily to a different Jenkins master.
  - &default-jenkins-slave-environment-master "JENKINS_MASTER=${JENKINS_MASTER:-http://sdk-swarm.build.couchbase.com:8080/}"
  - &default-jenkins-slave-lang "LANG=en_US.UTF-8"
+ - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
 
 services:
 
@@ -67,6 +68,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk alpine"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   amzn2:
@@ -76,6 +78,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   centos6:
@@ -85,6 +88,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk centos6"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   centos7:
@@ -94,6 +98,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk centos7"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   centos8:
@@ -103,6 +108,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk centos8"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   debian8:
@@ -112,6 +118,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk debian8"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   debian9:
@@ -121,6 +128,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk debian9"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   ubuntu14:
@@ -130,6 +138,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk ubuntu14 ubuntu14.04"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   ubuntu16:
@@ -139,6 +148,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk ubuntu16 ubuntu16.04"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   ubuntu20:
@@ -148,6 +158,7 @@ services:
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
+      - *repo-url
     <<: *default-jenkins-slave
 
   centos7-signing:
@@ -156,6 +167,7 @@ services:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"
       - *default-jenkins-slave-environment-master
+      - *repo-url
     <<: *default-jenkins-slave
     deploy:
       replicas: 1
@@ -199,6 +211,7 @@ services:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
       - "JENKINS_SLAVE_LABELS=debian10-signing docker"
       - *default-jenkins-slave-environment-master
+      - *repo-url
     <<: *default-jenkins-slave
     deploy:
       replicas: 1

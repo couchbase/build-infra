@@ -40,6 +40,7 @@ services:
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-agent
 
   # Placeholder service for aarch64
@@ -60,6 +61,7 @@ services:
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
       - "PARALLELISM=3"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
     <<: *default-jenkins-agent
@@ -86,6 +88,7 @@ services:
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
       - "PARALLELISM=3"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-agent
     deploy:
       resources:
@@ -110,6 +113,7 @@ services:
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
       - "PARALLELISM=16"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-agent
     deploy:
       resources:

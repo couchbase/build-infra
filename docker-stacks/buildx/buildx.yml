@@ -15,6 +15,7 @@ services:
       - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=couchbase-server"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       - "/etc/localtime:/etc/localtime"
