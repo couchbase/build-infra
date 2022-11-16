@@ -20,7 +20,7 @@ services:
         - "traefik.docker.network=traefik_reverse-proxy"
         - "traefik.http.routers.changelog.rule=Host(`changelog.build.couchbase.com`)"
         - "traefik.http.services.changelog_changelog.loadbalancer.server.port=80"
-    image: couchbasebuild/changelog-frontend:20210816
+    image: couchbasebuild/changelog-frontend:20221116
     init: true
     networks:
       - traefik_reverse-proxy

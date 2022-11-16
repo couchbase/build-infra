@@ -31,7 +31,7 @@ function App() {
   const [fromBuilds, setFromBuilds] = useState();
 
   // current selections
-  const [product, setProduct] = useState(selectedOptions['product'] || heading['product']);
+  const [product, setProduct] = useState(selectedOptions['product'] || "couchbase-server");
   const [fromVersion, setFromVersion] = useState(selectedOptions['fromVersion'] || heading['fromVersion']);
   const [fromBuild, setFromBuild] = useState(selectedOptions['fromBuild'] || heading['fromBuild']);
   const [toVersion, setToVersion] = useState(selectedOptions['toVersion'] || heading['toVersion']);
@@ -181,7 +181,11 @@ function App() {
 
   useEffect(() => {
     if (optionsChanged) {
-      setToBuild(heading['toBuild'])
+      if(fromVersion !== toVersion || fromBuild >= toBuild){
+        setToBuild(heading['toBuild'])
+      } else {
+        getChangeLog()
+      }
       if(toVersion === fromVersion) {
         setToBuilds(fromBuilds.filter(x => parseFloat(x) > parseFloat(fromBuild)))
       }
