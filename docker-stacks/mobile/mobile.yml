@@ -199,7 +199,7 @@ services:
       - jenkins
 
   litec-the-ark:
-    image: couchbasebuild/litec-the-ark:20210811
+    image: couchbasebuild/litec-the-ark:2022112
     init: true
     user: couchbase
     environment:
@@ -207,6 +207,8 @@ services:
       - "JENKINS_SLAVE_LABELS=litec litec-the-ark"
       - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
       - "JENKINS_SLAVE_EXECUTORS=3"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "/etc/timezone:/etc/timezone"
@@ -218,6 +220,8 @@ services:
       - source: mobile_jenkins_ns-buildbot_api_key.20220510
         target: /run/secrets/jenkins_master_password
         mode: 0444
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
     deploy:
       placement:
         constraints:
