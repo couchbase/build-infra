@@ -235,7 +235,7 @@ services:
     <<: *default-jenkins-secrets
 
   centos8:
-    image: couchbasebuild/server-centos8-build:20220717
+    image: couchbasebuild/server-centos8-build:20221125
     environment:
       - "JENKINS_SLAVE_NAME=server-centos8"
       - "JENKINS_SLAVE_LABELS=server centos8 mad-hatter x86_64"
