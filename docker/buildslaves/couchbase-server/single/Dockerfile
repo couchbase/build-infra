@@ -231,6 +231,9 @@ HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/
 # glib2 and friends - annoyingly needed by v8 build.
 RUN yum install -y glib2-devel && yum clean all
 
+# IPC/Cmd.pm - required for OpenSSL 3.0 build
+RUN yum install -y perl-IPC-Cmd
+
 # Our tools
 ARG CBDEP_VER
 ARG PATCH_VIA_GERRIT_VER
@@ -246,7 +249,7 @@ RUN curl -Lf https://download.docker.com/linux/static/stable/x86_64/docker-${DOC
 RUN usermod -a -G 999 couchbase
 
 # This might be temporary, if we can get parallel dpkg-buildpackage working.
-RUN yum install -y http://ftp5.gwdg.de/pub/opensuse/repositories/home:/JeanVEGA/CentOS_7/x86_64/pixz-1.0.7-40.2.x86_64.rpm && yum clean all
+RUN yum install -y https://download.opensuse.org/repositories/home:/Ledest:/misc/openSUSE_Leap_15.3/x86_64/pixz-1.0.7-0.1.x86_64.rpm && yum clean all
 
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permisions / ownership.

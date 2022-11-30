@@ -128,7 +128,7 @@ services:
     <<: *default-jenkins-one-agent
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20220719
+    image: couchbasebuild/server-amzn2-build:20221130
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"
@@ -165,7 +165,7 @@ services:
     <<: *default-jenkins-three-agent
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20221003
+    image: couchbasebuild/server-linux-build:20221130
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
       - "JENKINS_SLAVE_LABELS=server linux all monster neo elixir morpheus master x86_64"

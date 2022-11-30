@@ -213,6 +213,9 @@ RUN if [ "$(uname -m)" == "aarch64" ]; then \
 # glib2 and friends - annoyingly needed by v8 build.
 RUN yum install -y glib2-devel && yum clean all
 
+# IPC/Cmd.pm - required for OpenSSL 3.0 build
+RUN yum install -y perl-IPC-Cmd
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 
