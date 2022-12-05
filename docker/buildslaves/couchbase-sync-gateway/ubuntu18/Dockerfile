@@ -55,7 +55,7 @@ RUN set -x \
 
 # JDK for Jenkins.
 RUN set -x \
-    && apt install -y openjdk-8-jre-headless \
+    && apt install -y openjdk-11-jre-headless \
     && apt clean
 
 # Update locale
