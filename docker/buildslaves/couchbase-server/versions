@@ -5,6 +5,11 @@
 # are the same, e.g. some do not include all tooling, some install whatever
 # is available in their package manager, etc.
 
+# JRE - all
+JRE_MAJOR=17
+JRE_VERSION=17.0.5
+JRE_BUILD=8
+
 # Cmake # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
 CMAKE_MAJOR=3
 CMAKE_MINOR=20

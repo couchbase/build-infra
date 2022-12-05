@@ -20,6 +20,9 @@ docker build \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
   --build-arg GCC_VER=${GCC} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
+  --build-arg JRE_VERSION=${JRE_VERSION} \
+  --build-arg JRE_MAJOR=${JRE_MAJOR} \
+  --build-arg JRE_BUILD=${JRE_BUILD} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg TINI_VER=${TINI} \
   -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .

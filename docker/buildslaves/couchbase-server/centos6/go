@@ -20,6 +20,9 @@ then
         cp -a /usr/local /output
 fi
 docker build -t ${IMAGE}:${TAG} \
+  --build-arg JRE_VERSION=${JRE_VERSION} \
+  --build-arg JRE_MAJOR=${JRE_MAJOR} \
+  --build-arg JRE_BUILD=${JRE_BUILD} \
   --build-arg OPENSSH_VER=${OPENSSH} \
   .
 

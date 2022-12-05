@@ -5,13 +5,23 @@ LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
-# Install Couchbase build dependencies (jessie-backports needed for OpenJDK)
+# Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential curl git libssl-dev lsb-release openjdk-8-jdk sudo tar && \
+    apt-get install -y build-essential curl git libssl-dev lsb-release sudo tar && \
     apt-get install -y groff-base python-dev python-pip python-virtualenv && \
     apt-get install -y libuv1-dev libev-dev libevent-dev zlib1g-dev libbz2-dev libffi-dev && \
     apt-get install -y libunwind8 libicu57 libssl1.0.2 ccache && \
     apt-get clean
+
+# JRE for Jenkins.
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase

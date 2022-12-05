@@ -44,16 +44,15 @@ services:
     <<: *default-jenkins-agent
 
   # Placeholder service for aarch64
-  # Note: this should always have zero replicas, and its LAUNCH_IMAGE should
-  # always be kept current. Its presence here is required to allow EC2
-  # instances to discover the correct image.
+  # Note: this should always have zero replicas. Its presence here is
+  # required to allow EC2 instances to discover the correct image.
   amzn2_aarch64:
     image: 284614897128.dkr.ecr.us-east-2.amazonaws.com/server-amzn2-build:20221019
     deploy:
       replicas: 0
 
   ubuntu18_docker:
-    image: couchbasebuild/server-ubuntu18-cv:20221025
+    image: couchbasebuild/server-ubuntu18-cv:20221204
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-docker"
       - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small docker linux"
@@ -80,7 +79,7 @@ services:
         delay: 0s
 
   ubuntu18_small:
-    image: couchbasebuild/server-ubuntu18-cv:20221020
+    image: couchbasebuild/server-ubuntu18-cv:20221204
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-small"
       - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small"
@@ -105,7 +104,7 @@ services:
         delay: 0s
 
   ubuntu18_large:
-    image: couchbasebuild/server-ubuntu18-cv:20221020
+    image: couchbasebuild/server-ubuntu18-cv:20221204
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-large"
       - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 large"

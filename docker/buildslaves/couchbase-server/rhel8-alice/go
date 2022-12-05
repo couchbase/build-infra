@@ -3,6 +3,7 @@
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=build-docker.couchbase.com/couchbasebuild/server-rhel8-build
+. ../versions
 
 # Saving for historical reference, but not needed with latest shim Dockerfile
 #PRIV_DIR=~/jenkinsdocker-ssh
@@ -27,6 +28,9 @@ fi
 
 docker build \
     --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+    --build-arg JRE_VERSION=${JRE_VERSION} \
+    --build-arg JRE_MAJOR=${JRE_MAJOR} \
+    --build-arg JRE_BUILD=${JRE_BUILD} \
     --build-arg RH_USER=${RH_USER} \
     --build-arg RH_PASSWORD=${RH_PASSWORD} \
     --build-arg RH_POOL_ID=${RH_POOL_ID} \

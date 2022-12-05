@@ -16,7 +16,6 @@ RUN apt-get update && \
         libc6-dbg \
         libssl-dev \
         lsb-release \
-        openjdk-8-jdk \
         sudo \
         groff-base \
         python3-dev \
@@ -40,6 +39,16 @@ RUN apt-get update && \
         libc++abi-dev \
         ccache && \
     apt-get clean
+
+# JRE for Jenkins.
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase

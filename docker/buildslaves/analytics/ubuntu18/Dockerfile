@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04 analytics.jenkins agent
 
-FROM couchbasebuild/server-ubuntu18-build:20220408
+FROM couchbasebuild/server-ubuntu18-build:20221204
 LABEL maintainer="build-team@couchbase.com"
 
 # ENV vars for profile data retrieval - analytics is basically CV

@@ -1,4 +1,4 @@
-# Docker container for a Jenkins slave that can invoke Ansible playbooks
+# Docker container for a Jenkins agent that can invoke Ansible playbooks
 
 FROM couchbasebuild/ansible-playbook:2.4.1
 MAINTAINER build-team@couchbase.com
@@ -18,16 +18,17 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# Oracle JDK (for Jenkins and Analytics).
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-    http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz -o jdk.tgz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/jdk.tgz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
+# JRE for Jenkins.
+RUN set -x \
+    && ARCH=$(uname -m | sed -e 's/86_//') \
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_${ARCH}_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz \
+    && cd /usr/local \
+    && tar xvzf /tmp/deploy/openjre.tar.gz \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /tmp/deploy
 ENV JAVA_HOME=/usr/local/java
 
 ENV AGENT_VERSION=4.3

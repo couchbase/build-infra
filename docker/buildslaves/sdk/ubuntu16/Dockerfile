@@ -7,11 +7,21 @@ USER root
 
 # Install Couchbase build dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release openjdk-8-jdk sudo tar && \
+    apt-get install -y build-essential curl git libc6-dbg libssl-dev lsb-release sudo tar && \
     apt-get install -y groff-base python-dev python-pip python-virtualenv gdb gnupg2 && \
     apt-get install -y libuv-dev libev-dev libevent-dev libbz2-dev libffi-dev && \
     apt-get install -y libunwind8 libicu55 && \
     apt-get clean
+
+# JRE for Jenkins.
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -54,7 +64,7 @@ RUN apt-get update && \
     apt-get clean
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
+    curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.zip && \
     cd /usr/local && \
     unzip /tmp/deploy/gradle.zip && \
     unzip /tmp/deploy/maven.zip && \

@@ -63,8 +63,15 @@ RUN groupadd -g1000 couchbase && \
 # Dev basic tools
 RUN yum groupinstall -y "Development Tools"
 
-# JDK for Jenkins
-RUN yum install -y --setopt=keepcache=0 java-1.8.0-openjdk && yum clean packages
+# JRE for Jenkins.
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \

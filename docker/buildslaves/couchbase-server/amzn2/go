@@ -36,6 +36,9 @@ docker buildx build --pull ${PUSH} \
   --build-arg DOCKER_VER=${DOCKER} \
   --build-arg GCC_VER=${GCC} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
+  --build-arg JRE_VERSION=${JRE_VERSION} \
+  --build-arg JRE_MAJOR=${JRE_MAJOR} \
+  --build-arg JRE_BUILD=${JRE_BUILD} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg RUBY_MAJOR=${RUBY_MAJOR} \
   --build-arg RUBY_MINOR=${RUBY_MINOR} \

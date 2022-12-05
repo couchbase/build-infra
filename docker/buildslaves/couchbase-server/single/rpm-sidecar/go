@@ -23,7 +23,7 @@ get_img() {
     return
   fi
 
-  stackfile=$(git rev-parse --show-toplevel)/docker-stacks/couchbase-server/server-jenkins-buildslaves.yml
+  stackfile=$(git rev-parse --show-toplevel)/docker-stacks/couchbase-server/server-jenkins-agents.yaml
   case ${arch} in
     arm64)
       base_os=amzn2

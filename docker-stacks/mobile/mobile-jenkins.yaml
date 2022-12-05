@@ -9,7 +9,7 @@ services:
 
   # mobile.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.346.2
+    image: jenkins/jenkins:2.375.1
     deploy:
       replicas: 1
       labels:

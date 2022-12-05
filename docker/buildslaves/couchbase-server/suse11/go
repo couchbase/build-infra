@@ -45,11 +45,17 @@ then
     curl -o build/openssl-${OPENSSL}.tar.gz \
         https://www.openssl.org/source/openssl-${OPENSSL}.tar.gz
 fi
-
+if [ ! -e build/openjre-${JRE_VERSION}_${JRE_BUILD}.tar.gz ]
+then
+    curl -Lf -o build/openjre-${JRE_VERSION}_${JRE_BUILD}.tar.gz \
+      http://github.com/adoptium/temurin${JRE_MAJOR}-binaries/releases/download/jdk-${JRE_VERSION}%2B${JRE_BUILD}/OpenJDK${JRE_MAJOR}U-jre_x64_linux_hotspot_${JRE_VERSION}_${JRE_BUILD}.tar.gz
+fi
 
 docker build -t ${IMAGE}:${TAG} \
   --build-arg OPENSSL_VER=${OPENSSL} \
   --build-arg OPENSSH_VER=${OPENSSH} \
+  --build-arg JRE_VERSION=${JRE_VERSION} \
+  --build-arg JRE_BUILD=${JRE_BUILD} \
   .
 
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest

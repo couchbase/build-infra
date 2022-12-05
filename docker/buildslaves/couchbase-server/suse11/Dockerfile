@@ -29,6 +29,16 @@ RUN set -x \
     && make install \
     && rm -rf /opt/src/openssh-${OPENSSH_VER}
 
+# JRE for Jenkins.
+ARG JRE_VERSION
+ARG JRE_BUILD
+RUN rm -rf /usr/local/java* && find /usr/local/bin -xtype l -delete
+ADD build/openjre-${JRE_VERSION}_${JRE_BUILD}.tar.gz /usr/local
+RUN set -x \
+    && cd /usr/local \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done
+
 RUN zypper install -y rsync && zypper clean
 
 RUN rm -rf /home/couchbase/.ssh

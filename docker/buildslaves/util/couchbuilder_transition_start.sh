@@ -202,7 +202,7 @@ command -v gpg >/dev/null 2>&1 && {
         -retry 5 \
         -noRetryAfterConnected \
         -username "${jenkins_user}" \
-        -password @/run/secrets/jenkins_master_password \
+        -passwordFile /run/secrets/jenkins_master_password \
         >& /var/log/swarm-client.log &
     else
       sudo -u couchbase -H \
@@ -222,7 +222,7 @@ command -v gpg >/dev/null 2>&1 && {
         -retry 5 \
         -noRetryAfterConnected \
         -username "${jenkins_user}" \
-        -password @/run/secrets/jenkins_master_password \
+        -passwordFile /run/secrets/jenkins_master_password \
         >& /var/log/swarm-client.log &
     fi
 

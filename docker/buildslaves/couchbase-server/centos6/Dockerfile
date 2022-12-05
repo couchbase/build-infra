@@ -19,7 +19,9 @@ RUN set -x \
   && cd /tmp/deploy \
   && curl -L https://repo.anaconda.com/miniconda/Miniconda2-4.7.12.1-Linux-x86_64.sh -o miniconda2.sh \
   && chmod 755 miniconda2.sh \
-  && ./miniconda2.sh -b -f -p /home/couchbase/miniconda2
+  && ./miniconda2.sh -b -f -p /home/couchbase/miniconda2 \
+  && cd /tmp \
+  && rm -rf deploy
 
 # OpenSSH
 ARG OPENSSH_VER
@@ -33,6 +35,22 @@ RUN set -x \
     && make \
     && make install \
     && rm -rf /tmp/src
+
+# JRE for Jenkins.
+RUN yum remove -y java-1.8.0-openjdk-headless
+ARG JRE_MAJOR
+ARG JRE_VERSION
+ARG JRE_BUILD
+RUN set -x \
+    && ARCH=$(uname -m | sed -e 's/86_//') \
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -Lf https://github.com/adoptium/temurin${JRE_MAJOR}-binaries/releases/download/jdk-${JRE_VERSION}%2B${JRE_BUILD}/OpenJDK${JRE_MAJOR}U-jre_${ARCH}_linux_hotspot_${JRE_VERSION}_${JRE_BUILD}.tar.gz -o openjre.tar.gz \
+    && cd /usr/local \
+    && tar xvzf /tmp/deploy/openjre.tar.gz \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /tmp/deploy
 
 ENV AGENT_VERSION=4.3
 

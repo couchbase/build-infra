@@ -24,10 +24,19 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# JDK for Jenkins
-RUN apt-get update && \
-    apt-get install -y openjdk-8-jre-headless && \
-    apt-get clean
+ARG JRE_MAJOR
+ARG JRE_VERSION
+ARG JRE_BUILD
+RUN set -x \
+    && ARCH=$(uname -m | sed -e 's/86_//') \
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -Lf https://github.com/adoptium/temurin${JRE_MAJOR}-binaries/releases/download/jdk-${JRE_VERSION}%2B${JRE_BUILD}/OpenJDK${JRE_MAJOR}U-jre_${ARCH}_linux_hotspot_${JRE_VERSION}_${JRE_BUILD}.tar.gz -o openjre.tar.gz \
+    && cd /usr/local \
+    && tar xvzf /tmp/deploy/openjre.tar.gz \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /tmp/deploy
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER

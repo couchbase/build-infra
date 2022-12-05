@@ -12,10 +12,6 @@ LABEL maintainer="build-team@couchbase.com"
 USER root
 RUN yum -y update; yum clean all
 
-# JDK for Jenkins
-RUN yum install -y java-1.8.0-openjdk-headless curl && \
-    yum clean all
-
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base Amazon Linux 2 repositories
 RUN yum install --setopt=keepcache=0 -y \
@@ -47,6 +43,20 @@ RUN yum install --setopt=keepcache=0 -y \
                 xz \
     && yum clean all \
     && ln -s /usr/bin/python2.7 /usr/bin/python2.6
+
+ARG JRE_MAJOR
+ARG JRE_VERSION
+ARG JRE_BUILD
+RUN set -x \
+    && ARCH=$(uname -m | sed -e 's/86_//') \
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -Lf https://github.com/adoptium/temurin${JRE_MAJOR}-binaries/releases/download/jdk-${JRE_VERSION}%2B${JRE_BUILD}/OpenJDK${JRE_MAJOR}U-jre_${ARCH}_linux_hotspot_${JRE_VERSION}_${JRE_BUILD}.tar.gz -o openjre.tar.gz \
+    && cd /usr/local \
+    && tar xvzf /tmp/deploy/openjre.tar.gz \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /tmp/deploy
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase

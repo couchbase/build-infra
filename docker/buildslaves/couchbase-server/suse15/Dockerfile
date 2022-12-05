@@ -26,9 +26,6 @@ ARG TINI_VER
 ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini /tini
 RUN chmod +x /tini
 
-# JDK for Jenkins
-RUN zypper -n install java-1_8_0-openjdk-headless && zypper clean
-
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
 RUN zypper -n install \
@@ -54,6 +51,20 @@ RUN zypper -n install \
                 tar \
                 unzip \
     && zypper clean
+
+ARG JRE_MAJOR
+ARG JRE_VERSION
+ARG JRE_BUILD
+RUN set -x \
+    && ARCH=$(uname -m | sed -e 's/86_//') \
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -Lf https://github.com/adoptium/temurin${JRE_MAJOR}-binaries/releases/download/jdk-${JRE_VERSION}%2B${JRE_BUILD}/OpenJDK${JRE_MAJOR}U-jre_${ARCH}_linux_hotspot_${JRE_VERSION}_${JRE_BUILD}.tar.gz -o openjre.tar.gz \
+    && cd /usr/local \
+    && tar xvzf /tmp/deploy/openjre.tar.gz \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /tmp/deploy
 
 # * CMake (from cmake.org)
 ARG CMAKE_MAJOR
