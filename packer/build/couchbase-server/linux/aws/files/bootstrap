@@ -95,8 +95,8 @@ function get_stackfile() {
   declare -A stackfiles
   stackfiles["analytics"]="analytics/analytics-jenkins-agents.yml"
   stackfiles["cv"]="cv/cv-jenkins-agents.yml"
-  stackfiles["server"]="couchbase-server/server-jenkins-buildslaves.yml"
-  stackfiles["test"]="couchbase-server/server-jenkins-buildslaves.yml"
+  stackfiles["server"]="couchbase-server/server-jenkins-agents.yaml"
+  stackfiles["test"]="couchbase-server/server-jenkins-agents.yaml"
 
   if [ "${is_test_image}" = "1" ]; then
     branch=aws-testing

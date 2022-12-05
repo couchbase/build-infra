@@ -128,7 +128,7 @@ services:
     <<: *default-jenkins-one-agent
 
   amzn2:
-    image: couchbasebuild/server-amzn2-build:20221204
+    image: couchbasebuild/server-amzn2-build:20221205
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
       - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"

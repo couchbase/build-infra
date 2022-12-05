@@ -206,15 +206,17 @@ RUN set -x \
 
 # For the moment, we need "docker" in this image, and for the
 # "couchbase" user to have permissions to access docker.sock.
+# The 'docker' group on the host moves around, so add the user
+# to a number of likely candidates.
 # Additionally we require "pixz". This is all for single-linux support
 # on aarch64 (running in EC2), so only make those changes for that arch.
 ARG DOCKER_VER
 RUN if [ "$(uname -m)" == "aarch64" ]; then \
         set -e; \
+        set -x; \
         curl -Lf https://download.docker.com/linux/static/stable/aarch64/docker-${DOCKER_VER}.tgz \
         | tar xz --strip-components=1 -C /usr/local/bin; \
-        groupadd -g 994 docker; \
-        usermod -a -G docker couchbase; \
+        for gid in {990..997}; do groupadd -g ${gid} docker${gid}; usermod -a -G docker${gid} couchbase; done; \
         yum install -y \
             http://rpmfind.net/linux/opensuse/distribution/leap/15.3/repo/oss/aarch64/pixz-1.0.6-1.13.aarch64.rpm; \
         yum clean all; \
