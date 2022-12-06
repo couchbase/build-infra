@@ -52,7 +52,7 @@ x-node-product:
 services:
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20220111
+    image: couchbasebuild/server-centos7-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=unit-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
