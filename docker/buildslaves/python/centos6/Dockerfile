@@ -12,7 +12,7 @@ RUN yum install --setopt=keepcache=0 -y sudo curl \
         openssl-devel ncurses-devel sqlite-devel \
         readline-devel tk-devel gdbm-devel db4-devel \
         libpcap-devel xz-devel expat-devel curl-devel \
-        rsync openssh-clients java-1.8.0-openjdk-headless && \
+        rsync openssh-clients && \
     yum clean packages
 
 # Historic gcc 7.3.0
@@ -67,6 +67,18 @@ RUN set -x && \
       find . -samefile git -name 'git-*' -exec ln -sf git {} \; && \
       (strip * || true) && \
       ln -s /usr/local/bin/git /usr/bin/git
+
+# JRE for Jenkins.
+RUN set -x \
+    && ARCH=$(uname -m | sed -e 's/86_//') \
+    && mkdir /tmp/deploy \
+    && cd /tmp/deploy \
+    && curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_${ARCH}_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz \
+    && cd /usr/local \
+    && tar xvzf /tmp/deploy/openjre.tar.gz \
+    && ln -s jdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /tmp/deploy
 
 # * ccache (from source)
 RUN set -x && \

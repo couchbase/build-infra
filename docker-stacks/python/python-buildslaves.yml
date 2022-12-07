@@ -49,7 +49,7 @@ services:
     <<: *default-jenkins-slave
 
   centos6:
-    image: couchbasebuild/python-centos6-build:20220717
+    image: couchbasebuild/python-centos6-build:20221207
     environment:
       - "JENKINS_SLAVE_NAME=python-centos6"
       - "JENKINS_SLAVE_LABELS=linux python3 x86_64"
