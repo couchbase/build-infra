@@ -231,8 +231,10 @@ HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/
 # glib2 and friends - annoyingly needed by v8 build.
 RUN yum install -y glib2-devel && yum clean all
 
-# IPC/Cmd.pm - required for OpenSSL 3.0 build
-RUN yum install -y perl-IPC-Cmd
+# Perl modules required for OpenSSL 3.0 build
+RUN set -x \
+        && yum install -y perl-IPC-Cmd perl-Digest-SHA \
+        && yum clean all
 
 # Our tools
 ARG CBDEP_VER
