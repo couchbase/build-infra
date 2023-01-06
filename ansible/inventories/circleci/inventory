@@ -1,7 +1,7 @@
 [all]
-172.23.113.54 vm_name=circleci-linux-large-1
-172.23.112.255 vm_name=circleci-linux-large-2
-172.23.113.55 vm_name=circleci-linux-large-3
+172.23.112.21 vm_name=circleci-linux-large-1
+172.23.112.254 vm_name=circleci-linux-large-2
+172.23.112.11 vm_name=circleci-linux-large-3
 172.23.97.195 vm_name=circleci-linux-large-4
 172.23.105.79 vm_name=circleci-linux-large-5
 172.23.108.195 vm_name=circleci-linux-large-6
