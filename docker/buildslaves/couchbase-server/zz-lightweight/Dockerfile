@@ -116,6 +116,16 @@ RUN curl --fail "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "a
 
 RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
 
+# Install azure-cli, which is used for building and processing Azure images
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# Install packer script, which is used for building AWS/Azure/GCP images
+RUN cd /usr/local/bin \
+    && curl --fail https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip -o packer.zip \
+    && unzip packer.zip \
+    && chmod +x packer \
+    && rm packer.zip
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 
