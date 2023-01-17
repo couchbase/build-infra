@@ -357,6 +357,11 @@ services:
         mode: 0444
         uid: "901"
         gid: "901"
+      - source: profiledata.blackduck.api_token.20230116
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/blackduck-api-token
+        mode: 0444
+        uid: "901"
+        gid: "901"
       - source: profiledata.build_jira_json.20220213
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/build_jira.json
         mode: 0600
@@ -716,4 +721,6 @@ secrets:
     external: true
   # black duck
   profiledata.blackduck.credentials_json.20220708:
+    external: true
+  profiledata.blackduck.api_token.20230116:
     external: true
