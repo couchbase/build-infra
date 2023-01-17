@@ -1,8 +1,7 @@
-# Docker container for cross-compiling to Raspbian 9 (Stretch)
-# Note that this requires access to internal network resources to build
+# Docker container for cross-compiling
 
 FROM debian:buster
-MAINTAINER build-team@couchbase.com
+LABEL maintainer="build-team@couchbase.com"
 
 # The cross compilers installed here are used for generic OS (like Ubuntu Core)
 # Model specific cross compilation toolchains, such as Raspberry Pi, will be
@@ -10,6 +9,7 @@ MAINTAINER build-team@couchbase.com
 RUN apt-get update && apt-get install -y \
     unzip \
     wget \
+    jq \
     git \
     sudo \
     curl \
@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip3 install progressbar
 
-# Install cmake from source
+# CMake
 ARG CMAKE_MAJOR=3
 ARG CMAKE_MINOR=20
 ARG CMAKE_PATCH=1
@@ -42,19 +42,15 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# Jenkins Swarm jar and JDK for Jenkins.
+# JDK for Jenkins.
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
-    curl -Lf https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
+    curl -Lf https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.17%2B8/OpenJDK11U-jre_x64_linux_hotspot_11.0.17_8.tar.gz -o openjre.tar.gz && \
     cd /usr/local && \
     tar xvzf /tmp/deploy/openjre.tar.gz && \
     ln -s jdk* java && \
     for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
     rm -rf /tmp/deploy
-
-RUN curl -f \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.17/swarm-client-3.17.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
