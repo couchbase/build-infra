@@ -67,7 +67,7 @@ RUN set -x \
 RUN set -x \
     && curl --fail https://bootstrap.pypa.io/get-pip.py | python3 \
     && rm -f /usr/local/bin/pip /usr/local/bin/easy_install \
-    && pip3 install requests lxml oauthlib pycrypto boto3 pbr wheel filemagic pyjwt --upgrade \
+    && pip3 install cryptography requests lxml oauthlib pycrypto boto3 pbr wheel filemagic pyjwt --upgrade \
     && pip3 install jira
 
 # Utilities that are handy for zz-lightweight jobs and occasional interactive use
