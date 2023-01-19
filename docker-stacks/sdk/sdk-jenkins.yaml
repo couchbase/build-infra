@@ -14,7 +14,7 @@ services:
       replicas: 1
       resources:
         reservations:
-          memory: 8G
+          memory: 9G
     ports:
       - "8080:8080"
       - "50000:50000"
