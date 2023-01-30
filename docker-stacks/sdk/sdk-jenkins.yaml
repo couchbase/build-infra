@@ -9,12 +9,12 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.375.1
+    image: jenkins/jenkins:2.375.2
     deploy:
       replicas: 1
-      resources:
-        reservations:
-          memory: 9G
+      placement:
+        constraints:
+          - node.labels.role==sdkjenkins
     ports:
       - "8080:8080"
       - "50000:50000"
