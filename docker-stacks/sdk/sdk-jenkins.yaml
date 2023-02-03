@@ -34,6 +34,7 @@ services:
     environment:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
       - "JENKINS_OPTS=--sessionTimeout=1440 --sessionEviction=14400"
+      - "JENKINS_JAVA_OPTS=-Xmx20g"
 
 networks:
   jenkins:
