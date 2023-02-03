@@ -109,7 +109,7 @@ x-repo-url:
  - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
 services:
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20230117
+    image: couchbasebuild/zz-lightweight:20230202
     environment:
       - "JENKINS_SLAVE_NAME=zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"

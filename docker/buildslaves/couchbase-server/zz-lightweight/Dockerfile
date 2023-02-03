@@ -119,6 +119,14 @@ RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
 # Install azure-cli, which is used for building and processing Azure images
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+# Install gcloud for building and processing GCP images
+Run echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+    | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
+    && sudo apt-get update \
+    && sudo apt-get install google-cloud-cli
+
 # Install packer script, which is used for building AWS/Azure/GCP images
 RUN cd /usr/local/bin \
     && curl --fail https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip -o packer.zip \
