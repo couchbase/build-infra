@@ -55,18 +55,15 @@ fmt --split-only ${tmpfile} > ${txt}
 # Produce unwrapped output - just the de-UTF-8'd file.
 cp ${tmpfile} ${longtxt}
 
-# Tweak to prevent txt2html from scrambling things that look like lists.
-perl -pi -e 's/([A-Z1-9])\. /\1FROBOZ /g' ${tmpfile}
-
-# Convert to HTML.
+# Convert to HTML. Specify "--endpreformat_trigger_lines 0" to avoid
+# auto-creating<pre> blocks from indented text (the license files should
+# never need <pre> blocks).
 txt2html --titlefirst --outfile $html \
-  --custom_heading_regexp 'License Agreement($| for the Java)' \
-  --custom_heading_regexp 'SUPPLEMENTAL LICENSE TERMS$' \
+  --endpreformat_trigger_lines 0 \
+  --explicit_headings \
+  --custom_heading_regexp '^ *\d+\. .*' \
   --short_line_length 8000 \
   ${tmpfile}
-
-# Un-tweak.
-perl -pi -e 's/([A-Z1-9])FROBOZ /\1. /g' ${html}
 
 # Change owner of output files (don't want them owned by root).
 uid=$(stat -c %u .)

@@ -1,7 +1,7 @@
 # Docker container for converting license text to required formats
 
-FROM ubuntu:16.04
-MAINTAINER build-team@couchbase.com
+FROM ubuntu:22.04
+LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
@@ -11,7 +11,7 @@ RUN apt-get update && \
     perl -MCPAN -e "CPAN::Shell->notest('install', 'HTML::TextToHTML')" && \
     apt-get purge -y build-essential && \
     apt-get --purge autoremove -y && \
-    apt-get clean # comment
+    apt-get clean
 
 COPY entrypoint.sh /
 ENTRYPOINT [ "/entrypoint.sh" ]
