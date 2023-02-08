@@ -13,6 +13,11 @@ then
         fi
     done
 
+    ssh-keyscan github.com 2>/dev/null |
+    while IFS= read -r key; do
+        cat ~/.ssh/known_hosts 2>/dev/null | grep "$key" || echo "$key" >> ~/.ssh/known_hosts
+    done
+
     # Redirect container
     docker run -d \
         --name https-redirect \
