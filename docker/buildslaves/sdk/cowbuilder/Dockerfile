@@ -24,10 +24,11 @@ RUN set -x \
                               devscripts \
                               git \
                               lsb-release \
-                              openjdk-11-jdk-headless \
+                              openjdk-17-jre-headless \
                               reprepro \
                               sudo \
                               tar \
+                              zstd \
         && apt-get clean
 
 # Install ubuntu-archive-keyring - not presently available in the testing package repository
