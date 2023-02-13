@@ -105,6 +105,13 @@ RUN set -x \
         && apt install -y aspell \
         && apt clean
 
+# Install patchelf - required to fix rpaths after erlang's Install script
+# copies them to a new location
+RUN set -x \
+        && apt update \
+        && apt install -y patchelf \
+        && apt clean
+
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase
