@@ -153,7 +153,7 @@ services:
     <<: *default-jenkins-one-agent
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20221204
+    image: couchbasebuild/server-centos7-build:20230214
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
       - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat neo master x86_64"
@@ -211,7 +211,7 @@ services:
     <<: *default-jenkins-secrets
 
   centos7-asan:
-    image: couchbasebuild/server-centos7-build:20221204
+    image: couchbasebuild/server-centos7-build:20230214
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
       - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat neo elixir morpheus x86_64"

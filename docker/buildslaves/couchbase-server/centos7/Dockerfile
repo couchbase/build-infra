@@ -36,6 +36,7 @@ RUN yum install --setopt=keepcache=0 -y \
                 openssh-clients \
                 openssh-server \
                 openssl-devel-1.0.1e \
+                patchelf \
                 python-devel \
                 redhat-lsb-core \
                 rpm-build \
