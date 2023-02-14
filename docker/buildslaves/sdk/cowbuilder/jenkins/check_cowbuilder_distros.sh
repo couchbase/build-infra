@@ -5,11 +5,9 @@
 docker pull couchbasebuild/sdk-cowbuilder:latest
 docker run --rm -i couchbasebuild/sdk-cowbuilder:latest bash -s <<EOF
 errors=false
-sudo apt update -y
-set -e
-sudo apt install -y jq
+curl -Lfo /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq
 printf "\n\nChecking contents of /usr/share/debootstrap/scripts\n\n"
-for distro in \$(curl -Lf https://raw.githubusercontent.com/couchbase/product-metadata/master/couchbase-server/repo_upload/apt.json  2>/dev/null | jq -r '.os_versions | keys | .[]')
+for distro in \$(curl -Lf https://raw.githubusercontent.com/couchbase/product-metadata/master/couchbase-server/repo_upload/apt.json  2>/dev/null | /tmp/jq -r '.os_versions | keys | .[]')
 do
   if [ ! -f "/usr/share/debootstrap/scripts/\$distro" ]
   then
