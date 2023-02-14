@@ -36,7 +36,6 @@ RUN yum install --setopt=keepcache=0 -y \
                 openssh-clients \
                 openssh-server \
                 openssl-devel-1.0.1e \
-                patchelf \
                 python-devel \
                 redhat-lsb-core \
                 rpm-build \
@@ -231,6 +230,11 @@ RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 RUN set -x \
     && sed -i "s/^override_install_langs=/#override_install_langs=/" /etc/yum.conf \
     && yum reinstall -y glibc-common \
+    && yum clean all
+
+# Install patchelf - needed for erlang post-install
+RUN set -x \
+    && yum install -y patchelf \
     && yum clean all
 
 # Enable disk-checking healthcheck
