@@ -158,6 +158,12 @@ RUN set -x \
          ln -s /usr/bin/_apt $f; \
        done
 
+# Install patchelf - required to fix erlang rpaths post extraction
+RUN set -x \
+    && apt update \
+    && apt install -y patchelf \
+    && apt clean
+
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh

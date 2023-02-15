@@ -156,7 +156,7 @@ services:
     image: couchbasebuild/server-centos7-build:20230214
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -262,7 +262,7 @@ services:
     image: couchbasebuild/server-debian8-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
-      - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter cheshire-cat master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -274,7 +274,7 @@ services:
     image: couchbasebuild/server-debian9-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
-      - "JENKINS_SLAVE_LABELS=server debian9 vulcan alice mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server debian9 vulcan alice mad-hatter cheshire-cat master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -286,7 +286,7 @@ services:
     image: couchbasebuild/server-debian10-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-debian10"
-      - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter cheshire-cat master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -323,7 +323,7 @@ services:
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-suse12"
-      - "JENKINS_SLAVE_LABELS=vulcan alice mad-hatter cheshire-cat neo master server suse12 suse12.2 x86_64"
+      - "JENKINS_SLAVE_LABELS=vulcan alice mad-hatter cheshire-cat master server suse12 suse12.2 x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -347,7 +347,7 @@ services:
     image: couchbasebuild/server-suse15-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
-      - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -383,7 +383,7 @@ services:
     image: couchbasebuild/server-ubuntu18-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
-      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04 ubuntu18 cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04 ubuntu18 cheshire-cat master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -420,7 +420,7 @@ services:
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter cheshire-cat neo elixir morpheus master x86_64"
+      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter cheshire-cat elixir morpheus master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class

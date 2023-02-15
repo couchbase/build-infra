@@ -36,6 +36,12 @@ RUN set -x \
   && cd /tmp \
   && rm -rf deploy
 
+# Install patchelf - required to fix erlang rpaths post extraction
+RUN set -x \
+    && apt update \
+    && apt install -y patchelf \
+    && apt clean
+
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase

@@ -52,7 +52,7 @@ x-node-product:
 services:
 
   centos7:
-    image: couchbasebuild/server-centos7-build:20221204
+    image: couchbasebuild/server-centos7-build:20230214
     environment:
       - "JENKINS_SLAVE_NAME=unit-centos7"
       - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
@@ -62,7 +62,7 @@ services:
     <<: *default-jenkins-two-agent-with-ipv6
 
   ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20220527
+    image: couchbasebuild/server-ubuntu20-build:20230215
     environment:
       - "JENKINS_SLAVE_NAME=unit-ubuntu20"
       - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"
