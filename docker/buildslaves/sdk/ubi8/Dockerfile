@@ -115,7 +115,7 @@ RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo 
 RUN set -x \
     && mkdir /tmp/deploy \
     && curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-7.5.1-bin.zip \
-    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.zip \
+    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.zip \
     && cd /usr/local \
     && unzip /tmp/deploy/gradle.zip \
     && unzip /tmp/deploy/maven.zip \

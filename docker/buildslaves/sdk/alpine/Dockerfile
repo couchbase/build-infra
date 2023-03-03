@@ -78,7 +78,13 @@ RUN set -x \
     && rm -rf /tmp/deploy
 
 # sbt
-RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing sbt
+RUN set -x \
+    && apk add --no-cache bash \
+    && cd /tmp \
+    && mkdir /usr/local/sbt \
+    && curl -LO https://github.com/sbt/sbt/releases/download/v1.8.2/sbt-1.8.2.tgz \
+    && tar xf sbt-1.8.2.tgz --strip-components=1 -C /usr/local/sbt \
+    && ln -s /usr/local/sbt/bin/* /usr/local/bin
 
 # Gradle + Maven
 RUN set -x \
