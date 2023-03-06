@@ -20,7 +20,8 @@ x-default-jenkins-secrets: &default-jenkins-secrets
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
 
-# Use this one for an agent with one replica
+# Use this one for an agent with one replica - any of the agents only
+# servicing cheshire-cat and earlier builds
 x-default-jenkins-one-agent: &default-jenkins-one-agent
   deploy:
     resources:
@@ -38,8 +39,9 @@ x-default-jenkins-one-agent: &default-jenkins-one-agent
     - jenkins
   <<: *default-jenkins-secrets
 
-# Use this one for an agent with two replicas
-x-default-jenkins-two-agent: &default-jenkins-two-agent
+# Use this one for an agent with *zero* replicas - any of the agents
+# only servicing mad-hatter or older builds
+x-default-jenkins-zero-agent: &default-jenkins-zero-agent
   deploy:
     resources:
       limits:
@@ -49,52 +51,12 @@ x-default-jenkins-two-agent: &default-jenkins-two-agent
     placement:
       constraints:
         - node.labels.role==build
-    replicas: 2
+    replicas: 0
     update_config:
       parallelism: 1000
   networks:
     - jenkins
   <<: *default-jenkins-secrets
-
-# Use this one for an agent with three replicas
-x-default-jenkins-three-agent: &default-jenkins-three-agent
-  deploy:
-    resources:
-      limits:
-        memory: 9G
-      reservations:
-        memory: 9G
-    placement:
-      constraints:
-        - node.labels.role==build
-    replicas: 3
-    update_config:
-      parallelism: 1000
-  networks:
-    - jenkins
-  <<: *default-jenkins-secrets
-
-# Use this one for an agent with two replicas and IPv6 enabled.
-# Previously only CV unit tests agents had this, so to be
-# overly cautious, we'll continue only using this for CV.
-x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
-  deploy:
-    resources:
-      limits:
-        memory: 9G
-      reservations:
-        memory: 9G
-    placement:
-      constraints:
-        - node.labels.role==build
-    replicas: 2
-    update_config:
-      parallelism: 1000
-  networks:
-    - jenkins
-  <<: *default-jenkins-secrets
-  sysctls:
-    net.ipv6.conf.lo.disable_ipv6: 0
 
 # Pointed to Jenkins master; use a YAML anchor so we can change this
 # globally when necessary
@@ -131,44 +93,44 @@ services:
     image: couchbasebuild/server-amzn2-build:20221206
     environment:
       - "JENKINS_SLAVE_NAME=server-amzn2"
-      - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat neo master x86_64"
+      - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
   centos6:
     image: couchbasebuild/server-centos6-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-centos6"
-      - "JENKINS_SLAVE_LABELS=server centos6 vulcan alice mad-hatter x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos6 vulcan alice x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
       - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   centos7:
     image: couchbasebuild/server-centos7-build:20230214
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat master x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-three-agent
+    <<: *default-jenkins-one-agent
 
   linux-single:
     image: couchbasebuild/server-linux-build:20221206
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
-      - "JENKINS_SLAVE_LABELS=server linux all monster neo elixir morpheus master x86_64"
+      - "JENKINS_SLAVE_LABELS=server linux linux-asan all monster neo elixir morpheus master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -210,11 +172,14 @@ services:
       - jenkins
     <<: *default-jenkins-secrets
 
+  # This is identical to the normal centos7 agent except it has a memory
+  # reservation of 16GB, to ensure it doesn't get co-located with any
+  # other serverbuild containers.
   centos7-asan:
     image: couchbasebuild/server-centos7-build:20230214
     environment:
       - "JENKINS_SLAVE_NAME=server-centos7-asan"
-      - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat neo elixir morpheus x86_64"
+      - "JENKINS_SLAVE_LABELS=server centos7-asan all cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -226,7 +191,7 @@ services:
           memory: 16GB
       placement:
         constraints:
-          - node.labels.role==serverbuild-asan
+          - node.labels.role==build
       replicas: 1
       update_config:
         parallelism: 1000
@@ -244,7 +209,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   debian8-alice:
     image: couchbasebuild/server-debian8-alice-build:20220117
@@ -256,43 +221,43 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   debian8:
     image: couchbasebuild/server-debian8-build:20220117
     environment:
       - "JENKINS_SLAVE_NAME=server-debian8"
-      - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter cheshire-cat master x86_64"
+      - "JENKINS_SLAVE_LABELS=server debian8 mad-hatter x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-zero-agent
 
   debian9:
     image: couchbasebuild/server-debian9-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-debian9"
-      - "JENKINS_SLAVE_LABELS=server debian9 vulcan alice mad-hatter cheshire-cat master x86_64"
+      - "JENKINS_SLAVE_LABELS=server debian9 vulcan alice mad-hatter cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
   debian10:
     image: couchbasebuild/server-debian10-build:20220114
     environment:
       - "JENKINS_SLAVE_NAME=server-debian10"
-      - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter cheshire-cat master x86_64"
+      - "JENKINS_SLAVE_LABELS=server debian10 mad-hatter cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
   rhel8-alice:
     image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20221204
@@ -304,26 +269,26 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   suse11:
     image: couchbasebuild/server-suse11-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-suse11"
-      - "JENKINS_SLAVE_LABELS=server suse11 vulcan alice mad-hatter master x86_64"
+      - "JENKINS_SLAVE_LABELS=server suse11 vulcan alice x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   suse12:
     image: build-docker.couchbase.com/internal/server-suse12-build:20220717
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-suse12"
-      - "JENKINS_SLAVE_LABELS=vulcan alice mad-hatter cheshire-cat master server suse12 suse12.2 x86_64"
+      - "JENKINS_SLAVE_LABELS=server vulcan alice mad-hatter cheshire-cat suse12 suse12.2 x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -341,19 +306,19 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   suse15:
     image: couchbasebuild/server-suse15-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-suse15"
-      - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat master x86_64"
+      - "JENKINS_SLAVE_LABELS=server suse15 cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
   ubuntu16:
     image: couchbasebuild/server-ubuntu16-build:20221204
@@ -365,7 +330,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   ubuntu18-mad-hatter:
     image: couchbasebuild/server-ubuntu18-mad-hatter-build:20221204
@@ -377,19 +342,19 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   ubuntu18:
     image: couchbasebuild/server-ubuntu18-build:20221204
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu18"
-      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04 ubuntu18 cheshire-cat master x86_64"
+      - "JENKINS_SLAVE_LABELS=server ubuntu18.04 ubuntu18.04 ubuntu18 cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
   ubuntu18-clang9:
     image: couchbasebuild/server-ubuntu18-clang9-build:20221204
@@ -420,13 +385,13 @@ services:
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=server-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter cheshire-cat elixir morpheus master x86_64"
+      - "JENKINS_SLAVE_LABELS=server ubuntu20.04 ubuntu20 mad-hatter cheshire-cat x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-two-agent
+    <<: *default-jenkins-one-agent
 
 configs:
   jenkins_master_username:
