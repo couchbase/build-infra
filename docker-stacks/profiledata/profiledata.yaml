@@ -304,6 +304,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
+        target: /home/couchbase/couchbase-server/build/linux/.ssh/buildbot_id_dsa
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.ssh_privkey.id_buildbot.20200417
         target: /home/couchbase/couchbase-server/build/linux/.ssh/id_buildbot
         mode: 0600
