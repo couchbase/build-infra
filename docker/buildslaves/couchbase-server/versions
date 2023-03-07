@@ -33,8 +33,10 @@ RUBY_INSTALL_PATCH=2
 # Build tooling
 AUTOCONF=2.69       # amzn2, centos7, suse12, ubuntu18
 AUTOMAKE=1.15.1     # amzn2, centos7, suse12, ubuntu18
+CLANG=15.0.7        # single
 CCACHE=3.1.9        # amzn2, centos7, rhel8
 GCC=10.2.0          # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
+GCC_12=12.2.0       # single
 GIT=2.9.5           # centos7
 LIBTOOL=2.4.6       # amzn2, centos7, suse12, ubuntu18
 ASCIIDOCTOR=2.0.16  # amzn2, centos6, centos7, centos8, debian10, debian8, debian9, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
@@ -45,7 +47,8 @@ TINI=0.18.0        # amzn2, centos7, debian8, debian9, debian10, rhel8, suse15, 
 DOCKER=20.10.8     # single
 OPENSSH=8.8p1      # centos6, debian8, debian8-alice, suse11, ubuntu14
 OPENSSL=1.1.1m     # suse11
+YQ=4.31.1          # single
 
 # Ours
-CBDEP=1.0.4
-PATCH_VIA_GERRIT=1.1.1
+CBDEP=1.1.3
+PATCH_VIA_GERRIT=1.1.2

@@ -1,0 +1,22 @@
+#!/bin/sh -ex
+
+export GCC_VER=${GCC_VER:-12.2.0}
+export DOCKER_BUILDKIT=1
+
+IMAGE_NAME=couchbasebuild/single-gcc
+
+if [ "$1" = "--publish" ]
+then
+  BUILDER=buildx
+  PLATFORMS="--platform linux/amd64,linux/arm64"
+  PUSH=--push
+fi
+
+docker ${BUILDER} build \
+  -f Dockerfile \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg GCC_VER=${GCC_VER} \
+  ${PLATFORMS} \
+  --pull ${PUSH} \
+  --tag ${IMAGE_NAME}:${GCC_VER} \
+  .

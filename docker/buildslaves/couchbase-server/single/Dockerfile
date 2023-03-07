@@ -2,14 +2,14 @@
 # Docker container for Single Linux build. Currently based on
 # Centos 7 as it has the oldest glibc of the distros we support.
 
-# This has to be first - define the GCC version to use and
-# the image to pull it from
 ARG GCC_VER
-FROM couchbasebuild/centos-7-gcc:${GCC_VER} AS gcc
-
+ARG GCC_12_VER
+ARG CLANG_VER
+FROM couchbasebuild/single-gcc:${GCC_VER} as gcc_10
+FROM couchbasebuild/single-gcc:${GCC_12_VER} as gcc_12
+FROM couchbasebuild/single-clang:${CLANG_VER} as clang
 
 # Start of compile-only stages
-
 
 # First a base compile image that has some recurring dependencies
 FROM centos:centos7.9.2009 AS base-compile
@@ -17,7 +17,22 @@ LABEL imagename=base-compile
 
 RUN yum install -y curl deltarpm sudo
 RUN yum groupinstall -y "Development Tools"
-RUN yum install -y bzip2-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
+RUN yum install -y bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
+ENV PATH=/opt/gcc-${GCC_12_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+FROM base-compile AS pixz-compile
+WORKDIR /tmp
+ARG PIXZ_VERSION=1.0.7
+ARG PIXZ_SHA=ed227a0a3147db9380f6fe59cc87cd05
+ADD https://github.com/vasi/pixz/releases/download/v${PIXZ_VERSION}/pixz-${PIXZ_VERSION}.tar.gz /tmp/pixz.tar.gz
+RUN set -x \
+    && echo ${PIXZ_SHA} /tmp/pixz.tar.gz | md5sum -c - \
+    && mkdir /tmp/pixz && cd /tmp/pixz \
+    && tar xf /tmp/pixz.tar.gz --strip-components=1 \
+    && ./configure --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make install DESTDIR=/out \
+    && rm -rf /tmp/*
 
 
 # autoconf and friends - necessary for building some third-party deps
@@ -67,15 +82,21 @@ LABEL imagename=python-compile
 ARG PYTHON3_MAJOR
 ARG PYTHON3_MINOR
 ARG PYTHON3_PATCH
-RUN mkdir /tmp/python
-RUN curl -Lf https://www.python.org/ftp/python/${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}/Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}.tgz -o - \
-        | tar xz --strip-components=1 -C /tmp/python
 WORKDIR /tmp/python
-RUN ./configure --enable-optimizations --prefix=/usr/local
-RUN make -j altinstall
-RUN ln -s python${PYTHON3_MAJOR}.${PYTHON3_MINOR} /usr/local/bin/python${PYTHON3_MAJOR}
-RUN curl -f https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-RUN /usr/local/bin/python3 /tmp/get-pip.py
+RUN set -x \
+    && yum install -y sqlite-devel zlib-devel \
+    && curl -Lf https://www.python.org/ftp/python/${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}/Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}.tgz -o - \
+        | tar xz --strip-components=1 -C /tmp/python \
+    && ./configure --enable-shared --enable-loadable-sqlite-extensions --enable-optimizations --prefix=/usr/local \
+    &&  make -j install \
+    && curl -f https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
+    && echo "/usr/local/lib" > /etc/ld.so.conf.d/python.conf \
+    && ldconfig \
+    && /usr/local/bin/python3 /tmp/get-pip.py \
+    && cd /tmp \
+    && git clone https://github.com/pyinstaller/pyinstaller/ \
+    && cd pyinstaller/bootloader \
+    && /usr/local/bin/python3 ./waf all
 
 
 # Git
@@ -106,36 +127,65 @@ RUN ./configure --prefix=/usr/local && make -j && make install
 # This is the actual build agent base image
 # -----------------------------------------
 
-FROM centos:centos7.9.2009 AS build
+FROM centos:centos7.9.2009
 LABEL maintainer="build-team@couchbase.com"
 
-# Set LANG
-ENV LANG=en_US.UTF-8
+ARG BUILDARCH \
+    CLANG_VER \
+    GCC_VER \
+    GCC_12_VER
+
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 
 USER root
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER
-ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini /tini
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini-${BUILDARCH} /tini
 RUN chmod +x /tini
 
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repositories
-RUN yum install --setopt=keepcache=0 -y \
+RUN set -x \
+    && yum install -y epel-release \
+    && yum install --setopt=keepcache=0 -y \
                 binutils \
                 ed \
+                glib2-devel \
                 glibc-devel \
+                java-11-openjdk-headless \
+                libarchive \
+                libyaml \
+                m4 \
                 make \
                 man \
+                ninja-build \
                 ncurses-devel \
                 openssh-clients \
                 openssh-server \
+                patchelf \
                 rpm-build \
                 rpm-sign \
+                rsync \
                 sudo \
                 tar \
                 unzip \
                 which \
+    && yum clean all
+
+# Pyenv prereqs - for cbdep test suite
+RUN set -x \
+    && yum install --setopt=keepcache=0 -y \
+                bzip2-devel \
+                libffi-devel \
+                openssl \
+                openssl-devel \
+                readline-devel \
+                uuid-devel \
+                tkinter \
+                sqlite-devel \
     && yum clean all
 
 # Set up for SSH daemon
@@ -158,51 +208,65 @@ RUN groupadd -g1000 couchbase && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 
-# GCC - need to redundantly declare GCC_ARG here
-ARG GCC_VER
-RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
-COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+# GCC and clang
+COPY --from=gcc_10 /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+COPY --from=gcc_12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
+COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
 RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
-RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc10.conf && ldconfig
+RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf && ldconfig
 
 # Autoconf and friends
 COPY --from=autoconf-compile /usr/local/ /usr/local/
-RUN yum install -y m4 && yum clean all
 
 # * CMake (from cmake.org)
 ARG CMAKE_MAJOR
 ARG CMAKE_MINOR
 ARG CMAKE_PATCH
 RUN mkdir /tmp/deploy && \
-    curl -Lf https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
+    curl -Lf https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-$(uname -m).sh -o /tmp/deploy/cmake.sh && \
     (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
     rm -fr /tmp/deploy
 
-# * repo
+# repo
 RUN set -x \
     && curl -Lf https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
+
+# pixz
+COPY --from=pixz-compile /out/usr/local/ /usr/local/
 
 # Git
 COPY --from=git-compile /usr/local/ /usr/local/
 
 # Python 3 & pip
 COPY --from=python-compile /usr/local/ /usr/local/
+RUN set -x \
+    && echo "/usr/local/lib" > /etc/ld.so.conf.d/python.conf \
+    && ldconfig
 
 # Ruby
-RUN yum install -y libyaml && yum clean all
 COPY --from=ruby-compile /usr/local/ /usr/local/
 
 # Ccache
 COPY --from=ccache-compile /usr/local/ /usr/local/
 
-# Install asciidoctor
+# Asciidoctor
 ARG ASCIIDOCTOR_VER
 RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 
-# Install perl Data::Dumper (used by at least PCRE build script)
-RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper && yum clean all
+# yq
+ARG YQ_VER
+RUN set -x \
+    && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_${BUILDARCH} \
+    && chmod a+x /usr/local/bin/yq
+
+# Perl modules
+RUN yum install -y --setopt=keepcache=0 \
+        perl-Data-Dumper \
+        perl-Digest-SHA \
+        perl-IPC-Cmd \
+    && yum clean all
 
 # JNLP agent (for use in EC2 agents)
 ARG JNLP_AGENT_VER
@@ -214,27 +278,9 @@ ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
 
-# JDK for Jenkins.
-RUN yum install -y java-11-openjdk-headless rsync && \
-    yum clean all
-
-# patchelf
-RUN set -x \
-    && yum install -y epel-release \
-    && yum install -y patchelf \
-    && yum clean all
-
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
-
-# glib2 and friends - annoyingly needed by v8 build.
-RUN yum install -y glib2-devel && yum clean all
-
-# Perl modules required for OpenSSL 3.0 build
-RUN set -x \
-        && yum install -y perl-IPC-Cmd perl-Digest-SHA \
-        && yum clean all
 
 # Our tools
 ARG CBDEP_VER
@@ -246,17 +292,19 @@ RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_
 
 # Docker
 ARG DOCKER_VER
-RUN curl -Lf https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz \
+RUN curl -Lf https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VER}.tgz \
         | tar xz --strip-components=1 -C /usr/local/bin
 RUN usermod -a -G 999 couchbase
-
-# This might be temporary, if we can get parallel dpkg-buildpackage working.
-RUN yum install -y https://download.opensuse.org/repositories/home:/Ledest:/misc/openSUSE_Leap_15.3/x86_64/pixz-1.0.7-0.1.x86_64.rpm && yum clean all
 
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permisions / ownership.
 RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /home/couchbase/.cbdepcache/ /home/couchbase/.ccache \
     && chown -R couchbase:couchbase /home/couchbase
+
+COPY bashrc /root/.bashrc
+COPY bashrc /home/couchbase/.bashrc
+
+ENV PATH=/opt/clang-${CLANG_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /

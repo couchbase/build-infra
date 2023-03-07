@@ -1,0 +1,22 @@
+#!/bin/sh -ex
+
+export CLANG_VER=${CLANG_VER:-15.0.7}
+export DOCKER_BUILDKIT=1
+
+IMAGE_NAME=couchbasebuild/single-clang
+
+if [ "$1" = "--publish" ]
+then
+  BUILDER=buildx
+  PLATFORMS="--platform linux/amd64,linux/arm64"
+  PUSH=--push
+fi
+
+docker ${BUILDER} build \
+  -f Dockerfile \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg CLANG_VER=${CLANG_VER} \
+  ${PLATFORMS} \
+  --pull ${PUSH} \
+  --tag ${IMAGE_NAME}:${CLANG_VER} \
+  .

@@ -127,7 +127,7 @@ services:
     <<: *default-jenkins-one-agent
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20221206
+    image: couchbasebuild/server-linux-build:20230301
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
       - "JENKINS_SLAVE_LABELS=server linux linux-asan all monster neo elixir morpheus master x86_64"
@@ -165,7 +165,7 @@ services:
       placement:
         constraints:
           - node.labels.role==monster
-      replicas: 2
+      replicas: 3
       update_config:
         parallelism: 1000
     networks:
