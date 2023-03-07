@@ -9,7 +9,7 @@ cp ../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp ../util/hooks/buildx.sh build/buildx.sh
 cp ../util/swarm*.properties build
 
-docker build -t ${IMAGE}:${TAG} .
+docker build --pull -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then
