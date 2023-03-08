@@ -6,9 +6,36 @@ LABEL maintainer="build-team@couchbase.com"
 USER root
 
 # Install Couchbase signing dependencies
-RUN apt-get update && \
-    apt-get install -y build-essential curl git lsb-release reprepro sudo tar && \
-    apt-get clean
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y \
+        autoconf \
+        automake \
+        build-essential \
+        curl \
+        gcc \
+        git \
+        libbz2-dev \
+        libdb-dev \
+        libgpgme-dev \
+        liblzma-dev libz-dev \
+        lsb-release \
+        m4 \
+        sudo \
+        tar \
+    && apt-get clean
+
+RUN set -x \
+    && cd /tmp \
+    && git clone https://salsa.debian.org/debian/reprepro \
+    && cd reprepro \
+    && git checkout reprepro-debian-5.4.2-1 \
+    && autoreconf --install \
+    && autoconf \
+    && ./configure --prefix=/usr/local \
+    && make \
+    && make install \
+    && rm -rf /tmp/reprepro
 
 # JDK for Jenkins.
 RUN mkdir /tmp/deploy && \

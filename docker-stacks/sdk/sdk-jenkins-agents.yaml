@@ -206,7 +206,7 @@ services:
         mode: 0644
 
   debian10-signing:
-    image: couchbasebuild/sdk-debian10-signing:20220317
+    image: couchbasebuild/sdk-debian10-signing:20230308
     environment:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
       - "JENKINS_SLAVE_LABELS=debian10-signing docker"
