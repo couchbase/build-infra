@@ -15,6 +15,7 @@ RUN set -x \
         curl \
         gcc \
         git \
+        libarchive-dev \
         libbz2-dev \
         libdb-dev \
         libgpgme-dev \
@@ -23,6 +24,7 @@ RUN set -x \
         m4 \
         sudo \
         tar \
+        zstd \
     && apt-get clean
 
 RUN set -x \
@@ -32,7 +34,7 @@ RUN set -x \
     && git checkout reprepro-debian-5.4.2-1 \
     && autoreconf --install \
     && autoconf \
-    && ./configure --prefix=/usr/local \
+    && ./configure --with-libarchive --with-liblzma --with-libgpgme --with-libbz2 --prefix=/usr/local \
     && make \
     && make install \
     && rm -rf /tmp/reprepro
