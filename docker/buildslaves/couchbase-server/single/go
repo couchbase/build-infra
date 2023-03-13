@@ -19,11 +19,15 @@ TAG=$(date +%Y%m%d)
 
 if [ "$1" = "--publish" ]
 then
-  PUSH=--push
+  ACTION=--push
+  PLATFORMS=linux/amd64,linux/arm64
+else
+  ACTION=--load
+  PLATFORMS=linux/amd64
 fi
 
-docker buildx build --pull ${PUSH} \
-  --platform linux/amd64,linux/arm64 \
+docker buildx build --pull ${ACTION} \
+  --platform ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \
   --build-arg IMAGEROOT=${IMAGEROOT} \

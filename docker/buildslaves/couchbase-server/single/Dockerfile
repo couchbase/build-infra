@@ -15,6 +15,10 @@ FROM couchbasebuild/single-clang:${CLANG_VER} as clang
 FROM centos:centos7.9.2009 AS base-compile
 LABEL imagename=base-compile
 
+RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
+
 RUN yum install -y curl deltarpm sudo
 RUN yum groupinstall -y "Development Tools"
 RUN yum install -y bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
@@ -135,10 +139,6 @@ ARG BUILDARCH \
     GCC_VER \
     GCC_12_VER
 
-ENV LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
-RUN localedef -i en_US -f UTF-8 en_US.UTF-8
-
 USER root
 
 # tini, to avoid zombie issues when running with Swarm jar
@@ -215,6 +215,10 @@ COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
 RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
 RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf && ldconfig
+RUN set -x \
+    && echo /opt/gcc-${GCC_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf \
+    && echo /opt/gcc-${GCC_12_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_12_VER}.conf \
+    && ldconfig
 
 # Autoconf and friends
 COPY --from=autoconf-compile /usr/local/ /usr/local/
@@ -305,6 +309,10 @@ COPY bashrc /root/.bashrc
 COPY bashrc /home/couchbase/.bashrc
 
 ENV PATH=/opt/clang-${CLANG_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 # Docker Swarm properties - keep this towards end of Dockerfile
 COPY build/swarm*.properties /
