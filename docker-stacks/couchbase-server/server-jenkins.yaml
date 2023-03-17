@@ -9,7 +9,7 @@ services:
 
   # server.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.375.1
+    image: jenkins/jenkins:2.387.1
     deploy:
       replicas: 1
       labels:
