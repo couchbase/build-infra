@@ -2,7 +2,9 @@
 # This has to be first - define the GCC version to use and
 # the image to pull it from
 ARG GCC_VER
+ARG GCC_12_VER
 FROM couchbasebuild/amzn-2-gcc:${GCC_VER} AS gcc
+FROM couchbasebuild/amzn-2-gcc:${GCC_12_VER} AS gcc12
 FROM couchbasebuild/amzn-2-gcc:7.3.0 AS gcc-legacy
 
 # This is the actual build agent base image
@@ -74,8 +76,10 @@ RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper && yum clean all
 
 # GCC - need to redundantly declare GCC_ARG here
 ARG GCC_VER
+ARG GCC_12_VER
 RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
 COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+COPY --from=gcc12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
 
 # Historic gcc 7.3.0
 COPY --from=gcc-legacy /usr/local /usr/local

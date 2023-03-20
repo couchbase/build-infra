@@ -14,15 +14,18 @@ ECR_IMAGE=${ECR}/$(basename ${IMAGE})
 
 if [ "$1" = "--publish" ]
 then
-  PUSH=--push
+  ACTION=--push
+  PLATFORMS="--platform linux/amd64,linux/arm64"
   # Also push to our ECR; this assumes ~/.aws/credentials is set up
   aws ecr get-login-password --region us-east-2 \
     | docker login --username AWS --password-stdin ${ECR}
+else
+  ACTION=--load
 fi
 
-docker buildx build --pull ${PUSH} \
+docker buildx build --pull ${ACTION} \
   --tag ${IMAGE}:${TAG} --tag ${ECR_IMAGE}:${TAG} \
-  --platform linux/amd64,linux/arm64 \
+  ${PLATFORMS} \
   --target mainbuild \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   --build-arg ASCIIDOCTOR_VER=${ASCIIDOCTOR} \
@@ -34,6 +37,7 @@ docker buildx build --pull ${PUSH} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
   --build-arg DOCKER_VER=${DOCKER} \
   --build-arg GCC_VER=${GCC} \
+  --build-arg GCC_12_VER=${GCC_12} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg JRE_VERSION=${JRE_VERSION} \
   --build-arg JRE_MAJOR=${JRE_MAJOR} \
@@ -47,6 +51,8 @@ docker buildx build --pull ${PUSH} \
   --build-arg RUBY_INSTALL_PATCH=${RUBY_INSTALL_PATCH} \
   .
 
-# Also ensure the RPM sidecar is updated appropriately
-cd ../single/rpm-sidecar
-SINGLE_LINUX_IMAGE_arm64=${IMAGE}:${TAG} ./go $1
+if [ "$1" = "--publish" ]; then
+  # Also ensure the RPM sidecar is updated appropriately
+  cd ../single/rpm-sidecar
+  ./go $1
+fi
