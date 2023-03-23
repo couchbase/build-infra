@@ -13,6 +13,8 @@ ENV PATH="/usr/local/bin:${PATH}"
 
 # Install Couchbase build dependencies
 RUN apk add --no-cache \
+        abuild \
+        alpine-sdk \
         build-base \
         bzip2-dev \
         curl \
@@ -50,6 +52,7 @@ RUN set -x \
     && addgroup couchbase \
     && adduser couchbase -S -G couchbase \
     && addgroup couchbase wheel \
+    && addgroup couchbase abuild \
     && echo 'couchbase:couchbase' | chpasswd \
     && mkdir -p /opt/couchbase \
     && chown -R couchbase:couchbase /opt/couchbase \
