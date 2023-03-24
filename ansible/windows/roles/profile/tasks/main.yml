@@ -8,6 +8,11 @@
     msg: "Variable NODE_PRODUCT is required (e.g. couchbase-server)"
   when: "NODE_PRODUCT is not defined"
 
+- name: Check SSH_KEY variable
+  fail:
+    msg: 'Variable SSH_KEY is required (content of profile_sync ssh keyfile - try -e SSH_KEY="''$(cat profile_sync)''" with single- AND double-quotes'
+  when: "SSH_KEY is not defined or SSH_KEY | length < 200"
+
 - name: Ensure Administrator .ssh dir present
   win_file:
     path: C:\Users\Administrator\.ssh
@@ -18,7 +23,6 @@
     content: "{{ SSH_KEY }}\n"
     dest: C:\Users\Administrator\.ssh\profile_sync
   no_log: true
-  when: "'SSH_KEY' in ansible_env"
 
 - name: Copy startup script
   win_template:
