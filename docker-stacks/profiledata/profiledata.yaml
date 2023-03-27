@@ -96,7 +96,7 @@ services:
       ##################################
       # couchbase-server/build/windows #
       ##################################
-      - source: couchbase_server_shared_gitconfig
+      - source: couchbase_server_windows_gitconfig
         target: /home/couchbase/couchbase-server/build/windows/.gitconfig
         mode: 0644
         uid: "901"
@@ -203,7 +203,7 @@ services:
       ##################################
       # couchbase-server/cv/windows    #
       ##################################
-      - source: couchbase_server_shared_gitconfig
+      - source: couchbase_server_windows_gitconfig
         target: /home/couchbase/couchbase-server/cv/windows/.gitconfig
         mode: 0644
         uid: "901"
@@ -622,6 +622,8 @@ configs:
     file: config/couchbase-server/windows/.ssh/environment
   couchbase_server_windows_ssh_known_hosts:
     file: config/couchbase-server/windows/.ssh/known_hosts
+  couchbase_server_windows_gitconfig:
+    file: config/couchbase-server/windows/.gitconfig
   # shared
   couchbase_server_shared_m2_settings.20220106:
     file: config/couchbase-server/shared/.m2/settings.xml

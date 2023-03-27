@@ -18,6 +18,6 @@ C:
 # correct local locations, and then removing the temporary directory to tidy up
 
 New-Item -Path "c:\Users\Administrator" -Name "profile_sync" -ItemType "directory"
-& 'scp' -r -P $profile_port -i /Users/Administrator/.ssh/profile_sync couchbase@${profile_host}:couchbase-server/build/windows/ /Users/Administrator/profile_sync
+& 'scp' -r -P $profile_port -i /Users/Administrator/.ssh/profile_sync couchbase@${profile_host}:couchbase-server/{{ NODE_CLASS }}/windows/ /Users/Administrator/profile_sync
 Copy-Item "c:\Users\Administrator\profile_sync\windows\*" -Destination c:\Users\Administrator -Force -Recurse
 Remove-Item -Path C:\Users\Administrator\profile_sync -recurse

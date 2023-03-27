@@ -1,0 +1,12 @@
+[user]
+    email = build-team@couchbase.com
+    name = Build Team
+[color]
+    ui = auto
+
+[url "ssh://git@github.com/"]
+    insteadOf = git://github.com/
+
+[core]
+    longpaths = true
+        pager = cat
