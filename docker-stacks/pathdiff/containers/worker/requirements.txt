@@ -10,7 +10,7 @@ kombu==5.1.0
 prompt-toolkit==3.0.19
 pytz==2021.1
 PyYAML==5.4.1
-redis==3.5.3
+redis==4.5.3
 requests==2.26.0
 six==1.16.0
 vine==5.0.0
