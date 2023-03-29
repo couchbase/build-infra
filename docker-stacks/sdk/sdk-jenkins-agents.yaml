@@ -62,7 +62,7 @@ x-default-jenkins-slave-environment:
 services:
 
   alpine:
-    image: couchbasebuild/sdk-alpine-build:20230303
+    image: couchbasebuild/sdk-alpine-build:20230328
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine"
       - "JENKINS_SLAVE_LABELS=sdk alpine"
