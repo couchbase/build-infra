@@ -12,24 +12,28 @@ services:
         constraints:
           - node.labels.role==infrastructure
       replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+
+        - "traefik.http.routers.docker_registry.entrypoints=websecure"
+        - "traefik.http.routers.docker_registry.tls=true"
+        - "traefik.http.routers.docker_registry.rule=Host(`build-docker.couchbase.com`)"
+        - "traefik.http.routers.docker_registry.service=docker_registry"
+
+        - "traefik.http.services.docker_registry.loadbalancer.server.port=5000"
+        - "traefik.http.services.docker_registry.loadbalancer.server.scheme=http"
     image: registry:2
-    ports:
-      - 443:443
     configs:
       - source: docker_registry_config_20200212
         target: /etc/docker/registry/config.yml
         mode: 0664
-    secrets:
-      - source: buildhub.crt-2022
-        target: /run/secrets/buildhub.crt
-      - source: buildhub.key-2022
-        target: /run/secrets/buildhub.key
     volumes:
       - type: bind
         source: /buildteam/docker/registry
         target: /var/lib/registry
     networks:
-      registry:
+      traefik_reverse-proxy:
 
   registry-cleanup:
     deploy:
@@ -52,8 +56,6 @@ services:
       - type: bind
         source: /buildteam/docker/registry
         target: /var/lib/registry
-    networks:
-      registry:
 
   frontend:
     deploy:
@@ -65,13 +67,11 @@ services:
     ports:
       - 8010:80
     environment:
-      ENV_DOCKER_REGISTRY_HOST: registry
+      ENV_DOCKER_REGISTRY_HOST: build-docker.couchbase.com
       ENV_DOCKER_REGISTRY_PORT: 443
       ENV_DOCKER_REGISTRY_USE_SSL: 1
       ENV_REGISTRY_PROXY_FQDN: build-docker.couchbase.com
       ENV_REGISTRY_PROXY_PORT: 443
-    networks:
-      registry:
 
   joxit:
     deploy:
@@ -86,18 +86,11 @@ services:
       REGISTRY_URL: https://build-docker.couchbase.com:443
       DELETE_IMAGES: "true"
       REGISTRY_TITLE: "Couchbase Build Registry"
-    networks:
-      registry:
 
 configs:
   docker_registry_config_20200212:
     file: conf/registry-config.yml
 
-secrets:
-  buildhub.crt-2022:
-    external: true
-  buildhub.key-2022:
-    external: true
-
 networks:
-  registry:
+  traefik_reverse-proxy:
+    external: true

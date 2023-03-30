@@ -8,18 +8,37 @@ version: '3.8'
 services:
   traefik:
     image: traefik:v2.3.7
+    secrets:
+      - source: wildcard_build_couchbase_com_cert_20230329
+        target: /certs/wildcard.build.couchbase.com.crt
+      - source: wildcard_build_couchbase_com_key_20230329
+        target: /certs/wildcard.build.couchbase.com.key
+      - source: buildhub.crt-2022
+        target: /certs/wildcard.couchbase.com.crt
+      - source: buildhub.key-2022
+        target: /certs/wildcard.couchbase.com.key
+    configs:
+      - source: traefik_config
+        target: /etc/traefik/conf.yml
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.swarmmode=true"
       - "--providers.docker.watch=true"
+
+      - "--providers.file.directory=/etc/traefik"
+      - "--providers.file.watch=true"
+
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+
       - "--api.insecure=true"
     init: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 80:80
+      - 443:443
       - 6725:8080
     deploy:
       replicas: 3
@@ -33,3 +52,17 @@ networks:
   reverse-proxy:
     driver: overlay
     attachable: true
+
+secrets:
+  wildcard_build_couchbase_com_cert_20230329:
+    external: true
+  wildcard_build_couchbase_com_key_20230329:
+    external: true
+  buildhub.crt-2022:
+    external: true
+  buildhub.key-2022:
+    external: true
+
+configs:
+  traefik_config:
+    file: traefik-config.yaml

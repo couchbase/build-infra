@@ -1,0 +1,4 @@
+tls:
+  certificates:
+    - certFile: /certs/wildcard.build.couchbase.com.crt
+      keyFile: /certs/wildcard.build.couchbase.com.key

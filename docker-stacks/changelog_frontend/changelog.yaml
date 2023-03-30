@@ -18,9 +18,18 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_reverse-proxy"
-        - "traefik.http.routers.changelog.rule=Host(`changelog.build.couchbase.com`)"
-        - "traefik.http.services.changelog_changelog.loadbalancer.server.port=80"
-    image: couchbasebuild/changelog-frontend:20221116
+
+        - "traefik.http.routers.changelog_http.entrypoints=web"
+        - "traefik.http.routers.changelog_http.rule=Host(`changelog.build.couchbase.com`)"
+        - "traefik.http.routers.changelog_http.service=changelog"
+
+        - "traefik.http.routers.changelog_https.entrypoints=websecure"
+        - "traefik.http.routers.changelog_https.tls=true"
+        - "traefik.http.routers.changelog_https.rule=Host(`changelog.build.couchbase.com`)"
+        - "traefik.http.routers.changelog_https.service=changelog"
+
+        - "traefik.http.services.changelog.loadbalancer.server.port=80"
+    image: couchbasebuild/changelog-frontend:20230330
     init: true
     networks:
       - traefik_reverse-proxy

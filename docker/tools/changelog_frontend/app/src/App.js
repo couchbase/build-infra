@@ -5,7 +5,7 @@ import Changelog from './components/Changelog'
 import './App.css';
 const queryString = require('query-string');
 
-const apiUrl = 'http://build-db.build.couchbase.com:8000'
+const apiUrl = 'https://dbapi.build.couchbase.com'
 
 const blankLog = <>
   Choose a product, release, version and builds from the dropdowns above to view a change log.

@@ -10,10 +10,7 @@ storage:
   delete:
     enabled: true
 http:
-  addr: 0.0.0.0:443
-  tls:
-    certificate: /run/secrets/buildhub.crt
-    key: /run/secrets/buildhub.key
+  addr: 0.0.0.0:5000
   headers:
     X-Content-Type-Options: [nosniff]
     Access-Control-Allow-Origin: ['*']

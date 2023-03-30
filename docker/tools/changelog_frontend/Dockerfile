@@ -2,7 +2,7 @@ FROM node:alpine
 
 LABEL maintainer="build-team@couchbase.com"
 
-COPY . /app
+COPY app/ /app
 
 RUN set -x \
         && cd /app \

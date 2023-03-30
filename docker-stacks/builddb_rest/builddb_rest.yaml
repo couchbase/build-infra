@@ -15,8 +15,20 @@ services:
         parallelism: 1000
       placement:
         max_replicas_per_node: 1
-    ports:
-      - "8000:6543"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=builddb_rest"
+
+        - "traefik.http.routers.builddb_rest_http.entrypoints=webapi"
+        - "traefik.http.routers.builddb_rest_http.rule=Host(`dbapi.build.couchbase.com`)"
+        - "traefik.http.routers.builddb_rest_http.service=builddb_rest"
+
+        - "traefik.http.routers.builddb_rest_https.entrypoints=websecure"
+        - "traefik.http.routers.builddb_rest_https.tls=true"
+        - "traefik.http.routers.builddb_rest_https.rule=Host(`dbapi.build.couchbase.com`)"
+        - "traefik.http.routers.builddb_rest_https.service=builddb_rest"
+
+        - "traefik.http.services.builddb_rest.loadbalancer.server.port=6543"
     volumes:
       - type: bind
         source: /buildteam/builddb_repos
@@ -29,9 +41,55 @@ services:
     networks:
       - builddb_rest
 
+  traefik:
+    image: traefik:v2.3.7
+    secrets:
+      - source: wildcard_build_couchbase_com_cert_20230329
+        target: /certs/wildcard.build.couchbase.com.crt
+      - source: wildcard_build_couchbase_com_key_20230329
+        target: /certs/wildcard.build.couchbase.com.key
+    configs:
+      - source: traefik_config
+        target: /etc/traefik/conf.yml
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.swarmmode=true"
+      - "--providers.docker.watch=true"
+
+      - "--providers.file.directory=/etc/traefik"
+      - "--providers.file.watch=true"
+
+      - "--entrypoints.webapi.address=:8000"
+      - "--entrypoints.websecure.address=:443"
+
+      - "--api.insecure=true"
+    init: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8000:8000
+      - 443:443
+      - 6725:8080
+      placement:
+        constraints:
+          - "node.role==manager"
+    networks:
+      - builddb_rest
+
 configs:
   builddb_rest_20181219:
     file: conf/builddb_rest.ini
+  traefik_config:
+    file: conf/traefik-config.yaml
 
 networks:
   builddb_rest:
+    driver: overlay
+    attachable: true
+
+secrets:
+  wildcard_build_couchbase_com_cert_20230329:
+    external: true
+  wildcard_build_couchbase_com_key_20230329:
+    external: true
