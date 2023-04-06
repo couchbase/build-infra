@@ -112,6 +112,12 @@ RUN set -x \
         && apt install -y patchelf \
         && apt clean
 
+# Install xmlsec1 binary - required by python library for testing pySaml2
+RUN set -x \
+        && apt update \
+        && apt install -y xmlsec1 \
+        && apt clean
+
 # Add couchbase user to "docker" group on host (999)
 # Also include GID 996 for ECS
 RUN groupadd -g 999 docker && usermod -a -G docker couchbase
