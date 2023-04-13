@@ -50,5 +50,5 @@ OPENSSL=1.1.1m     # suse11
 YQ=4.31.1          # single
 
 # Ours
-CBDEP=1.1.3
+CBDEP=1.1.6
 PATCH_VIA_GERRIT=1.1.2
