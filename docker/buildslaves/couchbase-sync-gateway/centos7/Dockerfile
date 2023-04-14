@@ -24,6 +24,7 @@ RUN groupadd -g1000 couchbase && \
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repository
 RUN yum install --setopt=keepcache=0 -y \
+                binutils \
                 curl \
                 ed \
                 gcc \
