@@ -10,8 +10,17 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_reverse-proxy"
-        - "traefik.http.routers.toolserver.rule=Host(`tools.build.couchbase.com`)"
-        - "traefik.http.services.toolserver_proxy.loadbalancer.server.port=80"
+
+        - "traefik.http.routers.toolserver_http.entrypoints=web"
+        - "traefik.http.routers.toolserver_http.rule=Host(`tools.build.couchbase.com`)"
+        - "traefik.http.routers.toolserver_http.service=toolserver"
+
+        - "traefik.http.routers.toolserver_https.entrypoints=websecure"
+        - "traefik.http.routers.toolserver_https.tls=true"
+        - "traefik.http.routers.toolserver_https.rule=Host(`tools.build.couchbase.com`)"
+        - "traefik.http.routers.toolserver_https.service=toolserver"
+
+        - "traefik.http.services.toolserver.loadbalancer.server.port=80"
     image: build-docker.couchbase.com/couchbasebuild/toolserver:20220404
     networks:
       - traefik_reverse-proxy
