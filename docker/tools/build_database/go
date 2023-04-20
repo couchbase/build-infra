@@ -3,8 +3,11 @@
 TAG=$(date "+%Y%m%d")
 IMAGE="couchbasebuild/load-build-database"
 
-mkdir -p build
-cp -a ../../../build_database build
+rm -rf build
+mkdir build
+for entry in build_database setup.cfg pyproject.toml; do
+    cp -a ../../../build_database/$entry build
+done
 
 docker build --no-cache -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest

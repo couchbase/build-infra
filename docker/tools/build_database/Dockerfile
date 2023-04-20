@@ -5,7 +5,7 @@
 #  - build_database programs
 
 FROM couchbasebuild/ubuntu-1604-python3.6-base:latest
-MAINTAINER build-team@couchbase.com
+LABEL maintainer=build-team@couchbase.com
 
 USER root
 
@@ -14,10 +14,10 @@ ARG BUILD_DATABASE_DIR=/var/tmp/build_database
 
 # Install software in build_database directory,
 # then delete
-COPY build/build_database ${BUILD_DATABASE_DIR}
+COPY build ${BUILD_DATABASE_DIR}
 RUN cd $BUILD_DATABASE_DIR && \
-    pip3.6 install -r requirements.txt && \
-    pip3.6 install . && \
+    python3.6 -m pip install --upgrade pip && \
+    python3.6 -m pip install . && \
     cd $HOME && \
     rm -rf $BUILD_DATABASE_DIR
 

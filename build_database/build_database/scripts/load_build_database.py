@@ -30,14 +30,6 @@ import cbbuild.database.db as cbdatabase_db
 import cbbuild.util.git as cbutil_git
 
 
-# Set up logging and handler
-logger = logging.getLogger('load_build_database')
-logger.setLevel(logging.INFO)
-
-ch = logging.StreamHandler()
-logger.addHandler(ch)
-
-
 def send_email(smtp_server, receivers, message):
     """Simple method to send email"""
 
@@ -54,7 +46,7 @@ def send_email(smtp_server, receivers, message):
             'build-team@couchbase.com', receivers, msg.as_string()
         )
     except smtplib.SMTPException as exc:
-        logger.error('Mail server failure: %s', exc)
+        logging.error('Mail server failure: %s', exc)
     finally:
         smtp.quit()
 
@@ -218,7 +210,7 @@ class BuildDBLoader:
 
         manifest_path, commit = commit_info
         build_name = manifest_info.name
-        logger.info(f'Generating build document for manifest {build_name}...')
+        logging.info(f'Generating build document for manifest {build_name}...')
 
         # See if build document already is in the database and extract
         # for updating if so, otherwise create a new dictionary for
@@ -262,6 +254,7 @@ class BuildDBLoader:
         # Used for related (external) data; preserve any existing data
         build_data['metadata'] = build_data.get('metadata', dict())
 
+        logging.debug(f"Final build document: {build_data}")
         self.db.upsert_documents({build_name: build_data})
 
         self.first_prod_ver_build = (
@@ -324,7 +317,7 @@ class BuildDBLoader:
 
             for commit in commit_info:
                 commit_name = f'{project}-{commit.id.decode()}'
-                logger.debug(f'Generating commit document for '
+                logging.debug(f'Generating commit document for '
                              f'commit {commit_name}')
 
                 # See if commit document already is in the database
@@ -415,7 +408,7 @@ class BuildDBLoader:
                 commit_ids = [f'{project}-{diff_commits[0].id.decode()}']
 
             build_name = build_data['key_']
-            logger.debug(f'Updating {build_name} build document for '
+            logging.debug(f'Updating {build_name} build document for '
                          f'the following commits: {", ".join(commit_ids)}')
             build_document = self.db.get_document(build_name)
             build_document['commits'].extend(commit_ids)
@@ -450,9 +443,12 @@ def main():
 
     args = parser.parse_args()
 
-    # Set logging to debug level on stream handler if --debug was set
-    if args.debug:
-        ch.setLevel(logging.DEBUG)
+    # Initialize logging
+    logging.basicConfig(
+        stream=sys.stderr,
+        format='%(asctime)s: %(levelname)s: %(message)s',
+        level=logging.DEBUG if args.debug else logging.INFO
+    )
 
     # Check configuration file information
     db_repo_config = configparser.ConfigParser()
@@ -460,7 +456,7 @@ def main():
 
     if any(key not in db_repo_config
            for key in ['build_db', 'repos', 'email']):
-        logger.error(
+        logging.error(
             f'Invalid or unable to read config file {args.db_repo_config}'
         )
         sys.exit(1)
@@ -469,7 +465,7 @@ def main():
     db_required_keys = ['db_uri', 'username', 'password']
 
     if any(key not in db_info for key in db_required_keys):
-        logger.error(
+        logging.error(
             f'One of the following DB keys is missing in the config file:\n'
             f'    {", ".join(db_required_keys)}'
         )
@@ -479,7 +475,7 @@ def main():
     repo_required_keys = ['manifest_dir', 'manifest_url', 'repo_basedir']
 
     if any(key not in repo_info for key in repo_required_keys):
-        logger.error(
+        logging.error(
             f'One of the following repo keys is missing in the '
             f'config file:\n    {", ".join(repo_required_keys)}'
         )
@@ -489,7 +485,7 @@ def main():
     email_info = db_repo_config['email']
 
     if any(key not in email_info for key in email_required_keys):
-        logger.error(
+        logging.error(
             f'One of the following email keys is missing in the config '
             f'file:\n    {", ".join(email_required_keys)}'
         )
@@ -506,12 +502,12 @@ def main():
     last_manifest = build_db_loader.get_last_manifest()
     manifest_repo = repo_info['manifest_dir']
 
-    logger.info('Checking out/updating the build-manifests repo...')
+    logging.info('Checking out/updating the build-manifests repo...')
     cbutil_git.checkout_repo(manifest_repo, repo_info['manifest_url'])
 
-    logger.info(f'Creating manifest walker and walking it...')
+    logging.info(f'Creating manifest walker and walking it...')
     if last_manifest:
-        logger.info(f'    starting after commit {last_manifest[0]}...')
+        logging.info(f'    starting after commit {last_manifest[0]}...')
 
     manifest_walker = cbutil_git.ManifestWalker(manifest_repo, last_manifest)
 
@@ -520,19 +516,20 @@ def main():
             manifest_info = build_db_loader.get_manifest_info(manifest_xml)
         except mf_parse.InvalidManifest as exc:
             # If the file is not an XML file, simply move to next one
-            logger.info(f'{commit_info[0]}: {exc}, skipping...')
+            logging.info(f'{commit_info[0]}: {exc}, skipping...')
             continue
 
         build_db_loader.update_project_documents(manifest_info)
 
         build_data = build_db_loader.generate_build_document(commit_info,
                                                              manifest_info)
+
         build_db_loader.generate_commit_documents(build_data, manifest_info)
 
         if not build_db_loader.first_prod_ver_build:
             build_db_loader.update_build_commit_documents(build_data)
 
-        logger.debug('Updating last manifest document...')
+        logging.debug('Updating last manifest document...')
         build_db_loader.update_last_manifest(build_data['manifest_sha'])
 
 
