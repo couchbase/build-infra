@@ -64,7 +64,7 @@ RUN apt-get update && \
     apt-get clean
 RUN mkdir /tmp/deploy && \
     curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.zip && \
+    curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.zip && \
     cd /usr/local && \
     unzip /tmp/deploy/gradle.zip && \
     unzip /tmp/deploy/maven.zip && \

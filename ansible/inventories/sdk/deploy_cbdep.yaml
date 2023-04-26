@@ -1,0 +1,15 @@
+---
+- hosts: mac
+  gather_facts: yes
+  become: yes
+  vars:
+    ansible_password: "{{ MACPASS }}"
+  roles:
+    - cbdep
+
+- hosts: windows
+  gather_facts: yes
+  vars:
+    ansible_password: "{{ WINPASS }}"
+  roles:
+    - cbdep

@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+WINPASS=$1
+MACPASS=$2
+
+if [ -z "${MACPASS}" ]; then
+  echo "Usage: $0 <Windows Administrator password> <MacOS couchbase password>"
+  exit 1
+fi
+
+GITDIR=$(git rev-parse --show-toplevel)
+ANSIBLEDIR=${GITDIR}/ansible
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker run -it --rm \
+  -v ${ANSIBLEDIR}/common/roles:/roles \
+  -v ${SCRIPT_DIR}:/mnt \
+  couchbasebuild/ansible-playbook \
+  -i inventory -f 10 \
+  deploy_cbdep.yaml \
+  -e WINPASS=${WINPASS} \
+  -e MACPASS=${MACPASS}
