@@ -20,6 +20,9 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       - "/etc/localtime:/etc/localtime"
       - "/etc/timezone:/etc/timezone"
+      - "latestbuilds:/latestbuilds"
+      - "releases:/releases"
+      - "buildteam:/buildteam"
     configs:
       - source: jenkins_master_username
         target: /run/secrets/jenkins_master_username
@@ -34,7 +37,7 @@ services:
         mode: 0600
         uid: "1000"
         gid: "1000"
-      - source: buildx.config.rhcc_metadata.20221024
+      - source: buildx.config.rhcc_metadata.20230316
         target: /home/couchbase/.docker/rhcc-metadata.json
         mode: 0600
         uid: "1000"
@@ -56,7 +59,29 @@ secrets:
     external: true
   buildx.config.docker.20221004:
     external: true
-  buildx.config.rhcc_metadata.20221024:
+  buildx.config.rhcc_metadata.20230316:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true
+
+volumes:
+  latestbuilds:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/builds/latestbuilds"
+
+  releases:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/builds/releases"
+
+  buildteam:
+    driver: local
+    driver_opts:
+        type: "nfs"
+        o: "addr=cnt-s231.sc.couchbase.com"
+        device: ":/data/buildteam"
