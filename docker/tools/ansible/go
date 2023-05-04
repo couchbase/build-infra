@@ -1,18 +1,22 @@
-#!/bin/sh -e
+#!/bin/sh -ex
 
-VERSION=6.1.0
+VERSION=6.2.0
+
+if [ "$1" = "--publish" ]
+then
+  ACTION=--push
+  PLATFORMS=linux/amd64,linux/arm64
+else
+  ACTION=--load
+  PLATFORMS=linux/amd64
+fi
 
 for command in ansible ansible-playbook
 do
   IMAGE=couchbasebuild/${command}
-  docker build --pull \
+  docker buildx build --platform ${PLATFORMS} \
+    --pull ${ACTION} \
     --build-arg ANSIBLE_COMMAND=${command} \
     --build-arg ANSIBLE_VERSION=${VERSION} \
-    --tag $IMAGE:$VERSION .
-  docker tag $IMAGE:$VERSION $IMAGE:latest
-  if [ "$1" = "--publish" ]
-  then
-    docker push $IMAGE:$VERSION
-    docker push $IMAGE:latest
-  fi
+    --tag $IMAGE:$VERSION --tag $IMAGE:latest .
 done

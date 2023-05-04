@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ ! -f "${@:1:1}" ]
+then
+    cat <<-EOF >&2
+Error: no profile sync ssh key filename provided
+
+Usage:
+    ./go [ssh_key] -e ansible_password=[password] -e vs2022_key=ABCD1234 -e NODE_PRODUCT=couchbase-server -e NODE_CLASS=build
+EOF
+    exit 1
+fi
+
+docker run --rm -it \
+    -v $(cd ../../.. && pwd):/mnt \
+    couchbasebuild/ansible-playbook:6.2.0 \
+    -v \
+    -i /mnt/windows/couchbase-server/window2022/inventory \
+    /mnt/windows/couchbase-server/window2022/playbook.yml \
+    -e SSH_KEY="'$(cat ${@:1:1})'" \
+    "${@:2}"
