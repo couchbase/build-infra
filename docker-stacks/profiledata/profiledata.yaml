@@ -329,7 +329,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.digicert_jks.20211202
+      - source: profiledata.digicert_jks.20230504
         target: /home/couchbase/couchbase-server/build/linux/.digicert.jks
         mode: 0644
         uid: "901"
@@ -712,7 +712,7 @@ secrets:
   profiledata.aws_credentials.server.20220706:
     external: true
   # jarsigning cert from digicert
-  profiledata.digicert_jks.20211202:
+  profiledata.digicert_jks.20230504:
     external: true
   # jira auth
   profiledata.build_jira_json.20220213:
