@@ -164,6 +164,12 @@ RUN set -x \
     && apt install -y patchelf \
     && apt clean
 
+# Install xmlsec1 binary - required by python library for testing pySaml2
+RUN set -x \
+    && apt update \
+    && apt install -y xmlsec1 \
+    && apt clean
+
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
