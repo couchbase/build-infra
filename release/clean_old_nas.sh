@@ -44,6 +44,8 @@ remove_glob "*-PDB.zip" 60
 remove_glob "*amzn2*.rpm" 90
 remove_glob "*macos*.zip*" 90
 remove_glob "*macos*.dmg*" 90
+remove_glob "*linux*.deb*" 90
+remove_glob "*linux*.rpm*" 90
 remove_glob "*windows*exe*" 90
 remove_glob "*windows*msi*" 90
 remove_glob "*ubuntu*.deb*" 90
@@ -51,7 +53,7 @@ remove_glob "*debian*.deb*" 90
 remove_glob "*centos6*.rpm*" 90
 remove_glob "*centos8*.rpm*" 90
 remove_glob "*suse*.rpm*" 90
-remove_glob "*rhel8*.rpm*" 90
+remove_glob "*rhel*.rpm*" 90
 remove_glob "*oel*.rpm*" 90
 
 echo @@@@@@@@@
