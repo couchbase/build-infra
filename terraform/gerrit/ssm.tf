@@ -8,6 +8,16 @@ resource "aws_ssm_parameter" "authorized_keys" {
     Encoding = "none"
   }
 }
+resource "aws_ssm_parameter" "known_hosts" {
+  name  = "gerrit__.ssh__known_hosts"
+  type  = "SecureString"
+  value = file("~/aws-ssh/gerrit/.ssh/known_hosts")
+  tags = {
+    Owner    = local.owner
+    Consumer = local.project
+    Encoding = "none"
+  }
+}
 resource "aws_ssm_parameter" "config" {
   name  = "gerrit__.ssh__config"
   type  = "SecureString"

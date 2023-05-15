@@ -59,7 +59,7 @@ resource "aws_launch_template" "host" {
   network_interfaces {
     associate_public_ip_address = true
     subnet_id                   = module.vpc.public_subnets[0]
-    security_groups             = [module.ec2-instance-sg.this_security_group_id]
+    security_groups             = [module.ec2-instance-sg.security_group_id]
   }
 
   tag_specifications {

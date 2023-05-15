@@ -1,6 +1,6 @@
 module "alb" {
   source             = "terraform-aws-modules/alb/aws"
-  version            = "5.12.0"
+  version            = "8.6.0"
   name               = "${local.project}-nlb"
   load_balancer_type = "network"
   vpc_id             = module.vpc.vpc_id

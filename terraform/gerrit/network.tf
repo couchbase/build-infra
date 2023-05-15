@@ -1,5 +1,6 @@
 module "vpc" {
   source             = "terraform-aws-modules/vpc/aws"
+  version            = "4.0.1"
   name               = local.project
   cidr               = local.vpc_cidr
   azs                = ["us-east-2a", "us-east-2b"]
@@ -10,7 +11,7 @@ module "vpc" {
 
 module "ec2-instance-sg" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "3.18.0"
+  version = "4.17.2"
 
   name        = "${local.project}-host-sg"
   description = "Security group for ${local.project} host instance"
@@ -53,7 +54,7 @@ module "ec2-instance-sg" {
 
 module "ec2-load-balancer-sg" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "3.18.0"
+  version = "4.17.2"
 
   name        = "${local.project}-load-balancer-sg"
   description = "Security group for ${local.project} load balancer"
@@ -83,7 +84,7 @@ module "ec2-load-balancer-sg" {
 
 module "backup-sg" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "3.18.0"
+  version = "4.17.2"
 
   name        = "${local.project}-backup-sg"
   description = "Security group for ${local.project} backups"

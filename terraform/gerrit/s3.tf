@@ -1,6 +1,6 @@
 module "backup-bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "2.14.1"
+  version = "3.10.1"
 
   bucket                  = local.backup_bucket_name
   acl                     = "private"
