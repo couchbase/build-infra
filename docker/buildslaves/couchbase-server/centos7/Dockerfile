@@ -44,7 +44,8 @@ RUN yum install --setopt=keepcache=0 -y \
                 sudo \
                 tar \
                 unzip \
-                which && \
+                which \
+                xmlsec1-openssl && \
     ln -s /usr/bin/python2.7 /usr/bin/python2.6 \
     && yum clean all
 
