@@ -18,6 +18,18 @@ RUN set -x \
             clang-tools-9 \
         && apt clean
 
+# Python 3.9
+ENV DEBIAN_FRONTEND=noninteractive
+RUN set -x \
+    && apt-get update \
+    && apt-get -y install python3.9 python3.9-dev python3.9-venv libffi-dev \
+    && update-alternatives --remove python3 /usr/bin/python3.7 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
+    && curl https://bootstrap.pypa.io/get-pip.py | python3 \
+    && rm /usr/local/bin/pip \
+    && apt-get autoremove --purge -y \
+    && apt-get clean
+
 # Create symlinks so clang picks up gcc 7.3.0 and associated libraries
 RUN set -x \
         && mkdir -p /usr/local/include/x86_64-linux-gnu/c++ \

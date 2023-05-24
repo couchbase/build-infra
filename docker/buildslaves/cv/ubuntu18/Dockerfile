@@ -1,6 +1,6 @@
 # Docker container for Ubuntu 18.04
 
-FROM couchbasebuild/server-ubuntu18-clang9-build:20221204
+FROM couchbasebuild/server-ubuntu18-clang9-build:20230524
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
