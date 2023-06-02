@@ -61,10 +61,13 @@ docker buildx build --pull ${ACTION} \
   --build-arg YQ_VER=${YQ} \
   .
 
-# Also ensure the sidecars are updated appropriately
-for pkg_type in deb rpm
-do
-  pushd ${pkg_type}-sidecar
-  ./go $1
-  popd
-done
+if [ "$1" = "--publish" ]
+then
+  # Also ensure the sidecars are updated appropriately
+  for pkg_type in deb rpm
+  do
+    pushd ${pkg_type}-sidecar
+    ./go $1
+    popd
+  done
+fi

@@ -296,8 +296,10 @@ RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_
 
 # Docker
 ARG DOCKER_VER
-RUN curl -Lf https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VER}.tgz \
-        | tar xz --strip-components=1 -C /usr/local/bin
+RUN set -x \
+    && curl -Lf https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VER}.tgz \
+       | tar xz --strip-components=1 -C /usr/local/bin \
+    && for gid in {990..997}; do groupadd -g ${gid} docker${gid}; usermod -a -G docker${gid} couchbase; done;
 RUN usermod -a -G 999 couchbase
 
 # Need to create some directories so that the swarm stackfile can mount
