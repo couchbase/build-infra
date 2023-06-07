@@ -78,6 +78,12 @@ RUN set -x \
         && yum install -y xmlsec1 xmlsec1-openssl \
         && yum clean all
 
+# Testrunner python modules
+RUN pip3 install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1 \
+         beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2 \
+         pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3 \
+         docker==4.2.0 decorator==4.4.2
+
 # Add startup hook to enable buildx
 COPY build/buildx.sh /usr/sbin/couchhook.d/
 
@@ -86,9 +92,6 @@ COPY build/cv-hook.sh /usr/sbin/couchhook.d/
 
 # CV stuff (specifically alldependencies.py) still needs python2 :(
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 200
-
-# Create clang++-9 symlink
-RUN ln -s $(which clang++) $(which clang++)-9
 
 # Enable .gitconfig so repo doesn't get whiny
 COPY build/gitconfig /home/couchbase/.gitconfig

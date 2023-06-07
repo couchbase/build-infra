@@ -215,6 +215,9 @@ COPY --from=gcc_12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
 COPY --from=clang9 /opt/clang-9.0.1 /opt/clang-9.0.1
 COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
+RUN set -x \
+    && ln -s /opt/clang-9.0.1/bin/clang* /usr/bin \
+    && ln -s /opt/clang-9.0.1/bin/clang++ /usr/bin/clang++-9
 RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
 RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf && ldconfig
 RUN set -x \
@@ -312,7 +315,7 @@ RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /hom
 COPY bashrc /root/.bashrc
 COPY bashrc /home/couchbase/.bashrc
 
-ENV PATH=/opt/clang-9.0.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
