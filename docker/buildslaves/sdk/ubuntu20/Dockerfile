@@ -37,8 +37,14 @@ RUN apt-get update && \
         clang-tools \
         libc++-dev \
         libc++abi-dev \
+        valgrind \
         ccache && \
     apt-get clean
+
+# Clang 16
+RUN curl https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && \
+    echo "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-16 main" | tee -a /etc/apt/sources.list.d/clang16.list && \
+    sudo apt-get update -y && sudo apt-get install -y clang-16 clang-tools-16
 
 # JRE for Jenkins.
 RUN mkdir /tmp/deploy && \
