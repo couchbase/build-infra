@@ -75,7 +75,7 @@ RUN set -x \
 
 # Install xmlsec1 binary - required by python library for testing pySaml2
 RUN set -x \
-        && yum install -y xmlsec1 \
+        && yum install -y xmlsec1 xmlsec1-openssl \
         && yum clean all
 
 # Add startup hook to enable buildx
