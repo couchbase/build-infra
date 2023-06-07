@@ -1,28 +1,32 @@
-#!/bin/sh -e
+#!/bin/sh -ex
 
-TAG=$(date "+%Y%m%d")
-IMAGE=couchbasebuild/server-ubuntu18-cv
+# Things you might want to adjust:
+IMAGE=couchbasebuild/server-linux-cv
+
+# You can probably ignore the rest of this
 
 mkdir -p build
-cp -a ../../util/couchbuilder_transition_start.sh ./build/couchbuilder_start.sh
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/swarm*.properties build
 cp -a ../../util/healthcheck.sh build
-cp ../../util/hooks/buildx.sh ./build/
-cp ../cv-hook.sh ./build/
+cp -a ../../util/hooks/buildx.sh build
+cp -a ../cv-hook.sh build
 cp ../gitconfig ./build/
 cp ../ssh_environment ./build/
 
 . ../versions
 
+TAG=$(date +%Y%m%d)
 
 if [ "$1" = "--publish" ]
 then
   ACTION=--push
+  PLATFORMS="--platform linux/amd64,linux/arm64"
 else
   ACTION=--load
 fi
 
-docker buildx build --pull ${ACTION} \
-  --platform linux/amd64 \
+docker buildx build --pull ${ACTION} ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \

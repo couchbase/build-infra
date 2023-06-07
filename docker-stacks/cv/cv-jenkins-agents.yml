@@ -82,7 +82,7 @@ services:
     image: couchbasebuild/server-ubuntu18-cv:20230524
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-small"
-      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small"
+      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo ubuntu-18.04 small"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -98,7 +98,7 @@ services:
         constraints:
           - "node.labels.cvtype==ubuntu18-small"
         max_replicas_per_node: 1
-      replicas: 10
+      replicas: 2
       update_config:
         parallelism: 100
         delay: 0s
@@ -107,7 +107,7 @@ services:
     image: couchbasebuild/server-ubuntu18-cv:20230524
     environment:
       - "JENKINS_SLAVE_NAME=cv-ubuntu18-large"
-      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 large"
+      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo ubuntu-18.04 large"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -123,7 +123,57 @@ services:
         constraints:
           - "node.labels.cvtype==ubuntu18-large"
         max_replicas_per_node: 1
-      replicas: 10
+      replicas: 2
+      update_config:
+        parallelism: 1000
+        delay: 0s
+
+  linux_small:
+    image: couchbasebuild/server-linux-cv:20230421
+    environment:
+      - "JENKINS_SLAVE_NAME=cv-linux-small"
+      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master linux small"
+      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=3"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
+    <<: *default-jenkins-agent
+    deploy:
+      resources:
+        reservations:
+          # Small nodes have 16GB RAM
+          memory: 12G
+      placement:
+        constraints:
+          - "node.labels.cvtype==linux-small"
+        max_replicas_per_node: 1
+      replicas: 8
+      update_config:
+        parallelism: 100
+        delay: 0s
+
+  linux_large:
+    image: couchbasebuild/server-linux-cv:20230421
+    environment:
+      - "JENKINS_SLAVE_NAME=cv-linux-large"
+      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master linux large"
+      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=16"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
+    <<: *default-jenkins-agent
+    deploy:
+      resources:
+        reservations:
+          # Large nodes have 24GB RAM
+          memory: 20G
+      placement:
+        constraints:
+          - "node.labels.cvtype==linux-large"
+        max_replicas_per_node: 1
+      replicas: 8
       update_config:
         parallelism: 1000
         delay: 0s

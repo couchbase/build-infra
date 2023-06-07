@@ -18,7 +18,7 @@ USER root
 WORKDIR /tmp
 
 # Needed to ensure LANG is set correctly when ssh'ing into agent
-COPY ssh_environment /home/couchbase/.ssh/environment
+COPY build/ssh_environment /home/couchbase/.ssh/environment
 RUN set -x \
         && sed -ri 's/#PermitUserEnvironment no/PermitUserEnvironment yes/g' /etc/ssh/sshd_config \
         && chown -R couchbase:couchbase /home/couchbase/.ssh
@@ -127,13 +127,13 @@ RUN groupadd -g 996 dockerecs && usermod -a -G dockerecs couchbase
 COPY build/buildx.sh /usr/sbin/couchhook.d/
 
 # Enable additional hook for ccache
-COPY cv-hook.sh /usr/sbin/couchhook.d/
+COPY build/cv-hook.sh /usr/sbin/couchhook.d/
 
 # CV stuff (specifically alldependencies.py) still needs python2 :(
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 200
 
 # Enable .gitconfig so repo doesn't get whiny
-COPY gitconfig /home/couchbase/.gitconfig
+COPY build/gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 
 # Avoid having to rebuild image chain for simple start script modifications
