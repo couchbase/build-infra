@@ -1,6 +1,6 @@
 # Docker container for Single Linux
 
-FROM couchbasebuild/server-linux-build:20230421
+FROM couchbasebuild/server-linux-build:20230607
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
@@ -73,9 +73,10 @@ RUN set -x \
         && yum install -y aspell \
         && yum clean all
 
-# Add couchbase user to "docker" group on host (999)
-# Also include GID 996 for ECS
-RUN groupadd -g 996 dockerecs && usermod -a -G dockerecs couchbase
+# Install xmlsec1 binary - required by python library for testing pySaml2
+RUN set -x \
+        && yum install -y xmlsec1 \
+        && yum clean all
 
 # Add startup hook to enable buildx
 COPY build/buildx.sh /usr/sbin/couchhook.d/
@@ -85,6 +86,9 @@ COPY build/cv-hook.sh /usr/sbin/couchhook.d/
 
 # CV stuff (specifically alldependencies.py) still needs python2 :(
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 200
+
+# Create clang++-9 symlink
+RUN ln -s $(which clang++) $(which clang++)-9
 
 # Enable .gitconfig so repo doesn't get whiny
 COPY build/gitconfig /home/couchbase/.gitconfig

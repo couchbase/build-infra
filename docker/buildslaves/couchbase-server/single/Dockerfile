@@ -7,6 +7,7 @@ ARG GCC_12_VER
 ARG CLANG_VER
 FROM couchbasebuild/single-gcc:${GCC_VER} as gcc_10
 FROM couchbasebuild/single-gcc:${GCC_12_VER} as gcc_12
+FROM couchbasebuild/single-clang:9.0.1 as clang9
 FROM couchbasebuild/single-clang:${CLANG_VER} as clang
 
 # Start of compile-only stages
@@ -211,6 +212,7 @@ RUN groupadd -g1000 couchbase && \
 # GCC and clang
 COPY --from=gcc_10 /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 COPY --from=gcc_12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
+COPY --from=clang9 /opt/clang-9.0.1 /opt/clang-9.0.1
 COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
 RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
@@ -310,7 +312,7 @@ RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /hom
 COPY bashrc /root/.bashrc
 COPY bashrc /home/couchbase/.bashrc
 
-ENV PATH=/opt/clang-${CLANG_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/opt/clang-9.0.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
