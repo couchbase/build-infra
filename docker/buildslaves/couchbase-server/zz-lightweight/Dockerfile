@@ -1,6 +1,6 @@
 # Docker container for zz-lightweight
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
@@ -19,7 +19,8 @@ RUN set -x \
     && locale-gen en_US.UTF-8
 
 # Install required apt packages, i.e. build-essential, sudo, curl, common, SSHD, apt-utils
-RUN apt-get update \
+RUN set -x \
+    && apt-get update \
     && apt-get install -y \
        apt-utils \
        build-essential \
@@ -46,32 +47,29 @@ RUN set -x \
     && apt-get install -y openjdk-11-jre-headless \
     && apt-get clean
 
-# Install python3-dev and python3-apt
+# Install python3-dev and python3-apt, and python3-venv for blackduck
 RUN set -x \
     && apt-get update \
     && apt-get install -y \
        python3-dev \
        python3-apt \
+       python3-venv \
     && apt-get clean \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3 100 \
-    && cp /usr/lib/python3/dist-packages/apt_pkg.cpython-38-x86_64-linux-gnu.so /usr/lib/python3/dist-packages/apt_pkg.so
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 
-# Install python3-venv for blackduck
-RUN set -x \
-    && apt-get update \
-    && apt-get install python3-venv -y \
-    && apt-get clean
-
-# pip3 and python modules required by
-# i.e. jira, blackduck
+# pip3 and python modules required by various scripts, eg. jira, blackduck.
+# jira 3.5.1 introduced a regression at least with our key+jira version:
+# https://github.com/pycontribs/jira/issues/1677
 RUN set -x \
     && curl --fail https://bootstrap.pypa.io/get-pip.py | python3 \
     && rm -f /usr/local/bin/pip /usr/local/bin/easy_install \
-    && pip3 install cryptography requests lxml oauthlib pycrypto boto3 pbr wheel filemagic pyjwt --upgrade \
-    && pip3 install jira
+    && pip3 install cryptography requests lxml oauthlib pycrypto boto3 \
+       pbr wheel filemagic pyjwt pyyaml jinja2 --upgrade \
+    && pip3 install jira==3.5.0
 
 # Utilities that are handy for zz-lightweight jobs and occasional interactive use
-RUN apt-get update \
+RUN set -x \
+    && apt-get update \
     && apt-get install -y jq vim \
     && apt-get clean
 
@@ -80,7 +78,7 @@ RUN set -x \
     && add-apt-repository ppa:git-core/ppa -y \
     && apt-get update \
     && apt-get install -y git \
-    && apt clean
+    && apt-get clean
 
 # Install repo
 RUN set -x \
@@ -99,7 +97,7 @@ RUN set -x \
     && sudo apt-add-repository -y ppa:rael-gc/rvm \
     && sudo apt-get update \
     && sudo apt-get install -y rvm \
-    && apt clean
+    && apt-get clean
 
 # Install Deno for running javascript
 RUN set -x \
@@ -114,25 +112,53 @@ RUN curl --fail "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "a
     && sudo ./aws/install \
     && rm -rf ./aws awscliv2.zip
 
-RUN apt-get update && apt-get install git-lfs && rm -rf /var/lib/apt/lists/*
+# Anyone remember why we wanted this?
+RUN apt-get update && apt-get install -y git-lfs && rm -rf /var/lib/apt/lists/*
 
 # Install azure-cli, which is used for building and processing Azure images
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Install gcloud for building and processing GCP images
-Run echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
-    | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+RUN set -x \
+    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+      | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-    | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-    && sudo apt-get update \
-    && sudo apt-get install google-cloud-cli
+      | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
+    && apt-get update \
+    && apt-get install -y google-cloud-cli \
+    && apt-get clean
 
 # Install packer script, which is used for building AWS/Azure/GCP images
-RUN cd /usr/local/bin \
+RUN set -x \
+    && cd /usr/local/bin \
     && curl --fail https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip -o packer.zip \
     && unzip packer.zip \
     && chmod +x packer \
     && rm packer.zip
+
+# Install rclone, createrepo, rpm, and aptly for managing yum/apt repos
+RUN set -x \
+    && curl --fail "https://downloads.rclone.org/v1.61.1/rclone-v1.61.1-linux-amd64.deb" -o /tmp/rclone.deb \
+    && apt-get update \
+    && apt-get install -y createrepo-c aptly rpm expect /tmp/rclone.deb \
+    && apt-get clean \
+    && rm /tmp/rclone.deb
+
+# Docker CLI and buildx
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y apt-transport-https \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
+    && apt-get clean
+RUN addgroup --gid 999 docker && \
+    usermod -a -G docker couchbase
+RUN set -x \
+    && mkdir -p /home/couchbase/.docker \
+    && chown couchbase:couchbase /home/couchbase/.docker
 
 # Set LANG
 ENV LANG=en_US.UTF-8
@@ -150,6 +176,7 @@ CMD ["swarm"]
 # Avoid having to rebuild image chain for simple start script modifications
 COPY build/couchbuilder_start.sh /usr/sbin/
 COPY build/swarm*.properties /
+COPY buildx.sh /usr/sbin/couchhook.d/
 
 # Hack because build-from-manifest script (and possibly others) hardcodes
 # python3.6

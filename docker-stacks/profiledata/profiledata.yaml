@@ -347,6 +347,11 @@ services:
       ################################
       # couchbase-server/zz/linux    #
       ################################
+      - source: profiledata.gpg_key.repository_signing.20230601
+        target: /home/couchbase/couchbase-server/zz/linux/.gpg/repository_signing
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.ssh_privkey.id_cb-robot.20200417
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/id_cb-robot
         mode: 0600
@@ -651,6 +656,8 @@ configs:
 secrets:
   # gpg keys
   profiledata.gpg_key.rpm_signing.20200417:
+    external: true
+  profiledata.gpg_key.repository_signing.20230601:
     external: true
   profiledata.gpg_key.maven_central.20210512:
     external: true
