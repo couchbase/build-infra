@@ -7,7 +7,7 @@ ARG GCC_12_VER
 ARG CLANG_VER
 FROM couchbasebuild/single-gcc:${GCC_VER} as gcc_10
 FROM couchbasebuild/single-gcc:${GCC_12_VER} as gcc_12
-FROM couchbasebuild/single-clang:9.0.1 as clang9
+FROM couchbasebuild/single-clang:9.0.0 as clang9
 FROM couchbasebuild/single-clang:${CLANG_VER} as clang
 
 # Start of compile-only stages
@@ -20,9 +20,9 @@ RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
-RUN yum install -y curl deltarpm sudo
+RUN yum install -y --setopt=skip_missing_names_on_install=False curl deltarpm sudo
 RUN yum groupinstall -y "Development Tools"
-RUN yum install -y bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
+RUN yum install -y --setopt=skip_missing_names_on_install=False bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
 ENV PATH=/opt/gcc-${GCC_12_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 FROM base-compile AS pixz-compile
@@ -48,7 +48,7 @@ LABEL imagename=autoconf-compile
 ARG AUTOCONF_VER
 ARG AUTOMAKE_VER
 ARG LIBTOOL_VER
-RUN yum install -y --setopt=keepcache=0 perl-Data-Dumper m4
+RUN yum install -y --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 perl-Data-Dumper m4
 RUN cd /tmp && mkdir autoconf automake libtool
 RUN curl -Lf http://ftpmirror.gnu.org/autoconf/autoconf-${AUTOCONF_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/autoconf
 RUN curl -Lf http://ftpmirror.gnu.org/automake/automake-${AUTOMAKE_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/automake
@@ -89,7 +89,7 @@ ARG PYTHON3_MINOR
 ARG PYTHON3_PATCH
 WORKDIR /tmp/python
 RUN set -x \
-    && yum install -y sqlite-devel zlib-devel \
+    && yum install -y --setopt=skip_missing_names_on_install=False sqlite-devel zlib-devel \
     && curl -Lf https://www.python.org/ftp/python/${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}/Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}.tgz -o - \
         | tar xz --strip-components=1 -C /tmp/python \
     && ./configure --enable-shared --enable-loadable-sqlite-extensions --enable-optimizations --prefix=/usr/local \
@@ -110,7 +110,7 @@ LABEL imagename=git-compile
 
 ARG GIT_VER
 RUN mkdir /tmp/git
-RUN yum install -y curl-devel expat-devel gettext-devel perl-devel
+RUN yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel
 RUN curl -Lf https://www.kernel.org/pub/software/scm/git/git-${GIT_VER}.tar.gz -o - \
         | tar xz --strip-components=1 -C /tmp/git
 WORKDIR /tmp/git
@@ -151,7 +151,7 @@ RUN chmod +x /tini
 # * Packages from the base CentOS repositories
 RUN set -x \
     && yum install -y epel-release \
-    && yum install --setopt=keepcache=0 -y \
+    && yum install --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 -y \
                 binutils \
                 ed \
                 glib2-devel \
@@ -178,7 +178,7 @@ RUN set -x \
 
 # Pyenv prereqs - for cbdep test suite
 RUN set -x \
-    && yum install --setopt=keepcache=0 -y \
+    && yum install --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 -y \
                 bzip2-devel \
                 libffi-devel \
                 openssl \
@@ -212,12 +212,11 @@ RUN groupadd -g1000 couchbase && \
 # GCC and clang
 COPY --from=gcc_10 /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 COPY --from=gcc_12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
-COPY --from=clang9 /opt/clang-9.0.1 /opt/clang-9.0.1
+COPY --from=clang9 /opt/clang-9.0.0 /opt/clang-9.0.0
 COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
-    && ln -s /opt/clang-9.0.1/bin/clang* /usr/bin \
-    && ln -s /opt/clang-9.0.1/bin/clang++ /usr/bin/clang++-9
+    && ln -s /opt/clang-9.0.0/bin/clang* /usr/bin
 RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
 RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf && ldconfig
 RUN set -x \
@@ -271,9 +270,10 @@ RUN set -x \
     && chmod a+x /usr/local/bin/yq
 
 # Perl modules
-RUN yum install -y --setopt=keepcache=0 \
+RUN yum install -y  --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 \
         perl-Data-Dumper \
         perl-Digest-SHA \
+        perl-Digest-MD5 \
         perl-IPC-Cmd \
     && yum clean all
 
