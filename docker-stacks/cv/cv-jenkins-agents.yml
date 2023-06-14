@@ -179,7 +179,7 @@ services:
         delay: 0s
 
   CBD5141_large:
-    image: couchbasebuild/server-linux-cv:20230610
+    image: couchbasebuild/server-linux-cv:20230614
     environment:
       - "JENKINS_SLAVE_NAME=cbd5141-linux-large"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} linux testing"

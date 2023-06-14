@@ -43,7 +43,7 @@ RUN cmake ../llvm-project/llvm -G Ninja -Wno-dev \
         -DBUILD_SHARED_LIBS="ON" \
         -DCLANG_BUILD_EXAMPLES="OFF" \
         -DCLANG_INCLUDE_DOCS="OFF" \
-        -DCLANG_INCLUDE_TESTS="OFF" \
+        -DCLANG_INCLUDE_TESTS="ON" \
         -DCLANG_PLUGIN_SUPPORT="ON" \
         -DCMAKE_BUILD_TYPE="MinSizeRel" \
         -DCMAKE_C_FLAGS_RELEASE_INIT="$CFLAGS -O2" \
@@ -53,8 +53,9 @@ RUN cmake ../llvm-project/llvm -G Ninja -Wno-dev \
         -DCMAKE_VERBOSE_MAKEFILE="OFF" \
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR="ON" \
         -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld" \
+        -DGCC_INSTALL_PREFIX=/opt/gcc-${GCC_VER} \
         -DLLVM_BUILD_DOCS="OFF"
-RUN ninja -j4
+RUN ninja -j$(nproc)
 RUN mkdir /opt/clang-${CLANG_VER} \
     && mv bin include lib libexec share /opt/clang-${CLANG_VER} \
     && ln -s /opt/clang-${CLANG_VER}/bin/clang++ /opt/clang-${CLANG_VER}/bin/clang++-$(echo $CLANG_VER | cut -d. -f1)\
