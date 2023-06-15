@@ -216,7 +216,7 @@ COPY --from=clang9 /opt/clang-9.0.0 /opt/clang-9.0.0
 COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
-    && ln -s /opt/clang-9.0.0/bin/clang* /usr/bin
+    && ln -s /opt/clang-9.0.0/bin/* /usr/bin
 RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
 RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf && ldconfig
 RUN set -x \

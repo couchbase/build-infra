@@ -1,6 +1,6 @@
 # Docker container for Single Linux
 
-FROM couchbasebuild/server-linux-build:20230614
+FROM couchbasebuild/server-linux-build:20230615
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
