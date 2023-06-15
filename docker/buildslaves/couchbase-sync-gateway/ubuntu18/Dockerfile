@@ -43,6 +43,10 @@ RUN set -x \
     && curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
 
+# Making python3 as default
+RUN set -x \
+    && ln -s /usr/bin/python3 /usr/bin/python
+
 # PyInstaller is required by sgcollect_info
 RUN pip3 install -Iv PyInstaller==3.1
 
