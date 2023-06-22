@@ -21,5 +21,5 @@ docker ${BUILDER} build \
   --build-arg GCC_CONTAINER=couchbasebuild/single-gcc:${GCC_VER} \
   ${PLATFORMS} \
   --pull ${PUSH} \
-  --tag ${IMAGE_NAME}:${CLANG_VER} \
+  --tag ${IMAGE_NAME}:${CLANG_VER}-$(date +%Y%m%d) \
   .

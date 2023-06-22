@@ -53,6 +53,7 @@ RUN cmake ../llvm-project/llvm -G Ninja -Wno-dev \
         -DCMAKE_VERBOSE_MAKEFILE="OFF" \
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR="ON" \
         -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld" \
+        -DLLVM_ENABLE_THREADS="ON" \
         -DGCC_INSTALL_PREFIX=/opt/gcc-${GCC_VER} \
         -DLLVM_BUILD_DOCS="OFF"
 RUN ninja -j$(nproc)

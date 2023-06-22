@@ -4,11 +4,14 @@
 
 ARG GCC_VER
 ARG GCC_12_VER
-ARG CLANG_VER
+ARG CLANG_9_VER
+ARG CLANG_9_TAG
+ARG CLANG_15_VER
+ARG CLANG_15_TAG
 FROM couchbasebuild/single-gcc:${GCC_VER} as gcc_10
 FROM couchbasebuild/single-gcc:${GCC_12_VER} as gcc_12
-FROM couchbasebuild/single-clang:9.0.0 as clang9
-FROM couchbasebuild/single-clang:${CLANG_VER} as clang
+FROM couchbasebuild/single-clang:${CLANG_9_VER}-${CLANG_9_TAG} as clang9
+FROM couchbasebuild/single-clang:${CLANG_15_VER}-${CLANG_15_TAG} as clang15
 
 # Start of compile-only stages
 
@@ -136,7 +139,8 @@ FROM centos:centos7.9.2009
 LABEL maintainer="build-team@couchbase.com"
 
 ARG BUILDARCH \
-    CLANG_VER \
+    CLANG_9_VER \
+    CLANG_15_VER \
     GCC_VER \
     GCC_12_VER
 
@@ -213,7 +217,7 @@ RUN groupadd -g1000 couchbase && \
 COPY --from=gcc_10 /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
 COPY --from=gcc_12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
 COPY --from=clang9 /opt/clang-9.0.0 /opt/clang-9.0.0
-COPY --from=clang /opt/clang-${CLANG_VER} /opt/clang-${CLANG_VER}
+COPY --from=clang15 /opt/clang-${CLANG_15_VER} /opt/clang-${CLANG_15_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
     && ln -s /opt/clang-9.0.0/bin/* /usr/bin

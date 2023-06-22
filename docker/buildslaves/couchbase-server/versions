@@ -31,15 +31,18 @@ RUBY_INSTALL_MINOR=8
 RUBY_INSTALL_PATCH=2
 
 # Build tooling
-AUTOCONF=2.69       # amzn2, centos7, suse12, ubuntu18
-AUTOMAKE=1.15.1     # amzn2, centos7, suse12, ubuntu18
-CLANG=15.0.7        # single
-CCACHE=3.1.9        # amzn2, centos7, rhel8
-GCC=10.2.0          # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
-GCC_12=12.2.0       # amzn2, single
-GIT=2.9.5           # centos7
-LIBTOOL=2.4.6       # amzn2, centos7, suse12, ubuntu18
-ASCIIDOCTOR=2.0.16  # amzn2, centos6, centos7, centos8, debian10, debian8, debian9, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
+AUTOCONF=2.69         # amzn2, centos7, suse12, ubuntu18
+AUTOMAKE=1.15.1       # amzn2, centos7, suse12, ubuntu18
+CLANG_15=15.0.7       # single
+CLANG_15_TAG=20230615 # single
+CLANG_9=9.0.0         # single
+CLANG_9_TAG=20230615  # single
+CCACHE=3.4.1          # amzn2, centos7, rhel8, single
+GCC=10.2.0            # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
+GCC_12=12.2.0         # amzn2, single
+GIT=2.9.5             # centos7
+LIBTOOL=2.4.6         # amzn2, centos7, suse12, ubuntu18
+ASCIIDOCTOR=2.0.16    # amzn2, centos6, centos7, centos8, debian10, debian8, debian9, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
 
 # Other
 JNLP_AGENT=4.3     # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20

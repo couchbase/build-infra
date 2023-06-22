@@ -37,7 +37,10 @@ docker buildx build --pull ${ACTION} \
   --build-arg AUTOMAKE_VER=${AUTOMAKE} \
   --build-arg CBDEP_VER=${CBDEP} \
   --build-arg CCACHE_VER=${CCACHE} \
-  --build-arg CLANG_VER=${CLANG} \
+  --build-arg CLANG_9_VER=${CLANG_9} \
+  --build-arg CLANG_9_TAG=${CLANG_9_TAG} \
+  --build-arg CLANG_15_VER=${CLANG_15} \
+  --build-arg CLANG_15_TAG=${CLANG_15_TAG} \
   --build-arg CMAKE_MAJOR=${CMAKE_MAJOR} \
   --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
