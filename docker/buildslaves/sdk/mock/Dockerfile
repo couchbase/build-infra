@@ -1,11 +1,11 @@
 # Docker container for Centos8
 
-FROM couchbasebuild/sdk-ubi8-build:20221017
+FROM couchbasebuild/sdk-almalinux8-build:20230726
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
-RUN yum install -y --enablerepo centos8-appstream,centos8-baseos mock && yum clean all
+RUN yum install -y mock && yum clean all
 RUN usermod -a -G mock couchbase
 
 USER couchbase

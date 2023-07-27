@@ -1,17 +1,11 @@
-# Docker container for Centos8
+# Docker container for AlmaLinux 8
 
-FROM centos:8
+FROM almalinux:8
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
-# Not at all sure about this workaround
-RUN rpm --rebuilddb || ( \
-        rm -rf /var/lib/rpm && \
-        mv /var/lib/rpmrebuild* /var/lib/rpm \
-)
-
-RUN dnf install -y sudo
+RUN dnf install -y sudo && dnf clean all
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -28,14 +22,17 @@ RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
 
 ### Install Couchbase build dependencies ######################################
 # Add EPEL
-RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm dnf-plugins-core && \
-    dnf config-manager --set-enabled powertools
+RUN set -x \
+    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm dnf-plugins-core \
+    && dnf config-manager --set-enabled powertools \
+    && dnf clean all
 
 # * Packages from the base CentOS repository and EPEL
-RUN dnf install -y \
+RUN set -x \
+    && dnf install -y \
                 bzip2-devel \
-                cmake \
                 ed \
+                gcc-toolset-12-gcc-c++ \
                 git \
                 glibc.i686 \
                 libev-devel \
@@ -60,62 +57,64 @@ RUN dnf install -y \
                 tar \
                 unzip \
                 which \
-                wget
+                wget \
+    && dnf clean all
 
 # Dev basic tools
-RUN dnf groupinstall -y "Development Tools"
+RUN dnf groupinstall -y "Development Tools" && dnf clean all
 
-# JDK for Jenkins.
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/openjre.tar.gz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
+# Initial install of cbdep for installing JDK, etc
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+
+# Use cbdep to install Java, CMake
+RUN set -x \
+    && cbdep install -d /opt openjdk 11.0.16+8 \
+    && cd /usr/local \
+    && ln -s /opt/openjdk* java \
+    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
+    && rm -rf /root/.cbdepcache
+RUN set -x \
+    && cbdep install -d /opt cmake 3.24.2 \
+    && ln -s /opt/cmake-3.24.2/bin/cmake /usr/local/bin \
+    && rm -rf /root/.cbdepcache
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
     -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
 
-# CMake
-RUN mkdir /tmp/deploy && \
-    curl -L https://cmake.org/files/v3.21/cmake-3.21.4-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
-    (echo y ; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && \
-    rm /usr/local/bin/cmake-gui && \
-    rm -rf /tmp/deploy
-
 # Ensure /opt/cbdeps is writable
 RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
-# Build tools
-RUN curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo && \
-    sudo yum install -y --setopt=keepcache=0 sbt
-RUN mkdir /tmp/deploy && \
-    curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip && \
-    curl -L -o /tmp/deploy/maven.zip http://apache.mirrors.tds.net/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && \
-    cd /usr/local && \
-    unzip /tmp/deploy/gradle.zip && \
-    unzip /tmp/deploy/maven.zip && \
-    ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin && \
-    rm -rf /tmp/deploy
+# SBT, Gradle, Maven
+RUN set -x \
+    && curl https://www.scala-sbt.org/sbt-rpm.repo > /etc/yum.repos.d/sbt-rpm.repo \
+    && sudo yum install -y --setopt=keepcache=0 sbt \
+    && yum clean all
+RUN set -x \
+    && mkdir /tmp/deploy \
+    && curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip \
+    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.zip  \
+    && cd /usr/local \
+    && unzip /tmp/deploy/gradle.zip \
+    && unzip /tmp/deploy/maven.zip \
+    && ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin \
+    && rm -rf /tmp/deploy
 
-# Temp install step for "cbdep" tool
-ARG CACHEBUST=1
-RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
-
-# Run our builder startup script
+# Add our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 
 # Ensure appropriate directories exist and are owned by 'couchbase'
+RUN mkdir /home/couchbase/.ssh && chown couchbase:couchbase /home/couchbase/.ssh
+
+# Temp install step for "cbdep" tool
+ARG CACHEBUST=1
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 USER couchbase
-RUN mkdir /home/couchbase/.ssh
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG

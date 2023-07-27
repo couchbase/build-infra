@@ -101,11 +101,11 @@ services:
       - *repo-url
     <<: *default-jenkins-slave
 
-  centos8:
-    image: couchbasebuild/sdk-centos8-build:20230419
+  almalinux8:
+    image: couchbasebuild/sdk-almalinux8-build:20230726
     environment:
-      - "JENKINS_SLAVE_NAME=build-centos8"
-      - "JENKINS_SLAVE_LABELS=sdk centos8"
+      - "JENKINS_SLAVE_NAME=build-almalinux8"
+      - "JENKINS_SLAVE_LABELS=sdk centos8 almalinux8"
       - *default-jenkins-slave-environment-master
       - *default-jenkins-slave-lang
       - *repo-url

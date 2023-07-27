@@ -2,11 +2,12 @@
 
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
-IMAGE=couchbasebuild/sdk-ubi8-build
+IMAGE=couchbasebuild/sdk-almalinux8-build
 
 mkdir -p build
 INFRADIR=$(git rev-parse --show-toplevel)
 cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+
 
 if [ "$1" = "--publish" ]
 then
