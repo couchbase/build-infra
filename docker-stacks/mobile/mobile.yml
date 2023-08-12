@@ -42,7 +42,7 @@ services:
       - nfs
 
   lite-android-ubuntu18:
-    image: couchbasebuild/ubuntu1804-mobile-lite-android:20220414
+    image: couchbasebuild/ubuntu1804-mobile-lite-android:20230811
     init: true
     user: couchbase
     environment:
@@ -141,7 +141,7 @@ services:
       - jenkins
 
   litecore-centos73:
-    image: couchbasebuild/centos-73-litecore-build:20220308
+    image: couchbasebuild/centos-73-litecore-build:20230811
     init: true
     user: couchbase
     environment:

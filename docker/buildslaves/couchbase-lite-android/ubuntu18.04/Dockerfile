@@ -96,6 +96,9 @@ USER root
 # CBD-4280: set openjdk-11-jdk as default
 RUN update-java-alternatives -s java-1.11.0-openjdk-amd64
 
+# Add cbdep tool
+RUN curl --fail http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
