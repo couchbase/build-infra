@@ -15,6 +15,9 @@ fi
 if type brew &>/dev/null; then FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH && autoload -Uz compinit && compinit; fi
 
 # Add ruby to PATH
+if [ -d "/usr/local/opt/ruby/bin" ]; then
+  export PATH=/usr/local/opt/ruby/bin:$PATH
+fi
 gem_paths=$(gem env | grep "INSTALLATION DIRECTORY" | sed 's/.*: //g'  | sed 's/$/\/bin/g' | paste -sd ":" -)
 export PATH="${gem_paths}:$PATH"
 
