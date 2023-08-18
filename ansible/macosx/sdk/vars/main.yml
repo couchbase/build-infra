@@ -35,8 +35,10 @@ homebrew_installed_packages:
   - { name: oniguruma, state: linked }
   - { name: openssl, state: linked }
   - { name: pass, state: linked }
+  - { name: pkg-config, state: linked }
   - { name: python, state: linked }
   - { name: readline, state: linked }
   - { name: ruby-install, state: linked }
+  - { name: ruby, state: linked }
   - { name: ssh-copy-id, state: linked }
   - { name: wget, state: linked }
