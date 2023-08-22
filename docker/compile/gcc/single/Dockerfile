@@ -1,9 +1,9 @@
 # Docker container just to build GCC, because it's slow.
-# Note: A new version of binutils is also bundled for GCC>=12
+# Note: A new version of binutils is also bundled for GCC>=13
 
 FROM centos:7.9.2009 as builder
 ARG GCC_VER
-ARG BINUTILS_VERSION=2.40
+ARG BINUTILS_VER
 
 # Install the older gcc so we can bootstrap up to the newer, then
 # build and install newer. Note: important to update binutils here,
@@ -20,6 +20,19 @@ RUN yum install --setopt=keepcache=0 -y \
         texinfo \
         wget
 
+# If we're building a version of GCC more recent than 13, bundle in a newer
+# binutils - we build gcc with the tools in here, and provide it in the final
+# image for ingestion in the builder images
+WORKDIR /tmp
+RUN set -x \
+      && curl -Lf https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VER}.tar.xz -o binutils.tar.xz \
+      && mkdir binutils && cd binutils \
+      && tar xf ../binutils.tar.xz --strip-components=1 \
+      && ./configure --prefix=/opt/binutils-${BINUTILS_VER} \
+      && make -j$(nproc) \
+      && make install \
+      && rm -rf /tmp/binutils*
+
 RUN set -x \
       && mkdir /tmp/deploy \
       && cd /tmp/deploy \
@@ -28,7 +41,12 @@ RUN set -x \
 RUN cd /tmp/deploy/gcc-${GCC_VER} && ./contrib/download_prerequisites
 RUN mkdir /tmp/deploy/objdir
 WORKDIR /tmp/deploy/objdir
-RUN $PWD/../gcc-${GCC_VER}/configure --prefix=/opt/gcc-${GCC_VER} --disable-multilib --enable-languages=c,c++
+RUN $PWD/../gcc-${GCC_VER}/configure \
+      --prefix=/opt/gcc-${GCC_VER} \
+      --disable-multilib \
+      --enable-languages=c,c++ \
+      --with-as=/opt/binutils-${BINUTILS_VER}/bin/as \
+      --with-ld=/opt/binutils-${BINUTILS_VER}/bin/ld
 RUN make -j$(nproc)
 
 # We use install-strip for size reasons, but copy the non-stripped
@@ -47,22 +65,9 @@ RUN export PATH=/opt/gcc-${GCC_VER}/bin:${PATH} \
          | awk "/^\*link:/ { print; getline; print \"-rpath=/opt/gcc-${GCC_VER}/lib64\", \$0; next } { print }" \
          > $(dirname $(g++ -print-libgcc-file-name))/specs
 
-# If we're building a version of GCC more recent than 12, bundle in a newer
-# binutils - this will avoid e.g the stock version on centos7 failing to
-# build v8 on arm
-WORKDIR /tmp
-RUN set -x \
-    && if [ ! "${GCC_VER}" = "$(printf ${GCC_VER}\\n12 | sort -V | head -n1)" ]; then \
-      curl -Lf https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz -o binutils.tar.xz && \
-      mkdir binutils && cd binutils && \
-      tar xf ../binutils.tar.xz --strip-components=1 && \
-      ./configure --prefix=/opt/gcc-${GCC_VER} && \
-      make -j$(nproc) && \
-      make install && \
-      rm -rf /tmp/binutils* ; \
-    fi
-
 FROM scratch
 ARG GCC_VER
+ARG BINUTILS_VER
 LABEL maintainer="build-team@couchbase.com"
 COPY --from=builder /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+COPY --from=builder /opt/binutils-${BINUTILS_VER} /opt/binutils-${BINUTILS_VER}

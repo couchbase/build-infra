@@ -133,7 +133,7 @@ services:
     <<: *default-jenkins-one-agent
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20230616
+    image: couchbasebuild/server-linux-build:20230822
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
       - "JENKINS_SLAVE_LABELS=server linux linux-asan all monster neo elixir morpheus trinity master x86_64"

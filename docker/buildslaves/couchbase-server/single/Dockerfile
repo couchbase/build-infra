@@ -2,14 +2,16 @@
 # Docker container for Single Linux build. Currently based on
 # Centos 7 as it has the oldest glibc of the distros we support.
 
-ARG GCC_VER
-ARG GCC_12_VER
+ARG GCC_10_VER
+ARG GCC_10_TAG
+ARG GCC_13_VER
+ARG GCC_13_TAG
 ARG CLANG_9_VER
 ARG CLANG_9_TAG
 ARG CLANG_15_VER
 ARG CLANG_15_TAG
-FROM couchbasebuild/single-gcc:${GCC_VER} as gcc_10
-FROM couchbasebuild/single-gcc:${GCC_12_VER} as gcc_12
+FROM couchbasebuild/single-gcc:${GCC_10_VER}-${GCC_10_TAG} as gcc_10
+FROM couchbasebuild/single-gcc:${GCC_13_VER}-${GCC_13_TAG} as gcc_13
 FROM couchbasebuild/single-clang:${CLANG_9_VER}-${CLANG_9_TAG} as clang9
 FROM couchbasebuild/single-clang:${CLANG_15_VER}-${CLANG_15_TAG} as clang15
 
@@ -26,7 +28,7 @@ ENV LANG=en_US.UTF-8 \
 RUN yum install -y --setopt=skip_missing_names_on_install=False curl deltarpm sudo
 RUN yum groupinstall -y "Development Tools"
 RUN yum install -y --setopt=skip_missing_names_on_install=False bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
-ENV PATH=/opt/gcc-${GCC_12_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/opt/gcc-${GCC_13_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 FROM base-compile AS pixz-compile
 WORKDIR /tmp
@@ -139,10 +141,11 @@ FROM centos:centos7.9.2009
 LABEL maintainer="build-team@couchbase.com"
 
 ARG BUILDARCH \
+    BINUTILS_VER \
     CLANG_9_VER \
     CLANG_15_VER \
-    GCC_VER \
-    GCC_12_VER
+    GCC_10_VER \
+    GCC_13_VER
 
 USER root
 
@@ -214,18 +217,19 @@ RUN groupadd -g1000 couchbase && \
     usermod -G wheel root
 
 # GCC and clang
-COPY --from=gcc_10 /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
-COPY --from=gcc_12 /opt/gcc-${GCC_12_VER} /opt/gcc-${GCC_12_VER}
+COPY --from=gcc_10 /opt/gcc-${GCC_10_VER} /opt/gcc-${GCC_10_VER}
+COPY --from=gcc_13 /opt/gcc-${GCC_13_VER} /opt/gcc-${GCC_13_VER}
+COPY --from=gcc_13 /opt/binutils-${BINUTILS_VER} /opt/binutils-${BINUTILS_VER}
 COPY --from=clang9 /opt/clang-9.0.0 /opt/clang-9.0.0
 COPY --from=clang15 /opt/clang-${CLANG_15_VER} /opt/clang-${CLANG_15_VER}
-RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_VER}/bin/${prog} /usr/local/bin; done
+RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_10_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
     && ln -s /opt/clang-9.0.0/bin/* /usr/bin
-RUN for lib in /opt/gcc-${GCC_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
-RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf && ldconfig
+RUN for lib in /opt/gcc-${GCC_10_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
+RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_10_VER}.conf && ldconfig
 RUN set -x \
-    && echo /opt/gcc-${GCC_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_VER}.conf \
-    && echo /opt/gcc-${GCC_12_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_12_VER}.conf \
+    && echo /opt/gcc-${GCC_10_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_10_VER}.conf \
+    && echo /opt/gcc-${GCC_13_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_13_VER}.conf \
     && ldconfig
 
 # Autoconf and friends

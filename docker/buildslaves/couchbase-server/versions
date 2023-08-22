@@ -12,8 +12,8 @@ JRE_BUILD=8
 
 # Cmake # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
 CMAKE_MAJOR=3
-CMAKE_MINOR=20
-CMAKE_PATCH=1
+CMAKE_MINOR=27
+CMAKE_PATCH=2
 
 # Python3 # centos7
 PYTHON3_MAJOR=3
@@ -33,13 +33,16 @@ RUBY_INSTALL_PATCH=2
 # Build tooling
 AUTOCONF=2.69         # amzn2, centos7, suse12, ubuntu18
 AUTOMAKE=1.15.1       # amzn2, centos7, suse12, ubuntu18
+BINUTILS=2.41         # single
 CLANG_15=15.0.7       # single
 CLANG_15_TAG=20230615 # single
 CLANG_9=9.0.0         # single
 CLANG_9_TAG=20230615  # single
 CCACHE=3.4.1          # amzn2, centos7, rhel8, single
-GCC=10.2.0            # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
-GCC_12=12.2.0         # amzn2, single
+GCC_10=10.2.0         # amzn2, centos7, debian9, debian10, rhel8, suse12, suse15, ubuntu18, ubuntu20
+GCC_10_TAG=20230822   # single
+GCC_13=13.2.0         # amzn2, single
+GCC_13_TAG=20230822   # amzn2, single
 GIT=2.9.5             # centos7
 LIBTOOL=2.4.6         # amzn2, centos7, suse12, ubuntu18
 ASCIIDOCTOR=2.0.16    # amzn2, centos6, centos7, centos8, debian10, debian8, debian9, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20

@@ -2,7 +2,6 @@
 
 # Things you might want to adjust:
 IMAGE=couchbasebuild/server-linux-build
-
 # You can probably ignore the rest of this
 
 
@@ -35,6 +34,7 @@ docker buildx build --pull ${ACTION} \
   --build-arg ASCIIDOCTOR_VER=${ASCIIDOCTOR} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \
   --build-arg AUTOMAKE_VER=${AUTOMAKE} \
+  --build-arg BINUTILS_VER=${BINUTILS} \
   --build-arg CBDEP_VER=${CBDEP} \
   --build-arg CCACHE_VER=${CCACHE} \
   --build-arg CLANG_9_VER=${CLANG_9} \
@@ -45,8 +45,10 @@ docker buildx build --pull ${ACTION} \
   --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
   --build-arg DOCKER_VER=${DOCKER} \
-  --build-arg GCC_VER=${GCC} \
-  --build-arg GCC_12_VER=${GCC_12} \
+  --build-arg GCC_10_VER=${GCC_10} \
+  --build-arg GCC_10_TAG=${GCC_10_TAG} \
+  --build-arg GCC_13_VER=${GCC_13} \
+  --build-arg GCC_13_TAG=${GCC_13_TAG} \
   --build-arg GIT_VER=${GIT} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
