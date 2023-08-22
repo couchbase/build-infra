@@ -1,9 +1,9 @@
 version: '3.8'
 
 # Suggested deployment command:
-#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c server-jenkins-agents.yaml serverbuild
-# All services, networks, etc. will then get an "serverbuild_" prefix,
-# eg. "serverbuild_centos6"
+#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c server-jenkins-agents.yaml server
+# All services, networks, etc. will then get an "server_" prefix,
+# eg. "server_linux-single"
 
 # Default slave configurations. This is written using YAML anchors so
 # it can be substituted into all the slave declarations later. See
@@ -144,7 +144,7 @@ services:
       - *repo-url
     volumes:
       - type: volume
-        source: optcouchbase
+        source: serverbuild_optcouchbase
         target: /opt/couchbase
       - type: volume
         source: workspace
@@ -180,7 +180,7 @@ services:
 
   # This is identical to the normal centos7 agent except it has a memory
   # reservation of 16GB, to ensure it doesn't get co-located with any
-  # other serverbuild containers.
+  # other server containers.
   centos7-asan:
     image: couchbasebuild/server-centos7-build:20230214
     environment:
@@ -413,7 +413,12 @@ networks:
   jenkins:
 
 volumes:
-  optcouchbase:
+  # This volume must exist with this name on 'monster' agents, because voltron
+  # uses it to identify that it's running on a 'monster' agent (and uses it to
+  # communicate with the linux sidecar containers). Conveniently, 'docker
+  # stack deploy' *will* create an external volume if it doesn't exist.
+  serverbuild_optcouchbase:
+    external: true
   rpmdb:
   workspace:
   cbdepscache:

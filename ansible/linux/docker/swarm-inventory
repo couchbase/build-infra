@@ -31,8 +31,7 @@
 172.23.97.147  name=mega4-34.sc.couchbase.com labels=role=operator
 172.23.113.9   name=monster-01.sc.couchbase.com labels=role=monster
 172.23.113.29  name=monster-02.sc.couchbase.com labels=role=monster
-172.23.112.255 name=buildos-01.sc.couchbase.com labels=role=buildos
-172.23.113.11  name=buildos-02.sc.couchbase.com labels=role=buildos
+172.23.112.4   name=monster-03.sc.couchbase.com labels=role=monster
 172.23.105.183 name=mega4-35.sc.couchbase.com labels=role=build manager=true
 172.23.106.70  name=mega4-36.sc.couchbase.com labels=role=build
 172.23.106.117 name=mega4-37.sc.couchbase.com labels=role=build
