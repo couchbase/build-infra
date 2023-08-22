@@ -11,6 +11,11 @@ services:
   jenkins:
     image: jenkins/jenkins:2.401.3
     deploy:
+      resources:
+        limits:
+          memory: 7G
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==infrastructure
