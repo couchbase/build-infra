@@ -84,30 +84,53 @@ ARG RUBY_MINOR
 ARG RUBY_PATCH
 RUN ruby-install --prefix /usr/local -j -- ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH}
 
+# OpenSSL
+FROM base-compile as openssl-compile
+ARG OPENSSL_VER
+RUN yum install -y perl-IPC-Cmd
+WORKDIR /tmp/openssl-${OPENSSL_VER}
+ADD https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VER}/openssl-${OPENSSL_VER}.tar.gz /tmp
+RUN set -x \
+    && tar xf /tmp/openssl-${OPENSSL_VER}.tar.gz --strip-components=1 \
+    && ./config --prefix=/usr/local --libdir=lib --openssldir=/etc/pki/tls shared \
+    && make -j8 \
+    && make install \
+    && rm -rf /tmp/openssl*
 
 # Python
-FROM base-compile AS python-compile
+FROM openssl-compile AS python-compile
 LABEL imagename=python-compile
 
+ARG OPENSSL_VER
 ARG PYTHON3_MAJOR
 ARG PYTHON3_MINOR
 ARG PYTHON3_PATCH
 WORKDIR /tmp/python
+RUN yum install -y --setopt=skip_missing_names_on_install=False \
+        libpcap-devel \
+        xz-devel \
+        bzip2-devel \
+        sqlite-devel \
+        tk-devel
 RUN set -x \
-    && yum install -y --setopt=skip_missing_names_on_install=False sqlite-devel zlib-devel \
     && curl -Lf https://www.python.org/ftp/python/${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}/Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}.tgz -o - \
         | tar xz --strip-components=1 -C /tmp/python \
-    && ./configure --enable-shared --enable-loadable-sqlite-extensions --enable-optimizations --prefix=/usr/local \
-    &&  make -j install \
-    && curl -f https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
-    && echo "/usr/local/lib" > /etc/ld.so.conf.d/python.conf \
+    && echo "/usr/local/lib" > /etc/ld.so.conf.d/python-openssl.conf \
     && ldconfig \
+    && ./configure \
+        --enable-shared \
+        --enable-loadable-sqlite-extensions \
+        --enable-optimizations \
+        --prefix=/usr/local \
+        --with-openssl=/usr/local \
+    && make -j8 install \
+    && ldconfig \
+    && curl -f https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
     && /usr/local/bin/python3 /tmp/get-pip.py \
     && cd /tmp \
     && git clone https://github.com/pyinstaller/pyinstaller/ \
     && cd pyinstaller/bootloader \
     && /usr/local/bin/python3 ./waf all
-
 
 # Git
 FROM base-compile AS git-compile
@@ -255,6 +278,9 @@ COPY --from=pixz-compile /out/usr/local/ /usr/local/
 # Git
 COPY --from=git-compile /usr/local/ /usr/local/
 
+# OpenSSL
+COPY --from=openssl-compile /usr/local/ /usr/local/
+
 # Python 3 & pip
 COPY --from=python-compile /usr/local/ /usr/local/
 RUN set -x \
@@ -314,6 +340,9 @@ RUN set -x \
        | tar xz --strip-components=1 -C /usr/local/bin \
     && for gid in {990..997}; do groupadd -g ${gid} docker${gid}; usermod -a -G docker${gid} couchbase; done;
 RUN usermod -a -G 999 couchbase
+
+# Dev packages required for building cbdep
+RUN yum install -y libxml2-devel and libxslt-devel
 
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permisions / ownership.

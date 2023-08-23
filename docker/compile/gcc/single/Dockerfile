@@ -28,7 +28,7 @@ RUN set -x \
       && curl -Lf https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VER}.tar.xz -o binutils.tar.xz \
       && mkdir binutils && cd binutils \
       && tar xf ../binutils.tar.xz --strip-components=1 \
-      && ./configure --prefix=/opt/binutils-${BINUTILS_VER} \
+      && ./configure --prefix=/opt/binutils-${BINUTILS_VER} --enable-gold \
       && make -j$(nproc) \
       && make install \
       && rm -rf /tmp/binutils*

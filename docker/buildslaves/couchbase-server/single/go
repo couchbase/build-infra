@@ -18,14 +18,18 @@ TAG=$(date +%Y%m%d)
 
 if [ "$1" = "--publish" ]
 then
+  BUILDX=buildx
   ACTION=--push
   PLATFORMS=linux/amd64,linux/arm64
 else
-  ACTION=--load
-  PLATFORMS=linux/amd64
+  if [ "$(uname -m)" = "arm64" -o "$(uname -m)" = "aarch64" ]; then
+    PLATFORMS=linux/arm64
+  else
+    PLATFORMS=linux/amd64
+  fi
 fi
 
-docker buildx build --pull ${ACTION} \
+docker ${BUILDX} build --pull ${ACTION} \
   --platform ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \
@@ -52,6 +56,7 @@ docker buildx build --pull ${ACTION} \
   --build-arg GIT_VER=${GIT} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
+  --build-arg OPENSSL_VER=${OPENSSL_3} \
   --build-arg PATCH_VIA_GERRIT_VER=${PATCH_VIA_GERRIT} \
   --build-arg PYTHON3_MAJOR=${PYTHON3_MAJOR} \
   --build-arg PYTHON3_MINOR=${PYTHON3_MINOR} \
