@@ -43,7 +43,7 @@ fi
 active_user=$(whoami)
 
 # We need to let these fall through to a noop in case we hit mounts
-sudo chown -R couchbase:couchbase /home/couchbase/.ssh || :
+sudo chown -R couchbase:couchbase /home/couchbase || :
 chmod -R 600 /home/couchbase/.ssh/* || :
 chmod 700 /home/couchbase/.ssh || :
 

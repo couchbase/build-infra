@@ -1,0 +1,6 @@
+# So far only used by Alpine - others should adopt as we upgrade them
+
+CMAKE_VERSION=3.27.4
+GRADLE_VERSION=8.3
+MAVEN_VERSION=3.9.4
+SBT_VERSION=1.9.3

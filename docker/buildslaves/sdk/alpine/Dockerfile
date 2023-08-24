@@ -1,11 +1,13 @@
 # Docker container for Alpine
 
-FROM alpine:3.14
+ARG ALPINE_VERSION
+
+FROM alpine:${ALPINE_VERSION}
 
 ARG CMAKE_VERSION
-ARG SWARM_CLIENT_VERSION
 ARG GRADLE_VERSION
 ARG MAVEN_VERSION
+ARG SBT_VERSION
 
 LABEL maintainer="build-team@couchbase.com"
 
@@ -15,8 +17,11 @@ ENV PATH="/usr/local/bin:${PATH}"
 RUN apk add --no-cache \
         abuild \
         alpine-sdk \
+        bash \
         build-base \
         bzip2-dev \
+        ccache \
+        cmake \
         curl \
         gdb \
         git \
@@ -43,14 +48,16 @@ RUN apk add --no-cache \
         rsync \
         sudo \
         tar \
-        unzip \
-        ccache
+        unzip
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN set -x \
-    && addgroup couchbase \
-    && adduser couchbase -S -G couchbase \
+    && addgroup -g 1000 couchbase \
+    && adduser -D -u 1000 couchbase -G couchbase \
+    && chmod 755 /home/couchbase \
+    && mkdir /home/couchbase/.ssh /home/couchbase/.docker \
+    && chown -R couchbase:couchbase /home/couchbase \
     && addgroup couchbase wheel \
     && addgroup couchbase abuild \
     && echo 'couchbase:couchbase' | chpasswd \
@@ -70,23 +77,12 @@ RUN set -x \
             -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
 
-# CMake
-RUN set -x \
-    && mkdir /tmp/deploy \
-    && cd /tmp/deploy \
-    && curl -fLOs https://cmake.org/files/v$(echo ${CMAKE_VERSION} | awk 'BEGIN{FS=OFS="."} NF--')/cmake-${CMAKE_VERSION}.tar.gz \
-    && tar -zxf cmake-${CMAKE_VERSION}.tar.gz \
-    && cd cmake-${CMAKE_VERSION}/ \
-    && ./bootstrap && make -j8 && make install \
-    && rm -rf /tmp/deploy
-
 # sbt
 RUN set -x \
-    && apk add --no-cache bash \
     && cd /tmp \
     && mkdir /usr/local/sbt \
-    && curl -LO https://github.com/sbt/sbt/releases/download/v1.8.2/sbt-1.8.2.tgz \
-    && tar xf sbt-1.8.2.tgz --strip-components=1 -C /usr/local/sbt \
+    && curl -LO https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz \
+    && tar xf sbt-${SBT_VERSION}.tgz --strip-components=1 -C /usr/local/sbt \
     && ln -s /usr/local/sbt/bin/* /usr/local/bin
 
 # Gradle + Maven
@@ -107,12 +103,9 @@ RUN set -x \
     && git clone https://github.com/couchbase/libcouchbase.git \
     && cd libcouchbase && mkdir build && cd build \
     && ../cmake/configure \
-    && make \
+    && make -j8 \
     && make install \
     && rm -rf /tmp/deploy
-
-# Create python symlink
-RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Set LANG
 ENV LANG=en_US.UTF-8
@@ -125,10 +118,6 @@ RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux-x64-m
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
-
-# Ensure appropriate directories exist and are owned by 'couchbase'
-USER couchbase
-RUN mkdir /home/couchbase/.ssh
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG

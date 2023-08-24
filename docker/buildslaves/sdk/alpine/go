@@ -1,26 +1,37 @@
 #!/bin/sh -ex
 
 TAG=$(date +%Y%m%d)
-IMAGE=couchbasebuild/sdk-alpine-build
-
-mkdir -p build
-INFRADIR=$(git rev-parse --show-toplevel)
-cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 
 if [ "$1" = "--publish" ]
 then
-  ACTION="--push"
-else
-  ACTION="--load"
+  PUSH="--push"
 fi
 
-docker buildx build --platform linux/amd64 --pull ${ACTION} \
-    --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
-    --build-arg CACHEBUST=$(date +%Y%m%d-%H%M%S) \
-    --build-arg CMAKE_VERSION=3.21.3 \
-    --build-arg GRADLE_VERSION=4.10 \
-    --build-arg MAVEN_VERSION=3.5.4 \
-    --build-arg SWARM_CLIENT_VERSION=3.24 \
-    -t ${IMAGE}:${TAG} \
-    -t ${IMAGE}:latest \
-    .
+. ../versions
+
+# Do this outside the loop so all load/push builds get
+# cached the same
+CACHEBUST=$(date +%Y%m%d-%H%M%S)
+
+for ALPINE_VERSION in 3.17 3.18; do
+    IMAGE=couchbasebuild/sdk-alpine${ALPINE_VERSION}-build
+
+    mkdir -p build
+    INFRADIR=$(git rev-parse --show-toplevel)
+    cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+
+    for action in "--load" ${PUSH}; do
+        docker buildx build --platform linux/amd64 --pull \
+            ${action} --progress plain \
+            --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+            --build-arg CACHEBUST=${CACHEBUST} \
+            --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
+            --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+            --build-arg GRADLE_VERSION=${GRADLE_VERSION} \
+            --build-arg MAVEN_VERSION=${MAVEN_VERSION} \
+            --build-arg SBT_VERSION=${SBT_VERSION} \
+            -t ${IMAGE}:${TAG} \
+            -t ${IMAGE}:latest \
+            .
+    done
+done
