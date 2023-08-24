@@ -172,6 +172,9 @@ ARG BUILDARCH \
 
 USER root
 
+# Buildx
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER
 ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini-${BUILDARCH} /tini
@@ -182,6 +185,7 @@ RUN chmod +x /tini
 RUN set -x \
     && yum install -y epel-release \
     && yum install --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 -y \
+                awscli \
                 binutils \
                 ed \
                 glib2-devel \
@@ -204,6 +208,7 @@ RUN set -x \
                 tar \
                 unzip \
                 which \
+    && ln -s $(which ninja-build) /usr/local/bin/ninja \
     && yum clean all
 
 # Pyenv prereqs - for cbdep test suite

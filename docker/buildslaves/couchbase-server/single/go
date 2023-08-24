@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 
 # Things you might want to adjust:
 IMAGE=couchbasebuild/server-linux-build
@@ -16,8 +16,33 @@ cp -a ../../util/healthcheck.sh build
 
 TAG=$(date +%Y%m%d)
 
-if [ "$1" = "--publish" ]
-then
+PUBLISH=false
+SIDECARS=false
+
+usage() {
+  echo "Usage: $0 [--publish] [--sidecars]"
+  echo "Options:"
+  echo "  --publish    Publish the image to docker hub"
+  echo "  --sidecars   Build and publish sidecars"
+}
+
+for arg in "$@"; do
+  case "${arg}" in
+    --publish)
+      PUBLISH=true
+      ;;
+    --sidecars)
+      SIDECARS=true
+      ;;
+    *)
+      echo "Invalid flag: ${arg}"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+if ${PUBLISHING}; then
   BUILDX=buildx
   ACTION=--push
   PLATFORMS=linux/amd64,linux/arm64
@@ -71,8 +96,7 @@ docker ${BUILDX} build --pull ${ACTION} \
   --build-arg YQ_VER=${YQ} \
   .
 
-if [ "$1" = "--publish" ]
-then
+if ${SIDECARS}; then
   # Also ensure the sidecars are updated appropriately
   for pkg_type in deb rpm
   do

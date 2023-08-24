@@ -37,7 +37,7 @@ services:
         mode: 0600
         uid: "1000"
         gid: "1000"
-      - source: buildx.config.rhcc_metadata.20230316
+      - source: buildx.config.rhcc_metadata.20230824
         target: /home/couchbase/.docker/rhcc-metadata.json
         mode: 0600
         uid: "1000"
@@ -59,7 +59,7 @@ secrets:
     external: true
   buildx.config.docker.20221004:
     external: true
-  buildx.config.rhcc_metadata.20230316:
+  buildx.config.rhcc_metadata.20230824:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true
