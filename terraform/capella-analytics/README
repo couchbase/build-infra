@@ -1,0 +1,13 @@
+This provides a terraform module to create a private repository
+
+* Main.tf consists of required terraform version and module versions.
+* provider.tf contains terraform backend information.
+* ecr.tf calls modules/ecr, which performs the actual repo creation.
+* modules/ecr/aws_ecr_repository.tf creates repo
+* modules/ecr/aws_ecr_lifecycle_policy.tf sets rules to expire images
+* modules/ecr/aws_ecr_repository_policy.tf defines access levels
+
+To apply changes:
+terraform init
+terraform plan
+terraform apply
