@@ -28,7 +28,7 @@ x-default-jenkins-slave: &default-jenkins-slave
       uid: '1000'
       gid: '1000'
       mode: 0400
-    - source: docker_config_20210719
+    - source: sdk_docker_config_20210719
       target: /home/couchbase/.docker/config.json
       uid: '1000'
       gid: '1000'
@@ -209,7 +209,7 @@ services:
         mode: 0400
       - source: sdk_jenkins_ns-buildbot_api_key.20220510
         target: /run/secrets/jenkins_master_password
-      - source: docker_config_20210719
+      - source: sdk_docker_config_20210719
         target: /home/couchbase/.docker/config.json
         uid: '1000'
         gid: '1000'
@@ -245,7 +245,7 @@ secrets:
     external: true
   id_ns-codereview_20181212:
     external: true
-  docker_config_20210719:
+  sdk_docker_config_20210719:
     external: true
 
 configs:

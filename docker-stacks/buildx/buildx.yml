@@ -13,7 +13,7 @@ services:
       - "JENKINS_SLAVE_NAME=buildx"
       - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices couchbase-operator master buildx"
       - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
-      - "NODE_CLASS=build"
+      - "NODE_CLASS=build buildx"
       - "NODE_PRODUCT=couchbase-server"
       - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     volumes:
@@ -32,11 +32,6 @@ services:
         target: /run/secrets/jenkins_master_password
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-      - source: buildx.config.docker.20221004
-        target: /home/couchbase/.docker/config.json
-        mode: 0600
-        uid: "1000"
-        gid: "1000"
       - source: buildx.config.rhcc_metadata.20230824
         target: /home/couchbase/.docker/rhcc-metadata.json
         mode: 0600
@@ -56,8 +51,6 @@ configs:
 
 secrets:
   server_jenkins_ns-buildbot_api_key.20220510:
-    external: true
-  buildx.config.docker.20221004:
     external: true
   buildx.config.rhcc_metadata.20230824:
     external: true
