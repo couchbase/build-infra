@@ -3,6 +3,7 @@ resource "aws_efs_file_system" "main" {
     transition_to_ia = "AFTER_7_DAYS"
   }
 
+  throughput_mode = "elastic"
   encrypted = true
 
   tags = {
