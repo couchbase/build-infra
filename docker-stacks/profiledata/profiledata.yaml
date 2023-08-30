@@ -36,7 +36,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/build/linux/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -78,7 +78,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/build/macos/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -101,7 +101,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/build/windows/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -129,7 +129,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/cv/linux/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -157,7 +157,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/cv-docker/linux/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -185,7 +185,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/cv/macos/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -208,7 +208,7 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: couchbase_server_shared_m2_settings.20220106
+      - source: couchbase_server_shared_m2_settings.20230830
         target: /home/couchbase/couchbase-server/cv/windows/.m2/settings.xml
         mode: 0644
         uid: "901"
@@ -638,7 +638,7 @@ configs:
   couchbase_server_windows_gitconfig:
     file: config/couchbase-server/windows/.gitconfig
   # shared
-  couchbase_server_shared_m2_settings.20220106:
+  couchbase_server_shared_m2_settings.20230830:
     file: config/couchbase-server/shared/.m2/settings.xml
   couchbase_server_shared_ssh_known_hosts:
     file: config/couchbase-server/shared/.ssh/known_hosts

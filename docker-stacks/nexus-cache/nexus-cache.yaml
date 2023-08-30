@@ -15,8 +15,18 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_reverse-proxy"
-        - "traefik.http.routers.nexus_cache.rule=Host(`maven-cache.build.couchbase.com`)"
+
+        - "traefik.http.routers.nexus_cache_http.entrypoints=web"
+        - "traefik.http.routers.nexus_cache_http.rule=Host(`maven-cache.build.couchbase.com`)"
+        - "traefik.http.routers.nexus_cache_http.service=nexus_cache"
+
+        - "traefik.http.routers.nexus_cache_https.entrypoints=websecure"
+        - "traefik.http.routers.nexus_cache_https.tls=true"
+        - "traefik.http.routers.nexus_cache_https.rule=Host(`maven-cache.build.couchbase.com`)"
+        - "traefik.http.routers.nexus_cache_https.service=nexus_cache"
+
         - "traefik.http.services.nexus_cache.loadbalancer.server.port=8081"
+        - "traefik.http.services.nexus_cache.loadbalancer.server.scheme=http"
     image: sonatype/nexus3
     init: true
     volumes:
