@@ -3,7 +3,7 @@ Setup Mobile MACOS
 Prereq
 1. Setup a mac agent on mobile jenkins https://mobile.jenkins.couchbase.com using JNLP connection.
    Make a note of the agent's name and jnlp secret.  These are required when running the ansible
-   command at step 6.
+   command at step 6 & 7.
 2. Create a new Mac VM and install appropriate version of xcode as needed. VM ova and iso might be
     available on latestbuild.  If not, it will need to be downloaded from https://developer.apple.com
 
@@ -21,9 +21,9 @@ Deploy tools via ansible
        patch_via_gerrit.ini
 5. Ensure a copy of jenkins-appledeveloper.developerprofile in files directory
     info is in team's lastpass database
-6. Run the playbook and enter sudo password
-    % ansible-playbook -i inventory playbook.yml  -e "jenkins_node_name=<agent node name>
-       jenkins_jnlp_secret=<jnlp secret>" --ask-become-pass
+6. update inventory information
+7. Run the playbook and enter sudo password
+    % ansible-playbook -i inventory playbook.yml --ask-become-pass
 
 
 NOTES:

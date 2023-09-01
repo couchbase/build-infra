@@ -165,7 +165,14 @@
       become: true
 
     - name: Enable autologin for couchbase user
-      script: 
+      script:
         cmd: ./files/autologin.py --username {{ ansible_ssh_user }} --password {{ ansible_ssh_pass }}
         executable: python3
       become: true
+
+    - name: Create Keychain Profile for Notarization
+      shell: |
+             security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
+             xcrun notarytool store-credentials "COUCHBASE_AC_PASSWORD" --apple-id "build-apple@couchbase.com" --team-id {{ appstore_team_id }} --password {{ appstore_token }}
+      args:
+        executable: /bin/bash
