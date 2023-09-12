@@ -1,11 +1,13 @@
 # Docker container just to build clang, because it's slow.
 ARG GCC_CONTAINER
+ARG GCC_TAG
 FROM ${GCC_CONTAINER} as gcc
 
 FROM centos:7.9.2009 as build
+ARG BINUTILS_VER
+ARG CLANG_VER
 ARG GCC_VER
 COPY --from=gcc /opt /opt
-ARG CLANG_VER
 
 WORKDIR /tmp
 
@@ -30,7 +32,6 @@ RUN set -x \
     && cd /tmp/llvm-project \
     && git checkout llvmorg-${CLANG_VER}
 
-ENV PATH=/opt/gcc-${GCC_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 WORKDIR /tmp/llvm-project
 
 # Some missing includes in 9
@@ -39,6 +40,7 @@ RUN if [ "$(echo ${CLANG_VER} | cut -d. -f1)" = "9" ]; then \
         sed -i'' '/#include <vector>/a #include <limits>' llvm/utils/benchmark/src/benchmark_register.h; \
     fi
 
+ENV PATH=/opt/binutils-${BINUTILS_VER}/bin:/opt/gcc-${GCC_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 RUN cmake ../llvm-project/llvm -G Ninja -Wno-dev \
         -DBUILD_SHARED_LIBS="ON" \
         -DCLANG_BUILD_EXAMPLES="OFF" \

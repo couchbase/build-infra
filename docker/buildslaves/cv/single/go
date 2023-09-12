@@ -21,12 +21,11 @@ TAG=$(date +%Y%m%d)
 if [ "$1" = "--publish" ]
 then
   ACTION=--push
+  BUILDX=buildx
   PLATFORMS="--platform linux/amd64,linux/arm64"
-else
-  ACTION=--load
 fi
 
-docker buildx build --pull ${ACTION} ${PLATFORMS} \
+docker ${BUILDX} build --pull ${ACTION} ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \

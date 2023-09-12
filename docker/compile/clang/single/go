@@ -1,7 +1,9 @@
 #!/bin/sh -ex
 
+export BINUTILS_VER=${BINUTILS_VER:-2.41}
 export CLANG_VER=${CLANG_VER:-15.0.7}
-export GCC_VER=${GCC_VER:-12.2.0}
+export GCC_VER=${GCC_VER:-13.2.0}
+export GCC_TAG=${GCC_TAG:-20230911}
 export DOCKER_BUILDKIT=1
 
 IMAGE_NAME=couchbasebuild/single-clang
@@ -16,9 +18,10 @@ fi
 docker ${BUILDER} build \
   -f Dockerfile \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg GCC_VER=${GCC_VER} \
+  --build-arg BINUTILS_VER=${BINUTILS_VER} \
   --build-arg CLANG_VER=${CLANG_VER} \
-  --build-arg GCC_CONTAINER=couchbasebuild/single-gcc:${GCC_VER} \
+  --build-arg GCC_CONTAINER=couchbasebuild/single-gcc:${GCC_VER}-${GCC_TAG} \
+  --build-arg GCC_VER=${GCC_VER} \
   ${PLATFORMS} \
   --pull ${PUSH} \
   --tag ${IMAGE_NAME}:${CLANG_VER}-$(date +%Y%m%d) \

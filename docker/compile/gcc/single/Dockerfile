@@ -1,16 +1,13 @@
 # Docker container just to build GCC, because it's slow.
-# Note: A new version of binutils is also bundled for GCC>=13
+# Note: A new version of binutils is also bundled
 
 FROM centos:7.9.2009 as builder
 ARG GCC_VER
 ARG BINUTILS_VER
 
 # Install the older gcc so we can bootstrap up to the newer, then
-# build and install newer. Note: important to update binutils here,
-# as the version in the stock base image has a slightly bogus
-# version string that is mis-parsed by the gcc build process.
+# build and install newer.
 RUN yum install --setopt=keepcache=0 -y \
-        binutils \
         bison \
         bzip2 \
         file \
@@ -20,9 +17,8 @@ RUN yum install --setopt=keepcache=0 -y \
         texinfo \
         wget
 
-# If we're building a version of GCC more recent than 13, bundle in a newer
-# binutils - we build gcc with the tools in here, and provide it in the final
-# image for ingestion in the builder images
+ENV PATH=/opt/binutils-${BINUTILS_VER}/bin:$PATH
+
 WORKDIR /tmp
 RUN set -x \
       && curl -Lf https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VER}.tar.xz -o binutils.tar.xz \
@@ -65,7 +61,7 @@ RUN export PATH=/opt/gcc-${GCC_VER}/bin:${PATH} \
          | awk "/^\*link:/ { print; getline; print \"-rpath=/opt/gcc-${GCC_VER}/lib64\", \$0; next } { print }" \
          > $(dirname $(g++ -print-libgcc-file-name))/specs
 
-FROM scratch
+FROM centos:7.9.2009
 ARG GCC_VER
 ARG BINUTILS_VER
 LABEL maintainer="build-team@couchbase.com"

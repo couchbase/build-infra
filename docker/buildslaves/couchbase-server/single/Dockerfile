@@ -132,19 +132,6 @@ RUN set -x \
     && cd pyinstaller/bootloader \
     && /usr/local/bin/python3 ./waf all
 
-# Git
-FROM base-compile AS git-compile
-LABEL imagename=git-compile
-
-ARG GIT_VER
-RUN mkdir /tmp/git
-RUN yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel
-RUN curl -Lf https://www.kernel.org/pub/software/scm/git/git-${GIT_VER}.tar.gz -o - \
-        | tar xz --strip-components=1 -C /tmp/git
-WORKDIR /tmp/git
-RUN make -j prefix=/usr/local install
-
-
 # Ccache
 FROM base-compile AS ccache-compile
 LABEL imagename=ccache-compile
@@ -244,7 +231,7 @@ RUN groupadd -g1000 couchbase && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 
-# GCC and clang
+# GCC, binutils and clang
 COPY --from=gcc_10 /opt/gcc-${GCC_10_VER} /opt/gcc-${GCC_10_VER}
 COPY --from=gcc_13 /opt/gcc-${GCC_13_VER} /opt/gcc-${GCC_13_VER}
 COPY --from=gcc_13 /opt/binutils-${BINUTILS_VER} /opt/binutils-${BINUTILS_VER}
@@ -252,13 +239,33 @@ COPY --from=clang9 /opt/clang-9.0.0 /opt/clang-9.0.0
 COPY --from=clang15 /opt/clang-${CLANG_15_VER} /opt/clang-${CLANG_15_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_10_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
-    && ln -s /opt/clang-9.0.0/bin/* /usr/bin
+    && ln -s /opt/clang-${CLANG_9_VER}/bin/* /usr/local/bin \
+    && ln -s /opt/binutils-${BINUTILS_VER}/bin/* /usr/local/bin
 RUN for lib in /opt/gcc-${GCC_10_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
 RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_10_VER}.conf && ldconfig
 RUN set -x \
     && echo /opt/gcc-${GCC_10_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_10_VER}.conf \
     && echo /opt/gcc-${GCC_13_VER}/lib64 > /etc/ld.so.conf.d/gcc${GCC_13_VER}.conf \
     && ldconfig
+
+# clang is built against a specific GCC root. If you upgrade gcc, you must
+# rebuild any associated clang version
+RUN for clang in ${CLANG_9_VER} ${CLANG_15_VER}; do \
+      if ! /opt/clang-$clang/bin/clang --version; then \
+        echo "clang-$clang is broken, please ensure you have rebuilt it if you are upgrading gcc"; \
+        exit 1; \
+      fi; \
+    done
+
+# Git (needs to be built with newer gcc than is available in base builder)
+ARG GIT_VER
+RUN mkdir /tmp/git
+RUN yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel
+RUN set -x \
+    && curl -Lf https://www.kernel.org/pub/software/scm/git/git-${GIT_VER}.tar.gz -o - \
+        | tar xz --strip-components=1 -C /tmp/git \
+    && cd /tmp/git \
+    && PATH=/opt/gcc-${GCC_13_VER}/bin:$PATH make -j prefix=/usr/local install
 
 # Autoconf and friends
 COPY --from=autoconf-compile /usr/local/ /usr/local/
@@ -279,9 +286,6 @@ RUN set -x \
 
 # pixz
 COPY --from=pixz-compile /out/usr/local/ /usr/local/
-
-# Git
-COPY --from=git-compile /usr/local/ /usr/local/
 
 # OpenSSL
 COPY --from=openssl-compile /usr/local/ /usr/local/
