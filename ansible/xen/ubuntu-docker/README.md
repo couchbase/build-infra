@@ -71,14 +71,16 @@ Suggested incantation:
   docker run --rm -v $(pwd):/mnt couchbasebuild/ansible-playbook \
     -v -i inventory playbook.yml -e cmdline_password=secret \
     -e vm_name=mega4.7 -e memory=16 -e disksize=200 -e vcpus=8 \
-    -e swarm_manager=172.23.1.1 -e swarm_labels="cvtype=ubuntu18"
+    -e swarm_manager=172.23.1.1 -e swarm_labels="cvtype=ubuntu18" \
+    -l xcp-s625,newvms
 
 NOTES
 
-Don't run this with an inventory containing more than one uncommented
-VM host IP. The "add_host" functionality to add the new VM to the
-"newvms" Ansible group apparently doesn't work when multiple hosts are
-created at once.
+Specify "-l <xenserver host name>,newvms" to the ansible-playbook command line.
+This will limit the creation of the new VM to the specified Xen Server. The
+",newvms" part is important to allow the second half of the playbook to execute
+on the newly-created VM.
 
-Don't try getting around this by using -l on the ansible-playbook
-command line. That will filter out the new hosts entirely.
+I've never tried creating VMs on multiple XenServers at the same time with this
+- it probably won't work, and even if it did it would give them the same
+vm_name, which probably isn't what you want.

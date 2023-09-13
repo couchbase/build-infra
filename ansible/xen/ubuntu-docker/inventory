@@ -1,21 +1,16 @@
 [xenservers]
-# 172.23.99.41 name=xcp-s327 sr_name="VMStore1" network_name="Pool-wide network associated with eth1"
-# 172.23.96.155 name=xcp-s834 sr_name=VMStore
-# 172.23.104.32 network_name="vlan112"
-# 172.23.113.115 sr_name=VMStore
-# 172.23.110.9 sr_name=VMStore network_name="Pool-wide network associated with eth0"
-# 172.23.123.45 sr_name="Local Storage 01" network_name="Pool-wide network associated with eth0"
-# 172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
-# 172.23.104.32 name=xcp-s126 network_name="Pool-wide network associated with eth5"
-# 172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
-# 172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
-# 172.23.97.234 sr_name=VMStore1
-172.23.105.159 name=xcp-sd24 network_name="Pool-wide network associated with eth2"
-# 172.23.104.59 sr_name="Local storage01" network_name="Pool-wide network associated with eth1"
-# 172.23.110.57 name=xcp-sd20 sr_name=VMStore1 network_name="Pool-wide network associated with eth3"
-# 172.23.112.26 name=xcp-se29 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
-# 172.23.110.75 name=xcp-se27 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
-# 172.23.110.82 name=xcp-se23 sr_name=VMStore2 network_name="Pool-wide network associated with eth0"
+xcp-s241 ansible_host=172.23.97.234 sr_name=VMStore1
+xcp-s327 ansible_host=172.23.99.41 name=xcp-s327 sr_name="VMStore1" network_name="Pool-wide network associated with eth1"
+xcp-s513 ansible_host=172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2"
+xcp-s625 ansible_host=172.23.113.115 name=xcp-s625 sr_name=VMStore
+xcp-s824 ansible_host=172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04"
+xcp-s834 ansible_host=172.23.96.155 name=xcp-s834 sr_name=VMStore
+xcp-sa29 ansible_host=172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2"
+xcp-sd20 ansible_host=172.23.110.57 name=xcp-sd20 sr_name=VMStore1 network_name="Pool-wide network associated with eth3"
+xcp-sd24 ansible_host=172.23.105.159 name=xcp-sd24 network_name="Pool-wide network associated with eth2"
+xcp-se23 ansible_host=172.23.110.82 name=xcp-se23 sr_name=VMStore2 network_name="Pool-wide network associated with eth0"
+xcp-se27 ansible_host=172.23.110.75 name=xcp-se27 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
+xcp-se29 ansible_host=172.23.112.26 name=xcp-se29 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
 
 [newvms]
 # Don't put anything here; the playbook simply requires this group to exist
@@ -26,7 +21,7 @@ ansible_password="{{ cmdline_password }}"
 network_name="Pool-wide network associated with eth4"
 sr_name="Local storage"
 vm_template="Ubuntu Xenial Xerus 16.04"
-install_iso="ubuntu-22.04-fully-automated.iso"
+install_iso="ubuntu-22.04.3-fully-automated.iso"
 vm_name="default-vm"
 vcpus=4
 memory=16

@@ -1,7 +1,11 @@
 #!/bin/bash -e
 
 # Modify these as necessary
-UBUNTUVER=${1-22.04}
+
+UBUNTUVER=${1-22.04.3}
+
+# This seems to be the only version that works with XenServer 7.2, which some
+# of our hosts still are.
 XEVER=7.4.0-1
 
 # Derived values - probably don't modify these
@@ -18,8 +22,9 @@ bigecho() {
 }
 # Check for existence of required files first
 if [ ! -e ${XEUTIL} ]; then
-  echo "Please copy ${XEUTIL} into current working directory and try again."
-  exit 1
+  bigecho "Downloading ${XEUTIL}..."
+  curl -L -o ${XEUTIL} --fail \
+    https://github.com/xenserver/xe-guest-utilities/releases/download/v${XEVER}/xe-guest-utilities_${XEVER}-1_amd64.deb
 fi
 if [ ! -e ${UBUNTUCD} ]; then
   bigecho "Downloading Stock Ubuntu ${UBUNTUVER}"

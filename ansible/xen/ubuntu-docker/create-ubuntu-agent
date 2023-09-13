@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 usage() {
-    echo "Usage: $(basename $0) -n NAME -p XEN_PASSWORD"
+    echo "Usage: $(basename $0) -n NAME -x XEN_HOST-p XEN_PASSWORD"
     echo "    [-m MEMORY] [-c CPUS] [-d DISKSPACE]"
     echo "    [-r ROLES] [-e ROLE_ARG=VALUE]"
     echo "    [-s SWARM_MANAGER] [-l SWARM_LABELS]"
@@ -10,10 +10,13 @@ usage() {
 }
 
 
-while getopts ":n:p:m:c:d:s:l:r:e:" opt; do
+while getopts ":n:x:p:m:c:d:s:l:r:e:" opt; do
     case ${opt} in
         n)
             NAME=${OPTARG}
+            ;;
+        x)
+            XEN_HOST=${OPTARG}
             ;;
         p)
             XEN_PASSWORD=${OPTARG}
@@ -53,6 +56,7 @@ while getopts ":n:p:m:c:d:s:l:r:e:" opt; do
 done
 
 [ -z "${NAME}" ] && usage
+[ -z "${XEN_HOST}" ] && usage
 [ -z "${XEN_PASSWORD}" ] && usage
 MEMORY=${MEMORY:-20}
 CPUS=${CPUS:-8}
@@ -62,8 +66,8 @@ docker run --rm \
     -v $(pwd):/mnt \
     -v $(git rev-parse --show-toplevel)/ansible/common/roles:/rolescommon \
     -v $(git rev-parse --show-toplevel)/ansible/linux/common/roles:/roleslinux \
-    couchbasebuild/ansible-playbook:6.1.0 \
-    -v -i inventory playbook.yml \
+    couchbasebuild/ansible-playbook:6.2.0 \
+    -v -i inventory -l ${XEN_HOST}:newvms playbook.yml \
     -e cmdline_password=${XEN_PASSWORD} \
     -e vm_name=${NAME} -e role_list=${ROLES} \
     -e memory=${MEMORY} -e vcpus=${CPUS} -e disksize=${DISKSPACE} \

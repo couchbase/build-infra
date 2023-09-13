@@ -1,0 +1,9 @@
+[all]
+172.23.107.123 vm_name=gha-linux-large-1
+172.23.107.125 vm_name=gha-linux-large-2
+
+[all:vars]
+ansible_user=couchbase
+ansible_password=couchbase
+ansible_become=true
+ansible_become_password=couchbase

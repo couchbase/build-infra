@@ -16,7 +16,8 @@ RUN set -x \
       && . /venv/bin/activate \
       && pip install --upgrade pip \
       && pip install --upgrade ansible==${ANSIBLE_VERSION} \
-      && pip install --upgrade pywinrm
+      && pip install --upgrade pywinrm \
+      && pip install --upgrade ansible-toolbox
 
 ADD entrypoint.sh /
 # Need to save this arg in an environment variable, because ENTRYPOINT

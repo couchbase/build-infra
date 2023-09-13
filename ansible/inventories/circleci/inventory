@@ -17,8 +17,6 @@
 172.23.106.173 vm_name=circleci-linux-large-16
 172.23.106.174 vm_name=circleci-linux-large-17
 172.23.106.175 vm_name=circleci-linux-large-18
-172.23.104.233 vm_name=circleci-linux-large-19
-172.23.106.179 vm_name=circleci-linux-large-20
 
 [all:vars]
 ansible_user=couchbase

@@ -11,7 +11,7 @@ else
   PLATFORMS=linux/amd64
 fi
 
-for command in ansible ansible-playbook
+for command in ansible ansible-playbook ansible-role ansible-task ansible-eval
 do
   IMAGE=couchbasebuild/${command}
   docker buildx build --platform ${PLATFORMS} \

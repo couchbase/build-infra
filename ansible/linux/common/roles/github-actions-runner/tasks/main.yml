@@ -1,0 +1,92 @@
+---
+- name: Install GitHub Actions self-hosted launcher
+  block:
+    - name: Ensure ~/.ssh exists
+      file:
+        path: /home/couchbase/.ssh
+        state: directory
+        mode: "0700"
+        owner: couchbase
+        group: couchbase
+      tags: ssh
+
+    - name: Create .ssh config
+      copy:
+        src: ".ssh/{{ item }}"
+        dest: /home/couchbase/.ssh
+        owner: couchbase
+        group: couchbase
+        directory_mode: "0700"
+        mode: "0600"
+      loop: [ id_rsa, id_rsa.pub, known_hosts ]
+      tags: ssh
+
+    - name: Create /opt/gha
+      file:
+        path: /opt/gha
+        state: directory
+        mode: "0755"
+        owner: couchbase
+        group: couchbase
+      become: true
+
+    - name: Install GitHub Actions runner
+      shell:
+        cmd: >
+          curl -L https://github.com/actions/runner/releases/download/v2.308.0/actions-runner-linux-x64-2.308.0.tar.gz |
+          tar xzf -
+        chdir: /opt/gha
+        creates: /opt/gha/run.sh
+
+    - name: Install gh cli tool
+      shell:
+        cmd: >
+          cbdep install -d "${HOME}/tools" gh 2.34.0 &&
+          sudo ln -s "${HOME}/tools/gh-2.34.0/bin/gh" /usr/local/bin
+        creates: /usr/local/bin/gh
+
+    - name: Fetch install token
+      shell:
+        cmd: >
+          gh auth login --with-token &&
+          gh api --method POST
+          -H "Accept: application/vnd.github+json"
+          -H "X-GitHub-Api-Version: 2022-11-28"
+          /orgs/couchbasecloud/actions/runners/registration-token |
+          jq -r .token &&
+          gh auth logout --hostname github.com
+        stdin: "{{ gha_api_token }}"
+      register: gha_token
+
+    - name: Configure GitHub Actions runner
+      shell:
+        cmd: >
+          ./config.sh --unattended
+          --url https://github.com/{{ gha_org }}
+          --name {{ gha_runner_name }}
+          --token {{ gha_token.stdout_lines[0] }}
+          --runnergroup {{ gha_runner_group }}
+          --labels {{ gha_runner_labels }}
+        chdir: /opt/gha
+        creates: /opt/gha/.credentials
+
+    - name: Create GitHub Actions runner service
+      shell:
+        # This script both installs and enables the systemd service
+        cmd: ./svc.sh install couchbase
+        chdir: /opt/gha
+        creates: /etc/systemd/system/{{ gha_service_name }}.service
+      become: true
+
+    - name: Check if reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+      become: true
+      tags: pkgs
+
+    - name: Reboot if required
+      reboot:
+      when: reboot_required_file.stat.exists
+      become: true
+      tags: pkgs

@@ -84,7 +84,6 @@
   vars:
     ansible_user: couchbase
     ansible_password: couchbase
-    ansible_become: true
     ansible_become_password: couchbase
     ansible_python_interpreter: /usr/bin/python3
 
@@ -95,6 +94,10 @@
         timeout: 300
         sleep: 3
 
+    - name: Wait for cloud-init post-boot updates to complete
+      command: cloud-init status --wait
+      become: true
+
     # The space in " yes" is important due to the way 'cut' works
     - name: Wait for clock to synchronize
       shell: export synced=no; while [ "$synced" != " yes" ]; do sleep 1; synced=$(timedatectl status | grep synchronized | cut -d':' -f2); done
@@ -102,26 +105,29 @@
     - name: Set hostname
       hostname:
         name: "{{ vm_name }}"
+      become: true
 
     - name: Update /etc/hosts
       lineinfile:
         path: /etc/hosts
         regexp: '^127\.0\.1\.1'
         line: "127.0.1.1 {{ vm_name }}"
+      become: true
 
     - name: Enable coredumps in /tmp
       sysctl:
         name: kernel.core_pattern
         value: "/tmp/core.%e.%p.%h.%t"
         reload: yes
+      become: true
       tags: core
       changed_when: true
 
-    - name: Clean unused packages
+    - name: Perform system upgrades and clean unused packages (will take several minutes)
       apt:
         update_cache: yes
-        autoremove: yes
-        purge: yes
+        upgrade: dist
+      become: true
 
     - name: Mount NAS directories
       tags: mount
@@ -137,6 +143,7 @@
         - mountpoint: /buildteam
           nasserver: nas.build.couchbase.com
           naspath: /data/buildteam
+      become: true
 
     - name: Create /home/couchbase/.local/bin directory
       file:
@@ -167,36 +174,45 @@
         name: couchbase
         groups: docker
         append: yes
+      become: true
 
     - name: Disable automatic updates
       apt:
         name: unattended-upgrades
         state: absent
         purge: yes
-
-    - name: Wait for cloud-init post-boot updates to complete
-      command: cloud-init status --wait
+      become: true
 
     - name: Disable cloud-init for future reboots
       file:
         path: /etc/cloud/cloud-init.disabled
         state: touch
         owner: root
+      become: true
 
     - name: Reboot to be sure
       reboot:
+      become: true
 
     - name: Purge cloud-init
       apt:
         name: cloud-init
         state: absent
         purge: yes
+      become: true
 
     - name: Purge cloud-init leftover config
       file:
         name: "{{ item }}"
         state: absent
       loop: [ /etc/cloud, /var/lib/cloud ]
+      become: true
+
+    - name: Clean up no-longer-needed packages
+      apt:
+        autoremove: yes
+        purge: yes
+      become: true
 
     - name: Process VM-specific roles
       include_role:

@@ -15,7 +15,13 @@ autoinstall:
     install-server: true
   keyboard:
     layout: us
+  updates: security
   apt:
+    # https://askubuntu.com/a/1410679 - disable auto-upgrade (so sloooow...)
+    preferences:
+      - package: "*"
+        pin: "release a=jammy-security"
+        pin-priority: 200
     sources:
       docker.list:
         source: "deb https://download.docker.com/linux/ubuntu/ $RELEASE stable"
@@ -101,9 +107,10 @@ autoinstall:
     - software-properties-common
     - zsh
     - /cdrom/xe-guest-utilities.deb
-  package_update: true
-  package_upgrade: true
+  package_upgrade: false
   late-commands:
+    # Get rid of unattended-upgrade hack
+    - rm -f /target/etc/apt/preferences.d/90curtin.pref
     - curtin in-target --target /target -- timedatectl set-timezone America/Los_Angeles
     - curtin in-target --target /target -- apt-mark hold xe-guest-utilities
     - 'sed -i -e "s,^\(\s*bind\),#\1," /target/etc/netdata/netdata.conf'
