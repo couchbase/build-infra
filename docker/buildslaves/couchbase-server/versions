@@ -53,7 +53,7 @@ TINI=0.18.0        # amzn2, centos7, debian8, debian9, debian10, rhel8, suse15, 
 DOCKER=20.10.8     # single
 OPENSSH=8.8p1      # centos6, debian8, debian8-alice, suse11, ubuntu14
 OPENSSL=1.1.1m     # suse11
-OPENSSL_3=3.1.2    # single
+OPENSSL_111=w      # single
 YQ=4.31.1          # single
 
 # Ours

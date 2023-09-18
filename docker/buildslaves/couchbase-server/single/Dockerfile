@@ -30,6 +30,21 @@ RUN yum groupinstall -y "Development Tools"
 RUN yum install -y --setopt=skip_missing_names_on_install=False bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
 ENV PATH=/opt/gcc-${GCC_13_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+# sed - the stock version doesn't support extended expressions
+FROM base-compile AS sed-compile
+WORKDIR /tmp
+ARG SED_VERSION=4.9
+ARG SED_SHA=6aac9b2dbafcd5b7a67a8a9bcb8036c3
+ADD https://ftp.gnu.org/gnu/sed/sed-${SED_VERSION}.tar.xz /tmp/sed.tar.xz
+RUN set -x \
+    && echo ${SED_SHA} /tmp/sed.tar.xz | md5sum -c - \
+    && mkdir /tmp/sed && cd /tmp/sed \
+    && tar xf /tmp/sed.tar.xz --strip-components=1 \
+    && ./configure --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make install DESTDIR=/out \
+    && rm -rf /tmp/*
+
 FROM base-compile AS pixz-compile
 WORKDIR /tmp
 ARG PIXZ_VERSION=1.0.7
@@ -88,10 +103,10 @@ RUN ruby-install --prefix /usr/local -j -- ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PA
 FROM base-compile as openssl-compile
 ARG OPENSSL_VER
 RUN yum install -y perl-IPC-Cmd
-WORKDIR /tmp/openssl-${OPENSSL_VER}
-ADD https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VER}/openssl-${OPENSSL_VER}.tar.gz /tmp
+WORKDIR /tmp/openssl-1.1.1${OPENSSL_VER}
+ADD https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1${OPENSSL_VER}/openssl-1.1.1${OPENSSL_VER}.tar.gz /tmp
 RUN set -x \
-    && tar xf /tmp/openssl-${OPENSSL_VER}.tar.gz --strip-components=1 \
+    && tar xf /tmp/openssl-1.1.1${OPENSSL_VER}.tar.gz --strip-components=1 \
     && ./config --prefix=/usr/local --libdir=lib --openssldir=/etc/pki/tls shared \
     && make -j8 \
     && make install \
@@ -106,12 +121,15 @@ ARG PYTHON3_MAJOR
 ARG PYTHON3_MINOR
 ARG PYTHON3_PATCH
 WORKDIR /tmp/python
-RUN yum install -y --setopt=skip_missing_names_on_install=False \
-        libpcap-devel \
-        xz-devel \
+RUN set -x \
+    && yum install -y --setopt=skip_missing_names_on_install=False \
         bzip2-devel \
+        libpcap-devel \
         sqlite-devel \
-        tk-devel
+        tk-devel \
+        xz-devel
+
+ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib64/pkgconfig:/usr/share/pkgconfig"
 RUN set -x \
     && curl -Lf https://www.python.org/ftp/python/${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}/Python-${PYTHON3_MAJOR}.${PYTHON3_MINOR}.${PYTHON3_PATCH}.tgz -o - \
         | tar xz --strip-components=1 -C /tmp/python \
@@ -122,6 +140,7 @@ RUN set -x \
         --enable-loadable-sqlite-extensions \
         --enable-optimizations \
         --prefix=/usr/local \
+        --with-ssl-default-suites=openssl \
         --with-openssl=/usr/local \
     && make -j8 install \
     && ldconfig \
@@ -158,6 +177,8 @@ ARG BUILDARCH \
     GCC_13_VER
 
 USER root
+
+ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib64/pkgconfig:/usr/share/pkgconfig"
 
 # Buildx
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
@@ -284,14 +305,15 @@ RUN set -x \
     && curl -Lf https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
 
+# sed
+COPY --from=sed-compile /out/usr/local/ /usr/local/
+
 # pixz
 COPY --from=pixz-compile /out/usr/local/ /usr/local/
 
-# OpenSSL
-COPY --from=openssl-compile /usr/local/ /usr/local/
-
-# Python 3 & pip
+# Python 3, OpenSSL 1.1.1, pip
 COPY --from=python-compile /usr/local/ /usr/local/
+COPY --from=python-compile /etc/pki/tls /etc/pki/tls
 RUN set -x \
     && echo "/usr/local/lib" > /etc/ld.so.conf.d/python.conf \
     && ldconfig

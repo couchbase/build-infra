@@ -29,6 +29,7 @@ docker ${BUILDX} build --pull ${ACTION} ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg ASPELL_DICT_VERSION=${ASPELL_DICT_VERSION} \
   --build-arg VALGRIND_VERSION=${VALGRIND_VERSION} \
   --build-arg DOCKER_VERSION=${DOCKER_VERSION} \
   --build-arg JYTHON_VERSION=${JYTHON_VERSION} \

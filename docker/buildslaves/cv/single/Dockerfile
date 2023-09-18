@@ -1,6 +1,6 @@
 # Docker container for Single Linux
 
-FROM couchbasebuild/server-linux-build:20230912
+FROM couchbasebuild/server-linux-build:20230918
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
@@ -69,8 +69,15 @@ RUN set -x \
         && rm -rf /tmp/*
 
 # Install aspell
+ARG ASPELL_DICT_VERSION
 RUN set -x \
+        && mkdir /tmp/aspell \
+        && cd /tmp/aspell \
         && yum install -y aspell \
+        && curl -L -o /tmp/aspell-dict.tar.bz2 https://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-${ASPELL_DICT_VERSION}.tar.bz2 \
+        && tar xf /tmp/aspell-dict.tar.bz2 --strip-components=1 \
+        && ./configure && make && make install \
+        && rm -rf /tmp/aspell* \
         && yum clean all
 
 # Install xmlsec1 binary - required by python library for testing pySaml2

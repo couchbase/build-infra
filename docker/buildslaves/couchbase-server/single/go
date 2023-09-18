@@ -81,7 +81,7 @@ docker ${BUILDX} build --pull ${ACTION} \
   --build-arg GIT_VER=${GIT} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
-  --build-arg OPENSSL_VER=${OPENSSL_3} \
+  --build-arg OPENSSL_VER=${OPENSSL_111} \
   --build-arg PATCH_VIA_GERRIT_VER=${PATCH_VIA_GERRIT} \
   --build-arg PYTHON3_MAJOR=${PYTHON3_MAJOR} \
   --build-arg PYTHON3_MINOR=${PYTHON3_MINOR} \
