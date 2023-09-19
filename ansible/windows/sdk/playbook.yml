@@ -31,6 +31,8 @@
         - insted
         - python2
         - curl
+        - strawberryperl
+        - nasm
 
     - name: "Install Python 3"
       win_chocolatey:
@@ -82,6 +84,7 @@
           - C:\bin
           - C:\Program Files\CMake\bin
           - C:\Program Files\git\cmd
+          - C:\Program Files\NASM
           - C:\Program Files (x86)\WiX Toolset v3.11\bin
 
     - name: Install cbdep tool
