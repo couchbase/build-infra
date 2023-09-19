@@ -261,7 +261,9 @@ COPY --from=clang15 /opt/clang-${CLANG_15_VER} /opt/clang-${CLANG_15_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_10_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
     && ln -s /opt/clang-${CLANG_9_VER}/bin/* /usr/local/bin \
-    && ln -s /opt/binutils-${BINUTILS_VER}/bin/* /usr/local/bin
+    && ln -s /opt/binutils-${BINUTILS_VER}/bin/* /usr/local/bin \
+    && rm -rf /opt/gcc-${GCC_10_VER}/lib64/libstdc* \
+    && cp /opt/gcc-${GCC_13_VER}/lib64/libstdc* /opt/gcc-${GCC_10_VER}/lib64
 RUN for lib in /opt/gcc-${GCC_10_VER}/lib64/libstd*; do ln -s ${lib} /usr/local/lib64; done
 RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/gcc${GCC_10_VER}.conf && ldconfig
 RUN set -x \
