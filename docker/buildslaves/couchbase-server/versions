@@ -54,6 +54,7 @@ DOCKER=20.10.8     # single
 OPENSSH=8.8p1      # centos6, debian8, debian8-alice, suse11, ubuntu14
 OPENSSL=1.1.1m     # suse11
 OPENSSL_111=w      # single
+JQ=1.7             # single
 YQ=4.31.1          # single
 
 # Ours

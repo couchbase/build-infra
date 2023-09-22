@@ -80,6 +80,7 @@ docker ${BUILDX} build --pull ${ACTION} \
   --build-arg GCC_13_TAG=${GCC_13_TAG} \
   --build-arg GIT_VER=${GIT} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
+  --build-arg JQ_VER=${JQ} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg OPENSSL_VER=${OPENSSL_111} \
   --build-arg PATCH_VIA_GERRIT_VER=${PATCH_VIA_GERRIT} \

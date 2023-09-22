@@ -330,9 +330,12 @@ COPY --from=ccache-compile /usr/local/ /usr/local/
 ARG ASCIIDOCTOR_VER
 RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
 
-# yq
+# jq and yq
+ARG JQ_VER
 ARG YQ_VER
 RUN set -x \
+    && curl -L --fail -o /usr/local/bin/jq https://github.com/jqlang/jq/releases/download/jq-${JQ_VER}/jq-linux-${BUILDARCH} \
+    && chmod a+x /usr/local/bin/jq \
     && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_${BUILDARCH} \
     && chmod a+x /usr/local/bin/yq
 
