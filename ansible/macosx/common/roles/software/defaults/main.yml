@@ -19,6 +19,7 @@ homebrew_installed_packages:
    - gnutls
    - jpeg
    - jpeg-turbo
+   - jq
    - libevent
    - libffi
    - libidn2

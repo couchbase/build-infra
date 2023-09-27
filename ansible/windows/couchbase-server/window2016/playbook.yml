@@ -57,21 +57,22 @@
         name: "{{ item }}"
         allow_empty_checksums: "yes"
       with_items:
-        - git
+        - 7zip.commandline
+        - activeperl
         - cmake
         - curl
-        - nasm
-        - ninja
-        - MinGW
-        - ruby
-        - wixtoolset
-        - 7zip.commandline
+        - git
         - googlechrome
         - insted
+        - jq
+        - MinGW
+        - nasm
+        - ninja
         - pandoc
-        - vscode
-        - activeperl
+        - ruby
         - vcredist140
+        - vscode
+        - wixtoolset
 
     - name: Install JDK for Jenkins
       win_chocolatey:
