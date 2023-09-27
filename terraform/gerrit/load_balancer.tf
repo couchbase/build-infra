@@ -57,6 +57,7 @@ module "alb" {
      port               = 443
      protocol           = "TLS"
      certificate_arn    = "arn:aws:acm:us-east-2:284614897128:certificate/d787ef97-cec6-4d4b-a097-0b35d25b1716"
+     ssl_policy         = "ELBSecurityPolicy-TLS13-1-2-2021-06"
      target_group_index = 3
    }
   ]
