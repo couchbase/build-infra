@@ -269,3 +269,11 @@
       win_shell: gem install asciidoctor
       args:
         executable: cmd
+
+    - name: Configure ephemeral ports
+      win_shell: netsh int {{ item[0] }} set dynamicport {{ item[1] }} start=1025 num=64511
+      args:
+        executable: cmd
+      with_nested:
+      - [ 'ipv4', 'ipv6' ]
+      - [ 'tcp', 'udp' ]
