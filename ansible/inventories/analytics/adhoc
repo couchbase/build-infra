@@ -1,0 +1,6 @@
+#!/bin/bash -ex
+
+docker run -it --rm -v $(pwd):/mnt \
+  -v $(pwd)/..:/roles \
+  -v $(git rev-parse --show-toplevel)/ansible/common/roles:/roley \
+  couchbasebuild/ansible -f 20 -i inventory all "$@"
