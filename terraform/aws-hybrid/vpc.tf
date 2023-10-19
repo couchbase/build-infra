@@ -1,6 +1,6 @@
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  version = "3.0.0"
+  version = "5.1.2"
 
   name = "jenkins-workers"
   cidr = "10.0.0.0/16"

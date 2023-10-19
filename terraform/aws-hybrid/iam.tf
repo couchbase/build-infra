@@ -6,11 +6,20 @@ resource "aws_iam_policy" "ecr_pull" {
   policy = file("files/iam/policies/ecr-pull.json")
 }
 
+resource "aws_iam_policy" "ecr_push" {
+  name        = "_ecr_push_goldfish"
+  path        = "/"
+  description = "grant access to push to goldfish AWS accounts"
+
+  policy = file("files/iam/policies/ecr-push-goldfish.json")
+}
+
 module jenkins_worker {
     for_each = toset(var.environments)
     source = "./jenkins_worker"
     environment = each.key
     ecr_pull_policy_arn = aws_iam_policy.ecr_pull.arn
+    ecr_push_policy_arn = aws_iam_policy.ecr_push.arn
     vpc = module.vpc
 }
 

@@ -41,6 +41,11 @@ resource "aws_iam_role_policy_attachment" "ec2_ecr_pull" {
   policy_arn = var.ecr_pull_policy_arn
 }
 
+resource "aws_iam_role_policy_attachment" "ec2_ecr_push" {
+  role       = aws_iam_role.jenkins_worker.name
+  policy_arn = var.ecr_push_policy_arn
+}
+
 resource "aws_iam_instance_profile" "jenkins_worker" {
   name = "cbd-4108_${var.environment}_jenkins_worker"
   role = aws_iam_role.jenkins_worker.name
