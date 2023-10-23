@@ -20,9 +20,28 @@ x-default-jenkins-secrets: &default-jenkins-secrets
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
 
-# Use this one for an agent with two replicas and IPv6 enabled.
+# Use this one for an agent with one replica and IPv6 enabled.
 # Previously only CV unit tests agents had this, so to be
 # overly cautious, we'll continue only using this for CV.
+x-default-jenkins-one-agent-with-ipv6: &default-jenkins-one-agent-with-ipv6
+  deploy:
+    resources:
+      limits:
+        memory: 9G
+      reservations:
+        memory: 9G
+    placement:
+      constraints:
+        - node.labels.role==build
+    replicas: 1
+    update_config:
+      parallelism: 1000
+  networks:
+    - jenkins
+  <<: *default-jenkins-secrets
+  sysctls:
+    net.ipv6.conf.lo.disable_ipv6: 0
+
 x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
   deploy:
     resources:
@@ -59,13 +78,13 @@ services:
       - *cv-jenkins-master
       - *cv-jenkins-node-class
       - *node-product
-    <<: *default-jenkins-two-agent-with-ipv6
+    <<: *default-jenkins-one-agent-with-ipv6
 
-  ubuntu20:
-    image: couchbasebuild/server-ubuntu20-build:20230510
+  linux:
+    image: couchbasebuild/server-linux-cv:20230922
     environment:
-      - "JENKINS_SLAVE_NAME=unit-ubuntu20"
-      - "JENKINS_SLAVE_LABELS=ubuntu20.04 ubuntu20 unit-simple-test"
+      - "JENKINS_SLAVE_NAME=unit-linux"
+      - "JENKINS_SLAVE_LABELS=linux unit-simple-test"
       - *cv-jenkins-master
       - *cv-jenkins-node-class
       - *node-product
