@@ -62,7 +62,7 @@ x-default-jenkins-slave-environment:
 services:
 
   alpine317:
-    image: couchbasebuild/sdk-alpine3.17-build:20230823
+    image: couchbasebuild/sdk-alpine3.17-build:20231103
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine317"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.17 alpine"
@@ -72,7 +72,7 @@ services:
     <<: *default-jenkins-slave
 
   alpine318:
-    image: couchbasebuild/sdk-alpine3.18-build:20230823
+    image: couchbasebuild/sdk-alpine3.18-build:20231103
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine318"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.18 alpine"
@@ -102,7 +102,7 @@ services:
     <<: *default-jenkins-slave
 
   almalinux8:
-    image: couchbasebuild/sdk-almalinux8-build:20230726
+    image: couchbasebuild/sdk-almalinux8-build:20231103
     environment:
       - "JENKINS_SLAVE_NAME=build-almalinux8"
       - "JENKINS_SLAVE_LABELS=sdk centos8 almalinux8"

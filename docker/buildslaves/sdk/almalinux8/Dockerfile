@@ -54,6 +54,7 @@ RUN set -x \
                 redhat-lsb-core \
                 rpm-build \
                 ruby rubygems rubygem-rake \
+                sqlite-devel \
                 tar \
                 unzip \
                 which \
@@ -96,7 +97,7 @@ RUN set -x \
 RUN set -x \
     && mkdir /tmp/deploy \
     && curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip \
-    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.zip  \
+    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.9.5/binaries/apache-maven-3.9.5-bin.zip  \
     && cd /usr/local \
     && unzip /tmp/deploy/gradle.zip \
     && unzip /tmp/deploy/maven.zip \

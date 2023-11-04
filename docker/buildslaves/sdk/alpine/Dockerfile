@@ -107,6 +107,19 @@ RUN set -x \
     && make install \
     && rm -rf /tmp/deploy
 
+# add OpenSSL 1.1.1
+ARG openssl_version=1.1.1w
+ARG openssl_install_dir=/opt/openssl-$openssl_version
+RUN cd /tmp && \
+    curl -L -o openssl-$openssl_version.tar.gz https://www.openssl.org/source/openssl-$openssl_version.tar.gz && \
+    tar -xzf openssl-$openssl_version.tar.gz && \
+    cd openssl-$openssl_version && \
+    ./config --prefix=$openssl_install_dir --openssldir=$openssl_install_dir shared zlib-dynamic && \
+    make -j4 && \
+    make install_sw install_ssldirs && \
+    rm -rf /tmp/openssl-$openssl_version && \
+    rm -f /tmp/openssl-$openssl_version.tar.gz
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 
