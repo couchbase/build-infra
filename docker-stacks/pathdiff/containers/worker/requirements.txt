@@ -11,7 +11,7 @@ prompt-toolkit==3.0.19
 pytz==2021.1
 PyYAML==5.4.1
 redis==3.5.3
-requests==2.26.0
+requests==2.31.0
 six==1.16.0
 vine==5.0.0
 watchdog==2.1.3
