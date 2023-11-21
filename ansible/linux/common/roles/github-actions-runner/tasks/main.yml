@@ -21,6 +21,14 @@
       loop: [ id_rsa, id_rsa.pub, known_hosts ]
       tags: ssh
 
+    - name: Install additional packages
+      apt:
+        name:
+          - jq
+        state: present
+        update_cache: yes
+      become: true
+
     - name: Create /opt/gha
       file:
         path: /opt/gha
@@ -76,6 +84,13 @@
         cmd: ./svc.sh install couchbase
         chdir: /opt/gha
         creates: /etc/systemd/system/{{ gha_service_name }}.service
+      become: true
+
+    - name: Start GitHub Actions runner service
+      systemd:
+        name: "{{ gha_service_name }}"
+        state: started
+        daemon_reload: true
       become: true
 
     - name: Check if reboot is required
