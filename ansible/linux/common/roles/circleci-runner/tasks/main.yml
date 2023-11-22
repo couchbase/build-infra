@@ -77,3 +77,20 @@
         name: circleci
         state: started
       become: true
+
+    - name: Add disk cleanup script file
+      copy:
+        src: disk_cleanup.sh
+        dest: /home/couchbase/disk_cleanup.sh
+        owner: couchbase
+        mode: "0755"
+      tags: diskcleanup
+
+    - name: cron job run disk cleanup script
+      cron:
+        name: "Disk Cleanup"
+        minute: "30"
+        hour: "*"
+        job: "/home/couchbase/disk_cleanup.sh >> /home/couchbase/disk_cleanup.log"
+        state: present
+      tags: diskcleanup
