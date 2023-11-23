@@ -54,7 +54,7 @@ else
   fi
 fi
 
-docker ${BUILDX} build --pull ${ACTION} \
+docker ${BUILDX} build ${ACTION} \
   --platform ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \

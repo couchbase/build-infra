@@ -195,6 +195,7 @@ RUN set -x \
     && yum install --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 -y \
                 awscli \
                 binutils \
+                chrpath \
                 ed \
                 glib2-devel \
                 glibc-devel \
@@ -305,6 +306,7 @@ RUN mkdir /tmp/deploy && \
 # repo
 RUN set -x \
     && curl -Lf https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo \
+    && sed -i 's/env python$/env python3/' /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
 
 # sed

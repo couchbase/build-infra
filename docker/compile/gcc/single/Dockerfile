@@ -37,6 +37,13 @@ RUN set -x \
 RUN cd /tmp/deploy/gcc-${GCC_VER} && ./contrib/download_prerequisites
 RUN mkdir /tmp/deploy/objdir
 WORKDIR /tmp/deploy/objdir
+RUN set -x \
+    && sed 's/#define DWARF_VERSION_DEFAULT 5/#define DWARF_VERSION_DEFAULT 4/' /tmp/deploy/gcc-${GCC_VER}/gcc/defaults.h > /tmp/defaults.h.fixed \
+    && if cmp -s /tmp/deploy/gcc-${GCC_VER}/gcc/defaults.h /tmp/defaults.h.fixed; then \
+      echo "Couldn't set DWARF_VERSION_DEFAULT" && exit 1; \
+    else \
+      mv /tmp/defaults.h.fixed /tmp/deploy/gcc-${GCC_VER}/gcc/defaults.h; \
+    fi
 RUN $PWD/../gcc-${GCC_VER}/configure \
       --prefix=/opt/gcc-${GCC_VER} \
       --disable-multilib \
