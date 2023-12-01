@@ -9,7 +9,7 @@ services:
 
   # sdk.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.414.1
+    image: jenkins/jenkins:2.426.1
     deploy:
       replicas: 1
       placement:
