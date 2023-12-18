@@ -47,6 +47,7 @@
           - coreutils
           - doxygen
           - git
+          - jq
           - openssl
           - pass
           - python
