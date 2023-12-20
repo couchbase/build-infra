@@ -1,5 +1,8 @@
 #!/bin/bash
 
-docker run --rm -it -v $(pwd):/mnt \
-    couchbasebuild/ansible-playbook:2.9.6 -i inventory --ask-become-pass \
-    playbook.yml $@
+docker run --rm -it -v $(pwd)/..:/mnt \
+    couchbasebuild/ansible-playbook:2.9.6 \
+    -i couchbase-server/inventory \
+    --ask-pass --ask-become-pass \
+    -e "SSH_KEY=$(cat ~/.ssh/profile_sync) NODE_CLASS=build NODE_PRODUCT=couchbase-server" \
+    couchbase-server/playbook.yml $@

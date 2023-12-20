@@ -1,16 +1,16 @@
 - name: Install brew
   block:
   - name: Check if installed (brew)
-    stat:
-      path: "{{ homebrew_dir }}"
-    register: brew
+    command: brew --version
+    register: brew_version
+    ignore_errors: yes
 
   - debug: msg="Installing homebrew.  This will take a while"
 
   - name: install homebrew
     shell: |
       yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    when: brew.stat.exists == False
+    when: brew_version.rc != 0
 
   ### begin check license acceptance
   # We can potentially end up in a situation where we can't disable brew analytics because
@@ -29,7 +29,7 @@
   ### end check license acceptance ###
 
   - name: Disable analytics (brew)
-    shell: ./brew analytics off
+    shell: brew analytics off
     args:
       chdir: "{{ homebrew_dir }}/bin"
 

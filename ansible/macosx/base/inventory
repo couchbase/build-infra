@@ -1,5 +1,5 @@
 [all]
-test  ansible_host=x.x.x.x NODE_CLASS=build NODE_PRODUCT=couchbase-server XCODE_VERSION=11.3.1
+test  ansible_host=x.x.x.x NODE_CLASS=build NODE_PRODUCT=couchbase-server XCODE_VERSION=12.5.1
 
 [all:vars]
 ansible_connection=ssh

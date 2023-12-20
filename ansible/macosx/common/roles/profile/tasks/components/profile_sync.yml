@@ -5,6 +5,7 @@
     state: directory
     owner: "{{ ansible_ssh_user }}"
     group: staff
+  become: true
 
 - name: Ensure user ssh directory is present
   file:

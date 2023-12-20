@@ -18,6 +18,7 @@
     - { role: 'roles/testrunner', tags: 'testrunner' }
     - { role: '../common/roles/profile', tags: 'profile' }
     - { role: 'roles/cv', tags: 'cv' }
+    - { role: '../common/roles/software', tags: 'software' }
 
 - hosts: all
   tasks:
@@ -26,3 +27,4 @@
       name: asciidoctor
       user_install: no
       state: latest
+  become: true

@@ -4,5 +4,5 @@ test  ansible_host=x.x.x.x NODE_CLASS=build NODE_PRODUCT=couchbase-server
 [all:vars]
 ansible_connection=ssh
 ansible_ssh_user=couchbase
-ruby_version=2.6
+ruby_version=3.0
 NODE_PRODUCT=couchbase-server
