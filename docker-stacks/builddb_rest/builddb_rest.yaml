@@ -44,9 +44,9 @@ services:
   traefik:
     image: traefik:v2.3.7
     secrets:
-      - source: wildcard_build_couchbase_com_cert_20230921
+      - source: wildcard_build_couchbase_com_cert_20231221
         target: /certs/wildcard.build.couchbase.com.crt
-      - source: wildcard_build_couchbase_com_key_20230921
+      - source: wildcard_build_couchbase_com_key_20231221
         target: /certs/wildcard.build.couchbase.com.key
     configs:
       - source: traefik_config
@@ -90,7 +90,7 @@ networks:
     attachable: true
 
 secrets:
-  wildcard_build_couchbase_com_cert_20230921:
+  wildcard_build_couchbase_com_cert_20231221:
     external: true
-  wildcard_build_couchbase_com_key_20230921:
+  wildcard_build_couchbase_com_key_20231221:
     external: true
