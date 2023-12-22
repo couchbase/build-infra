@@ -1,6 +1,18 @@
 [all]
-172.23.107.123 vm_name=gha-linux-large-1
-172.23.107.125 vm_name=gha-linux-large-2
+172.23.113.153 vm_name=gha-runner-01
+172.23.113.161 vm_name=gha-runner-02
+172.23.113.164 vm_name=gha-runner-03
+172.23.113.167 vm_name=gha-runner-04
+172.23.113.168 vm_name=gha-runner-05
+172.23.113.171 vm_name=gha-runner-06
+172.23.113.172 vm_name=gha-runner-07
+172.23.113.173 vm_name=gha-runner-08
+172.23.113.174 vm_name=gha-runner-09
+172.23.113.175 vm_name=gha-runner-10
+172.23.113.176 vm_name=gha-runner-11
+172.23.113.177 vm_name=gha-runner-12
+172.23.104.157 vm_name=gha-runner-13
+172.23.104.170 vm_name=gha-runner-14
 
 [all:vars]
 ansible_user=couchbase
