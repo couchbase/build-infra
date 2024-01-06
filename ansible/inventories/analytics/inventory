@@ -1,15 +1,9 @@
 [all]
-172.23.104.54   name=analytics-01 manager=true
-172.23.104.51   name=analytics-02
-172.23.104.56   name=analytics-03
-172.23.104.50   name=analytics-04
-172.23.104.55   name=analytics-05
-172.23.104.57   name=analytics-06
-172.23.107.124  name=analytics-12
+172.23.107.124  name=analytics-12 manager=true
 172.23.107.130  name=analytics-13
-172.23.107.138  name=analytics-14
+172.23.107.138  name=analytics-14 manager=true
 172.23.107.144  name=analytics-15
-172.23.104.180  name=analytics-16
+172.23.104.180  name=analytics-16 manager=true
 172.23.104.22   name=analytics-17
 
 [all:vars]

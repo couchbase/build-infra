@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Suggested deployment command:
-#  docker --host 172.23.104.54 stack deploy --with-registry-auth -c analytics-jenkins-agents.yml analytics
+#  docker --host 172.23.107.124 stack deploy --with-registry-auth -c analytics-jenkins-agents.yml analytics
 # All services, networks, etc. will then get an "analytics_" prefix,
 # eg. "analytics_ubuntu18"
 
