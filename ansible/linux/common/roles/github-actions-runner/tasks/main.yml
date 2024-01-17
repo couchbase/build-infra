@@ -63,17 +63,17 @@
           /orgs/couchbasecloud/actions/runners/registration-token |
           jq -r .token &&
           gh auth logout --hostname github.com
-        stdin: "{{ gha_api_token }}"
+        stdin: "{{ gha_api_token | mandatory }}"
       register: gha_token
 
     - name: Configure GitHub Actions runner
       shell:
         cmd: >
           ./config.sh --unattended
-          --url https://github.com/{{ gha_org }}
+          --url https://github.com/{{ gha_org | mandatory }}
           --name {{ gha_runner_name }}
           --token {{ gha_token.stdout_lines[0] }}
-          --runnergroup {{ gha_runner_group }}
+          --runnergroup {{ gha_runner_group | mandatory }}
           --labels {{ gha_runner_labels }}
         chdir: /opt/gha
         creates: /opt/gha/.credentials

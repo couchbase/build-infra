@@ -1,0 +1,11 @@
+# sample playbook for testing and manual runs
+---
+- hosts: all
+  gather_facts: True
+
+  tasks:
+
+    - name: Test couchbase-cloud-runner role
+      include_role:
+        name: couchbase-cloud-runner
+      tags: playbook

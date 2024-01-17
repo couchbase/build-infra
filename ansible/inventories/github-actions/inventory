@@ -1,9 +1,25 @@
 [all]
-172.23.107.123 vm_name=gha-linux-large-1
-172.23.107.125 vm_name=gha-linux-large-2
+gha-runner-01 ansible_host=172.23.113.153 vm_name=gha-runner-01
+gha-runner-02 ansible_host=172.23.113.161 vm_name=gha-runner-02
+gha-runner-03 ansible_host=172.23.113.164 vm_name=gha-runner-03
+gha-runner-04 ansible_host=172.23.113.167 vm_name=gha-runner-04
+gha-runner-05 ansible_host=172.23.112.21  vm_name=gha-runner-05
+gha-runner-06 ansible_host=172.23.113.171 vm_name=gha-runner-06
+gha-runner-07 ansible_host=172.23.113.172 vm_name=gha-runner-07
+gha-runner-08 ansible_host=172.23.113.173 vm_name=gha-runner-08
+gha-runner-09 ansible_host=172.23.112.11  vm_name=gha-runner-09
+gha-runner-10 ansible_host=172.23.113.175 vm_name=gha-runner-10
+gha-runner-11 ansible_host=172.23.112.254 vm_name=gha-runner-11
+gha-runner-12 ansible_host=172.23.112.20  vm_name=gha-runner-12
+gha-runner-13 ansible_host=172.23.104.157 vm_name=gha-runner-13
+gha-runner-14 ansible_host=172.23.104.155 vm_name=gha-runner-14
+gha-runner-15 ansible_host=172.23.96.225  vm_name=gha-runner-15
+gha-runner-16 ansible_host=172.23.96.226  vm_name=gha-runner-16
+gha-runner-17 ansible_host=172.23.96.141  vm_name=gha-runner-17
+gha-runner-18 ansible_host=172.23.96.162  vm_name=gha-runner-18
+gha-runner-19 ansible_host=172.23.96.227  vm_name=gha-runner-19
 
 [all:vars]
 ansible_user=couchbase
 ansible_password=couchbase
-ansible_become=true
 ansible_become_password=couchbase
