@@ -10,3 +10,5 @@
 [core]
     longpaths = true
         pager = cat
+     symlinks = true
+
