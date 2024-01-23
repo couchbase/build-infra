@@ -48,19 +48,6 @@ services:
       - "REPO_URL=https://github.com/couchbasedeps/git-repo"
     <<: *default-jenkins-slave
 
-  centos6:
-    image: couchbasebuild/python-centos6-build:20221207
-    environment:
-      - "JENKINS_SLAVE_NAME=python-centos6"
-      - "JENKINS_SLAVE_LABELS=linux python3 x86_64"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
-      - "NODE_CLASS=build"
-      - "NODE_PRODUCT=couchbase-server"
-      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
-    <<: *default-jenkins-slave
-
 configs:
   couchbase_ssh_config_20191203:
     file: config/couchbase_ssh_config
