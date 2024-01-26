@@ -1,5 +1,10 @@
 # Docker container for Centos 7.3
 
+# This has to be first - define the GCC version to use and
+# the image to pull it from
+ARG GCC_VER
+FROM couchbasebuild/centos-7-gcc:${GCC_VER} AS gcc
+
 FROM centos:7.3.1611
 LABEL maintainer="build-team@couchbase.com"
 
@@ -43,10 +48,14 @@ RUN yum install -y ruby-devel gcc make rpm-build rubygems
 RUN gem install ffi:1.12.2 && \
     gem install fpm:1.11.0
 
-# GCC (from couchbasebuild/centos-7-gcc)
-COPY build/local /usr/local
+# GCC - need to redundantly declare GCC_ARG here
+ARG GCC_VER
+RUN mkdir -p /opt && ln -s gcc-${GCC_VER} /opt/gcc
+COPY --from=gcc /opt/gcc-${GCC_VER} /opt/gcc-${GCC_VER}
+# Historic gcc 7.3.0
+COPY --from=couchbasebuild/centos-7-gcc:7.3.0 /usr/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
-     mv /tmp/ld.so.conf /etc && ldconfig
+    mv /tmp/ld.so.conf /etc && ldconfig
 
 # Install Couchbase Lite Core toolchain requirements
 RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip java-11-openjdk-devel
