@@ -16,7 +16,7 @@
     dest: C:\vs2022\vs_professional.exe
 
 - name: Install Visual Studio Professional 2022 and dotnet tools
-  win_command: C:\vs2022\vs_professional.exe --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Component.VC.Redist.MSM --quiet --productKey "{{ vs2022_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+  win_command: C:\vs2022\vs_professional.exe --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Workload.Azure --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NativeDesktop  --add Microsoft.VisualStudio.Workload.NativeMobile --add Microsoft.VisualStudio.Workload.NetCoreTools --add Microsoft.VisualStudio.Workload.NetCrossPlat --add Microsoft.VisualStudio.Workload.NetWeb --add Microsoft.VisualStudio.Component.VC.Redist.MSM --add Microsoft.VisualStudio.Component.VC.Llvm.Clang --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset --quiet --productKey "{{ vs2022_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
   args:
     chdir: C:\vs2022
   register: install_output
