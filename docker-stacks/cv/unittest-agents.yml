@@ -81,7 +81,7 @@ services:
     <<: *default-jenkins-one-agent-with-ipv6
 
   linux:
-    image: couchbasebuild/server-linux-cv:20230922
+    image: couchbasebuild/server-linux-cv:20240129
     environment:
       - "JENKINS_SLAVE_NAME=unit-linux"
       - "JENKINS_SLAVE_LABELS=linux unit-simple-test"

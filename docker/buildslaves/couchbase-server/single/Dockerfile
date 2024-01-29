@@ -217,6 +217,7 @@ RUN set -x \
                 tar \
                 unzip \
                 which \
+                xfsprogs-devel \
     && ln -s $(which ninja-build) /usr/local/bin/ninja \
     && yum clean all
 
