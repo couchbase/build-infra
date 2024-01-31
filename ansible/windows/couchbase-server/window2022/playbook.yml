@@ -14,13 +14,6 @@
         path: C:\Temp
         state: directory
 
-    - name: "Install OpenSSL"
-      win_chocolatey:
-        name: openssl
-        version: 1.1.1.800
-      tags:
-      - python
-
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
       win_feature:
@@ -73,7 +66,7 @@
     - name: Install JDK for Jenkins
       win_chocolatey:
         name: openjdk
-        version: 11.0.2.01
+        state: latest
 
     - name: Create download area for Ansible
       win_file:
@@ -137,7 +130,6 @@
     - name: Check decode result
       win_shell: Test-Path C:\Temp\repo
       register: repo_downloaded
-      changed_when: file_exists.stdout | trim | bool
 
     - name: Remove repo temp file
       win_file:
@@ -269,6 +261,32 @@
       win_shell: gem install asciidoctor
       args:
         executable: cmd
+
+    - name: Install OpenSSH
+      win_chocolatey:
+        name: openssh
+        params: /SSHServerFeature
+        state: latest
+      tags:
+        - openssh
+
+    - name: Ensure OpenSSH executables are pathed (machine)
+      win_path:
+        name: PATH
+        elements: C:\Program Files\OpenSSH-Win64
+        scope: machine
+        state: present
+      tags:
+        - openssh
+
+    - name: Ensure OpenSSH executables are pathed (user)
+      win_path:
+        name: PATH
+        elements: C:\Program Files\OpenSSH-Win64
+        scope: user
+        state: present
+      tags:
+        - openssh
 
     - name: Configure ephemeral ports
       win_shell: netsh int {{ item[0] }} set dynamicport {{ item[1] }} start=1025 num=64511

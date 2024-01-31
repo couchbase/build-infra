@@ -230,7 +230,7 @@
         params: /SSHServerFeature
         state: latest
 
-    - name: Ensure OpenSSH executables are pathed
+    - name: Ensure OpenSSH executables are pathed (machine)
       win_path:
         name: PATH
         elements: C:\Program Files\OpenSSH-Win64
@@ -239,7 +239,7 @@
       tags:
         - path
 
-    - name: Ensure OpenSSH executables are pathed
+    - name: Ensure OpenSSH executables are pathed (user)
       win_path:
         name: PATH
         elements: C:\Program Files\OpenSSH-Win64
