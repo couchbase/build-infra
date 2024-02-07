@@ -57,11 +57,19 @@
         - nasm
         - ninja
         - pandoc
-        - ruby
         - strawberryperl
         - vcredist140
         - vscode
         - wixtoolset
+
+    - name: "Install Ruby"
+      win_chocolatey:
+        name: ruby
+        state: present
+        version: 2.6.10.1
+        force: yes
+      tags:
+      - ruby
 
     - name: Install JDK for Jenkins
       win_chocolatey:
