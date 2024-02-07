@@ -12,12 +12,12 @@ USER root
 RUN yum clean all && yum swap -y fakesystemd systemd
 
 RUN yum install --setopt=keepcache=0 -y \
-		deltarpm \
-                ca-certificates \
-		git \
-		sudo \
-		which \
-                yum-plugin-ovl
+    deltarpm \
+    ca-certificates \
+    git \
+    sudo \
+    which \
+    yum-plugin-ovl
 
 # clean up nsswitch
 RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
@@ -57,8 +57,9 @@ COPY --from=couchbasebuild/centos-7-gcc:7.3.0 /usr/local /usr/local
 RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
     mv /tmp/ld.so.conf /etc && ldconfig
 
-# Install Couchbase Lite Core toolchain requirements
-RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip java-11-openjdk-devel
+# Install Couchbase Lite Core toolchain requirements,
+# including updated binutils for vector search build
+RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip java-11-openjdk-devel binutils
 
 # * ccache (from source)
 RUN mkdir /tmp/deploy && \

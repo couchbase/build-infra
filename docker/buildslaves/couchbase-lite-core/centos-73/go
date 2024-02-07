@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+GCC_VER=11.2.0
+
 # Bump this when rebuilding with changes
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/centos-73-litecore-build
@@ -10,7 +12,7 @@ cp -a ../../util/swarm*.properties build
 cp -a ../../util/healthcheck.sh build
 
 docker build \
-  --build-arg GCC_VER=${GCC} \
+  --build-arg GCC_VER=${GCC_VER} \
   -t ${IMAGE}:$TAG -t ${IMAGE}:latest .
 
 if [ "$1" = "--publish" ]

@@ -141,7 +141,7 @@ services:
       - jenkins
 
   litecore-centos73:
-    image: couchbasebuild/centos-73-litecore-build:20240125
+    image: couchbasebuild/centos-73-litecore-build:20240206
     init: true
     user: couchbase
     environment:
