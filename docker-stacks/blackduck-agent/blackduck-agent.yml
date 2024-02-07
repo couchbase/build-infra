@@ -1,0 +1,49 @@
+version: '3.8'
+
+# Suggested deployment command:
+#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c blackduck-agent.yml blackduck
+# All services, networks, etc. will then get an "blackduck_" prefix,
+# eg. "blackduck_agent"
+
+services:
+
+  agent:
+    image: couchbasebuild/blackduck-agent:20240207
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=blackduck-agent"
+      - "JENKINS_SLAVE_LABELS=blackduck ubuntu22.04"
+      - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
+      - "NODE_CLASS=build zz"
+      - "NODE_PRODUCT=couchbase-server"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+    secrets:
+      - source: server_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_master_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+
+configs:
+  jenkins_master_username:
+    file: config/jenkins_master_username
+
+secrets:
+  server_jenkins_ns-buildbot_api_key.20220510:
+    external: true
+  profiledata.ssh_privkey.profile_sync.20200423:
+    external: true
+
+networks:
+  jenkins:

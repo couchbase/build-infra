@@ -1,0 +1,40 @@
+#!/bin/sh -e
+
+IMAGE=couchbasebuild/blackduck-agent
+mkdir -p build
+cp -a ../../buildslaves/util/swarm*.properties build
+cp -a ../../buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+
+TAG=$(date +%Y%m%d)
+
+source ../../buildslaves/couchbase-server/versions
+
+PUBLISH=false
+
+for arg in "$@"; do
+  case "${arg}" in
+    --publish)
+      PUBLISH=true
+      ;;
+    *)
+      echo "Invalid flag: ${arg}"
+      exit 1
+      ;;
+  esac
+done
+
+docker build \
+  --platform linux/amd64 \
+  --tag ${IMAGE}:${TAG} \
+  --tag ${IMAGE}:latest \
+  --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
+  --build-arg TINI_VER=${TINI} \
+  --build-arg YQ_VER=${YQ} \
+  .
+
+
+if ${PUBLISH}; then
+  docker push ${IMAGE}:${TAG}
+  docker push ${IMAGE}:latest
+fi
