@@ -12,6 +12,7 @@ xcp-sd24 ansible_host=172.23.105.159 network_name="Pool-wide network associated 
 xcp-se23 ansible_host=172.23.110.82 sr_name=VMStore2 network_name="Pool-wide network associated with eth0"
 xcp-se27 ansible_host=172.23.110.75 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
 xcp-se29 ansible_host=172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth2"
+xcp-sf36 ansible_host=172.23.124.101 sr_name="VMStore - Raid 1" network_name="Pool-wide network associated with eth2"
 
 [newvms]
 # Don't put anything here; the playbook simply requires this group to exist

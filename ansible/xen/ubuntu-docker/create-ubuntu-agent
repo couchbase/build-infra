@@ -10,6 +10,7 @@ usage() {
 }
 
 
+ARGS=()
 while getopts ":n:x:p:m:c:d:s:l:r:e:" opt; do
     case ${opt} in
         n)
@@ -37,13 +38,13 @@ while getopts ":n:x:p:m:c:d:s:l:r:e:" opt; do
             ROLES=${OPTARG}
             ;;
         e)
-            ARGS="-e ${OPTARG} ${ARGS}"
+            ARGS+=(-e "${OPTARG}")
             ;;
         s)
-            ARGS="-e swarm_manager=${OPTARG} ${ARGS}"
+            ARGS+=(-e "swarm_manager=${OPTARG}")
             ;;
         l)
-            ARGS="-e swarm_labels=${OPTARG} ${ARGS}"
+            ARGS+=(-e "swarm_labels=${OPTARG}")
             ;;
         \?)
             usage
@@ -71,4 +72,4 @@ docker run --rm \
     -e cmdline_password=${XEN_PASSWORD} \
     -e vm_name=${NAME} -e role_list=${ROLES} \
     -e memory=${MEMORY} -e vcpus=${CPUS} -e disksize=${DISKSPACE} \
-    ${ARGS}
+    "${ARGS[@]}"
