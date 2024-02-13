@@ -5,4 +5,5 @@
     ui = auto
 
 [url "ssh://git@github.com/"]
-       insteadOf = git://github.com/
+	insteadOf = https://github.com/
+	insteadOf = git://github.com/

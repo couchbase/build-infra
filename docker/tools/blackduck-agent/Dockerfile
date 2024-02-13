@@ -16,6 +16,7 @@ RUN set -x \
         curl \
         git \
         jq \
+        libxml2-utils \
         openjdk-11-jre-headless \
         openjdk-11-jdk \
         openjdk-11-jdk-headless \
