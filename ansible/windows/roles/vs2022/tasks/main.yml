@@ -24,7 +24,7 @@
 
 - block:
   - name: couchbase-lite vs2022 components
-    win_command: C:\vs2022\vs_professional.exe --add Component.Android.NDK.R15C --add Component.Android.SDK26 --add Component.Android.SDK27 --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Microsoft.VisualStudio.Component.VC.143 --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --add Microsoft.VisualStudio.Component.Windows10SDK.20348 --add Microsoft.VisualStudio.ComponentGroup.UWP.VC --add Microsoft.VisualStudio.Component.VC.ATL.ARM --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Component.Xamarin --quiet --productKey "{{ vs2022_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
+    win_command: C:\vs2022\vs_professional.exe --add Component.Android.NDK.R15C --add Component.Android.SDK26 --add Component.Android.SDK27 --add Microsoft.VisualStudio.Workload.WebCrossPlat --add Microsoft.VisualStudio.Component.VC.143 --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --add Microsoft.VisualStudio.Component.Windows10SDK.20348 --add Microsoft.VisualStudio.ComponentGroup.UWP.VC --add Microsoft.VisualStudio.Component.VC.ATL.ARM --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Component.Xamarin --add Microsoft.VisualStudio.Component.VC.Llvm.Clang --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset --quiet --productKey "{{ vs2022_key }}" --includeRecommended --addProductLang en-US --norestart --wait --nocache
     register: cbl_install_output
     failed_when: ( cbl_install_output.rc not in [ 3010, 0 ] )
   - debug: var=cbl_install_output.stdout_lines
