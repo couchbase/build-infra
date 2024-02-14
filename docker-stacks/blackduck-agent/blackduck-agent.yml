@@ -8,7 +8,7 @@ version: '3.8'
 services:
 
   agent:
-    image: couchbasebuild/blackduck-agent:20240213
+    image: couchbasebuild/blackduck-agent:20240214
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=blackduck-agent"
@@ -16,6 +16,8 @@ services:
       - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
       - "NODE_CLASS=build zz"
       - "NODE_PRODUCT=couchbase-server"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
     deploy:
       placement:
         constraints:

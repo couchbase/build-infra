@@ -12,6 +12,7 @@ RUN chmod +x /tini
 RUN set -x \
     && apt update \
     && apt install -y \
+        apt-transport-https \
         build-essential \
         curl \
         git \
@@ -32,6 +33,13 @@ RUN set -x \
     && ln -s /usr/bin/bundler3.0 /usr/local/bin/bundle \
     && apt clean
 
+RUN set -x \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list \
+    && apt update \
+    && apt install -y docker-ce-cli \
+    && apt clean
+
 ARG YQ_VER
 RUN set -x \
     && curl -Lfo /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_amd64 \
@@ -45,7 +53,8 @@ RUN set -x \
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN set -x \
-    && useradd couchbase -G sudo -m -s /bin/bash \
+    && addgroup --gid 999 docker \
+    && useradd couchbase -G sudo,docker -m -s /bin/bash \
     && mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase \
     && echo 'couchbase:couchbase' | chpasswd \
     && sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
