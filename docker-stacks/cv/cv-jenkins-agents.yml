@@ -73,7 +73,7 @@ services:
         constraints:
           - "node.labels.cvtype==docker"
         max_replicas_per_node: 1
-      replicas: 1
+      replicas: 2
       update_config:
         parallelism: 100
         delay: 0s
