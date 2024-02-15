@@ -84,5 +84,17 @@ RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 
 USER couchbase
 
+# Android SDK
+ARG CMDTOOLS_LINUX_VERSION="7302050"
+ENV ANDROID_SDK_HOME="/home/couchbase/tools/android-sdk"
+ENV ANDROID_SDK_TOOLS="/home/couchbase/tools/android-sdk/cmdline-tools/latest"
+
+RUN set -x \
+    && mkdir -p "${ANDROID_SDK_TOOLS}" && cd "${ANDROID_SDK_TOOLS}" \
+    && curl -Lfso ./tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${CMDTOOLS_LINUX_VERSION}_latest.zip \
+    && unzip tools.zip && rm tools.zip && mv cmdline-tools/* . \
+    && ln -s "${ANDROID_SDK_TOOLS}" "${ANDROID_SDK_HOME}/tools" \
+    && yes 'y' | "${ANDROID_SDK_HOME}/tools/bin/sdkmanager" --licenses >/dev/null
+
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8
