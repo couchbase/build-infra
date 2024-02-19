@@ -82,6 +82,7 @@ RUN $SDK_CMD "tools" && \
     $SDK_CMD "build-tools;28.0.3" && \
     $SDK_CMD "build-tools;29.0.0" && \
     $SDK_CMD "build-tools;29.0.2" && \
+    $SDK_CMD "ndk;25.1.8937393" && \
     $SDK_CMD "platforms;android-29" && \
     $SDK_CMD "extras;android;m2repository" "extras;google;m2repository" && \
     $SDK_CMD "cmake;3.10.2.4988404"
@@ -97,7 +98,7 @@ USER root
 RUN update-java-alternatives -s java-1.11.0-openjdk-amd64
 
 # Add cbdep tool
-RUN curl --fail http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl --fail http://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
