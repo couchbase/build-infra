@@ -238,16 +238,18 @@ class BuildDBLoader:
         build_data.update(dict(zip(release_keys, release_data)))
 
         index_key = f'{product}-{version}'
-        build_data['prev_build_num'] = (
-            self.prod_ver_index.get(index_key, None)
-        )
+        # Don't overwrite prev_build_num if it was set by an earlier run
+        if build_data.get('prev_build_num') is None:
+            build_data['prev_build_num'] = (
+                self.prod_ver_index.get(index_key, None)
+            )
 
         build_data['commits'] = list()   # Populated (potentially) later
         build_data['manifest_sha'] = commit.id.decode()
         build_data['manifest_path'] = manifest_path.decode()
         build_data['timestamp'] = commit.commit_time
         build_data['download_url'] = (
-            f'http://latestbuilds.service.couchbase.com/builds/latestbuilds/'
+            f'https://latestbuilds.service.couchbase.com/builds/latestbuilds/'
             f'{product}/{release}/{build_num}'
         )
 
