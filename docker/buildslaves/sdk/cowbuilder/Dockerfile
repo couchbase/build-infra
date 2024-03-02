@@ -1,6 +1,6 @@
 
 # Docker container for Debian - testing tag is used for debootstrap freshness
-FROM debian:testing-20200720-slim
+FROM debian:testing-20240211-slim
 LABEL maintainer="build-team@couchbase.com"
 ENV LANG=en_US.UTF-8
 
@@ -12,6 +12,8 @@ RUN set -x \
         && apt-get install -y locales \
         && apt-get clean \
         && locale-gen en_US.UTF-8
+
+COPY pbuilderrc /etc/pbuilderrc
 
 # Install basic slave dependencies
 RUN set -x \
@@ -29,17 +31,8 @@ RUN set -x \
                               sudo \
                               tar \
                               zstd \
+                              ubuntu-archive-keyring \
         && apt-get clean
-
-# Install ubuntu-archive-keyring - not presently available in the testing package repository
-RUN set -x \
-        && cp /etc/apt/sources.list /tmp/sources.list \
-        && echo "deb http://deb.debian.org/debian buster main" >> /etc/apt/sources.list \
-        && apt update \
-        && apt install -y ubuntu-archive-keyring \
-        && mv /tmp/sources.list /etc/apt \
-        && apt update \
-        && apt clean
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
@@ -47,8 +40,6 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
-
-COPY pbuilderrc /etc/pbuilderrc
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
