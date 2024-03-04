@@ -81,7 +81,7 @@
     - name: cron job run disk cleanup script
       cron:
         name: "Disk Cleanup"
-        minute: "30"
+        minute: "*/5"
         hour: "*"
         job: "/home/couchbase/disk_cleanup.sh >> /home/couchbase/disk_cleanup.log"
         state: present
