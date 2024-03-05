@@ -98,6 +98,7 @@ autoinstall:
   packages:
     - apt-transport-https
     - ca-certificates
+    - chrony
     - curl
     - docker-ce
     - netdata
@@ -114,6 +115,7 @@ autoinstall:
     - curtin in-target --target /target -- timedatectl set-timezone America/Los_Angeles
     - curtin in-target --target /target -- apt-mark hold xe-guest-utilities
     - 'sed -i -e "s,^\(\s*bind\),#\1," /target/etc/netdata/netdata.conf'
-    - mkdir -p /target/etc/systemd/system/docker.service.d
+    - mkdir -p /target/etc/systemd/system/docker.service.d /target/etc/docker
     - cp /cdrom/docker-service.conf /target/etc/systemd/system/docker.service.d
+    - cp /cdrom/docker-daemon.json /target/etc/docker/daemon.json
     - 'echo "couchbase ALL=(ALL:ALL) NOPASSWD: ALL" > /target/etc/sudoers.d/couchbase'

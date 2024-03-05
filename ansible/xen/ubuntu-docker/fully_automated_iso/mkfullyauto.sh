@@ -2,7 +2,7 @@
 
 # Modify these as necessary
 
-UBUNTUVER=${1-22.04.3}
+UBUNTUVER=${1-22.04.4}
 
 # This seems to be the only version that works with XenServer 7.2, which some
 # of our hosts still are.
@@ -46,7 +46,7 @@ mkdir -p boot/grub nocloud
 cp ../user-data nocloud
 touch nocloud/meta-data
 cp ../${XEUTIL} xe-guest-utilities.deb
-cp ../docker-service.conf .
+cp ../docker-service.conf ../docker-daemon.json .
 
 sed -e 's,---, autoinstall ds=nocloud\\\;s=/cdrom/nocloud/ ---,g' \
   -e 's/timeout=.*/timeout=2/' \
