@@ -126,6 +126,7 @@ cd ${LATESTBUILDS}/couchbase-lite-net
 
 # older than 90 days
 remove_glob "*.nupkg*" 90
+remove_glob "*.snupkg*" 90
 remove_glob "*.zip*"   90
 
 echo @@@@@@@@@
