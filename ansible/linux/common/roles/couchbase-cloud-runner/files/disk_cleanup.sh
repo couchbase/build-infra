@@ -10,11 +10,14 @@ if [[ $(($used_percent)) -ge ${DF_THRESHOLD} ]]; then
   docker system prune --force
 fi
 
-# Still bad, run docker system prune --all to clear build cache
+# Still bad, run docker system prune --all and --volumes to clear build cache
+# Potentially, A build could be running while cleanup happens.
+# We want to keep the recent image(s), in case they are created and required by the build.
 used_percent=$(df -kh . | tail -n1 | awk '{print $5}' |sed -e 's/%//')
 if [[ $(($used_percent)) -ge ${DF_THRESHOLD} ]]; then
   echo -e "$(date) \tDisk usage is above ${DF_THRESHOLD}% - running docker system prune --all"
-  docker system prune --all --volumes --force
+  docker system prune --all --filter "until=3h" --force
+  docker system prune --volumes --force
 fi
 
 # Still bad, the hammer: bazel clean --expunge
