@@ -9,3 +9,8 @@
       include_role:
         name: couchbase-cloud-runner
       tags: playbook
+
+    - name: Test github-actions-runner role
+      include_role:
+        name: github-actions-runner
+      tags: playbook

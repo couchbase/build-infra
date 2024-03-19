@@ -29,6 +29,15 @@
         update_cache: yes
       become: true
 
+    - name: Add cleanup script
+      copy:
+        src: "disk_cleanup.sh"
+        dest: /home/couchbase
+        owner: couchbase
+        group: couchbase
+        mode: "0755"
+      tags: diskcleanup
+
     - name: Create /opt/gha
       file:
         path: /opt/gha
@@ -65,18 +74,27 @@
           gh auth logout --hostname github.com
         stdin: "{{ gha_api_token | mandatory }}"
       register: gha_token
+      tags: config_runner
 
     - name: Configure GitHub Actions runner
       shell:
         cmd: >
-          ./config.sh --unattended
+          ./config.sh --unattended --replace
           --url https://github.com/{{ gha_org | mandatory }}
           --name {{ gha_runner_name }}
           --token {{ gha_token.stdout_lines[0] }}
           --runnergroup {{ gha_runner_group | mandatory }}
-          --labels {{ gha_runner_labels }}
+          --labels {{ gha_runner_labels }},{{ gha_runner_name }}
         chdir: /opt/gha
         creates: /opt/gha/.credentials
+      tags: config_runner
+
+    - name: Enable cleanup job
+      lineinfile:
+        path: /opt/gha/.env
+        line: ACTIONS_RUNNER_HOOK_JOB_STARTED=/home/couchbase/disk_cleanup.sh
+        state: present
+      tags: diskcleanup
 
     - name: Create GitHub Actions runner service
       shell:
@@ -85,6 +103,7 @@
         chdir: /opt/gha
         creates: /etc/systemd/system/{{ gha_service_name }}.service
       become: true
+      tags: config_runner
 
     - name: Start GitHub Actions runner service
       systemd:
@@ -92,6 +111,7 @@
         state: started
         daemon_reload: true
       become: true
+      tags: config_runner
 
     - name: Check if reboot is required
       stat:

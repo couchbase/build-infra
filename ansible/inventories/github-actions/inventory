@@ -20,7 +20,7 @@ gha-runner-18 ansible_host=172.23.96.162  vm_name=gha-runner-18
 gha-runner-19 ansible_host=172.23.96.227  vm_name=gha-runner-19
 gha-runner-20 ansible_host=172.23.113.53  vm_name=gha-runner-20
 gha-runner-21 ansible_host=172.23.113.51  vm_name=gha-runner-21
-gha-runner-22 ansible_host=172.23.113.54  vm_name=gha-runner-22
+gha-runner-22 ansible_host=172.23.113.23  vm_name=gha-runner-22
 gha-runner-23 ansible_host=172.23.113.55  vm_name=gha-runner-23
 gha-runner-24 ansible_host=172.23.113.30  vm_name=gha-runner-24
 gha-runner-25 ansible_host=172.23.112.19  vm_name=gha-runner-25

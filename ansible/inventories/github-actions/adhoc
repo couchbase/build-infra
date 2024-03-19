@@ -3,4 +3,4 @@
 docker run -it --rm -v $(pwd):/mnt \
   -v $(pwd)/..:/roles \
   -v $(git rev-parse --show-toplevel)/ansible/common/roles:/roley \
-  couchbasebuild/ansible -f 100 -b -i inventory all "$@"
+  couchbasebuild/ansible -f 100 -i inventory all "$@"
