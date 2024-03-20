@@ -12,6 +12,14 @@
       register: filestat
       failed_when: filestat.stat.exists == False
 
+    - name: Get UUID of host's pool
+      command: xe pool-list --minimal
+      register: pooluuid
+      failed_when: pooluuid.stdout == ""
+
+    - name: Enable auto-boot on pool
+      command: xe pool-param-set uuid="{{ pooluuid.stdout }}" other-config:auto_poweron=true
+
     - name: Get UUID of share SR
       command: xe sr-list name-label="{{ sr_name }}" --minimal
       register: sruuid
@@ -52,6 +60,9 @@
 
     - name: Insert CD
       command: xe vm-cd-add vm={{ vmuuid.stdout }} cd-name="{{ install_iso }}" device=1
+
+    - name: Enable auto-boot for VM
+      command: xe vm-param-set uuid={{ vmuuid.stdout }} other-config:auto_poweron=true
 
     - name: Boot VM and start installation
       command: xe vm-start uuid={{ vmuuid.stdout }}
