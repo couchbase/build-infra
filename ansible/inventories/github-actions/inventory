@@ -25,7 +25,7 @@ gha-runner-23 ansible_host=172.23.113.55  vm_name=gha-runner-23
 gha-runner-24 ansible_host=172.23.113.30  vm_name=gha-runner-24
 gha-runner-25 ansible_host=172.23.112.19  vm_name=gha-runner-25
 gha-runner-26 ansible_host=172.23.113.39  vm_name=gha-runner-26
-gha-runner-27 ansible_host=172.23.113.57  vm_name=gha-runner-27
+gha-runner-27 ansible_host=172.23.113.36  vm_name=gha-runner-27
 
 [all:vars]
 ansible_user=couchbase
