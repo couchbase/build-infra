@@ -1,0 +1,32 @@
+#!/bin/sh -e
+
+IMAGE=couchbasebuild/gerrit
+GERRIT_VER=3.7.4
+mkdir -p build
+
+PUBLISH=false
+
+for arg in "$@"; do
+  case "${arg}" in
+    --publish)
+      PUBLISH=true
+      ;;
+    *)
+      echo "Invalid flag: ${arg}"
+      exit 1
+      ;;
+  esac
+done
+
+docker buildx build \
+  --platform linux/amd64 \
+  --tag ${IMAGE}:${GERRIT_VER} \
+  --tag ${IMAGE}:latest \
+  --build-arg GERRIT_VER=${GERRIT_VER} \
+  .
+
+
+if ${PUBLISH}; then
+  docker push ${IMAGE}:${GERRIT_VER}
+  docker push ${IMAGE}:latest
+fi

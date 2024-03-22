@@ -88,3 +88,14 @@ resource "aws_ssm_parameter" "id_github_ns-codereview_pub" {
     Encoding = "none"
   }
 }
+
+resource "aws_ssm_parameter" "jira-creds_json" {
+  name  = "gerrit__.ssh__jira-creds.json"
+  type  = "SecureString"
+  value = file("~/aws-ssh/gerrit/.ssh/jira-creds.json")
+  tags = {
+    Owner    = local.owner
+    Consumer = local.project
+    Encoding = "none"
+  }
+}

@@ -11,7 +11,7 @@ locals {
 
   alert_email_recipient = "build-team@couchbase.com"
 
-  instance_type = "c5.xlarge"
+  instance_type = "c5.2xlarge"
 
   backup_device  = "sde"
   data_device    = "sdf"
@@ -25,6 +25,7 @@ locals {
   backup_bucket_name = "cb-${local.project}.backups"
 
   vpc_cidr                  = "10.0.0.0/16"
+  vpc_deny_cidrs            = ["34.212.153.171/32"]
   aws_instance_connect_cidr = "3.16.146.0/29"
 
   # If recovering from a snapshot, restore the snapshot to a volume via the
@@ -55,6 +56,7 @@ locals {
     "db",
     "etc",
     "git",
+    "hooks",
     "index",
     "lib",
     "logs",

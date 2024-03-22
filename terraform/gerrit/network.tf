@@ -9,6 +9,17 @@ module "vpc" {
   enable_vpn_gateway = false
 }
 
+resource "aws_network_acl_rule" "vpc_deny_acl" {
+  count          = length(local.vpc_deny_cidrs)
+  network_acl_id = module.vpc.default_network_acl_id
+
+  rule_number = 50 + count.index
+  egress      = false
+  protocol    = "all"
+  rule_action = "deny"
+  cidr_block  = local.vpc_deny_cidrs[count.index]
+}
+
 module "ec2-instance-sg" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.17.2"

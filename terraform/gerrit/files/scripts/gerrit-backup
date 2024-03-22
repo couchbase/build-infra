@@ -83,6 +83,7 @@ if ! sudo tar -czf /mnt/scratch/backup-${tag}.tgz \
     "db" \
     "etc" \
     "git" \
+    "hooks" \
     "index" \
     "lib" \
     "logs" \

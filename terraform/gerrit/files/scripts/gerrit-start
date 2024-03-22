@@ -35,7 +35,7 @@ then
         $(</opt/build-team/vars/vol_mount_args) \
         -p $(</opt/build-team/vars/web_port):$(</opt/build-team/vars/web_port) \
         -p $(</opt/build-team/vars/git_port):$(</opt/build-team/vars/git_port) \
-        gerritcodereview/gerrit:${GERRIT_VERSION}
+        couchbasebuild/gerrit:${GERRIT_VERSION}
 else
     echo "FATAL: /mnt/data is not mounted"
 fi
