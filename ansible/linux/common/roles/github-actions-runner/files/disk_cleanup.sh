@@ -56,7 +56,7 @@ log "Disk cleanup starting"
 trap "log 'Disk cleanup completed'" EXIT
 
 # Go builds using '/tmp' by default and often litters these directories around.
-run "rm -rf $(ls -d /tmp/go-build*)"
+run 'rm -rf /tmp/go-build*'
 
 # Clean up old docker images.
 run "docker system prune --filter 'until=6h' --force"
