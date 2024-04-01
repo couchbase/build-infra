@@ -33,7 +33,7 @@ function run_go() {
   # Find a usable install of Go, preferably the most up-to-date one.
   GO=$(find ${HOME}/install -name go -type f -executable | sort | tail -1)
 
-  if [ ! -z ${GO} ]; then
+  if [ -z "${GO}" ]; then
     return
   fi
 
