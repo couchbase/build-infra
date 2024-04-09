@@ -21,6 +21,16 @@ COPY --from=skopeo /tmp/gopath/src/github.com/containers/skopeo/bin/skopeo /usr/
 COPY --from=skopeo /tmp/gopath/src/github.com/containers/skopeo/default-policy.json /etc/containers/policy.json
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
+# Install latest git
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y \
+       software-properties-common \
+    && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu add-apt-repository ppa:git-core/ppa -y \
+    && apt-get update \
+    && apt-get install -y git \
+    && apt-get clean
+
 # Docker; xmllint (used for parsing manifest); jq (used for parsing
 # output from builddb REST API)
 RUN set -x \
