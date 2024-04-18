@@ -339,6 +339,11 @@ services:
         mode: 0444
         uid: "901"
         gid: "901"
+      - source: profiledata.aws_credentials.server.20240418
+        target: /home/couchbase/couchbase-server/build/linux/.aws/credentials
+        mode: 0444
+        uid: "901"
+        gid: "901"
       - source: profiledata.ini_file.gerrit_onboard_offboard.20221213
         target: /home/couchbase/couchbase-server/build/linux/.ssh/gerrit-onboard-offboard.ini
         mode: 0600
@@ -392,6 +397,11 @@ services:
         gid: "901"
       - source: profiledata.build_jira_creds.20220712
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/jira-creds.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.cloud_jira_creds.20240418
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/cloud-jira-creds.json
         mode: 0600
         uid: "901"
         gid: "901"
@@ -728,6 +738,8 @@ secrets:
     external: true
   profiledata.aws_credentials.server.20220706:
     external: true
+  profiledata.aws_credentials.server.20240418:
+    external: true
   # jarsigning cert from digicert
   profiledata.digicert_jks.20230504:
     external: true
@@ -739,6 +751,9 @@ secrets:
     external: true
   # jira credentials
   profiledata.build_jira_creds.20220712:
+    external: true
+  # cloud jira credentials
+  profiledata.cloud_jira_creds.20240418:
     external: true
   # jenkins tokens (for user ns-buildbot)
   profiledata.jenkins_api_token.server_job_automation.20220708:
