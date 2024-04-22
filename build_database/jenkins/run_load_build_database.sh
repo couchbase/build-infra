@@ -11,6 +11,7 @@ docker run --pull always --rm -u couchbase \
 docker run --rm -u couchbase \
     -v /buildteam:/buildteam \
     -v /home/couchbase/build_database/build_db_loader_conf.ini:/etc/build_db_loader_conf.ini \
-    -v /home/couchbase/build_database/jira.netrc:/home/couchbase/.netrc \
+    -v /home/couchbase/build_database/jira-creds.json:/home/couchbase/jira-creds.json \
+    -v /home/couchbase/build_database/cloud-jira-creds.json:/home/couchbase/cloud-jira-creds.json \
     couchbasebuild/load-build-database:latest \
     jira_commenter -c /etc/build_db_loader_conf.ini -d
