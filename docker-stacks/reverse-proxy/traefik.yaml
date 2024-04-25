@@ -13,9 +13,9 @@ services:
         target: /certs/wildcard.build.couchbase.com.crt
       - source: wildcard_build_couchbase_com_key_20240312
         target: /certs/wildcard.build.couchbase.com.key
-      - source: wildcard_couchbase_com_cert_20230425
+      - source: wildcard_couchbase_com_cert_20240425
         target: /certs/wildcard.couchbase.com.crt
-      - source: wildcard_couchbase_com_key_20230425
+      - source: wildcard_couchbase_com_key_20240425
         target: /certs/wildcard.couchbase.com.key
     configs:
       - source: traefik_config
@@ -61,9 +61,9 @@ secrets:
     external: true
   wildcard_build_couchbase_com_key_20240312:
     external: true
-  wildcard_couchbase_com_cert_20230425:
+  wildcard_couchbase_com_cert_20240425:
     external: true
-  wildcard_couchbase_com_key_20230425:
+  wildcard_couchbase_com_key_20240425:
     external: true
 
 configs:
