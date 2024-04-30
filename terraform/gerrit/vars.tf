@@ -67,4 +67,61 @@ locals {
   data_volume_throughput           = 200
   backup_restore_volume_iops       = 3000
   backup_restore_volume_throughput = 200
+
+  network_acls = {
+    default_ingress = [
+      {
+        rule_no     = 100
+        action = "allow"
+        from_port   = 0
+        to_port     = 0
+        icmp_code   = 0
+        icmp_type   = 0
+        protocol    = "-1"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_no         = 101
+        action     = "allow"
+        from_port       = 0
+        to_port         = 0
+        icmp_code       = 0
+        icmp_type       = 0
+        protocol        = "-1"
+        ipv6_cidr_block = "::/0"
+      },
+      {
+        rule_no     = 50
+        action = "deny"
+        from_port   = 0
+        to_port     = 0
+        icmp_code   = 0
+        icmp_type   = 0
+        protocol    = "-1"
+        cidr_block  = "34.212.153.171/32"
+      },
+    ]
+    default_egress = [
+      {
+        rule_no     = 100
+        action = "allow"
+        from_port   = 0
+        to_port     = 0
+        icmp_code   = 0
+        icmp_type   = 0
+        protocol    = "-1"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_no         = 101
+        action     = "allow"
+        from_port       = 0
+        to_port         = 0
+        icmp_code       = 0
+        icmp_type       = 0
+        protocol        = "-1"
+        ipv6_cidr_block = "::/0"
+      },
+    ]
+  }
 }

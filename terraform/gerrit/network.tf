@@ -7,17 +7,10 @@ module "vpc" {
   public_subnets     = ["10.0.0.0/24", "10.0.1.0/24"]
   enable_nat_gateway = false
   enable_vpn_gateway = false
-}
+  manage_default_network_acl = true
 
-resource "aws_network_acl_rule" "vpc_deny_acl" {
-  count          = length(local.vpc_deny_cidrs)
-  network_acl_id = module.vpc.default_network_acl_id
-
-  rule_number = 50 + count.index
-  egress      = false
-  protocol    = "all"
-  rule_action = "deny"
-  cidr_block  = local.vpc_deny_cidrs[count.index]
+  default_network_acl_ingress = local.network_acls["default_ingress"]
+  default_network_acl_egress = local.network_acls["default_egress"]
 }
 
 module "ec2-instance-sg" {
@@ -31,7 +24,7 @@ module "ec2-instance-sg" {
   ingress_with_cidr_blocks = [
     {
       rule        = "ssh-tcp"
-      cidr_blocks = "0.0.0.0/0"
+      cidr_blocks = local.aws_instance_connect_cidr
     },
     {
       rule        = "http-8080-tcp"

@@ -26,11 +26,13 @@ echo "${backup_restore_volume_throughput}" > /opt/build-team/vars/backup_restore
 # Install prereqs #
 ###################
 
-yum install -y \
+yum install --setopt=skip_missing_names_on_install=False -y \
     docker \
+    ec2-instance-connect \
     git \
     iptables-services \
-    jq
+    jq \
+    unzip
 
 # Need aws cli 2 to set throughput on new volumes
 pushd /tmp
@@ -91,13 +93,14 @@ gerrit-get-secrets
 # Drop container access to instance metadata #
 ##############################################
 
+systemctl restart docker
 cat << 'EOF' > /etc/sysconfig/iptables
 *filter
 :DOCKER-USER - [0:0]
 -A DOCKER-USER -d 169.254.169.254/32 -j DROP
 COMMIT
 EOF
-
+systemctl stop docker
 
 #####################
 # Configure logging #

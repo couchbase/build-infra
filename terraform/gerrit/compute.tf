@@ -10,7 +10,7 @@ data "aws_ami" "amzn2" {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm*-gp2"]
+    values = ["al2023-ami-ecs-hvm*-x86_64"]
   }
 
   filter {
@@ -31,7 +31,7 @@ resource "aws_launch_template" "host" {
     ebs {
       delete_on_termination = true
       volume_type           = "gp3"
-      volume_size           = 16
+      volume_size           = 40
     }
   }
 
@@ -81,7 +81,11 @@ resource "aws_autoscaling_group" "gerrit" {
   desired_capacity   = 1
   max_size           = 1
   min_size           = 0
-  target_group_arns  = module.alb.target_group_arns
+  target_group_arns  = [
+    module.alb.target_groups["gerrit-git"].arn,
+    module.alb.target_groups["gerrit-http"].arn,
+    module.alb.target_groups["gerrit-https"].arn,
+  ]
 
   health_check_grace_period = 300
   health_check_type         = "ELB"
