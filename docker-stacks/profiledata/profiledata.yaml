@@ -334,11 +334,6 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
-      - source: profiledata.aws_credentials.server.20220706
-        target: /home/couchbase/couchbase-server/build/linux/.aws/credentials
-        mode: 0444
-        uid: "901"
-        gid: "901"
       - source: profiledata.aws_credentials.server.20240418
         target: /home/couchbase/couchbase-server/build/linux/.aws/credentials
         mode: 0444
@@ -375,7 +370,7 @@ services:
         mode: 0444
         uid: "901"
         gid: "901"
-      - source: profiledata.blackduck.credentials_json.20220708
+      - source: profiledata.blackduck.credentials_json.20240511
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/blackduck-creds.json
         mode: 0444
         uid: "901"
@@ -736,8 +731,6 @@ secrets:
   # aws credentials
   profiledata.aws_credentials.mobile.20210512:
     external: true
-  profiledata.aws_credentials.server.20220706:
-    external: true
   profiledata.aws_credentials.server.20240418:
     external: true
   # jarsigning cert from digicert
@@ -759,7 +752,7 @@ secrets:
   profiledata.jenkins_api_token.server_job_automation.20220708:
     external: true
   # black duck
-  profiledata.blackduck.credentials_json.20220708:
+  profiledata.blackduck.credentials_json.20240511:
     external: true
   profiledata.blackduck.api_token.20230116:
     external: true

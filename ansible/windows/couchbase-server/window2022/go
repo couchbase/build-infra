@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -f "${@:1:1}" ]
+if [ ! -f "$1" ]
 then
     cat <<-EOF >&2
 Error: no profile sync ssh key filename provided
@@ -14,6 +14,7 @@ fi
 docker run --rm -it \
     -v $(cd ../../.. && pwd):/mnt \
     couchbasebuild/ansible-playbook:6.2.0 \
+    -f 100 \
     -v \
     -i /mnt/windows/couchbase-server/window2022/inventory \
     /mnt/windows/couchbase-server/window2022/playbook.yml \

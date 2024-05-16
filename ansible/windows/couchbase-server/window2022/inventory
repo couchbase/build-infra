@@ -1,5 +1,7 @@
 [windows]
 172.23.113.13 hostname=server-windows-vs2022-01
+172.23.96.229 hostname=server-windows-vs2022-02
+172.23.97.115 hostname=server-windows-vs2022-03
 
 [windows:vars]
 ansible_user=Administrator

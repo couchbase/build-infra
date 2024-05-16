@@ -1,7 +1,4 @@
 [windows]
-172.23.120.218 hostname=server-windows-01
-172.23.96.229 hostname=server-windows-02
-172.23.97.115 hostname=server-windows-03
 172.23.113.10 hostname=server-windows-04
 172.23.113.12 hostname=server-windows-05
 172.23.113.14 hostname=server-windows-06
