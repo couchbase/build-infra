@@ -42,7 +42,7 @@ The primary playbook here is `playbook.yml`.
 You can use our Docker image (recommended):
 
     docker run -it --rm -v $(pwd):/mnt -v $(pwd)/../roles:/mnt/roles \
-       -v /home/couchbase/jenkinsdocker-ssh/:/ssh \
+       -v /home/couchbase/jenkinsdocker-ssh/:/mnt/ssh \
        couchbasebuild/ansible-playbook:2.7.4 \
        -i inventory playbook.yml -e ansible_password=PASSWORD \
        -e vs2015_key=KEY -e vs2017_key=KEY
