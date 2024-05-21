@@ -3,7 +3,6 @@
   vars:
     task_history_limit: 1
   tasks:
-  # Uncomment this if you intend to tear down an existing swarm first
   - name: Teardown
     shell: "docker info | grep 'Swarm: inactive' || docker swarm leave --force"
     when: teardown is defined

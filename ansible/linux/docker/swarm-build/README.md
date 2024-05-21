@@ -13,4 +13,6 @@ The first host in the group will be treated as the initial leader and used for s
 
 It is assumed that all target nodes have docker installed and have a local couchbase user which is a member of the docker group.
 
+Note: "teardown=true" should only be used if your aim is to destroy and recreate an existing swarm.
+
 Example invocation: `ansible-playbook -i ../swarm-inventory playbook.yml --limit server [-e teardown=true]`

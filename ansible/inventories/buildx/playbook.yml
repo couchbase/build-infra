@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: True
+
+  tasks:
+
+    - name: Prep buildx
+      include_role:
+        name: buildx
+      tags: playbook

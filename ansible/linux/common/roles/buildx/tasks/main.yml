@@ -1,0 +1,24 @@
+---
+- name: Create systemd service file for binfmt
+  copy:
+    dest: /etc/systemd/system/binfmt.service
+    content: |
+      [Unit]
+      Description=Setup binfmt support for Docker buildx
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      ExecStart=/usr/bin/docker run --rm --privileged tonistiigi/binfmt@sha256:66e11bea77a5ea9d6f0fe79b57cd2b189b5d15b93a2bdb925be22949232e4e55 --install all
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start binfmt service
+  systemd:
+    name: binfmt.service
+    enabled: yes
