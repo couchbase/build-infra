@@ -59,7 +59,7 @@ trap "log 'Disk cleanup completed'" EXIT
 run 'rm -rf /tmp/go-build*'
 
 # Clean up old docker images.
-run "docker system prune --filter 'until=6h' --force"
+run "docker system prune --filter 'until=6h' --all --force"
 
 # A high watermark, percentage of disk space used.
 THRESHOLD=75
