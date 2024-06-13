@@ -63,11 +63,10 @@ MEMORY=${MEMORY:-20}
 CPUS=${CPUS:-8}
 DISKSPACE=${DISKSPACE:-200}
 
-docker run --rm \
-    -v $(pwd):/mnt \
-    -v $(git rev-parse --show-toplevel)/ansible/common/roles:/rolescommon \
-    -v $(git rev-parse --show-toplevel)/ansible/linux/common/roles:/roleslinux \
-    couchbasebuild/ansible-playbook:6.2.0 \
+ansible_dir=$(git rev-parse --show-toplevel)/ansible
+export ANSIBLE_ROLES_PATH=${ansible_dir}/common/roles:${ansible_dir}/linux/common/roles
+export ANSIBLE_HOST_KEY_CHECKING=false
+ansible-playbook \
     -v -i inventory -l ${XEN_HOST}:newvms playbook.yml \
     -e cmdline_password=${XEN_PASSWORD} \
     -e vm_name=${NAME} -e role_list=${ROLES} \

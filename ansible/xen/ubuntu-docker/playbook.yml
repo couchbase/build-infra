@@ -3,8 +3,8 @@
   gather_facts: False
   hosts: xenservers
   vars:
-    - disksize_in_gib: "{{ disksize | int * 1024 * 1024 * 1024 }}"
-    - memory_in_gib: "{{ memory | int * 1024 * 1024 * 1024 }}"
+    disksize_in_gib: "{{ disksize | int * 1024 * 1024 * 1024 }}"
+    memory_in_gib: "{{ memory | int * 1024 * 1024 * 1024 }}"
 
   tasks:
     - name: Check for existence of docker-config.json
@@ -105,10 +105,6 @@
         timeout: 300
         sleep: 3
 
-    - name: Wait for cloud-init post-boot updates to complete
-      command: cloud-init status --wait
-      become: true
-
     # The space in " yes" is important due to the way 'cut' works
     - name: Wait for clock to synchronize
       shell: export synced=no; while [ "$synced" != " yes" ]; do sleep 1; synced=$(timedatectl status | grep synchronized | cut -d':' -f2); done
@@ -194,17 +190,6 @@
         purge: yes
       become: true
 
-    - name: Disable cloud-init for future reboots
-      file:
-        path: /etc/cloud/cloud-init.disabled
-        state: touch
-        owner: root
-      become: true
-
-    - name: Reboot to be sure
-      reboot:
-      become: true
-
     - name: Purge cloud-init
       apt:
         name: cloud-init
@@ -225,6 +210,10 @@
         purge: yes
       become: true
 
+    - name: Reboot to be sure
+      reboot:
+      become: true
+
     - name: Process VM-specific roles
       include_role:
         name: "{{ rolename }}"
@@ -240,7 +229,7 @@
 
     - name: Join Docker Swarm
       when: swarm_manager is defined
-      command: docker swarm join --token {{ swarm_join_token.stdout }} {{ swarm_manager }}
+      command: docker swarm join --token {{ swarm_join_token.stdout }} {{ swarm_manager }}:2377
       tags: docker_swarm
 
     - name: Add Swarm labels

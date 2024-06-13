@@ -2,11 +2,12 @@
 
 # Modify these as necessary
 
-UBUNTUVER=${1-22.04.4}
+UBUNTUVER=${1-24.04}
 
-# This seems to be the only version that works with XenServer 7.2, which some
-# of our hosts still are.
-XEVER=7.4.0-1
+# This version may not work with XenServer 7.2; not sure whether any of our hosts
+# still use this. But the version that worked with 7.2 doesn't seem to work with
+# XenServer 8.2, which we definitely do still use.
+XEVER=8.4.0
 
 # Derived values - probably don't modify these
 UBUNTUCD=ubuntu-${UBUNTUVER}-live-server-amd64.iso
