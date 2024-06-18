@@ -173,7 +173,7 @@ services:
         constraints:
           - "node.labels.cvtype==linux-large"
         max_replicas_per_node: 1
-      replicas: 9
+      replicas: 20
       update_config:
         parallelism: 1000
         delay: 0s

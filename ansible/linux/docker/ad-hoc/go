@@ -1,4 +1,0 @@
-#!/bin/bash
-
-docker run --rm -it -v $(realpath ..)/swarm-inventory:/mnt/inventory -v ~/jenkinsdocker-ssh:/ssh \
-  couchbasebuild/ansible -i inventory -f 100 "$@"
