@@ -214,6 +214,15 @@
       reboot:
       become: true
 
+    - name: Ensure Docker is fully running
+      service:
+        name: docker
+        state: started
+      register: dockerdetails
+      until: dockerdetails.status.ActiveState == "active"
+      retries: 40
+      delay: 2
+
     - name: Process VM-specific roles
       include_role:
         name: "{{ rolename }}"
