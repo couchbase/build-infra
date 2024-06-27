@@ -27,6 +27,7 @@ echo "${backup_restore_volume_throughput}" > /opt/build-team/vars/backup_restore
 ###################
 
 yum install --setopt=skip_missing_names_on_install=False -y \
+    amazon-cloudwatch-agent \
     docker \
     ec2-instance-connect \
     git \
@@ -116,6 +117,32 @@ cat << 'EOF' > /etc/docker/daemon.json
 }
 EOF
 
+##############
+# Cloudwatch #
+##############
+
+cat << 'EOF' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+{
+  "metrics": {
+    "append_dimensions": {
+      "ServiceName": "gerrit",
+      "Environment": "production",
+      "Owner": "build-team"
+    },
+    "metrics_collected": {
+      "disk": {
+        "measurement": [
+          { "name": "disk_used_percent", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 60,
+        "resources": ["*"],
+        "ignore_file_system_types": ["sysfs", "tmpfs", "devtmpfs"]
+      }
+    }
+  }
+}
+EOF
+systemctl enable --now amazon-cloudwatch-agent
 
 ##################
 # Start services #

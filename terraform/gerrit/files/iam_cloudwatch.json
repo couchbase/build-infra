@@ -3,7 +3,10 @@
     "Statement": [
         {
             "Action": [
+                "cloudwatch:PutMetricData",
+                "ec2:DescribeTags",
                 "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
                 "logs:PutLogEvents",
                 "logs:CreateLogGroup"
             ],
