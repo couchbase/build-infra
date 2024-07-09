@@ -24,14 +24,13 @@ logger.addHandler(ch)
 
 
 class JiraCommenter:
-    def __init__(self, db_info, dryrun):
-        jira_creds_file = '/home/couchbase/jira-creds.json'
-        cloud_jira_creds_file = '/home/couchbase/cloud-jira-creds.json'
-        server_jira_creds = json.loads(open(jira_creds_file).read())
-        cloud_jira_creds = json.loads(open(cloud_jira_creds_file).read())
 
-        self.server_jira = JIRA(server=server_jira_creds['url'],
-                                token_auth=server_jira_creds['apitoken']
+    def __init__(self, db_info, dryrun, issues_creds_file, cloud_creds_file):
+        issues_jira_creds = json.loads(open(issues_creds_file).read())
+        cloud_jira_creds = json.loads(open(cloud_creds_file).read())
+
+        self.issues_jira = JIRA(server=issues_jira_creds['url'],
+                                token_auth=issues_jira_creds['apitoken']
                                 )
         self.cloud_jira = JIRA(cloud_jira_creds['url'],
                                basic_auth=(f"{cloud_jira_creds['username']}",
@@ -42,14 +41,32 @@ class JiraCommenter:
         self.db = cbdatabase_db.CouchbaseDB(db_info)
         self.dryrun = dryrun
         self.ticket_re = re.compile(r'(\b[A-Z][A-Z0-9]+-\d+\b)')
+        self.extref_re = re.compile(
+            r'^Ext-ref:(.*)$', flags=re.MULTILINE | re.IGNORECASE
+        )
 
-    def get_tickets(self, commit):
-        """Returns list of ticket IDs named by commit"""
 
-        return self.ticket_re.findall(commit.summary)
+    def make_ticket_comments(self, commit, build):
+        """
+        Posts Jira comments on any ticket IDs named by commit, either in the
+        subject line or in Ext-ref footer
+        """
 
-    def make_comment(self, ticket, commit, build):
-        """Makes a comment on the specified ticket about the commit/build"""
+        # Find tickets named by commit subject (first line of message)
+        subject = commit.summary.split('\n', 1)[0]
+        for ticket in self.ticket_re.findall(subject):
+            self.make_comment(ticket, commit, subject, build)
+
+        # Find tickets named on Ext-ref: lines
+        for extref_line in self.extref_re.findall(commit.summary):
+            for ticket in self.ticket_re.findall(extref_line):
+                self.make_comment(ticket, commit, subject, build)
+
+
+    def make_comment(self, ticket, commit, subject, build):
+        """
+        Makes a comment on the specified ticket about the commit/build
+        """
 
         found_on_server = False
         found_on_cloud = False
@@ -60,7 +77,7 @@ class JiraCommenter:
             return
 
         try:
-            jticket = self.server_jira.issue(ticket)
+            jticket = self.issues_jira.issue(ticket)
             found_on_server = True
         except JIRAError as e:
             try:
@@ -81,20 +98,21 @@ class JiraCommenter:
         message = (
             f"Build {build.key} contains {commit.project} "
             f"commit [{commit.sha[0:7]}|{url}] with commit message:\n"
-            f"{commit.summary}"
+            f"{subject}"
         )
 
         if self.dryrun:
             logger.info(f'(Not) posting Jira comment on {ticket}:\n{message}')
             return
         if found_on_server:
-            self.server_jira.add_comment(jticket, message)
+            self.issues_jira.add_comment(jticket, message)
             logger.info(
                 f'Posting Jira comment on {ticket} on issues.couchbase.com:\n{message}')
         if found_on_cloud:
             self.cloud_jira.add_comment(jticket, message)
             logger.info(
                 f'Posting Jira comment on {ticket} on cloud jira:\n{message}')
+
 
     def scan_and_comment(self):
         """
@@ -122,12 +140,7 @@ class JiraCommenter:
                         )
                         continue
 
-                    # We actually only need and care about the commit message
-                    # subject (first line)
-                    commit.summary = commit.summary.split('\n', 1)[0]
-
-                    for ticket in self.get_tickets(commit):
-                        self.make_comment(ticket, commit, build)
+                    self.make_ticket_comments(commit, build)
 
             if not self.dryrun:
                 build.set_metadata('jira_comments', True)
@@ -142,6 +155,10 @@ def main():
     parser.add_argument('-c', '--config', dest='db_repo_configfile',
                         help='Configuration file for build database loader',
                         default='build_db_conf.ini')
+    parser.add_argument('--issues-creds', type=str, required=True,
+                        help='Credentials file for issues.couchbase.com')
+    parser.add_argument('--cloud-creds', type=str, required=True,
+                        help='Credentials file for Couchbase Cloud Jira')
     parser.add_argument('-n', '--dryrun', action='store_true',
                         help="Don't change JIRA or Database, just log what "
                              "would be done")
@@ -162,5 +179,7 @@ def main():
         sys.exit(1)
 
     db_info = db_repo_config['build_db']
-    commenter = JiraCommenter(db_info, args.dryrun)
+    commenter = JiraCommenter(
+        db_info, args.dryrun, args.issues_creds, args.cloud_creds
+    )
     commenter.scan_and_comment()

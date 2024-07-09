@@ -14,4 +14,7 @@ docker run --rm -u couchbase \
     -v /home/couchbase/build_database/jira-creds.json:/home/couchbase/jira-creds.json \
     -v /home/couchbase/build_database/cloud-jira-creds.json:/home/couchbase/cloud-jira-creds.json \
     couchbasebuild/load-build-database:latest \
-    jira_commenter -c /etc/build_db_loader_conf.ini -d
+    jira_commenter -d \
+        -c /etc/build_db_loader_conf.ini \
+        --issues-creds /home/couchbase/jira-creds.json \
+        --cloud-creds /home/couchbase/cloud-jira-creds.json
