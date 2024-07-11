@@ -1,11 +1,14 @@
 provider "aws" {
   profile = local.profile
   region  = local.region
-  shared_credentials_file = local.shared_credentials_file
+  shared_credentials_files = local.shared_credentials_files
 }
 
-data "aws_subnet_ids" "public_subnet_ids" {
-  vpc_id = local.vpc_id
+data "aws_subnets" "public_subnet_ids" {
+  filter {
+    name   = "vpc-id"
+    values = [local.vpc_id]
+  }
 }
 
 data "aws_caller_identity" "current" {}

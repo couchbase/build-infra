@@ -1,23 +1,32 @@
-resource "aws_launch_configuration" "proget" {
+resource "aws_launch_template" "proget" {
   image_id      = local.ami_id
   instance_type = "c5a.large"
   key_name      = "proget"
-  security_groups      = [aws_security_group.proget.id]
-  lifecycle { create_before_destroy = false }
+  network_interfaces {
+      associate_public_ip_address = false
+      security_groups = [aws_security_group.proget.id]
+  }
+  monitoring {
+      enabled   = true
+  }
 }
 
 # proget autoscaling group
 resource "aws_autoscaling_group" "proget" {
-  name     = "proget-${aws_launch_configuration.proget.name}"
-  max_size = 1
-  min_size = 1
+  name             = "proget-${aws_launch_template.proget.name}"
+  max_size         = 1
+  min_size         = 1
+  desired_capacity = 1
 
   default_cooldown = 120
 
-  vpc_zone_identifier       = [tolist(data.aws_subnet_ids.public_subnet_ids.ids)[0]]
+  vpc_zone_identifier       = [tolist(data.aws_subnets.public_subnet_ids.ids)[0]]
   target_group_arns         = [aws_lb_target_group.proget.arn]
   wait_for_capacity_timeout = "5m"
-  launch_configuration      = aws_launch_configuration.proget.name
+  launch_template {
+      id      = aws_launch_template.proget.id
+      version = "$Latest"
+  }
 
   health_check_grace_period = 300
   health_check_type         = "ELB"

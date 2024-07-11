@@ -3,6 +3,7 @@ resource "aws_lb_target_group" "proget" {
   port        = 80
   protocol    = "HTTP"
   vpc_id = local.vpc_id
+  deregistration_delay = 60
 
   lifecycle {
     create_before_destroy = true
@@ -10,14 +11,13 @@ resource "aws_lb_target_group" "proget" {
 
   health_check {
     enabled = true
-    path = "/feeds/dev"
-    port = 80
+    path = "/"
     protocol = "HTTP"
-    interval = 30
-    healthy_threshold = 10
+    interval = 60
+    healthy_threshold = 2
     unhealthy_threshold = 10
-    timeout = 15
-    matcher = "200"
+    timeout = 30
+    matcher = "200,302"
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_lb" "proget" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [ aws_security_group.proget_lb.id ]
-  subnets            = data.aws_subnet_ids.public_subnet_ids.ids
+  subnets            = data.aws_subnets.public_subnet_ids.ids
   enable_deletion_protection = false
 }
 
