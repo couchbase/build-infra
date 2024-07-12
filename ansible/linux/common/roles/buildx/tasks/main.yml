@@ -17,6 +17,7 @@
 - name: Reload systemd
   systemd:
     daemon_reload: yes
+  become: true
 
 - name: Enable and start binfmt service
   systemd:

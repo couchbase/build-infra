@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: True
+
+  tasks:
+
+    - name: Start service
+      shell: "systemctl list-units --all --type=service --no-pager --no-legend 'actions.runner*' | awk '{print $1}' | xargs sudo systemctl start"
+      args:
+        chdir: /opt/gha
+        warn: false
+      changed_when: false
+      become: true

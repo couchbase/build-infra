@@ -1,6 +1,6 @@
 This playbook can be used to (re)create a docker swarm.
 
-It is intended to be used with the inventory file in the parent folder and `--limit`ed to a specific group. Nodes should have a populated manager variable (in the case of managers) and a comma-separated list of `label=value` labels if required.
+It is intended to be triggered using the `go` script in the parent folder, and limited to a specific group in the docker-swarms inventory. Nodes should have a populated manager variable (in the case of managers) and a comma-separated list of `label=value` labels if required.
 
 The first host in the group will be treated as the initial leader and used for swarm init and token retrieval, and delegated to when adding the other nodes.
 
@@ -15,4 +15,4 @@ It is assumed that all target nodes have docker installed and have a local couch
 
 Note: "teardown=true" should only be used if your aim is to destroy and recreate an existing swarm.
 
-Example invocation: `ansible-playbook -i ../swarm-inventory playbook.yml --limit server [-e teardown=true]`
+Example invocation (in parent dir): `./go -p swarm-build/playbook.yml -i docker-swarms -g cv [-e teardown=true]`

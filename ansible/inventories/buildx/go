@@ -1,6 +1,0 @@
-#!/bin/bash -ex
-
-docker run -it --rm -v $(pwd):/mnt \
-    -v $(git rev-parse --show-toplevel)/ansible/linux/common/roles:/roles \
-    -v $(git rev-parse --show-toplevel)/ansible/common/roles:/roley \
-    couchbasebuild/ansible-playbook -v -f 20 -i inventory playbook.yml $@

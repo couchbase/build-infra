@@ -1,81 +1,81 @@
 [mega4]
-172.23.96.171  name=mega4-01.sc.couchbase.com labels=role=build manager=true
-172.23.96.173  name=mega4-02.sc.couchbase.com labels=role=build
-172.23.96.176  name=mega4-03.sc.couchbase.com labels=role=build
-172.23.96.218  name=mega4-04.sc.couchbase.com labels=role=build
-172.23.96.208  name=mega4-05.sc.couchbase.com labels=role=build
-172.23.96.211  name=mega4-06.sc.couchbase.com labels=role=build
-172.23.96.249  name=mega4-07.sc.couchbase.com labels=role=build
-172.23.121.104 name=mega4-12.sc.couchbase.com labels=role=build manager=true
-172.23.120.91  name=mega4-13.sc.couchbase.com labels=role=build
-172.23.120.111 name=mega4-14.sc.couchbase.com labels=role=build
-172.23.121.109 name=mega4-15.sc.couchbase.com labels=role=build
-172.23.120.253 name=mega4-16.sc.couchbase.com labels=role=build
-172.23.121.111 name=mega4-17.sc.couchbase.com labels=role=build
-172.23.121.112 name=mega4-18.sc.couchbase.com labels=role=build
-172.23.121.113 name=mega4-19.sc.couchbase.com labels=role=build
-172.23.120.19  name=mega4-20.sc.couchbase.com labels=role=build
-172.23.113.28  name=mega4-21.sc.couchbase.com labels=role=build manager=true
-172.23.113.44  name=mega4-22.sc.couchbase.com labels=role=build
-172.23.113.49  name=mega4-23.sc.couchbase.com labels=role=build manager=true
-172.23.113.41  name=mega4-24.sc.couchbase.com labels=role=build
-172.23.113.42  name=mega4-25.sc.couchbase.com labels=role=build
-172.23.113.43  name=mega4-26.sc.couchbase.com labels=role=build
-172.23.113.46  name=mega4-27.sc.couchbase.com labels=role=build
-172.23.113.50  name=mega4-28.sc.couchbase.com labels=role=build
-172.23.113.48  name=mega4-29.sc.couchbase.com labels=role=build
-172.23.113.45  name=mega4-30.sc.couchbase.com labels=role=build
-172.23.113.47  name=mega4-31.sc.couchbase.com labels=role=build
-172.23.113.37  name=mega4-32.sc.couchbase.com labels=role=infrastructure
-172.23.96.52   name=mega4-33.sc.couchbase.com labels=role=infrastructure
-172.23.97.147  name=mega4-34.sc.couchbase.com labels=role=docker-buildx
-172.23.113.9   name=monster-01.sc.couchbase.com labels=role=monster
-172.23.113.29  name=monster-02.sc.couchbase.com labels=role=monster
-172.23.112.4   name=monster-03.sc.couchbase.com labels=role=monster
-172.23.105.183 name=mega4-35.sc.couchbase.com labels=role=build manager=true
-172.23.106.70  name=mega4-36.sc.couchbase.com labels=role=build
-172.23.106.117 name=mega4-37.sc.couchbase.com labels=role=build
-172.23.106.50  name=mega4-38.sc.couchbase.com labels=role=serverbuild-asan
+mega4-01   ansible_host=172.23.96.171  labels=role=build manager=true
+mega4-02   ansible_host=172.23.96.173  labels=role=build
+mega4-03   ansible_host=172.23.96.176  labels=role=build
+mega4-04   ansible_host=172.23.96.218  labels=role=build
+mega4-05   ansible_host=172.23.96.208  labels=role=build
+mega4-06   ansible_host=172.23.96.211  labels=role=build
+mega4-07   ansible_host=172.23.96.249  labels=role=build
+mega4-12   ansible_host=172.23.121.104 labels=role=build manager=true
+mega4-13   ansible_host=172.23.120.91  labels=role=build
+mega4-14   ansible_host=172.23.120.111 labels=role=build
+mega4-15   ansible_host=172.23.121.109 labels=role=build
+mega4-16   ansible_host=172.23.120.253 labels=role=build
+mega4-17   ansible_host=172.23.121.111 labels=role=build
+mega4-18   ansible_host=172.23.121.112 labels=role=build
+mega4-19   ansible_host=172.23.121.113 labels=role=build
+mega4-20   ansible_host=172.23.120.19  labels=role=build
+mega4-21   ansible_host=172.23.113.28  labels=role=build manager=true
+mega4-22   ansible_host=172.23.113.44  labels=role=build
+mega4-23   ansible_host=172.23.113.49  labels=role=build manager=true
+mega4-24   ansible_host=172.23.113.41  labels=role=build
+mega4-25   ansible_host=172.23.113.42  labels=role=build
+mega4-26   ansible_host=172.23.113.43  labels=role=build
+mega4-27   ansible_host=172.23.113.46  labels=role=build
+mega4-28   ansible_host=172.23.113.50  labels=role=build
+mega4-29   ansible_host=172.23.113.48  labels=role=build
+mega4-30   ansible_host=172.23.113.45  labels=role=build
+mega4-31   ansible_host=172.23.113.47  labels=role=build
+mega4-32   ansible_host=172.23.113.37  labels=role=infrastructure
+mega4-33   ansible_host=172.23.96.52   labels=role=infrastructure
+mega4-34   ansible_host=172.23.97.147  labels=role=docker-buildx
+monster-01 ansible_host=172.23.113.9   labels=role=monster
+monster-02 ansible_host=172.23.113.29  labels=role=monster
+monster-03 ansible_host=172.23.112.4   labels=role=monster
+mega4-35   ansible_host=172.23.105.183 labels=role=build manager=true
+mega4-36   ansible_host=172.23.106.70  labels=role=build
+mega4-37   ansible_host=172.23.106.117 labels=role=build
+mega4-38   ansible_host=172.23.106.50  labels=role=serverbuild-asan
 
 [sdk]
-172.23.97.81   name=sdk-swarm-01.build.couchbase.com manager=true
-172.23.97.95   name=sdk-swarm-02.build.couchbase.com manager=true
-172.23.97.97   name=sdk-swarm-03.build.couchbase.com manager=true
-172.23.96.70   name=sdk-swarm-04.build.couchbase.com
+sdk-swarm-01 ansible_host=172.23.97.81 manager=true
+sdk-swarm-02 ansible_host=172.23.97.95 manager=true
+sdk-swarm-03 ansible_host=172.23.97.97 manager=true
+sdk-swarm-04 ansible_host=172.23.96.70
 
 [builddb]
-172.23.96.217  name=build-db-01.build.couchbase.com manager=true
-172.23.107.139 name=build-db-02.build.couchbase.com manager=true
-172.23.96.250  name=build-db-03.build.couchbase.com manager=true
+build-db-01 ansible_host=172.23.96.217  manager=true
+build-db-02 ansible_host=172.23.107.139 manager=true
+build-db-03 ansible_host=172.23.96.250  manager=true
 
 [analytics]
-172.23.107.124 name=analytics-12.build.couchbase.com labels=cvtype=ubuntu18 manager=true
-172.23.107.130 name=analytics-13.build.couchbase.com labels=cvtype=ubuntu18
-172.23.107.138 name=analytics-14.build.couchbase.com labels=cvtype=ubuntu18 manager=true
-172.23.107.144 name=analytics-15.build.couchbase.com labels=cvtype=ubuntu18
-172.23.104.180 name=analytics-16.build.couchbase.com labels=cvtype=ubuntu18 manager=true
-172.23.104.22  name=analytics-17.build.couchbase.com labels=cvtype=ubuntu18
+analytics-12 ansible_host=172.23.107.124 labels=cvtype=ubuntu18 manager=true
+analytics-13 ansible_host=172.23.107.130 labels=cvtype=ubuntu18
+analytics-14 ansible_host=172.23.107.138 labels=cvtype=ubuntu18 manager=true
+analytics-15 ansible_host=172.23.107.144 labels=cvtype=ubuntu18
+analytics-16 ansible_host=172.23.104.180 labels=cvtype=ubuntu18 manager=true
+analytics-17 ansible_host=172.23.104.22  labels=cvtype=ubuntu18
 
 [cv]
-172.23.113.26  name=ubuntu18-cv-small-01  labels=cvtype=ubuntu18-small manager=true
-172.23.97.107  name=ubuntu18-cv-small-03  labels=cvtype=linux-small manager=true
-172.23.97.156  name=ubuntu18-cv-small-04  labels=cvtype=linux-small
-172.23.108.43  name=ubuntu18-cv-large-11  labels=cvtype=ubuntu18-large manager=true
-172.23.108.59  name=ubuntu18-cv-large-12  labels=cvtype=ubuntu18-large
-172.23.97.171  name=ubuntu18-cv-large-14  labels=cvtype=linux-large
-172.23.96.72   name=ubuntu18-cv-large-15  labels=cvtype=linux-large
-172.23.104.198 name=ubuntu18-cv-docker-03 labels=cvtype=docker
-172.23.96.223  name=ubuntu18-cv-docker-04 labels=cvtype=docker
-172.23.104.161 name=linux-cv-large-01     labels=cvtype=linux-large
-172.23.104.169 name=linux-cv-large-02     labels=cvtype=linux-large
-172.23.104.196 name=linux-cv-large-03     labels=cvtype=linux-large
-172.23.104.199 name=linux-cv-large-04     labels=cvtype=linux-large
-172.23.104.200 name=linux-cv-large-05     labels=cvtype=linux-large
-172.23.97.0    name=linux-cv-large-06     labels=cvtype=linux-large
-172.23.124.34  name=linux-cv-large-09     labels=cvtype=linux-large
-172.23.124.35  name=linux-cv-large-10     labels=cvtype=linux-large
-172.23.124.45  name=linux-cv-large-11     labels=cvtype=linux-large
-172.23.124.46  name=linux-cv-large-12     labels=cvtype=linux-large
+ubuntu18-cv-small-01  ansible_host=172.23.113.26  labels=cvtype=ubuntu18-small manager=true
+ubuntu18-cv-small-03  ansible_host=172.23.97.107  labels=cvtype=linux-small manager=true
+ubuntu18-cv-small-04  ansible_host=172.23.97.156  labels=cvtype=linux-small
+ubuntu18-cv-large-11  ansible_host=172.23.108.43  labels=cvtype=ubuntu18-large manager=true
+ubuntu18-cv-large-12  ansible_host=172.23.108.59  labels=cvtype=ubuntu18-large
+ubuntu18-cv-large-14  ansible_host=172.23.97.171  labels=cvtype=linux-large
+ubuntu18-cv-large-15  ansible_host=172.23.96.72   labels=cvtype=linux-large
+ubuntu18-cv-docker-03 ansible_host=172.23.104.198 labels=cvtype=docker
+ubuntu18-cv-docker-04 ansible_host=172.23.96.223  labels=cvtype=docker
+linux-cv-large-01     ansible_host=172.23.104.161 labels=cvtype=linux-large
+linux-cv-large-02     ansible_host=172.23.104.169 labels=cvtype=linux-large
+linux-cv-large-03     ansible_host=172.23.104.196 labels=cvtype=linux-large
+linux-cv-large-04     ansible_host=172.23.104.199 labels=cvtype=linux-large
+linux-cv-large-05     ansible_host=172.23.104.200 labels=cvtype=linux-large
+linux-cv-large-06     ansible_host=172.23.97.0    labels=cvtype=linux-large
+linux-cv-large-09     ansible_host=172.23.124.34  labels=cvtype=linux-large
+linux-cv-large-10     ansible_host=172.23.124.35  labels=cvtype=linux-large
+linux-cv-large-11     ansible_host=172.23.124.45  labels=cvtype=linux-large
+linux-cv-large-12     ansible_host=172.23.124.46  labels=cvtype=linux-large
 
 [all:vars]
 ansible_user=couchbase

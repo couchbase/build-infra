@@ -16,7 +16,7 @@ Options Ansible variables:
     runner. Default is empty.
 
   - gha_runner_name - The name to give to this runner. All runners must
-    have a unique name. Will default to the value of "vm_name".
+    have a unique name. Will default to the name in the inventory.
 
 Note: This role requires that the runner be added to a non-default runner group.
 Since those can only be defined at the org level, we only support adding runners

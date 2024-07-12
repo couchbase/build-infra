@@ -1,0 +1,42 @@
+---
+- hosts: all
+  vars:
+    job_ids: []
+  gather_facts: True
+
+  tasks:
+  - name: Ensure lsof installed
+    apt:
+      name: lsof
+      state: present
+    become: true
+
+  - name: Ensure script present
+    copy:
+      src: /mnt/playbooks/gha-runners/files/unmanage.sh
+      dest: /tmp/unmanage.sh
+      mode: '0755'
+
+  - name: Run script indefinitely
+    shell: /tmp/unmanage.sh > /tmp/unmanage.log
+    async: 1800
+    poll: 0
+    register: unmanager
+    become: true
+
+  - name: Initial delay before checking status
+    pause:
+      seconds: 2
+
+  - name: Wait for running jobs to complete
+    async_status:
+      jid: "{{ unmanager.ansible_job_id }}"
+    register: job_result
+    until: job_result.finished
+    retries: 240
+    delay: 30
+    become: true
+
+  - name: Print completion message
+    debug:
+      msg: Job complete

@@ -1,5 +1,5 @@
 [all]
-172.23.97.147 vm_name=mega4-34
+mega4-34 ansible_host=172.23.97.147
 
 [all:vars]
 ansible_user=couchbase

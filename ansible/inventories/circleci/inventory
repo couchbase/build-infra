@@ -1,19 +1,19 @@
 [all]
-172.23.97.79 vm_name=circleci-linux-large-4
-172.23.104.79 vm_name=circleci-linux-large-5
-172.23.108.195 vm_name=circleci-linux-large-6
-172.23.104.172 vm_name=circleci-linux-large-7
-172.23.104.224 vm_name=circleci-linux-large-8
-172.23.104.142 vm_name=circleci-linux-large-9
-172.23.104.175 vm_name=circleci-linux-large-10
-172.23.106.169 vm_name=circleci-linux-large-11
-172.23.105.250 vm_name=circleci-linux-large-12
-172.23.104.192 vm_name=circleci-linux-large-13
-172.23.104.193 vm_name=circleci-linux-large-14
-172.23.106.172 vm_name=circleci-linux-large-15
-172.23.106.173 vm_name=circleci-linux-large-16
-172.23.106.174 vm_name=circleci-linux-large-17
-172.23.106.175 vm_name=circleci-linux-large-18
+circleci-linux-large-4  ansible_host=172.23.97.79
+circleci-linux-large-5  ansible_host=172.23.104.79
+circleci-linux-large-6  ansible_host=172.23.108.195
+circleci-linux-large-7  ansible_host=172.23.104.172
+circleci-linux-large-8  ansible_host=172.23.104.224
+circleci-linux-large-9  ansible_host=172.23.104.142
+circleci-linux-large-10 ansible_host=172.23.104.175
+circleci-linux-large-11 ansible_host=172.23.106.169
+circleci-linux-large-12 ansible_host=172.23.105.250
+circleci-linux-large-13 ansible_host=172.23.104.192
+circleci-linux-large-14 ansible_host=172.23.104.193
+circleci-linux-large-15 ansible_host=172.23.106.172
+circleci-linux-large-16 ansible_host=172.23.106.173
+circleci-linux-large-17 ansible_host=172.23.106.174
+circleci-linux-large-18 ansible_host=172.23.106.175
 
 [all:vars]
 ansible_user=couchbase

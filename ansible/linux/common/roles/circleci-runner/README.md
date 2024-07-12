@@ -7,4 +7,4 @@ Required Ansible variables:
    https://circleci.com/docs/runner-installation
 
 - circleci_runner_name - The name to give to this runner. All runners
-  must have a unique name. Will default to the value of "vm_name".
+  must have a unique name. Will default to the value of `inventory_hostname`.

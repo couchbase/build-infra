@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: True
+
+  tasks:
+
+    - name: Configure tsan
+      include_role:
+        name: linux-cv

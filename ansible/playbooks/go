@@ -1,0 +1,87 @@
+#!/bin/bash -e
+
+show_help() {
+    echo "Usage: $0 -i <inventory> -g <groups> [-p <playbook>] [extra]"
+    echo
+    echo "This script runs a playbook or ad-hoc command against a specified inventory and group/s"
+    echo
+    echo "Arguments:"
+    echo "  -i|--inventory    Directory name in ansible/inventories - circleci, docker-swarms, sdk etc."
+    echo "  -g|--groups       Comma separated group list, or all for all."
+    echo "  -p|--playbook     Playbook to deploy (optional - if not specified you can run ad-hoc ansible commands)"
+    echo "  -h|--help         Show this help"
+    echo
+    echo "Optional arguments:"
+    echo "  extra       Extra arguments passed through to ansible-playbook (or ansible, if playbook is unspecified)"
+    echo
+    echo "Examples:"
+    echo "  $0 -p linux-cv.yml -i docker-swarms -g cv"
+    echo "  $0 -p swarm-build/playbook.yml -i testing -g local -e teardown=true"
+    echo "  $0 -i github-actions -g all -m shell -a 'uptime'"
+}
+
+cmd=ansible
+positional_params=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -p|----playbook)
+      playbook="$2"
+      cmd=ansible-playbook
+      limit=--limit # Slightly different way of passing in groups in
+                    # ansible/ansible-playbook, the former uses a
+                    # positional param
+      shift 2
+      ;;
+    -i|--inventory)
+      inventory=$(cd "$(dirname $(pwd)/../inventories/${2})" && pwd -P)/${2}/inventory
+      shift 2
+      ;;
+    -g|--groups)
+      groups="$2"
+      shift 2
+      ;;
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      positional_params+=("$1")
+      shift
+      ;;
+  esac
+  if [ "$named_args" = 3 ]; then
+    break
+  fi
+done
+
+if [ ! -f "${inventory}" ]; then
+    echo "Error: Inventory file not found: ${inventory}"
+    error=true
+fi
+
+if [ "${playbook}" != "" ]; then
+    if [ ! -f "${playbook}" ]; then
+        echo "Error: Playbook file not found: ${playbook}"
+        error=true
+    fi
+    # convert to path relative to container mountpoint
+    playbook="playbooks/${playbook}"
+fi
+
+if [ "${groups}" = "" ]; then
+    echo "Error: Groups must be specified (use 'all' for all)"
+    error=true
+fi
+
+if [ "${error}" = "true" ]; then
+    echo
+    show_help
+    exit 1
+fi
+
+docker run -it --rm \
+    -v ${inventory}:/mnt/inventory \
+    -v $(pwd):/mnt/playbooks \
+    -v $(git rev-parse --show-toplevel)/ansible/linux/common/roles:/roles \
+    -v $(git rev-parse --show-toplevel)/ansible/common/roles:/roley \
+    couchbasebuild/${cmd} -v -f 20 -i inventory ${playbook} ${limit} ${groups} ${positional_params[@]}

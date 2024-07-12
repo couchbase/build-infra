@@ -5,7 +5,7 @@
   tasks:
   - name: Teardown
     shell: "docker info | grep 'Swarm: inactive' || docker swarm leave --force"
-    when: teardown is defined
+    when: teardown is defined and teardown | bool
 
   - name: Check if swarm exists
     shell: "docker info | grep 'Swarm: active'"

@@ -4,4 +4,4 @@
   gather_facts: True
 
   roles:
-    - { role: '../nfs-remount' }
+    - { role: 'nfs-remount' }
