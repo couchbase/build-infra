@@ -1,20 +1,10 @@
 #!/bin/bash -ex
 
-docker run --pull always --rm -u couchbase \
-    -v /buildteam:/buildteam \
-    -v /home/couchbase/jenkinsdocker-ssh:/home/couchbase/.ssh \
-    -v /home/couchbase/build_database/build_db_loader_conf.ini:/etc/build_db_loader_conf.ini \
-    -v /home/couchbase/build_database:/home/couchbase/build_database \
-    couchbasebuild/load-build-database:latest \
-    load_build_database -c /etc/build_db_loader_conf.ini -d
+SCRIPT_DIR=$(dirname $(readlink -e -- "${BASH_SOURCE}"))
+cd "${SCRIPT_DIR}/.."
 
-docker run --rm -u couchbase \
-    -v /buildteam:/buildteam \
-    -v /home/couchbase/build_database/build_db_loader_conf.ini:/etc/build_db_loader_conf.ini \
-    -v /home/couchbase/build_database/jira-creds.json:/home/couchbase/jira-creds.json \
-    -v /home/couchbase/build_database/cloud-jira-creds.json:/home/couchbase/cloud-jira-creds.json \
-    couchbasebuild/load-build-database:latest \
-    jira_commenter -d \
-        -c /etc/build_db_loader_conf.ini \
-        --issues-creds /home/couchbase/jira-creds.json \
-        --cloud-creds /home/couchbase/cloud-jira-creds.json
+rye sync
+rye run load_build_database -d -c ~/.ssh/build_db_load_conf.ini
+rye run jira_commenter -d -c ~/.ssh/build_db_load_conf.ini \
+  --issues-creds ~/.ssh/jira-creds.json \
+  --cloud-creds ~/.ssh/cloud-jira-creds.json

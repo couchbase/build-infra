@@ -400,6 +400,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.ini_file.build_db_load_conf.20240711
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/build_db_load_conf.ini
+        mode: 0600
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/macos #
       ################################
@@ -747,6 +752,9 @@ secrets:
     external: true
   # cloud jira credentials
   profiledata.cloud_jira_creds.20240418:
+    external: true
+  # build database loader configuration
+  profiledata.ini_file.build_db_load_conf.20240711:
     external: true
   # jenkins tokens (for user ns-buildbot)
   profiledata.jenkins_api_token.server_job_automation.20220708:

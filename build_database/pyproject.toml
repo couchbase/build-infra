@@ -1,3 +1,36 @@
+[project]
+name = "build_database"
+version = "1.6.0"
+description = "Couchbase Build Team build database commands package"
+authors = [
+    { name = "Couchbase Build Team", email = "build-team@couchbase.com" }
+]
+dependencies = [
+    "cbbuild-database>=0.8.0",
+    "cbbuild-manifest>=0.7.0",
+    "cbbuild-util>=0.7.0",
+    "jira",
+]
+readme = "README.md"
+requires-python = ">=3.10, <3.11"
+license = { text = "Apache License, Version 2.0" }
+
+[project.scripts]
+jira_commenter = "build_database.scripts.jira_commenter:main"
+load_build_database = "build_database.scripts.load_build_database:main"
+add_commit_history = "build_database.scripts.add_commit_history:main"
+regenerate_repositories = "build_database.scripts.regenerate_repositories:main"
+
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["build_database"]
