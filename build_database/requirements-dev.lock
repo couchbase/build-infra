@@ -10,7 +10,7 @@
 #   universal: false
 
 -e file:.
-cbbuild-database==0.8.0
+cbbuild-database==0.8.1
     # via build-database
 cbbuild-manifest==0.7.0
     # via build-database

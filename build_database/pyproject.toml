@@ -6,7 +6,7 @@ authors = [
     { name = "Couchbase Build Team", email = "build-team@couchbase.com" }
 ]
 dependencies = [
-    "cbbuild-database>=0.8.0",
+    "cbbuild-database>=0.8.1",
     "cbbuild-manifest>=0.7.0",
     "cbbuild-util>=0.7.0",
     "jira",
