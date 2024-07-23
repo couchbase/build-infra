@@ -6,5 +6,5 @@ cd "${SCRIPT_DIR}/.."
 rye sync
 rye run load_build_database -d -c ~/.ssh/build_db_load_conf.ini
 rye run jira_commenter -d -c ~/.ssh/build_db_load_conf.ini \
-  --issues-creds ~/.ssh/jira-creds.json \
+  --issues-creds ~/.ssh/issues-jira-creds.json \
   --cloud-creds ~/.ssh/cloud-jira-creds.json

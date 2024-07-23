@@ -395,6 +395,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.issues_jira_creds.20240722
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/issues-jira-creds.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.cloud_jira_creds.20240418
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/cloud-jira-creds.json
         mode: 0600
@@ -747,8 +752,11 @@ secrets:
   # jira auth pem
   profiledata.build_jira_pem.20220213:
     external: true
-  # jira credentials
+  # jira credentials - buildteam_automation (VULN, etc)
   profiledata.build_jira_creds.20220712:
+    external: true
+  # jira credentials - build-team (jira_commenter)
+  profiledata.issues_jira_creds.20240722:
     external: true
   # cloud jira credentials
   profiledata.cloud_jira_creds.20240418:
