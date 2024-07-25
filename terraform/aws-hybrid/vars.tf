@@ -11,6 +11,7 @@ variable "environments" {
         "analytics",
         "cv",
         "server",
+        "sdk",
         "test"
     ]
 }

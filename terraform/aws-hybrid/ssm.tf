@@ -399,3 +399,115 @@ resource "aws_ssm_parameter" "server_ssh_patch_via_gerrit_ini" {
     Encoding = "none"
   }
 }
+
+##########
+# SDK #
+##########
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_config" {
+  name  = "jenkins-worker__sdk__.ssh__config"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/config")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_known_hosts" {
+  name  = "jenkins-worker__sdk__.ssh__known_hosts"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/known_hosts")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_environment" {
+  name  = "jenkins-worker__sdk__.ssh__environment"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/environment")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_gitconfig" {
+  name  = "jenkins-worker__sdk__.gitconfig"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.gitconfig")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_id_buildbot" {
+  name  = "jenkins-worker__sdk__.ssh__id_buildbot"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/id_buildbot")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_id_cb_robot" {
+  name  = "jenkins-worker__sdk__.ssh__id_cb_robot"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/id_cb-robot")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_id_ns_codereview" {
+  name  = "jenkins-worker__sdk__.ssh__id_ns-codereview"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/id_ns-codereview")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_ns_buildbot_rsa" {
+  name  = "jenkins-worker__sdk__.ssh__ns-buildbot.rsa"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/ns-buildbot.rsa")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}
+
+resource "aws_ssm_parameter" "couchbase_server_sdk_ssh_patch_via_gerrit_ini" {
+  name  = "jenkins-worker__sdk__.ssh__patch_via_gerrit.ini"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/patch_via_gerrit.ini")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "sdk"
+    Encoding = "none"
+  }
+}

@@ -96,6 +96,7 @@ function get_stackfile() {
   stackfiles["analytics"]="analytics/analytics-jenkins-agents.yml"
   stackfiles["cv"]="cv/cv-jenkins-agents.yml"
   stackfiles["server"]="couchbase-server/server-jenkins-agents.yaml"
+  stackfiles["sdk"]="sdk/sdk-jenkins-agents.yaml"
   stackfiles["test"]="couchbase-server/server-jenkins-agents.yaml"
 
   if [ "${is_test_image}" = "1" ]; then
@@ -214,6 +215,11 @@ function docker_run_args() {
 
   # Mount docker socket for analytics builders
   if [ "${environment}" = "analytics" ]
+  then
+    args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+  fi
+  # Mount docker socket for sdk builders
+  if [ "${environment}" = "sdk" ]
   then
     args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
   fi
