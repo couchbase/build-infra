@@ -8,11 +8,11 @@ version: '3.8'
 services:
 
   agent:
-    image: couchbasebuild/blackduck-agent:20240222
+    image: couchbasebuild/blackduck-agent:20240726
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=blackduck-agent"
-      - "JENKINS_SLAVE_LABELS=blackduck ubuntu22.04"
+      - "JENKINS_SLAVE_LABELS=blackduck ubuntu24.04"
       - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
       - "NODE_CLASS=build zz"
       - "NODE_PRODUCT=couchbase-server"

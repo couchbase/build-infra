@@ -1,7 +1,23 @@
 # Dockerfile for Jenkins worker running black duck detect
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 LABEL maintainer="Couchbase Build Team <build-team@couchbase.com>"
+
+# Create couchbase user with password-less sudo privs, and give
+# ownership of /opt/couchbase
+#
+# Note: we do this prior to installing openjdk as openjdk depends on systemd
+# which creates a `systemd-journal` group with gid 999 - by creating our docker
+# group with gid 999 up front, a different gid will be used for systemd-journal
+RUN set -x \
+    && apt update \
+    && apt install -y adduser sudo \
+    && apt clean \
+    && addgroup --gid 999 docker \
+    && useradd couchbase -G sudo,docker -m -s /bin/bash \
+    && mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase \
+    && echo 'couchbase:couchbase' | chpasswd \
+    && sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER
@@ -18,9 +34,9 @@ RUN set -x \
         git \
         jq \
         libxml2-utils \
-        openjdk-11-jre-headless \
-        openjdk-11-jdk \
-        openjdk-11-jdk-headless \
+        openjdk-17-jre-headless \
+        openjdk-17-jdk \
+        openjdk-17-jdk-headless \
         python3 \
         python3-pip \
         python3-venv \
@@ -30,12 +46,12 @@ RUN set -x \
         sudo \
         vim \
         wget \
-    && ln -s /usr/bin/bundler3.0 /usr/local/bin/bundle \
+    && ln -s /usr/bin/bundler3.2 /usr/local/bin/bundle \
     && apt clean
 
 RUN set -x \
     && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
-    && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list \
     && apt update \
     && apt install -y docker-ce-cli \
     && apt clean
@@ -49,15 +65,6 @@ RUN set -x \
     && curl -Lfo /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo \
     && sed -i 's/env python$/env python3/' /usr/local/bin/repo \
     && chmod a+x /usr/local/bin/repo
-
-# Create couchbase user with password-less sudo privs, and give
-# ownership of /opt/couchbase
-RUN set -x \
-    && addgroup --gid 999 docker \
-    && useradd couchbase -G sudo,docker -m -s /bin/bash \
-    && mkdir -p /opt/couchbase && chown -R couchbase:couchbase /opt/couchbase \
-    && echo 'couchbase:couchbase' | chpasswd \
-    && sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # Jenkins bits
 ARG JNLP_AGENT_VER

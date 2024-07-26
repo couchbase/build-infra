@@ -33,7 +33,6 @@ docker build \
   --build-arg YQ_VER=${YQ} \
   .
 
-
 if ${PUBLISH}; then
   docker push ${IMAGE}:${TAG}
   docker push ${IMAGE}:latest
