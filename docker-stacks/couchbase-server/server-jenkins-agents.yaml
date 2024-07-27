@@ -95,6 +95,30 @@ services:
         target: /home/couchbase/.docker/config.json
     <<: *default-jenkins-one-agent
 
+  zzz-lightweight:
+    image: couchbasebuild/zz-lightweight:20240726
+    init: true
+    environment:
+      - "JENKINS_SLAVE_NAME=zzz-lightweight"
+      - "JENKINS_SLAVE_LABELS=zzz-lightweight"
+      - "JENKINS_SLAVE_EXECUTORS=10"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - "NODE_CLASS=build zz"
+      - *node-product
+      - *repo-url
+    volumes:
+      - "latestbuilds:/latestbuilds"
+      - "releases:/releases"
+      - "buildteam:/buildteam"
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /home/couchbase/.docker/config.json
+        target: /home/couchbase/.docker/config.json
+    <<: *default-jenkins-one-agent
+
   amzn2:
     image: couchbasebuild/server-amzn2-build:20230317
     environment:
