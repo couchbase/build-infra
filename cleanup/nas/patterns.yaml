@@ -1,0 +1,57 @@
+rootdir:
+
+  # Default rules for all (non-skipped) subdirectories
+  REMOVE:
+    # All source tarballs everywhere
+    ".*source.tar.gz": 2
+
+  SUBDIRS:
+
+    "escrow.*|gcc|github_backups|mobiledeps|packages-access":
+      SKIP: true
+
+    "cbdeps":
+      # More aggressive here as there are a number of internal/toy builds
+      REMOVE:
+        ".*(tgz|md5)": 45
+      REMOVE_EMPTY_DIRS: true
+
+    "couchbase-server|couchbase-columnar":
+      REMOVE:
+        # All installers everywhere (with a few exceptions below)
+        ".*(deb|rpm|dmg|msi)": 90
+        # All debug files
+        ".*(debug|dbg).*": 60
+        ".*-PDB.zip": 60
+        # All MacOS .orig/-unsigned files from codesigning
+        ".*macos.*orig": 2
+        ".*macos.*-unsinged.zip": 2
+
+      SUBDIRS:
+        "toybuilds":
+          # Everything
+          REMOVE:
+            ".*": 30
+          REMOVE_EMPTY_DIRS: true
+
+        "cheshire-cat|mad-hatter|neo":
+          # Leave centos7 and linux EE .deb files around
+          KEEP:
+            - ".*centos7.*"
+            - ".*enterprise.*linux.*deb"
+
+        # For "master", we don't want to pick up the linux EE .deb "KEEP"
+        # rule under ".*" below. So just put an empty entry here, which
+        # says "the master subdirectory has no additional rules".
+        "master": {}
+
+        ".*":
+          # Leave linux EE .deb files around
+          KEEP:
+            - ".*enterprise.*linux.*deb"
+
+    # Catch-all for subdirectories not mentioned above
+    ".*":
+      REMOVE:
+        # All likely installer and other large artifacts and checksums.
+        ".*(deb|rpm|msi|zip|dmg|nupkg|apk|war|aar|jar|tar.gz|tgz|md5|sha256)": 180
