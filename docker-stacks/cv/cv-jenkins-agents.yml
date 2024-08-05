@@ -132,7 +132,7 @@ services:
     image: couchbasebuild/server-linux-cv:20240129
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-small"
-      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity morpheus linux small"
+      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux small"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -157,7 +157,7 @@ services:
     image: couchbasebuild/server-linux-cv:20240129
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-large"
-      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity morpheus linux large"
+      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux large"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
