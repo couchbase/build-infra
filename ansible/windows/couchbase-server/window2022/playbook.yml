@@ -2,9 +2,6 @@
 - hosts: all
 
   tasks:
-    - name: Disable Windows antivirus during setup
-      win_shell: Add-MpPreference -ExclusionPath "C:"
-
     - name: Copy patch_via_gerrit
       include_role:
         name: ../../../common/roles/patch_via_gerrit
@@ -71,10 +68,45 @@
       tags:
       - ruby
 
-    - name: Install JDK for Jenkins
-      win_chocolatey:
-        name: openjdk
-        state: latest
+    - name: Set up Java for Jenkins
+      block:
+        - name: Install JDK
+          win_chocolatey:
+            name: openjdk
+            state: latest
+
+        - name: Find JDK install dirs
+          win_find:
+            paths: 'C:\Program Files\OpenJDK'
+            recurse: no
+            file_type: directory
+            patterns: 'jdk-*'
+          register: java_dirs
+
+        - name: Determine latest JDK
+          set_fact:
+            latest_java_dir: "{{ (java_dirs.files | map(attribute='path') | list | sort | last) }}"
+
+        - name: Set JAVA_HOME
+          win_environment:
+            state: present
+            name: JAVA_HOME
+            value: '{{ latest_java_dir }}'
+            level: machine
+
+        - name: Retrieve current JDK path
+          win_shell: '[System.Environment]::GetEnvironmentVariable("PATH", "Machine")'
+          register: current_path
+
+        - name: Ensure JDK bindir is on PATH
+          win_environment:
+            state: present
+            name: PATH
+            value: "{{ latest_java_dir }}\\bin;{{ current_path.stdout }}"
+            level: machine
+          when: latest_java_dir + '\\bin' not in current_path.stdout
+      tags:
+        - java
 
     - name: Create download area for Ansible
       win_file:
