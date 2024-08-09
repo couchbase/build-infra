@@ -19,7 +19,7 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Install Couchbase Lite Android toolchain requirements
 RUN apt-get update && \
-    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-11-jdk gnupg2 zip rsync wget && \
+    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-17-jdk gnupg2 zip rsync wget && \
     apt-get clean
 
 # Swarm client jar - only needed until CBD-4101 is resolved
@@ -94,8 +94,8 @@ RUN cd /home/couchbase/jenkins/tools && \
 # Revert so CMD will run as root.
 USER root
 
-# CBD-4280: set openjdk-11-jdk as default
-RUN update-java-alternatives -s java-1.11.0-openjdk-amd64
+# CBD-4280: set openjdk-17-jdk as default
+RUN update-java-alternatives -s java-1.17.0-openjdk-amd64
 
 # Add cbdep tool
 RUN curl --fail http://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
