@@ -27,8 +27,11 @@ services:
 
         - "traefik.http.services.nexus_cache.loadbalancer.server.port=8081"
         - "traefik.http.services.nexus_cache.loadbalancer.server.scheme=http"
-    image: sonatype/nexus3
+    image: sonatype/nexus3:3.69.0
     init: true
+    environment:
+      # https://stackoverflow.com/a/74268743/1425601
+      - "INSTALL4J_ADD_VM_PARAMS=-Djava.util.prefs.userRoot=/nexus-data/javaprefs"
     volumes:
       - type: bind
         source: /buildteam/nexus-cache
