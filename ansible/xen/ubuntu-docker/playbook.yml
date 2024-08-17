@@ -142,7 +142,8 @@
         path: "{{ item.mountpoint }}"
         src: "{{ item.nasserver }}:{{ item.naspath }}"
         fstype: nfs
-        opts: rw,soft
+        # https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/client-and-managed-controllers/nfs-guide#_3_configure_nfs_client_mount_point
+        opts: _netdev,rw,bg,hard,intr,rsize=32768,wsize=32768,noatime,nodiratime,sync
         dump: "0"
         passno: "0"
         state: mounted
