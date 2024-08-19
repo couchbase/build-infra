@@ -90,9 +90,6 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
-      - type: bind
-        source: /home/couchbase/.docker/config.json
-        target: /home/couchbase/.docker/config.json
     <<: *default-jenkins-one-agent
 
   zzz-lightweight:
@@ -114,9 +111,6 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
-      - type: bind
-        source: /home/couchbase/.docker/config.json
-        target: /home/couchbase/.docker/config.json
     <<: *default-jenkins-one-agent
 
   amzn2:

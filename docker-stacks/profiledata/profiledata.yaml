@@ -355,6 +355,11 @@ services:
       ################################
       # couchbase-server/zz/linux    #
       ################################
+      - source: profiledata.docker_config.dockerio_ghcrio_rhcc.20230828
+        target: /home/couchbase/couchbase-server/zz/linux/.docker/config.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.gpg_key.repository_signing.20230601
         target: /home/couchbase/couchbase-server/zz/linux/.gpg/repository_signing
         mode: 0600
