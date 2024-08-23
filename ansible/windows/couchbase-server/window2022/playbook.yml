@@ -183,9 +183,9 @@
         - repo
 
     - name: "Install repo wrapper"
-      copy:
-        dest: "{{ targetvolume | default('c') }}:\\bin\\repo.cmd"
-        content: "@call python %~dp0\\repo %*"
+      win_copy:
+        src: repo.exe
+        dest: "{{ targetvolume | default('c') }}:\\bin\\"
       tags:
         - repo
 

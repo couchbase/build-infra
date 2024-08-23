@@ -6,7 +6,7 @@ then
 Error: no profile sync ssh key filename provided
 
 Usage:
-    ./go [ssh_key] -e ansible_password=[password] -e vs2022_key=ABCD1234 -e NODE_PRODUCT=couchbase-server -e NODE_CLASS=build
+    ./go [profiledata_ssh_key] -e ansible_password=[password] -e vs2022_key=ABCD1234 -e NODE_PRODUCT=couchbase-server -e NODE_CLASS=build
 EOF
     exit 1
 fi
