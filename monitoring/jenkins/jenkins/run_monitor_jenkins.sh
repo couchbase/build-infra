@@ -15,5 +15,5 @@ docker run --rm -u couchbase \
     -w /home/couchbase/jenkins_monitor \
     -v /home/couchbase/jenkins_monitor/jenkins_monitor.json:/etc/jenkins_monitor.json \
     -v /home/couchbase/db:/home/couchbase/db \
-    couchbasebuild/jenkins_monitor:20210329 \
+    couchbasebuild/jenkins_monitor:20240816 \
     monitor_jenkins -d -c /etc/jenkins_monitor.json

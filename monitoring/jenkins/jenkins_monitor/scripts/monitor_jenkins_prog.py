@@ -602,7 +602,11 @@ def main():
         try:
             monitor = JenkinsMonitor(email_info, server_info)
             monitor.check_nodes_online()
-            monitor.check_nodes_diskspace()
+            #Check diskspace is disabled to reduce jenkins api calls.
+            #Recently, jenkins went offline often due to heavy loads.
+            #Frequent api calls makes the matter worse.  Since we don't
+            #see diskspace issue often anymore, it is safe to disable it.
+            #monitor.check_nodes_diskspace()
             monitor.check_running_builds()
         except RuntimeError as exc:
             logger.error(f'Monitoring of server {server_info["name"]} '
