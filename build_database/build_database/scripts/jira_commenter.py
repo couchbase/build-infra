@@ -25,13 +25,9 @@ logger.addHandler(ch)
 
 class JiraCommenter:
 
-    def __init__(self, db_info, dryrun, issues_creds_file, cloud_creds_file):
-        issues_jira_creds = json.loads(open(issues_creds_file).read())
+    def __init__(self, db_info, dryrun, cloud_creds_file):
         cloud_jira_creds = json.loads(open(cloud_creds_file).read())
 
-        self.issues_jira = JIRA(server=issues_jira_creds['url'],
-                                token_auth=issues_jira_creds['apitoken']
-                                )
         self.cloud_jira = JIRA(cloud_jira_creds['url'],
                                basic_auth=(f"{cloud_jira_creds['username']}",
                                            f"{cloud_jira_creds['apitoken']}"
@@ -68,8 +64,6 @@ class JiraCommenter:
         Makes a comment on the specified ticket about the commit/build
         """
 
-        found_on_server = False
-        found_on_cloud = False
         # Exception: Don't bother with ASTERIXDB tickets since
         # they're on a different JIRA
         if ticket.startswith("ASTERIXDB"):
@@ -77,22 +71,16 @@ class JiraCommenter:
             return
 
         try:
-            jticket = self.issues_jira.issue(ticket)
-            found_on_server = True
+            jticket = self.cloud_jira.issue(ticket)
         except JIRAError as e:
-            try:
-                jticket = self.cloud_jira.issue(ticket)
-                found_on_cloud = True
-            except JIRAError as e:
-                if e.status_code == 404:
-                    logger.info(
-                        f"commit references non-existent ticket {ticket}")
-                else:
-                    logger.warning(
-                        f"error loading JIRA issue ticket {ticket}: {e.text}"
-                    )
-                return
-
+            if e.status_code == 404:
+                logger.info(
+                    f"commit references non-existent ticket {ticket}")
+            else:
+                logger.warning(
+                    f"error loading JIRA issue ticket {ticket}: {e.text}"
+                )
+            return
         org = commit.remote.split('/')[3]
         url = f'https://github.com/{org}/{commit.project}/commit/{commit.sha}'
         message = (
@@ -104,14 +92,9 @@ class JiraCommenter:
         if self.dryrun:
             logger.info(f'(Not) posting Jira comment on {ticket}:\n{message}')
             return
-        if found_on_server:
-            self.issues_jira.add_comment(jticket, message)
-            logger.info(
-                f'Posting Jira comment on {ticket} on issues.couchbase.com:\n{message}')
-        if found_on_cloud:
-            self.cloud_jira.add_comment(jticket, message)
-            logger.info(
-                f'Posting Jira comment on {ticket} on cloud jira:\n{message}')
+        self.cloud_jira.add_comment(jticket, message)
+        logger.info(
+            f'Posting Jira comment on {ticket} on cloud jira:\n{message}')
 
 
     def scan_and_comment(self):
@@ -155,8 +138,6 @@ def main():
     parser.add_argument('-c', '--config', dest='db_repo_configfile',
                         help='Configuration file for build database loader',
                         default='build_db_conf.ini')
-    parser.add_argument('--issues-creds', type=str, required=True,
-                        help='Credentials file for issues.couchbase.com')
     parser.add_argument('--cloud-creds', type=str, required=True,
                         help='Credentials file for Couchbase Cloud Jira')
     parser.add_argument('-n', '--dryrun', action='store_true',
@@ -180,6 +161,6 @@ def main():
 
     db_info = db_repo_config['build_db']
     commenter = JiraCommenter(
-        db_info, args.dryrun, args.issues_creds, args.cloud_creds
+        db_info, args.dryrun, args.cloud_creds
     )
     commenter.scan_and_comment()

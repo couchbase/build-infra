@@ -5,7 +5,5 @@ cd "${SCRIPT_DIR}/.."
 
 rye sync
 rye run load_build_database -d -c ~/.ssh/build_db_load_conf.ini
-# Disabling during Jira transition
-#rye run jira_commenter -d -c ~/.ssh/build_db_load_conf.ini \
-#  --issues-creds ~/.ssh/issues-jira-creds.json \
-#  --cloud-creds ~/.ssh/cloud-jira-creds.json
+rye run jira_commenter -d -c ~/.ssh/build_db_load_conf.ini \
+  --cloud-creds ~/.ssh/cloud-jira-creds.json
