@@ -46,6 +46,7 @@ def patchset_created_jira(
         logger.info(f'{issue_key} does not exist.')
         return
     review_list = []
+    new_review_list = []
     commit_title = ' '.join(commit_summary.split(' ', 5)[:5])
     new_gerrit_entry = f'[{commit_title}|{change_url}]\trepo:{project_name}\tbranch:{branch_name}'
     gerrit_reviews = field_values['fields'][GERRIT_CUSTOM_FIELD]
