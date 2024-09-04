@@ -5,10 +5,11 @@ version: '3.8'
 # All services, networks, etc. will then get an "sdk_" prefix,
 # eg. "sdk_centos7"
 
-# Default slave configuration. This is written using a YAML anchor so
-# it can be substituted into all the slave declarations later. See
+# Default agent configuration with two replicas. This is written using a
+# YAML anchor so it can be substituted into all the agent declarations
+# later. See
 # https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
-x-default-jenkins-slave: &default-jenkins-slave
+x-default-jenkins-two-agent: &default-jenkins-two-agent
   init: true
   deploy:
     placement:
@@ -39,14 +40,51 @@ x-default-jenkins-slave: &default-jenkins-slave
     - source: jenkins_master_username
       target: /run/secrets/jenkins_master_username
       mode: 0444
-    - source: jenkins_slave_ssh_config_20200422
+    - source: jenkins_agent_ssh_config_20200422
       target: /home/couchbase/.ssh/config
       uid: '1000'
       gid: '1000'
       mode: 0644
 
+# Single-replica agent configuration.
+x-default-jenkins-two-agent: &default-jenkins-one-agent
+  init: true
+  deploy:
+    placement:
+      constraints:
+        - node.labels.role==build
+    replicas: 1
+  networks:
+    - jenkins
+  secrets:
+    - source: ns-buildbot.rsa
+      target: /home/couchbase/.ssh/ns-buildbot.rsa
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: id_ns-codereview_20181212
+      target: /home/couchbase/.ssh/id_ns-codereview
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_docker_config_20210719
+      target: /home/couchbase/.docker/config.json
+      uid: '1000'
+      gid: '1000'
+      mode: 0400
+    - source: sdk_jenkins_ns-buildbot_api_key.20220510
+      target: /run/secrets/jenkins_master_password
+  configs:
+    - source: jenkins_master_username
+      target: /run/secrets/jenkins_master_username
+      mode: 0444
+    - source: jenkins_agent_ssh_config_20200422
+      target: /home/couchbase/.ssh/config
+      uid: '1000'
+      gid: '1000'
+      mode: 0644
 
-x-default-jenkins-slave-environment:
+x-default-jenkins-two-agent-environment:
 # Due to https://github.com/docker/compose/issues/229, the Jenkins container is
 # created with a container name "sdk_jenkins", which is not a valid DNS entry.
 # "dig" will actually resolve it OK inside another container, but Java will
@@ -55,8 +93,8 @@ x-default-jenkins-slave-environment:
 # cbdeps packages, JENKINS_MASTER may be set in the local environment when
 # running this stack. If it is, its value will override the value here. This
 # means you can attach these agents temporarily to a different Jenkins master.
- - &default-jenkins-slave-environment-master "JENKINS_MASTER=${JENKINS_MASTER:-http://sdk-swarm.build.couchbase.com:8080/}"
- - &default-jenkins-slave-lang "LANG=en_US.UTF-8"
+ - &default-jenkins-two-agent-environment-master "JENKINS_MASTER=${JENKINS_MASTER:-http://sdk-swarm.build.couchbase.com:8080/}"
+ - &default-jenkins-two-agent-lang "LANG=en_US.UTF-8"
  - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
 
 services:
@@ -66,20 +104,20 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine317"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.17 alpine"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
 
   alpine318:
     image: couchbasebuild/sdk-alpine3.18-build:20231103
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine318"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.18 alpine"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
 
   # Placeholder for AWS agents
   # Note: this should always have zero replicas. Its presence here is
@@ -104,59 +142,69 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
 
   centos7:
     image: couchbasebuild/sdk-centos7-build:20230419
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-one-agent
 
   almalinux8:
     image: couchbasebuild/sdk-almalinux8-build:20231103
     environment:
       - "JENKINS_SLAVE_NAME=build-almalinux8"
       - "JENKINS_SLAVE_LABELS=sdk centos8 almalinux8"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-one-agent
+
+  rockylinux9:
+    image: couchbasebuild/sdk-rockylinux9-build:20240904
+    environment:
+      - "JENKINS_SLAVE_NAME=build-rockylinux9"
+      - "JENKINS_SLAVE_LABELS=sdk rockylinux9"
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
+      - *repo-url
+    <<: *default-jenkins-two-agent
 
   debian9:
     image: couchbasebuild/sdk-debian9-build:20230419
     environment:
       - "JENKINS_SLAVE_NAME=build-debian9"
       - "JENKINS_SLAVE_LABELS=sdk debian9"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
 
   ubuntu20:
     image: couchbasebuild/sdk-ubuntu20-build:20230607
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
-      - *default-jenkins-slave-environment-master
-      - *default-jenkins-slave-lang
+      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-two-agent-lang
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
 
   centos7-signing:
     image: couchbasebuild/sdk-centos7-signing:20220317
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"
-      - *default-jenkins-slave-environment-master
+      - *default-jenkins-two-agent-environment-master
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
     deploy:
       replicas: 1
       placement:
@@ -187,7 +235,7 @@ services:
       - source: jenkins_master_username
         target: /run/secrets/jenkins_master_username
         mode: 0444
-      - source: jenkins_slave_ssh_config_20200422
+      - source: jenkins_agent_ssh_config_20200422
         target: /home/couchbase/.ssh/config
         uid: '1000'
         gid: '1000'
@@ -198,9 +246,9 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
       - "JENKINS_SLAVE_LABELS=debian10-signing docker"
-      - *default-jenkins-slave-environment-master
+      - *default-jenkins-two-agent-environment-master
       - *repo-url
-    <<: *default-jenkins-slave
+    <<: *default-jenkins-two-agent
     deploy:
       replicas: 1
       placement:
@@ -236,7 +284,7 @@ services:
       - source: jenkins_master_username
         target: /run/secrets/jenkins_master_username
         mode: 0444
-      - source: jenkins_slave_ssh_config_20200422
+      - source: jenkins_agent_ssh_config_20200422
         target: /home/couchbase/.ssh/config
         uid: '1000'
         gid: '1000'
@@ -269,8 +317,8 @@ secrets:
 configs:
   jenkins_master_username:
     file: config/jenkins_master_username
-  jenkins_slave_ssh_config_20200422:
-    file: conf/jenkins_slave_ssh_config
+  jenkins_agent_ssh_config_20200422:
+    file: conf/jenkins_agent_ssh_config
 
 networks:
   jenkins:
