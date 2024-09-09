@@ -29,7 +29,7 @@ services:
         - "traefik.http.routers.changelog_https.service=changelog"
 
         - "traefik.http.services.changelog.loadbalancer.server.port=80"
-    image: couchbasebuild/changelog-frontend:20230330
+    image: couchbasebuild/changelog-frontend:20240909
     init: true
     networks:
       - traefik_reverse-proxy

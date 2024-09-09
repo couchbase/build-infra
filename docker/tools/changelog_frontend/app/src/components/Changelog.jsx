@@ -190,7 +190,7 @@ export default function Changelog(props) {
             return (
               <a
                 key={`${textPart}-${i}`}
-                href={`https://issues.couchbase.com/browse/${textPart}`}
+                href={`https://jira.issues.couchbase.com/browse/${textPart}`}
               >
                 {textPart}
               </a>
