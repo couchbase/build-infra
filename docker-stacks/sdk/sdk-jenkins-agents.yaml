@@ -47,7 +47,7 @@ x-default-jenkins-two-agent: &default-jenkins-two-agent
       mode: 0644
 
 # Single-replica agent configuration.
-x-default-jenkins-two-agent: &default-jenkins-one-agent
+x-default-jenkins-one-agent: &default-jenkins-one-agent
   init: true
   deploy:
     placement:
@@ -93,8 +93,8 @@ x-default-jenkins-two-agent-environment:
 # cbdeps packages, JENKINS_MASTER may be set in the local environment when
 # running this stack. If it is, its value will override the value here. This
 # means you can attach these agents temporarily to a different Jenkins master.
- - &default-jenkins-two-agent-environment-master "JENKINS_MASTER=${JENKINS_MASTER:-http://sdk-swarm.build.couchbase.com:8080/}"
- - &default-jenkins-two-agent-lang "LANG=en_US.UTF-8"
+ - &default-jenkins-agent-environment-master "JENKINS_MASTER=${JENKINS_MASTER:-http://sdk-swarm.build.couchbase.com:8080/}"
+ - &default-jenkins-agent-lang "LANG=en_US.UTF-8"
  - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
 
 services:
@@ -104,8 +104,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine317"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.17 alpine"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
@@ -114,8 +114,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine318"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.18 alpine"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
@@ -142,8 +142,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
@@ -152,8 +152,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-one-agent
 
@@ -162,18 +162,18 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-almalinux8"
       - "JENKINS_SLAVE_LABELS=sdk centos8 almalinux8"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-one-agent
 
   rockylinux9:
-    image: couchbasebuild/sdk-rockylinux9-build:20240904
+    image: couchbasebuild/sdk-rockylinux9-build:20240909
     environment:
       - "JENKINS_SLAVE_NAME=build-rockylinux9"
       - "JENKINS_SLAVE_LABELS=sdk rockylinux9"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
@@ -182,8 +182,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-debian9"
       - "JENKINS_SLAVE_LABELS=sdk debian9"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
@@ -192,8 +192,8 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
-      - *default-jenkins-two-agent-environment-master
-      - *default-jenkins-two-agent-lang
+      - *default-jenkins-agent-environment-master
+      - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
@@ -202,7 +202,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"
-      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-agent-environment-master
       - *repo-url
     <<: *default-jenkins-two-agent
     deploy:
@@ -246,7 +246,7 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
       - "JENKINS_SLAVE_LABELS=debian10-signing docker"
-      - *default-jenkins-two-agent-environment-master
+      - *default-jenkins-agent-environment-master
       - *repo-url
     <<: *default-jenkins-two-agent
     deploy:

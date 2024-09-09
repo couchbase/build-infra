@@ -46,6 +46,7 @@ RUN dnf install --setopt=keepcache=0 -y \
                 gcc-c++ \
                 git \
                 git-clang-format \
+                glibc-langpack-en \
                 java-11-openjdk \
                 java-latest-openjdk-devel \
                 jsoncpp-devel \
