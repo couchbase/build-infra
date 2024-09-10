@@ -26,11 +26,6 @@ x-default-jenkins-agent: &default-jenkins-agent
       target: /run/secrets/jenkins_master_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
-    - source: nsbuildbot-docker-config.json
-      target: /home/couchbase/.docker/config.json
-      uid: "1000"
-      gid: "1000"
-      mode: 0400
 
 services:
 
@@ -67,7 +62,7 @@ services:
       - "JENKINS_SLAVE_LABELS=analytics server couchsterix-test"
       - JENKINS_MASTER=http://analytics.jenkins.couchbase.com/
       - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
-      - NODE_CLASS=cv
+      - NODE_CLASS=cv zz
       - NODE_PRODUCT=couchbase-server
       - COUCHBASE_DISABLED_UNIT_TESTS=ALL
       - "REPO_URL=https://github.com/couchbasedeps/git-repo"
