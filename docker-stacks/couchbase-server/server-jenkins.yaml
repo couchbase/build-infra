@@ -9,7 +9,7 @@ services:
 
   # server.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.462.1
+    image: jenkins/jenkins:2.462.2
     deploy:
       resources:
         limits:
