@@ -1,3 +1,4 @@
-gha_runner_name: "{{ inventory_hostname }}"
+# vm_name will be defined when using create-ubuntu-agent script
+gha_runner_name: "{{ vm_name | default(inventory_hostname) }}"
 gha_service_name: "actions.runner.{{ gha_org }}.{{ gha_runner_name }}"
 gha_runner_labels: ""

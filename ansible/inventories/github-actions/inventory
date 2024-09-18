@@ -1,31 +1,57 @@
-[all]
-gha-runner-01 ansible_host=172.23.113.153
-gha-runner-02 ansible_host=172.23.113.161
-gha-runner-03 ansible_host=172.23.113.164
-gha-runner-04 ansible_host=172.23.113.167
-gha-runner-05 ansible_host=172.23.112.21
-gha-runner-06 ansible_host=172.23.113.171
-gha-runner-07 ansible_host=172.23.113.172
-gha-runner-08 ansible_host=172.23.113.173
-gha-runner-09 ansible_host=172.23.112.11
-gha-runner-10 ansible_host=172.23.113.175
-gha-runner-11 ansible_host=172.23.112.254
-gha-runner-12 ansible_host=172.23.112.20
-gha-runner-13 ansible_host=172.23.104.157
-gha-runner-14 ansible_host=172.23.104.155
-gha-runner-15 ansible_host=172.23.96.225
-gha-runner-16 ansible_host=172.23.96.226
-gha-runner-17 ansible_host=172.23.96.141
-gha-runner-18 ansible_host=172.23.96.162
-gha-runner-19 ansible_host=172.23.96.227
-gha-runner-20 ansible_host=172.23.113.53
-gha-runner-21 ansible_host=172.23.113.51
-gha-runner-22 ansible_host=172.23.113.23
-gha-runner-23 ansible_host=172.23.113.55
-gha-runner-24 ansible_host=172.23.113.30
-gha-runner-25 ansible_host=172.23.112.19
-gha-runner-26 ansible_host=172.23.113.39
-gha-runner-27 ansible_host=172.23.113.36
+[gha_runners:children]
+gha_xcp_sf36
+gha_xcp_s810
+gha_xcp_se23
+
+[gha_xcp_s810]
+# host is full
+gha-runner-01 ansible_host=172.23.113.57
+gha-runner-02 ansible_host=172.23.113.2
+gha-runner-03 ansible_host=172.23.113.58
+gha-runner-04 ansible_host=172.23.113.56
+gha-runner-05 ansible_host=172.23.113.34
+gha-runner-06 ansible_host=172.23.113.93
+gha-runner-07 ansible_host=172.23.113.94
+gha-runner-08 ansible_host=172.23.113.96
+gha-runner-09 ansible_host=172.23.113.70
+gha-runner-10 ansible_host=172.23.113.74
+gha-runner-11 ansible_host=172.23.113.69
+gha-runner-12 ansible_host=172.23.113.68
+
+[gha_xcp_se23]
+# host is full
+gha-runner-16 ansible_host=172.23.104.192
+gha-runner-17 ansible_host=172.23.104.193
+gha-runner-18 ansible_host=172.23.105.44
+gha-runner-19 ansible_host=172.23.105.45
+gha-runner-33 ansible_host=172.23.105.46
+gha-runner-34 ansible_host=172.23.105.10
+gha-runner-35 ansible_host=172.23.105.31
+gha-runner-36 ansible_host=172.23.105.32
+gha-runner-37 ansible_host=172.23.105.47
+gha-runner-38 ansible_host=172.23.105.37
+
+[gha_xcp_sf36]
+# host is full
+gha-runner-13 ansible_host=172.23.113.23
+gha-runner-14 ansible_host=172.23.113.30
+gha-runner-15 ansible_host=172.23.113.87
+gha-runner-20 ansible_host=172.23.113.76
+gha-runner-21 ansible_host=172.23.113.77
+gha-runner-22 ansible_host=172.23.113.78
+gha-runner-23 ansible_host=172.23.113.79
+gha-runner-24 ansible_host=172.23.113.82
+gha-runner-25 ansible_host=172.23.113.60
+gha-runner-26 ansible_host=172.23.113.83
+gha-runner-27 ansible_host=172.23.113.65
+gha-runner-28 ansible_host=172.23.113.86
+gha-runner-29 ansible_host=172.23.113.71
+gha-runner-30 ansible_host=172.23.113.72
+gha-runner-31 ansible_host=172.23.113.73
+gha-runner-32 ansible_host=172.23.113.75
+
+[bazel_cache]
+bazel-cache ansible_host=172.23.113.35
 
 [all:vars]
 ansible_user=couchbase

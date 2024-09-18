@@ -2,7 +2,7 @@
 
 # Modify these as necessary
 
-UBUNTUVER=${1-24.04}
+UBUNTUVER=${1-24.04.1}
 
 # This version may not work with XenServer 7.2; not sure whether any of our hosts
 # still use this. But the version that worked with 7.2 doesn't seem to work with

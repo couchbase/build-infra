@@ -76,6 +76,8 @@
       register: gha_token
       tags: config_runner
 
+    # inventory_hostname will be the new VM's IP when being run via
+    # create-ubuntu-agent
     - name: Configure GitHub Actions runner
       shell:
         cmd: >
@@ -84,7 +86,7 @@
           --name {{ gha_runner_name }}
           --token {{ gha_token.stdout_lines[0] }}
           --runnergroup {{ gha_runner_group | mandatory }}
-          --labels {{ gha_runner_labels }},{{ gha_runner_name }}
+          --labels {{ gha_runner_labels }},{{ gha_runner_name }},{{ inventory_hostname }}
         chdir: /opt/gha
         creates: /opt/gha/.credentials
       tags: config_runner

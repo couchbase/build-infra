@@ -1,0 +1,51 @@
+  # playbook to update custom GitHub Actions runner labels
+# based on current hostname and IP
+---
+- hosts: all
+  gather_facts: True
+  vars:
+    gha_runner_label_list: "{{ (gha_runner_labels | default('')).split(',') }}"
+
+  tasks:
+    - name: Update Runner Labels
+      block:
+        - name: Get runner ID
+          shell:
+            cmd: jq -r '"/orgs/couchbasecloud/actions/runners/" + (.agentId|tostring) + "/labels"' /opt/gha/.runner
+          register: gha_runner_path
+
+        - name: Get hostname
+          shell:
+            cmd: hostname
+          register: gha_hostname
+
+        - name: Log in to GHA
+          shell:
+            cmd: gh auth login --with-token
+            stdin: "{{ gha_api_token | mandatory }}"
+
+        - name: Reset current custom labels
+          shell:
+            cmd: >
+              gh api \
+                --method DELETE \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                {{ gha_runner_path.stdout }}
+
+        - name: Add new labels
+          shell:
+            cmd: >
+              gh api \
+                --method POST \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                {{ gha_runner_path.stdout }} \
+                -f "labels[]={{ item }}"
+          loop: "{{ [ gha_runner_label_list, ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]), gha_hostname.stdout ] | flatten | select }}"
+
+      always:
+        - name: Log out of GHA
+          shell:
+            cmd: gh auth logout --hostname github.com
+          when: True

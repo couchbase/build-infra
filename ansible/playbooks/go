@@ -6,7 +6,7 @@ show_help() {
     echo "This script runs a playbook or ad-hoc command against a specified inventory and group/s"
     echo
     echo "Arguments:"
-    echo "  -i|--inventory    Directory name in ansible/inventories - circleci, docker-swarms, sdk etc."
+    echo "  -i|--inventory    Directory name in ansible/inventories - github-actions, docker-swarms, sdk etc."
     echo "  -g|--groups       Comma separated group list, or all for all."
     echo "  -p|--playbook     Playbook to deploy (optional - if not specified you can run ad-hoc ansible commands)"
     echo "  -h|--help         Show this help"
@@ -84,4 +84,4 @@ docker run -it --rm \
     -v $(pwd):/mnt/playbooks \
     -v $(git rev-parse --show-toplevel)/ansible/linux/common/roles:/roles \
     -v $(git rev-parse --show-toplevel)/ansible/common/roles:/roley \
-    couchbasebuild/${cmd} -v -f 20 -i inventory ${playbook} ${limit} ${groups} ${positional_params[@]}
+    couchbasebuild/${cmd} -v -f 20 -i inventory ${playbook} ${limit} ${groups} "${positional_params[@]}"
