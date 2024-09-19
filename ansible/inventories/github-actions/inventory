@@ -5,10 +5,10 @@ gha_xcp_se23
 
 [gha_xcp_s810]
 # host is full
-gha-runner-01 ansible_host=172.23.113.57
+gha-runner-01 ansible_host=172.23.113.36
 gha-runner-02 ansible_host=172.23.113.2
-gha-runner-03 ansible_host=172.23.113.58
-gha-runner-04 ansible_host=172.23.113.56
+gha-runner-03 ansible_host=172.23.113.56
+gha-runner-04 ansible_host=172.23.112.19
 gha-runner-05 ansible_host=172.23.113.34
 gha-runner-06 ansible_host=172.23.113.93
 gha-runner-07 ansible_host=172.23.113.94
