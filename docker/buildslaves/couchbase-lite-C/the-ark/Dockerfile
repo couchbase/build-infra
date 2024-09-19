@@ -1,6 +1,6 @@
 # Docker container for cross-compiling
 
-FROM debian:buster
+FROM ubuntu:22.04
 LABEL maintainer="build-team@couchbase.com"
 
 # The cross compilers installed here are used for generic OS (like Ubuntu Core)
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     make \
     python3 \
-    python3-pip \
+    python3-progressbar \
     rsync \
     ruby \
     devscripts \
@@ -24,8 +24,6 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     zlib1g-dev \
 && rm -rf /var/lib/apt/lists
-
-RUN pip3 install progressbar
 
 # CMake
 ARG CMAKE_MAJOR=3
