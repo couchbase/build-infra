@@ -15,10 +15,17 @@ FROM couchbasebuild/single-gcc:${GCC_13_VER}-${GCC_13_TAG} as gcc_13
 FROM couchbasebuild/single-clang:${CLANG_9_VER}-${CLANG_9_TAG} as clang9
 FROM couchbasebuild/single-clang:${CLANG_15_VER}-${CLANG_15_TAG} as clang15
 
+# Base image
+FROM centos:centos7.9.2009 as base
+
+# Use vault for package installation - CentOS 7 is now EOL, so the original
+# mirrors are no longer available
+RUN sed -i -e '/^mirrorlist/d;/^#baseurl=/{s,^#,,;s,/mirror,/vault,;}' /etc/yum.repos.d/CentOS*.repo
+
 # Start of compile-only stages
 
 # First a base compile image that has some recurring dependencies
-FROM centos:centos7.9.2009 AS base-compile
+FROM base AS base-compile
 LABEL imagename=base-compile
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
@@ -97,7 +104,7 @@ RUN sudo make -j install
 ARG RUBY_MAJOR
 ARG RUBY_MINOR
 ARG RUBY_PATCH
-RUN ruby-install --prefix /usr/local -j -- ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH}
+RUN ruby-install -c --prefix /usr/local -j -- ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH}
 
 # OpenSSL
 FROM base-compile as openssl-compile
@@ -166,7 +173,7 @@ RUN ./configure --prefix=/usr/local && make -j && make install
 # This is the actual build agent base image
 # -----------------------------------------
 
-FROM centos:centos7.9.2009
+FROM base
 LABEL maintainer="build-team@couchbase.com"
 
 ARG BUILDARCH \
@@ -285,12 +292,13 @@ RUN for clang in ${CLANG_9_VER} ${CLANG_15_VER}; do \
 # Git (needs to be built with newer gcc than is available in base builder)
 ARG GIT_VER
 RUN mkdir /tmp/git
-RUN yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel
+RUN yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel && yum clean all
 RUN set -x \
     && curl -Lf https://www.kernel.org/pub/software/scm/git/git-${GIT_VER}.tar.gz -o - \
         | tar xz --strip-components=1 -C /tmp/git \
     && cd /tmp/git \
-    && PATH=/opt/gcc-${GCC_13_VER}/bin:$PATH make -j prefix=/usr/local install
+    && PATH=/opt/gcc-${GCC_13_VER}/bin:$PATH make -j prefix=/usr/local install \
+    && rm -rf /tmp/git
 
 # Autoconf and friends
 COPY --from=autoconf-compile /usr/local/ /usr/local/
@@ -331,7 +339,7 @@ COPY --from=ccache-compile /usr/local/ /usr/local/
 
 # Asciidoctor
 ARG ASCIIDOCTOR_VER
-RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER}
+RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER} && rm -rf /root/.gem
 
 # jq and yq
 ARG JQ_VER
@@ -381,10 +389,16 @@ RUN set -x \
 RUN usermod -a -G 999 couchbase
 
 # Dev packages required for building cbdep
-RUN yum install -y libxml2-devel and libxslt-devel
+RUN yum install -y libxml2-devel libxslt-devel && yum clean all
+
+# Truncate logfiles
+RUN find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+
+# Remove unnecessary files and directories
+RUN rm -rf /tmp/* /var/cache/yum
 
 # Need to create some directories so that the swarm stackfile can mount
-# on top of them without messing up permisions / ownership.
+# on top of them without messing up permissions / ownership.
 RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /home/couchbase/.cbdepcache/ /home/couchbase/.ccache \
     && chown -R couchbase:couchbase /home/couchbase
 
