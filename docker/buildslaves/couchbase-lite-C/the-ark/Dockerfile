@@ -1,6 +1,6 @@
 # Docker container for cross-compiling
 
-FROM debian:buster
+FROM ubuntu:22.04
 LABEL maintainer="build-team@couchbase.com"
 
 # The cross compilers installed here are used for generic OS (like Ubuntu Core)
@@ -15,17 +15,13 @@ RUN apt-get update && apt-get install -y \
     curl \
     make \
     python3 \
-    python3-pip \
+    python3-progressbar \
     rsync \
     ruby \
     devscripts \
-    g++-arm-linux-gnueabihf \
-    g++-aarch64-linux-gnu \
     libicu-dev \
     zlib1g-dev \
 && rm -rf /var/lib/apt/lists
-
-RUN pip3 install progressbar
 
 # CMake
 ARG CMAKE_MAJOR=3
@@ -61,3 +57,7 @@ COPY build/couchbuilder_start.sh /usr/sbin/
 COPY build/swarm*.properties /
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
+
+# Keep this stuff at the end, because the ARG declaration breaks Docker build caching
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
