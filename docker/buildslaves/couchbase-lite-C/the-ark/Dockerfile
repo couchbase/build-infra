@@ -1,6 +1,6 @@
 # Docker container for cross-compiling
 
-FROM ubuntu:22.04
+FROM debian:bullseye
 LABEL maintainer="build-team@couchbase.com"
 
 # The cross compilers installed here are used for generic OS (like Ubuntu Core)
@@ -21,6 +21,10 @@ RUN apt-get update && apt-get install -y \
     devscripts \
     libicu-dev \
     zlib1g-dev \
+    clang \
+    llvm \
+    lld \
+    ninja-build \
 && rm -rf /var/lib/apt/lists
 
 # CMake
