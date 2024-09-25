@@ -71,10 +71,12 @@ ubuntu18-cv-docker-03 ansible_host=172.23.104.198 labels=cvtype=docker
 ubuntu18-cv-docker-04 ansible_host=172.23.96.223  labels=cvtype=docker
 linux-cv-large-01     ansible_host=172.23.104.161 labels=cvtype=linux-large
 linux-cv-large-02     ansible_host=172.23.104.169 labels=cvtype=linux-large
-linux-cv-large-03     ansible_host=172.23.104.196 labels=cvtype=linux-large
-linux-cv-large-04     ansible_host=172.23.104.199 labels=cvtype=linux-large
+linux-cv-large-03     ansible_host=172.23.112.254 labels=cvtype=linux-large
+linux-cv-large-04     ansible_host=172.23.96.90   labels=cvtype=linux-large
 linux-cv-large-05     ansible_host=172.23.104.200 labels=cvtype=linux-large
-linux-cv-large-06     ansible_host=172.23.97.0    labels=cvtype=linux-large
+linux-cv-large-06     ansible_host=172.23.112.21  labels=cvtype=linux-large
+linux-cv-large-07     ansible_host=172.23.112.11  labels=cvtype=linux-large
+linux-cv-large-08     ansible_host=172.23.112.20  labels=cvtype=linux-large
 linux-cv-large-09     ansible_host=172.23.124.34  labels=cvtype=linux-large
 linux-cv-large-10     ansible_host=172.23.124.35  labels=cvtype=linux-large
 linux-cv-large-11     ansible_host=172.23.124.45  labels=cvtype=linux-large
