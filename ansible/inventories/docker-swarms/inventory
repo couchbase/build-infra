@@ -37,8 +37,8 @@ mega4-36   ansible_host=172.23.106.70  labels=role=build
 mega4-37   ansible_host=172.23.106.117 labels=role=build
 mega4-38   ansible_host=172.23.106.50  labels=role=build
 mega4-39   ansible_host=172.23.113.3   labels=role=jenkins
-mega4-40   ansible_host=172.23.113.54   labels=role=jenkins
-mega4-41   ansible_host=172.23.113.40  labels=role=jenkins
+mega4-40   ansible_host=172.23.113.54  labels=role=jenkins
+mega4-41   ansible_host=172.23.113.40  labels=role=serverjenkins
 
 [sdk]
 sdk-swarm-01 ansible_host=172.23.97.81 manager=true
