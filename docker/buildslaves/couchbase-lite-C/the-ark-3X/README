@@ -1,0 +1,5 @@
+This is a back up of Dockerfile for couchbasebuild/litec-the-ark:20230113
+In order to support older couchbase-lite-c builds (3.1.x and 3.2.x), we had
+to create a build agent using this container.  If further change to this
+container is necessary, we need to build the container image as
+couchbasebuild/litec-the-ark-3X:<date>

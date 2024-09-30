@@ -203,6 +203,40 @@ services:
     networks:
       - jenkins
 
+  litec-the-ark-3X:
+    image: couchbasebuild/litec-the-ark:20230113
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=mobile-litec-the-ark-3X"
+      - "JENKINS_SLAVE_LABELS=litec litec-the-ark-3X"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
+      - "JENKINS_SLAVE_EXECUTORS=3"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+    secrets:
+      - source: mobile_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_master_password
+        mode: 0444
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
 configs:
   jenkins_master_username:
     file: config/jenkins_master_username
