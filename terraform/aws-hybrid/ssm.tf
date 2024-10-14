@@ -352,6 +352,18 @@ resource "aws_ssm_parameter" "server_ssh_id_buildbot" {
   }
 }
 
+resource "aws_ssm_parameter" "server_ssh_buildbot_id_dsa" {
+  name  = "jenkins-worker__server__.ssh__buildbot_id_dsa"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/buildbot_id_dsa")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "server"
+    Encoding = "none"
+  }
+}
+
 resource "aws_ssm_parameter" "server_ssh_id_cb_robot" {
   name  = "jenkins-worker__server__.ssh__id_cb_robot"
   type  = "SecureString"
