@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-GERRIT_VERSION=3.7.4
+GERRIT_VERSION=3.10.1
 
 if mount | grep /mnt/data &> /dev/null
 then
