@@ -11,7 +11,7 @@ locals {
 
   alert_email_recipient = "build-team@couchbase.com"
 
-  instance_type = "c5.2xlarge"
+  instance_type = "c5.4xlarge"
 
   backup_device  = "sde"
   data_device    = "sdf"
