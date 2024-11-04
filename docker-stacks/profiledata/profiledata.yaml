@@ -627,6 +627,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.cloud_jira_creds.20240418
+        target: /home/couchbase/mobile/build/linux/.ssh/cloud-jira-creds.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
 
 configs:
   #####################
