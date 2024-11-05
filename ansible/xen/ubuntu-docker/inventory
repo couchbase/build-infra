@@ -11,7 +11,7 @@ xcp-sd20 ansible_host=172.23.110.57 sr_name=VMStore1 network_name="Pool-wide net
 xcp-sd24 ansible_host=172.23.105.159 network_name="Pool-wide network associated with eth2"
 xcp-se23 ansible_host=172.23.110.82 sr_name=VMStore1 network_name="Pool-wide network associated with eth0"
 xcp-se27 ansible_host=172.23.110.75 sr_name=VMStore1 network_name="Pool-wide network associated with eth2"
-xcp-se29 ansible_host=172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth2"
+xcp-se29 ansible_host=172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
 xcp-sf25 ansible_host=172.23.124.111 sr_name=VMStore1 network_name="Pool-wide network associated with eth2"
 xcp-sf36 ansible_host=172.23.124.101 sr_name="VMStore - Raid 1" network_name="Pool-wide network associated with eth2"
 

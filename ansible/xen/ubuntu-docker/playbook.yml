@@ -244,8 +244,6 @@
 
         - name: Apply settings
           command: sysctl -p /etc/sysctl.d/99-mmap_rnd_bits.conf
-          args:
-            warn: false
           become: true
 
     - name: Process VM-specific roles
