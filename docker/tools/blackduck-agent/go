@@ -31,6 +31,7 @@ docker build \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg TINI_VER=${TINI} \
   --build-arg YQ_VER=${YQ} \
+  --build-arg UV_VER=0.4.30 \
   .
 
 if ${PUBLISH}; then

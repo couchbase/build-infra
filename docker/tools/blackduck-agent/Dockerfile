@@ -75,6 +75,20 @@ RUN set -x \
     && chmod 644 /usr/share/jenkins/agent.jar \
     && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
 
+# cbdep
+RUN set -x \
+    && curl -L -o /usr/local/bin/cbdep https://packages.couchbase.com/cbdep/cbdep-linux \
+    && chmod 755 /usr/local/bin/cbdep
+
+# UV for Jenkins scripts
+ARG UV_VER
+RUN set -x \
+    && cd /tmp \
+    && curl -L -o uv.tgz https://github.com/astral-sh/uv/releases/download/${UV_VER}/uv-x86_64-unknown-linux-gnu.tar.gz \
+    && tar xf uv.tgz \
+    && cp -a uv-*/* /usr/local/bin \
+    && rm -rf uv*
+
 ENV AGENT_WORKDIR=/home/couchbase/agent
 RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chown couchbase:couchbase /home/couchbase/.jenkins ${AGENT_WORKDIR}
