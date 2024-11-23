@@ -55,8 +55,8 @@
 # --------------------------------------------------------------------
 
 import gettext
-import six.moves.xmlrpc_client as xmlrpclib
-import six.moves.http_client as httplib
+import xmlrpc.client as xmlrpclib
+import http.client as httplib
 import socket
 import sys
 

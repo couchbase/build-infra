@@ -1,6 +1,7 @@
 ---
 build_db:
-  - db_uri: couchbase://localhost/infrastructure
+  - db_uri: couchbase://localhost
+    bucket: infrastructure
     username: Administrator
     password: passwd
 platforms:

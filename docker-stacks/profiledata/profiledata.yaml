@@ -415,6 +415,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.update_system_info_yaml.20241122
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/update_system_info.yaml
+        mode: 0600
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/macos #
       ################################
@@ -773,6 +778,9 @@ secrets:
     external: true
   # build database loader configuration
   profiledata.ini_file.build_db_load_conf.20240711:
+    external: true
+  # config file for update_build_system_inventory job
+  profiledata.update_system_info_yaml.20241122:
     external: true
   # jenkins tokens (for user ns-buildbot)
   profiledata.jenkins_api_token.server_job_automation.20220708:

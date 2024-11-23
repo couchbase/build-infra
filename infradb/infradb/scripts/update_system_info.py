@@ -1,5 +1,3 @@
-#!/usr/bin/env python3.6
-
 """
 Program to determine the current list of systems available on the various
 virtual platforms (currently Xen, with possible future support for Docker
@@ -13,12 +11,12 @@ import sys
 
 import yaml
 
-import cbbuild.cbutil.db as cbutil_db
+import cbbuild.database.db as cb_db
 
 
 # Set up logging and handler
 logger = logging.getLogger('load_build_database')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()
 logger.addHandler(ch)
@@ -49,7 +47,7 @@ class FindSystems:
     def __init__(self, db_info, platforms):
         """Basic initialization"""
 
-        self.db = cbutil_db.CouchbaseDB(db_info)
+        self.db = cb_db.CouchbaseDB(db_info)
         self.platforms = platforms
         self.system_info = {}
         self.failures = False
@@ -63,14 +61,14 @@ class FindSystems:
         for platform in self.platforms:
             # Import appropriate class for given platform
             host_type = platform['host_type']
-            cls = import_class(
-                '{}.{}'.format(platform_mod, host_type), 'System'
-            )
+            cls = import_class(f"{platform_mod}.{host_type}", 'System')
+            logger.info(f"Processing platforms of type {host_type}")
 
             # Run through set of hosts and gather information
             # (instantiates the imported class); set failures
             # attribute if a host was unable to connect
             for host_info in platform['hosts']:
+                logger.info(f"Host: {host_info.get('name', 'Unknown')}")
                 host_system = cls(**host_info)
                 failed, data = host_system.find_systems()
                 self.system_info.update(data)
@@ -107,7 +105,7 @@ def main():
 
     with open(args.sys_config) as fh:
         try:
-            sys_config = yaml.load(fh)
+            sys_config = yaml.safe_load(fh)
         except yaml.YAMLError as exc:
             print(f'Failed to parse servers.yaml: {exc.message}')
             sys.exit(1)

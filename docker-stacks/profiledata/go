@@ -4,4 +4,4 @@
 # time, easiest just to blow away the stack and re-create.
 docker --host mega4.build.couchbase.com stack rm profiledata
 sleep 5
-docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c profiledata.yaml profiledata
+docker --host mega4.build.couchbase.com stack deploy --detach=true --with-registry-auth -c profiledata.yaml profiledata
