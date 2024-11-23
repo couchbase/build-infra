@@ -152,10 +152,20 @@ RUN set -x \
     && chmod 755 /tmp/rye \
     && /tmp/rye self install --toolchain-version=3.10 --yes \
     && rm /tmp/rye
+
+# Install UV as user couchbase also.
+RUN set -x \
+    && cd /tmp \
+    && curl -LO https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-unknown-linux-gnu.tar.gz \
+    && tar xf uv-x86_64-unknown-linux-gnu.tar.gz \
+    && mkdir -p /home/couchbase/.local/bin \
+    && cp -a uv-x86_64-unknown-linux-gnu/* /home/couchbase/.rye/shims \
+    && rm -rf uv-x86_64-unknown-linux-gnu.tar.gz uv-x86_64-unknown-linux-gnu
+
 USER root
 
-# Ensure Rye's shims are on agents' PATH so they have a proper `python` command
-RUN echo "/home/couchbase/.rye/shims" >> /etc/path
+# Ensure uv and Rye's shims are on agents' PATH so they have a proper `python` command
+RUN echo "/hoome/couchbase/.local/bin:/home/couchbase/.rye/shims" >> /etc/path
 
 # Set LANG
 ENV LANG=en_US.UTF-8
