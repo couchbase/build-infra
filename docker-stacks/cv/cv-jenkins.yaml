@@ -26,6 +26,7 @@ services:
         - "traefik.http.routers.cv_jenkins.rule=Host(`cv.jenkins.couchbase.com`)"
         - "traefik.http.services.cv_jenkins.loadbalancer.server.port=8080"
     ports:
+      - "8480:8080"
       - "50002:50002"
     volumes:
       - type: bind
