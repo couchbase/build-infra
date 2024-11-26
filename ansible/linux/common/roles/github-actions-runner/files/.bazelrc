@@ -1,0 +1,5 @@
+# Specify the current bazel cache VM
+build:remote-cache --remote_cache=grpc://172.23.113.35:9092/
+# Enable remote-cache as part of the "cache" config, used by
+# couchbase-cloud jobs
+build:cache --config=remote-cache

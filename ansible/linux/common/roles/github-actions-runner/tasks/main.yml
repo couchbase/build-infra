@@ -38,6 +38,15 @@
         mode: "0755"
       tags: diskcleanup
 
+    - name: Add .bazelrc
+      copy:
+        src: ".bazelrc"
+        dest: /home/couchbase/.bazelrc
+        owner: couchbase
+        group: couchbase
+        mode: "0444"
+      tags: bazelrc
+
     - name: Create /opt/gha
       file:
         path: /opt/gha
