@@ -55,15 +55,19 @@ IMPORTANT: It is assumed that the target Xen Server has an ISO Library
 configured which contains "ubuntu-24.04.1-fully-automated.iso" (or
 whatever image is named in the inventory's "install_iso" variable).
 Instructions on creating that ISO are in the fully_automated_iso
-subdirectory. You can configure this in XenCenter by navigating to the
+subdirectory. You can configure this in XO by navigating to the
 "Storage" tab for the VM host and:
 
- - click "New SR"
+ - click "+ Add a storage"
+ - Enter something like "NFS ISOs (buildteam) for both Name and Description
  - select "NFS ISO" for the Type
- - provide any name; I recommend "NFS ISO Library (Ubuntu)"
- - you can leave "Autogenerate description based on SR settings" checked
- - provide the share name "cnt-s231.sc.couchbase.com:/data/buildteam/iso"
-   and select NFSv3## Ansible
+ - Under settings, enter "cnt-s231.sc.couchbase.com" for Server and click the
+   magnifying glass on the right of that field
+ - Drop down the "Path" option and select `/data/builds`
+ - Enter "iso" for Subdirectory and click the little magnifying glass on
+   the right of that field
+ - This should cause the "Summary" section to populate, so now you can
+   click "Create"
 
 # Script invocation
 

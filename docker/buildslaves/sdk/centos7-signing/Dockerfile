@@ -4,6 +4,9 @@ FROM centos:centos7.4.1708
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
+# Use vault for package installation - CentOS 7 is now EOL, so the original
+# mirrors are no longer available
+RUN sed -i -e '/^mirrorlist/d;/^#baseurl=/{s,^#,,;s,/mirror,/vault,;}' /etc/yum.repos.d/CentOS*.repo
 RUN yum clean all && \
     yum install --setopt=keepcache=0 -y sudo deltarpm
 

@@ -1,7 +1,7 @@
 version: '3.5'
 
 # Suggested deployment command:
-#  docker --host sdk-swarm.build.couchbase.com stack deploy --with-registry-auth -c sdk-jenkins.yaml sdk
+#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c sdk-jenkins.yaml sdk
 # All services, networks, etc. will then get an "sdk_" prefix,
 # eg. "sdk_jenkins"
 
@@ -11,13 +11,22 @@ services:
   jenkins:
     image: jenkins/jenkins:2.462.3
     deploy:
-      replicas: 1
+      resources:
+        limits:
+          memory: 7G
+        reservations:
+          memory: 7G
       placement:
         constraints:
           - node.labels.role==sdkjenkins
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+        - "traefik.http.routers.sdk_jenkins.rule=Host(`sdk.jenkins.couchbase.com`)"
+        - "traefik.http.services.sdk_jenkins.loadbalancer.server.port=8080"
     ports:
-      - "8080:8080"
-      - "50000:50000"
+      - "50004:50004"
     volumes:
       - type: bind
         source: /var/run/docker.sock
@@ -27,6 +36,7 @@ services:
         target: /var/jenkins_home
     networks:
       - jenkins
+      - traefik_reverse-proxy
 
 # See http://www.technowise.in/2016/10/fix-no-valid-crumb-was-included-in.html
 # and https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Nginx
@@ -34,7 +44,8 @@ services:
     environment:
       - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
       - "JENKINS_OPTS=--sessionTimeout=1440 --sessionEviction=14400"
-      - "JENKINS_JAVA_OPTS=-Xmx20g"
 
 networks:
   jenkins:
+  traefik_reverse-proxy:
+    external: true

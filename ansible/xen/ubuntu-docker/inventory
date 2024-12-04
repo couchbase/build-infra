@@ -1,18 +1,18 @@
 [xenservers]
-xcp-s241 ansible_host=172.23.97.234 sr_name=VMStore1 ansible_python_interpreter=/opt/python3/bin/python3
-xcp-s327 ansible_host=172.23.99.41 sr_name="VMStore1" network_name="Pool-wide network associated with eth1" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-s513 ansible_host=172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-s625 ansible_host=172.23.113.115 sr_name=VMStore ansible_python_interpreter=/opt/python3/bin/python3
-xcp-s810 ansible_host=172.23.125.121 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-s824 ansible_host=172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-s834 ansible_host=172.23.96.155 sr_name=VMStore ansible_python_interpreter=/opt/python3/bin/python3
-xcp-sa29 ansible_host=172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-sd20 ansible_host=172.23.110.57 sr_name=VMStore1 network_name="Pool-wide network associated with eth3" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-sd24 ansible_host=172.23.105.159 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-se23 ansible_host=172.23.110.82 sr_name=VMStore1 network_name="Pool-wide network associated with eth0" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-se27 ansible_host=172.23.110.75 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-se29 ansible_host=172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
-xcp-sf25 ansible_host=172.23.124.111 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
+xcp-s241 ansible_host=172.23.97.234 sr_name=VMStore1 ansible_python_interpreter=/opt/python/bin/python3
+xcp-s327 ansible_host=172.23.99.41 sr_name="VMStore1" network_name="Pool-wide network associated with eth1" ansible_python_interpreter=/opt/python/bin/python3
+xcp-s513 ansible_host=172.23.112.51 sr_name=VMStore network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
+xcp-s625 ansible_host=172.23.113.115 sr_name=VMStore ansible_python_interpreter=/opt/python/bin/python3
+xcp-s810 ansible_host=172.23.125.121 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
+xcp-s824 ansible_host=172.23.112.50 network_name="Pool-wide network associated with eth0" vm_template="Ubuntu Bionic Beaver 18.04" ansible_python_interpreter=/opt/python/bin/python3
+xcp-s834 ansible_host=172.23.96.155 sr_name=VMStore ansible_python_interpreter=/opt/python/bin/python3
+xcp-sa29 ansible_host=172.23.112.23 sr_name=VMStore network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
+xcp-sd20 ansible_host=172.23.110.57 sr_name=VMStore1 network_name="Pool-wide network associated with eth3" ansible_python_interpreter=/opt/python/bin/python3
+xcp-sd24 ansible_host=172.23.105.159 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
+xcp-se23 ansible_host=172.23.110.82 sr_name=VMStore1 network_name="Pool-wide network associated with eth0" ansible_python_interpreter=/opt/python/bin/python3
+xcp-se27 ansible_host=172.23.110.75 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
+xcp-se29 ansible_host=172.23.112.26 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
+xcp-sf25 ansible_host=172.23.124.111 sr_name=VMStore1 network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python/bin/python3
 xcp-sf36 ansible_host=172.23.124.101 sr_name="VMStore - Raid 1" network_name="Pool-wide network associated with eth2" ansible_python_interpreter=/opt/python3/bin/python3
 
 [newvms]
