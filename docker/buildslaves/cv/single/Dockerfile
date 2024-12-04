@@ -1,6 +1,6 @@
 # Docker container for Single Linux
 
-FROM couchbasebuild/server-linux-build:20240129
+FROM couchbasebuild/server-linux-build:20240920
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
@@ -34,15 +34,6 @@ RUN set -x \
         && ./configure --prefix=/usr/local && make -j$(nproc) && make install \
         && debuginfo-install -y glibc \
         && rm -rf /tmp/* && ccache --clear && yum clean all
-
-# # Code coverage requires gcovr to convert from gcov to XML files consumable by Jenkins.
-# # Also, if we eventually remove paramiko from the main buildslave image, we could add
-# # it back here for CV.
-RUN set -x \
-    && yum install -y python2-pip \
-    && python2 -m pip install MarkupSafe==1.1.1 \
-    && python2 -m pip install jinja2==2.11.3 \
-    && python2 -m pip install gcovr==4.2
 
 # Install GDB - needed for detecting what program created a core file
 # & extracting the set of shared libraries.
@@ -102,6 +93,9 @@ RUN set -x \
     && ./configure --prefix=/usr \
     && make && make install \
     && rm -rf /tmp/gdb*
+
+# lsof and netstat for debugging purposes
+RUN yum install -y lsof net-tools && yum clean all
 
 # Add startup hook to enable buildx
 COPY build/buildx.sh /usr/sbin/couchhook.d/

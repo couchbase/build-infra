@@ -129,7 +129,7 @@ services:
         delay: 0s
 
   linux_small:
-    image: couchbasebuild/server-linux-cv:20240129
+    image: couchbasebuild/server-linux-cv:20241203
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-small"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux small"
@@ -154,7 +154,7 @@ services:
         delay: 0s
 
   linux_large:
-    image: couchbasebuild/server-linux-cv:20240129
+    image: couchbasebuild/server-linux-cv:20241203
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-large"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux large"
