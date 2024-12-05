@@ -26,7 +26,14 @@ RUN sed -i -e '/^mirrorlist/d;/^#baseurl=/{s,^#,,;s,/mirror,/vault,;}' /etc/yum.
 
 # First a base compile image that has some recurring dependencies
 FROM base AS base-compile
+ARG GCC_13_VER
+ARG BINUTILS_VER
 LABEL imagename=base-compile
+
+COPY --from=gcc_13 /opt/gcc-${GCC_13_VER} /opt/gcc-${GCC_13_VER}
+COPY --from=gcc_13 /opt/binutils-${BINUTILS_VER} /opt/binutils-${BINUTILS_VER}
+
+ENV PATH=/opt/gcc-${GCC_13_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
@@ -35,7 +42,6 @@ ENV LANG=en_US.UTF-8 \
 RUN yum install -y --setopt=skip_missing_names_on_install=False curl deltarpm sudo
 RUN yum groupinstall -y "Development Tools"
 RUN yum install -y --setopt=skip_missing_names_on_install=False bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
-ENV PATH=/opt/gcc-${GCC_13_VER}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # sed - the stock version doesn't support extended expressions
 FROM base-compile AS sed-compile
@@ -152,11 +158,7 @@ RUN set -x \
     && make -j8 install \
     && ldconfig \
     && curl -f https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
-    && /usr/local/bin/python3 /tmp/get-pip.py \
-    && cd /tmp \
-    && git clone https://github.com/pyinstaller/pyinstaller/ \
-    && cd pyinstaller/bootloader \
-    && /usr/local/bin/python3 ./waf all
+    && /usr/local/bin/python3 /tmp/get-pip.py
 
 # Ccache
 FROM base-compile AS ccache-compile
@@ -176,7 +178,7 @@ RUN ./configure --prefix=/usr/local && make -j && make install
 FROM base
 LABEL maintainer="build-team@couchbase.com"
 
-ARG BUILDARCH \
+ARG TARGETARCH \
     BINUTILS_VER \
     CLANG_9_VER \
     CLANG_15_VER \
@@ -192,7 +194,7 @@ COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/doc
 
 # tini, to avoid zombie issues when running with Swarm jar
 ARG TINI_VER
-ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini-${BUILDARCH} /tini
+ADD https://github.com/krallin/tini/releases/download/v${TINI_VER}/tini-${TARGETARCH} /tini
 RUN chmod +x /tini
 
 ### Install Couchbase build dependencies ######################################
@@ -345,9 +347,9 @@ RUN gem install asciidoctor -v ${ASCIIDOCTOR_VER} && rm -rf /root/.gem
 ARG JQ_VER
 ARG YQ_VER
 RUN set -x \
-    && curl -L --fail -o /usr/local/bin/jq https://github.com/jqlang/jq/releases/download/jq-${JQ_VER}/jq-linux-${BUILDARCH} \
+    && curl -L --fail -o /usr/local/bin/jq https://github.com/jqlang/jq/releases/download/jq-${JQ_VER}/jq-linux-${TARGETARCH} \
     && chmod a+x /usr/local/bin/jq \
-    && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_${BUILDARCH} \
+    && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_${TARGETARCH} \
     && chmod a+x /usr/local/bin/yq
 
 # Perl modules

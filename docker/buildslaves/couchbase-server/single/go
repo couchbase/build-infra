@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh -ex
 
 # Things you might want to adjust:
 IMAGE=couchbasebuild/server-linux-build
