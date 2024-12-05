@@ -29,7 +29,7 @@ function node_busy {
 
     curl --silent --fail \
         -u "${JENKINS_USERNAME}:${JENKINS_PASSWORD}" \
-        "${JENKINS_URL}/computer/${JENKINS_AGENT_NAME}/api/xml?tree=executors[idle],oneOffExecutors[idle]" \
+        "${JENKINS_URL}/computer/${JENKINS_AGENT_NAME}/api/xml?tree=executors%5Bidle%5D,oneOffExecutors%5Bidle%5D" \
         | fgrep -q 'idle>false<'
 }
 
