@@ -56,6 +56,14 @@ sudo chown -R couchbase:couchbase /home/couchbase || :
 chmod -R 600 /home/couchbase/.ssh/* || :
 chmod 700 /home/couchbase/.ssh || :
 
+# If docker.sock is available, ensure there's a group for it with the
+# correct GID and that the couchbase user is in that group
+if [ -e /var/run/docker.sock ]; then
+    sock_gid=$(stat --format=%g /var/run/docker.sock)
+    groupadd --non-unique --gid ${sock_gid} dockercb
+    usermod -a -G dockercb couchbase
+fi
+
 if [ -f /ssh/aws-credentials ]
 then
     mkdir -p /home/couchbase/.aws
