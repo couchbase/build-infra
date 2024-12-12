@@ -83,10 +83,17 @@ class JiraCommenter:
             return
         org = commit.remote.split('/')[3]
         url = f'https://github.com/{org}/{commit.project}/commit/{commit.sha}'
+
+        # Make ticket references in the commit message into links
+        # (otherwise Jira replaces them with a little card including the
+        # ticket summary which is very hard to read)
+        wikisubject = self.ticket_re.sub(
+            r'[\1|https://jira.issues.couchbase.com/browse/\1]', subject
+        )
         message = (
             f"Build {build.key} contains {commit.project} "
             f"commit [{commit.sha[0:7]}|{url}] with commit message:\n"
-            f"{subject}"
+            f"{wikisubject}"
         )
 
         if self.dryrun:
