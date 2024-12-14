@@ -38,7 +38,7 @@ rootdir:
           # Leave centos7 and linux EE .deb files around
           KEEP:
             - ".*centos7.*"
-            - ".*enterprise.*linux.*deb"
+            - ".*enterprise.*linux_.*deb"
 
         # For "master", we don't want to pick up the linux EE .deb "KEEP"
         # rule under ".*" below. So just put an empty entry here, which
@@ -46,9 +46,10 @@ rootdir:
         "master": {}
 
         ".*":
-          # Leave linux EE .deb files around
+          # Leave linux EE .deb files around. The _ keeps normal linux
+          # .deb files around but allows purging linux-asan .deb files.
           KEEP:
-            - ".*enterprise.*linux.*deb"
+            - ".*enterprise.*linux_.*deb"
 
     # Catch-all for subdirectories not mentioned above
     ".*":
