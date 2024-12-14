@@ -237,6 +237,53 @@ services:
     networks:
       - jenkins
 
+  linux-single:
+    image: couchbasebuild/server-linux-build:20241205
+    environment:
+      - "JENKINS_SLAVE_NAME=mobile-linux"
+      - "JENKINS_SLAVE_LABELS=mobile-single-linux"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - type: volume
+        source: workspace
+        target: /home/couchbase/jenkins/workspace
+      - type: volume
+        source: cbdepscache
+        target: /home/couchbase/.cbdepscache
+      - type: volume
+        source: cbdepcache
+        target: /home/couchbase/.cbdepcache
+      - type: volume
+        source: ccache
+        target: /home/couchbase/.ccache
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /home/couchbase/.docker/config.json
+        target: /home/couchbase/.docker/config.json
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+    secrets:
+      - source: mobile_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_master_password
+        mode: 0444
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
 configs:
   jenkins_master_username:
     file: config/jenkins_master_username
@@ -254,14 +301,18 @@ networks:
    attachable: true
 
 volumes:
-   latestbuilds:
+  workspace:
+  cbdepscache:
+  cbdepcache:
+  ccache:
+  latestbuilds:
     driver: local
     driver_opts:
         type: "nfs"
         o: "addr=cnt-s231.sc.couchbase.com"
         device: ":/data/builds/latestbuilds"
 
-   releases:
+  releases:
     driver: local
     driver_opts:
         type: "nfs"
