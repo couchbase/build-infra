@@ -393,6 +393,9 @@ RUN usermod -a -G 999 couchbase
 # Dev packages required for building cbdep
 RUN yum install -y libxml2-devel libxslt-devel && yum clean all
 
+# Strace to help when debugging issues
+RUN yum install -y strace
+
 # Truncate logfiles
 RUN find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
 
