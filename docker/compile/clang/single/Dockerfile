@@ -1,15 +1,19 @@
 # Docker container just to build clang, because it's slow.
 ARG GCC_CONTAINER
 ARG GCC_TAG
-FROM ${GCC_CONTAINER} as gcc
+FROM ${GCC_CONTAINER} AS gcc
 
-FROM centos:7.9.2009 as build
+FROM centos:7.9.2009 AS build
 ARG BINUTILS_VER
 ARG CLANG_VER
 ARG GCC_VER
 COPY --from=gcc /opt /opt
 
 WORKDIR /tmp
+
+# Use vault for package installation - CentOS 7 is now EOL, so the original
+# mirrors are no longer available
+RUN sed -i -e '/^mirrorlist/d;/^#baseurl=/{s,^#,,;s,/mirror,/vault,;}' /etc/yum.repos.d/CentOS*.repo
 
 # Clang build needs a newer cmake than is present in distro repos
 ARG CMAKE_MAJOR=3

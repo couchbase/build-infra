@@ -10,13 +10,16 @@ ARG CLANG_9_VER
 ARG CLANG_9_TAG
 ARG CLANG_15_VER
 ARG CLANG_15_TAG
-FROM couchbasebuild/single-gcc:${GCC_10_VER}-${GCC_10_TAG} as gcc_10
-FROM couchbasebuild/single-gcc:${GCC_13_VER}-${GCC_13_TAG} as gcc_13
-FROM couchbasebuild/single-clang:${CLANG_9_VER}-${CLANG_9_TAG} as clang9
-FROM couchbasebuild/single-clang:${CLANG_15_VER}-${CLANG_15_TAG} as clang15
+ARG CLANG_18_VER
+ARG CLANG_18_TAG
+FROM couchbasebuild/single-gcc:${GCC_10_VER}-${GCC_10_TAG} AS gcc_10
+FROM couchbasebuild/single-gcc:${GCC_13_VER}-${GCC_13_TAG} AS gcc_13
+FROM couchbasebuild/single-clang:${CLANG_9_VER}-${CLANG_9_TAG} AS clang9
+FROM couchbasebuild/single-clang:${CLANG_15_VER}-${CLANG_15_TAG} AS clang15
+FROM couchbasebuild/single-clang:${CLANG_18_VER}-${CLANG_18_TAG} AS clang18
 
 # Base image
-FROM centos:centos7.9.2009 as base
+FROM centos:centos7.9.2009 AS base
 
 # Use vault for package installation - CentOS 7 is now EOL, so the original
 # mirrors are no longer available
@@ -113,7 +116,7 @@ ARG RUBY_PATCH
 RUN ruby-install -c --prefix /usr/local -j -- ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH}
 
 # OpenSSL
-FROM base-compile as openssl-compile
+FROM base-compile AS openssl-compile
 ARG OPENSSL_VER
 RUN yum install -y perl-IPC-Cmd
 WORKDIR /tmp/openssl-1.1.1${OPENSSL_VER}
@@ -182,6 +185,7 @@ ARG TARGETARCH \
     BINUTILS_VER \
     CLANG_9_VER \
     CLANG_15_VER \
+    CLANG_18_VER \
     GCC_10_VER \
     GCC_13_VER
 
@@ -269,6 +273,7 @@ COPY --from=gcc_13 /opt/gcc-${GCC_13_VER} /opt/gcc-${GCC_13_VER}
 COPY --from=gcc_13 /opt/binutils-${BINUTILS_VER} /opt/binutils-${BINUTILS_VER}
 COPY --from=clang9 /opt/clang-9.0.0 /opt/clang-9.0.0
 COPY --from=clang15 /opt/clang-${CLANG_15_VER} /opt/clang-${CLANG_15_VER}
+COPY --from=clang18 /opt/clang-${CLANG_18_VER} /opt/clang-${CLANG_18_VER}
 RUN for prog in gcc g++; do ln -s /opt/gcc-${GCC_10_VER}/bin/${prog} /usr/local/bin; done
 RUN set -x \
     && ln -s /opt/clang-${CLANG_9_VER}/bin/* /usr/local/bin \
@@ -284,7 +289,7 @@ RUN set -x \
 
 # clang is built against a specific GCC root. If you upgrade gcc, you must
 # rebuild any associated clang version
-RUN for clang in ${CLANG_9_VER} ${CLANG_15_VER}; do \
+RUN for clang in ${CLANG_9_VER} ${CLANG_15_VER} ${CLANG_18_VER}; do \
       if ! /opt/clang-$clang/bin/clang --version; then \
         echo "clang-$clang is broken, please ensure you have rebuilt it if you are upgrading gcc"; \
         exit 1; \

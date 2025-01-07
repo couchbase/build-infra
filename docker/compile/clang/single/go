@@ -1,9 +1,9 @@
 #!/bin/sh -ex
 
 export BINUTILS_VER=${BINUTILS_VER:-2.41}
-export CLANG_VER=${CLANG_VER:-15.0.7}
+export CLANG_VER=${CLANG_VER:-18.1.8}
 export GCC_VER=${GCC_VER:-13.2.0}
-export GCC_TAG=${GCC_TAG:-20230911}
+export GCC_TAG=${GCC_TAG:-20241203}
 export DOCKER_BUILDKIT=1
 
 IMAGE_NAME=couchbasebuild/single-clang

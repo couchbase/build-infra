@@ -70,6 +70,8 @@ docker ${BUILDX} build ${ACTION} \
   --build-arg CLANG_9_TAG=${CLANG_9_TAG} \
   --build-arg CLANG_15_VER=${CLANG_15} \
   --build-arg CLANG_15_TAG=${CLANG_15_TAG} \
+  --build-arg CLANG_18_VER=${CLANG_18} \
+  --build-arg CLANG_18_TAG=${CLANG_18_TAG} \
   --build-arg CMAKE_MAJOR=${CMAKE_MAJOR} \
   --build-arg CMAKE_MINOR=${CMAKE_MINOR} \
   --build-arg CMAKE_PATCH=${CMAKE_PATCH} \
