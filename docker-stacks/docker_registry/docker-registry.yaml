@@ -43,7 +43,7 @@ services:
       replicas: 0
       restart_policy:
         condition: none
-    image: registry:2
+    image: registry:2.8.3
     entrypoint:
       - /entrypoint.sh
       - garbage-collect
