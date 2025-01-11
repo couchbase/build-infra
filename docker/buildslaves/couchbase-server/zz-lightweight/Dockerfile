@@ -165,7 +165,7 @@ RUN set -x \
 USER root
 
 # Ensure uv and Rye's shims are on agents' PATH so they have a proper `python` command
-RUN echo "/hoome/couchbase/.local/bin:/home/couchbase/.rye/shims" >> /etc/path
+RUN echo "/home/couchbase/.local/bin:/home/couchbase/.rye/shims" >> /etc/path
 
 # Set LANG
 ENV LANG=en_US.UTF-8

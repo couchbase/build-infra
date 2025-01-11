@@ -25,7 +25,7 @@ mega4-27   ansible_host=172.23.113.46  labels=role=build
 mega4-28   ansible_host=172.23.113.50  labels=role=build
 mega4-29   ansible_host=172.23.113.48  labels=role=build
 mega4-30   ansible_host=172.23.113.45  labels=role=infrastructure
-mega4-31   ansible_host=172.23.113.47  labels=role=infrastructure
+mega4-31   ansible_host=172.23.113.19  labels=role=infrastructure
 mega4-32   ansible_host=172.23.113.37  labels=role=infrastructure
 mega4-33   ansible_host=172.23.96.52   labels=role=infrastructure
 mega4-34   ansible_host=172.23.97.147  labels=role=docker-buildx

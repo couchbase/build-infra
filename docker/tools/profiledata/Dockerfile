@@ -22,9 +22,6 @@ RUN set -x \
         && chmod 700 ~/.ssh
 USER root
 
-HEALTHCHECK --interval=5s \
-        CMD (nc -z localhost:4000 && cat /home/couchbase/.ssh/authorized_keys) || exit 1
-
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]

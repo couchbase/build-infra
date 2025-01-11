@@ -22,7 +22,7 @@ services:
         constraints:
           - node.labels.role==infrastructure
       replicas: 1
-    image: couchbasebuild/profiledata:20211202
+    image: couchbasebuild/profiledata:20250111
     init: true
     ports:
       - 4000:4000
@@ -368,6 +368,11 @@ services:
       - source: profiledata.ssh_privkey.id_cb-robot.20200417
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/id_cb-robot
         mode: 0600
+        uid: "901"
+        gid: "901"
+      - source: profiledata.jenkins_api_token.cb-robot-bsl.20250111
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/cb-robot-bsl-jenkins-token
+        mode: 0444
         uid: "901"
         gid: "901"
       - source: profiledata.jenkins_api_token.server_job_automation.20220708
@@ -784,6 +789,9 @@ secrets:
     external: true
   # jenkins tokens (for user ns-buildbot)
   profiledata.jenkins_api_token.server_job_automation.20220708:
+    external: true
+  # jenkins tokens (for user cb-robot)
+  profiledata.jenkins_api_token.cb-robot-bsl.20250111:
     external: true
   # black duck
   profiledata.blackduck.credentials_json.20240511:
