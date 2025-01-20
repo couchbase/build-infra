@@ -203,7 +203,7 @@ services:
       - jenkins
 
   litec-the-ark:
-    image: couchbasebuild/litec-the-ark:20240923
+    image: couchbasebuild/litec-the-ark:20250120
     init: true
     user: couchbase
     environment:

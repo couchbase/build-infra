@@ -6,6 +6,7 @@ LABEL maintainer="build-team@couchbase.com"
 # The cross compilers installed here are used for generic OS (like Ubuntu Core)
 # Model specific cross compilation toolchains, such as Raspberry Pi, will be
 # acquired dynamically in a running container.
+# clang-16 implicitly installs llvm-16, so it is not needed here
 RUN apt-get update && apt-get install -y \
     unzip \
     wget \
@@ -21,8 +22,7 @@ RUN apt-get update && apt-get install -y \
     devscripts \
     libicu-dev \
     zlib1g-dev \
-    clang \
-    llvm \
+    clang-16 \
     lld \
     ninja-build \
 && rm -rf /var/lib/apt/lists
