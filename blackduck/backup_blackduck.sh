@@ -24,14 +24,17 @@ source ${BD_ROOT}/couchbase-blackduck-versions
 BACKUP_DIR=${BACKUP_ROOT}/blackduck_couchbase_$(date +%Y%m%d%H%M)
 mkdir -p ${BACKUP_DIR}
 
-# Copy important local config files
+# Create backup
+${BD_ROOT}/hub-${HUB_VERSION}/docker-swarm/bin/hub_create_data_dump.sh  \
+    --live-system \
+    ${BACKUP_DIR}/ 2>&1
+
+# Copy important local config files - needs to be done after the backup
+# with newer hub versions, as `hub_create_data_dump.sh` checks to ensure
+# the directory is empty before starting.
 cp ${BD_ROOT}/couchbase* \
     ${BD_ROOT}/start_hub.sh \
     ${BACKUP_DIR}/
-
-# Create backup
-${BD_ROOT}/hub-${HUB_VERSION}/docker-swarm/bin/hub_create_data_dump.sh  \
-    ${BACKUP_DIR}/ 2>&1
 
 # Retain 60 backups
 pushd ${BACKUP_DIR}/..
