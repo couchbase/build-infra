@@ -1,0 +1,4 @@
+#!/bin/bash -ex
+
+LEADER=mega4.build.couchbase.com
+docker --host ${LEADER} stack deploy --detach=false --with-registry-auth -c xen-orchestra.yaml xo

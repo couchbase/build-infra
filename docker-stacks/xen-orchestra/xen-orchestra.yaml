@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+  orchestra:
+    image: ezka77/xen-orchestra-ce:5.168
+    depends_on:
+      - redis
+    environment:
+      - DEBUG=xo:main
+      - NODE_ENV=production
+      - XOA_PLAN=5
+    #privileged: true
+    # SYS_ADMIN should be enough capability to use NFS mount
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - type: bind
+        source: /buildteam/xo/storage
+        target: /storage
+    networks:
+      - traefik_reverse-proxy
+    logging: &default_logging
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "2"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_reverse-proxy"
+
+        - "traefik.http.routers.xen_orchestra_http.entrypoints=web"
+        - "traefik.http.routers.xen_orchestra_http.rule=Host(`xo.build.couchbase.com`)"
+        - "traefik.http.routers.xen_orchestra_http.service=xen_orchestra"
+
+        - "traefik.http.routers.xen_orchestra_https.entrypoints=websecure"
+        - "traefik.http.routers.xen_orchestra_https.tls=true"
+        - "traefik.http.routers.xen_orchestra_https.rule=Host(`xo.build.couchbase.com`)"
+        - "traefik.http.routers.xen_orchestra_https.service=xen_orchestra"
+
+        - "traefik.http.services.xen_orchestra.loadbalancer.server.port=8000"
+        - "traefik.http.services.xen_orchestra.loadbalancer.server.scheme=http"
+
+  redis:
+    image: redis:7.4.2-alpine
+    command: redis-server --appendonly yes
+    user: 1000:1000
+    volumes:
+      - type: bind
+        source: /buildteam/xo/redis
+        target: /data
+    networks:
+      - traefik_reverse-proxy
+    logging:
+      <<: *default_logging
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==infrastructure"
+
+networks:
+  traefik_reverse-proxy:
+    external: true
+volumes:
+  xo-data:
+  redis-data:
