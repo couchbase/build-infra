@@ -8,7 +8,7 @@ version: '3.8'
 services:
 
   agent:
-    image: couchbasebuild/blackduck-agent:20241105
+    image: couchbasebuild/blackduck-agent:20250218
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=blackduck-agent"

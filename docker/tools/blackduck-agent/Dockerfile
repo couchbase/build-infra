@@ -32,6 +32,7 @@ RUN set -x \
         build-essential \
         curl \
         git \
+        git-lfs \
         jq \
         libxml2-utils \
         openjdk-17-jre-headless \
