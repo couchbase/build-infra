@@ -7,14 +7,12 @@ version: '3.5'
 
 services:
 
-  # cv.jenkins.couchbase.com
+  # testing-cv.jenkins.couchbase.com
   jenkins:
     image: jenkins/jenkins:2.462.2
     deploy:
       resources:
         limits:
-          memory: 7G
-        reservations:
           memory: 7G
       placement:
         constraints:
@@ -23,17 +21,16 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_reverse-proxy"
-        - "traefik.http.routers.cv_jenkins.rule=Host(`cv.jenkins.couchbase.com`)"
-        - "traefik.http.services.cv_jenkins.loadbalancer.server.port=8080"
+        - "traefik.http.routers.testing_cv_jenkins.rule=Host(`testing-cv.jenkins.couchbase.com`)"
+        - "traefik.http.services.testing_cv_jenkins.loadbalancer.server.port=8080"
     ports:
-      - "8480:8080"
-      - "50002:50002"
+      - "50005:50005"
     volumes:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
       - type: bind
-        source: /home/couchbase/cv-jenkins-home
+        source: /home/couchbase/testing-cv-jenkins-home
         target: /var/jenkins_home
     networks:
       - jenkins

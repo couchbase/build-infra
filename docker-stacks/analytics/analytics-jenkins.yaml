@@ -18,7 +18,7 @@ services:
           memory: 7G
       placement:
         constraints:
-          - node.labels.role==jenkins
+          - node.labels.role==megajenkins
       replicas: 1
       labels:
         - "traefik.enable=true"
@@ -32,7 +32,7 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
       - type: bind
-        source: /buildteam/jenkins/analytics-jenkins-home
+        source: /home/couchbase/analytics-jenkins-home
         target: /var/jenkins_home
     networks:
       - jenkins

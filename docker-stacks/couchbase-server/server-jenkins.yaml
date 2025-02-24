@@ -18,7 +18,7 @@ services:
           memory: 7G
       placement:
         constraints:
-          - node.labels.role==serverjenkins
+          - node.labels.role==megajenkins
       replicas: 1
       labels:
         - "traefik.enable=true"
