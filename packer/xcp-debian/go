@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+rsync -avP preseed couchbase@mega3.build.couchbase.com:/buildteam/downloads
+packer build .
+rmdir output-debian

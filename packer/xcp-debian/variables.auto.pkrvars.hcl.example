@@ -1,0 +1,5 @@
+xcp_host = "xcp-se29"
+xcp_password = "<password>"
+debian_version = "12.9.0"
+# Uncomment if you need to use a different SR than the `default_sr` in hosts.pkr.hcl
+# sr_name = "Local storage"
