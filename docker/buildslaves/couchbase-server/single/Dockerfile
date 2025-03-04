@@ -399,7 +399,21 @@ RUN usermod -a -G 999 couchbase
 RUN yum install -y libxml2-devel libxslt-devel && yum clean all
 
 # Strace to help when debugging issues
-RUN yum install -y strace
+RUN yum install -y strace && yum clean all
+
+# Install the latest gdb and symlink in /usr/local/bin
+ARG GDB_VER
+RUN set -x \
+    && yum install -y texinfo gmp-devel mpfr-devel && yum clean all \
+    && mkdir -p /opt/gdb-${GDB_VER} /tmp/gdb \
+    && cd /tmp/gdb \
+    && curl -Lf https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
+        | tar xz --strip-components=1 \
+    && ./configure --prefix=/opt/gdb-${GDB_VER} \
+    && make -j$(nproc) \
+    && make install \
+    && ln -sf /opt/gdb-${GDB_VER}/bin/gdb /usr/local/bin/gdb \
+    && rm -rf /tmp/gdb
 
 # Truncate logfiles
 RUN find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
