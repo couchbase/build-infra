@@ -201,28 +201,43 @@ function docker_run_args() {
     args="${args}-e PARALLELISM=${parallelism} "
   fi
 
-  # Mount docker and special /opt/couchbase volume for server
+  # Mount docker socket when needed
+  # For server, analytics, sdk, or any service with "docker" in the name
+  case "${environment}" in
+    server|analytics|sdk)
+      chown 1000:1000 /var/run/docker.sock
+      args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+      ;;
+    *)
+      # For any service with "docker" in the name
+      if [ "$(echo "${service}" | grep -c "docker")" -gt 0 ]; then
+        chown 1000:1000 /var/run/docker.sock
+        args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+      fi
+      ;;
+  esac
+
+  # Mount special /opt/couchbase volume for server
   # to enable rpm/deb packaging in sidecar containers
-  if [ "${environment}" = "server" ]
-  then
-    args="${args}-v /var/run/docker.sock:/var/run/docker.sock -v serverbuild_optcouchbase:/opt/couchbase "
+  if [ "${environment}" = "server" ]; then
+    args="${args}-v serverbuild_optcouchbase:/opt/couchbase "
   fi
 
-  if [ "${environment}" = "cv" ]
-  then
+  # Mount CV hook script
+  if [ "${environment}" = "cv" ]; then
     args="${args}-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh "
   fi
 
-  # Mount docker socket for analytics builders
-  if [ "${environment}" = "analytics" ]
-  then
-    args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+  # Overwrite buildx hook on docker cv workers since the buildx targets in the datacenter
+  # won't be available
+  if [ "${environment}" = "cv" ] && [ "$(echo "${service}" | grep -c "docker")" -eq 1 ]; then
+    rm -rf /tmp/buildx.sh
+    echo "#!/bin/bash" > /tmp/buildx.sh
+    echo "echo 'Overriding buildx hook - arm workers not available in AWS'" >> /tmp/buildx.sh
+    chmod +x /tmp/buildx.sh
+    args="${args}-v /tmp/buildx.sh:/usr/sbin/couchhook.d/buildx.sh "
   fi
-  # Mount docker socket for sdk builders
-  if [ "${environment}" = "sdk" ]
-  then
-    args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
-  fi
+
   echo "${args}"
 }
 
