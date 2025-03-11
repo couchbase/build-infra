@@ -1,9 +1,9 @@
-Two slaves need to be started outside of the swarm so that they can be
+Two agents need to be started outside of the swarm so that they can be
 run with --privileged. There is a job,
 
-http://sdk.jenkins.couchbase.com/job/recreate-special-slave/
+http://sdk.jenkins.couchbase.com/job/recreate-special-agent/
 
-which handles starting these slaves from their :latest tags. They are
+which handles starting these agents from their :latest tags. They are
 currently launched on sdk-swarm-01.build.couchbase.com. That host must
 have files
 
