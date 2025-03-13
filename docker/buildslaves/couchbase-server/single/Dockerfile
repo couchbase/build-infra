@@ -447,7 +447,6 @@ ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 
-
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching
 ARG CONTAINER_TAG_ARG
