@@ -1,0 +1,17 @@
+#!/bin/sh -ex
+
+# Things you might want to adjust:
+IMAGE=couchbasebuild/server-linux-cv
+
+# You can probably ignore the rest of this
+
+TAG="$(date +%Y%m%d)-hack"
+
+if [ "$1" = "--publish" ]
+then
+  ACTION=--push
+fi
+
+docker buildx build --pull ${ACTION} \
+  --tag ${IMAGE}:${TAG} \
+  .

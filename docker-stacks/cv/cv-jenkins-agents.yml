@@ -51,32 +51,13 @@ services:
     deploy:
       replicas: 0
 
+  # Placeholder service for ubuntu18_docker.
+  # Note: this should always have zero replicas. Its presence here is
+  # required to allow EC2 instances to discover the correct image.
   ubuntu18_docker:
     image: couchbasebuild/server-ubuntu18-cv:20230524
-    environment:
-      - "JENKINS_SLAVE_NAME=cv-ubuntu18-docker"
-      - "JENKINS_SLAVE_LABELS=u18-docker-slave {{.Node.Hostname}} vulcan 6.5.0 6.5.1 6.5.2 6.6.0 7.0.0 mad-hatter cheshire-cat neo master ubuntu-18.04 small docker"
-      - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
-      - "NODE_CLASS=cv-docker"
-      - "NODE_PRODUCT=couchbase-server"
-      - "PARALLELISM=3"
-      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:rw"
-    <<: *default-jenkins-agent
     deploy:
-      resources:
-        reservations:
-          # Docker nodes have 16GB RAM
-          memory: 12G
-      placement:
-        constraints:
-          - "node.labels.cvtype==docker"
-        max_replicas_per_node: 1
-      replicas: 2
-      update_config:
-        parallelism: 100
-        delay: 0s
+      replicas: 0
 
   ubuntu18_small:
     image: couchbasebuild/server-ubuntu18-cv:20230524
@@ -129,7 +110,7 @@ services:
         delay: 0s
 
   linux_small:
-    image: couchbasebuild/server-linux-cv:20250107
+    image: couchbasebuild/server-linux-cv:20250224-hack
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-small"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux small"
@@ -138,6 +119,8 @@ services:
       - "NODE_PRODUCT=couchbase-server"
       - "PARALLELISM=3"
       - "REPO_URL=https://github.com/couchbasedeps/git-repo"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
     <<: *default-jenkins-agent
     deploy:
       resources:

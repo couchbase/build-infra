@@ -57,16 +57,12 @@ analytics-16 ansible_host=172.23.104.180 labels=cvtype=ubuntu18 manager=true
 analytics-17 ansible_host=172.23.104.22  labels=cvtype=ubuntu18
 
 [cv]
-ubuntu18-cv-small-01  ansible_host=172.23.113.26  labels=cvtype=ubuntu18-small manager=true
-ubuntu18-cv-small-03  ansible_host=172.23.97.107  labels=cvtype=linux-small manager=true
-ubuntu18-cv-small-04  ansible_host=172.23.97.156  labels=cvtype=linux-small
+ubuntu18-cv-small-01  ansible_host=172.23.113.26  labels=cvtype=ubuntu18-small
 ubuntu18-cv-large-11  ansible_host=172.23.108.43  labels=cvtype=ubuntu18-large manager=true
 ubuntu18-cv-large-12  ansible_host=172.23.108.59  labels=cvtype=ubuntu18-large
 ubuntu18-cv-large-14  ansible_host=172.23.97.171  labels=cvtype=linux-large
 ubuntu18-cv-large-15  ansible_host=172.23.96.72   labels=cvtype=linux-large
-ubuntu18-cv-docker-03 ansible_host=172.23.104.198 labels=cvtype=docker
-ubuntu18-cv-docker-04 ansible_host=172.23.96.223  labels=cvtype=docker
-linux-cv-large-01     ansible_host=172.23.104.161 labels=cvtype=linux-large
+linux-cv-large-01     ansible_host=172.23.104.161 labels=cvtype=linux-large manager=true
 linux-cv-large-02     ansible_host=172.23.104.169 labels=cvtype=linux-large
 linux-cv-large-03     ansible_host=172.23.112.254 labels=cvtype=linux-large
 linux-cv-large-04     ansible_host=172.23.96.90   labels=cvtype=linux-large
@@ -76,8 +72,12 @@ linux-cv-large-07     ansible_host=172.23.112.11  labels=cvtype=linux-large
 linux-cv-large-08     ansible_host=172.23.112.20  labels=cvtype=linux-large
 linux-cv-large-09     ansible_host=172.23.124.34  labels=cvtype=linux-large
 linux-cv-large-10     ansible_host=172.23.124.35  labels=cvtype=linux-large
-linux-cv-large-11     ansible_host=172.23.124.45  labels=cvtype=linux-large
+linux-cv-large-11     ansible_host=172.23.124.45  labels=cvtype=linux-large manager=true
 linux-cv-large-12     ansible_host=172.23.124.46  labels=cvtype=linux-large
+linux-cv-large-13     ansible_host=172.23.113.108 labels=cvtype=linux-large
+linux-cv-large-14     ansible_host=172.23.113.107 labels=cvtype=linux-large
+linux-cv-small-1      ansible_host=172.23.105.106 labels=cvtype=linux-small
+linux-cv-small-2      ansible_host=172.23.105.78  labels=cvtype=linux-small
 
 [all:vars]
 ansible_user=couchbase
