@@ -264,6 +264,8 @@ RUN groupadd -g1000 couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
+    echo 'Defaults env_keep += "PATH"' >> /etc/sudoers.d/wheel_group && \
+    sed -i 's/^Defaults\s\+secure_path.*/# &/' /etc/sudoers && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 

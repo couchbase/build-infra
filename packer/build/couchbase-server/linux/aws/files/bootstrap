@@ -201,21 +201,9 @@ function docker_run_args() {
     args="${args}-e PARALLELISM=${parallelism} "
   fi
 
-  # Mount docker socket when needed
-  # For server, analytics, sdk, or any service with "docker" in the name
-  case "${environment}" in
-    server|analytics|sdk)
-      chown 1000:1000 /var/run/docker.sock
-      args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
-      ;;
-    *)
-      # For any service with "docker" in the name
-      if [ "$(echo "${service}" | grep -c "docker")" -gt 0 ]; then
-        chown 1000:1000 /var/run/docker.sock
-        args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
-      fi
-      ;;
-  esac
+  # Mount docker socket
+  chown 1000:1000 /var/run/docker.sock
+  args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
 
   # Mount special /opt/couchbase volume for server
   # to enable rpm/deb packaging in sidecar containers

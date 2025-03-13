@@ -151,7 +151,7 @@ services:
     <<: *default-jenkins-one-agent
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20250304
+    image: couchbasebuild/server-linux-build:20250313
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
       - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher master x86_64"

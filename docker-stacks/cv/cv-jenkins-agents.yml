@@ -51,11 +51,17 @@ services:
     deploy:
       replicas: 0
 
-  # Placeholder service for ubuntu18_docker.
-  # Note: this should always have zero replicas. Its presence here is
-  # required to allow EC2 instances to discover the correct image.
+  # Placeholder service for ubuntu18_docker
   ubuntu18_docker:
     image: couchbasebuild/server-ubuntu18-cv:20230524
+    deploy:
+      replicas: 0
+
+  # Placeholder service for linux_docker.
+  # Note: this should always have zero replicas. Its presence here is
+  # required to allow EC2 instances to discover the correct image.
+  linux_docker:
+    image: couchbasebuild/server-linux-cv:20250313
     deploy:
       replicas: 0
 
@@ -110,7 +116,7 @@ services:
         delay: 0s
 
   linux_small:
-    image: couchbasebuild/server-linux-cv:20250224-hack
+    image: couchbasebuild/server-linux-cv:20250313
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-small"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux small"
@@ -137,7 +143,7 @@ services:
         delay: 0s
 
   linux_large:
-    image: couchbasebuild/server-linux-cv:20250107
+    image: couchbasebuild/server-linux-cv:20250313
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-large"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux large"

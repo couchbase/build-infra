@@ -1,6 +1,6 @@
 # Docker container for Single Linux
 
-FROM couchbasebuild/server-linux-build:20250107
+FROM couchbasebuild/server-linux-build:20250313
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
@@ -109,6 +109,9 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 200
 # Enable .gitconfig so repo doesn't get whiny
 COPY build/gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
+
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
 
 # Avoid having to rebuild image chain for simple start script modifications
 COPY ./build/couchbuilder_start.sh /usr/sbin/
