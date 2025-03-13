@@ -264,6 +264,8 @@ RUN groupadd -g1000 couchbase && \
     echo 'couchbase:couchbase' | chpasswd && \
     echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/wheel_group && \
     echo 'Defaults:%wheel !requiretty' >> /etc/sudoers.d/wheel_group && \
+    echo 'Defaults env_keep += "PATH"' >> /etc/sudoers.d/wheel_group && \
+    sed -i 's/^Defaults\s\+secure_path.*/# &/' /etc/sudoers && \
     chmod 440 /etc/sudoers.d/wheel_group && \
     usermod -G wheel root
 
@@ -444,6 +446,7 @@ COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/tini", "--", "/usr/sbin/couchbuilder_start.sh" ]
 CMD [ "swarm" ]
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+
 
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching

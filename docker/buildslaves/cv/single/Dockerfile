@@ -110,6 +110,9 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 200
 COPY build/gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
 
+# Docker Swarm properties - keep this towards end of Dockerfile
+COPY build/swarm*.properties /
+
 # Avoid having to rebuild image chain for simple start script modifications
 COPY ./build/couchbuilder_start.sh /usr/sbin/
 COPY ./build/healthcheck.sh /usr/sbin/

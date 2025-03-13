@@ -55,11 +55,17 @@ function root_free_space_ok {
         return 1
     fi
 }
-
 function memory_ok {
+    local error_pattern='unable to create native thread: possibly out of memory or process/resource limits reached'
+
     if [ -f "/var/log/swarm-client.log" ]; then
-        grep 'unable to create native thread: possibly out of memory or process/resource limits reached' /var/log/swarm-client.log && return 1
+        grep "$error_pattern" /var/log/swarm-client.log && return 1
     fi
+
+    if [ -f "/home/couchbase/swarmclient0.log" ]; then
+        grep "$error_pattern" /home/couchbase/swarmclient0.log && return 1
+    fi
+
     return 0
 }
 
