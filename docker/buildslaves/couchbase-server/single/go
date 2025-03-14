@@ -64,7 +64,6 @@ docker ${BUILDX} build ${ACTION} \
   --build-arg AUTOCONF_VER=${AUTOCONF} \
   --build-arg AUTOMAKE_VER=${AUTOMAKE} \
   --build-arg BINUTILS_VER=${BINUTILS} \
-  --build-arg CBDEP_VER=${CBDEP} \
   --build-arg CCACHE_VER=${CCACHE} \
   --build-arg CLANG_9_VER=${CLANG_9} \
   --build-arg CLANG_9_TAG=${CLANG_9_TAG} \
@@ -84,6 +83,8 @@ docker ${BUILDX} build ${ACTION} \
   --build-arg GIT_VER=${GIT} \
   --build-arg JNLP_AGENT_VER=${JNLP_AGENT} \
   --build-arg JQ_VER=${JQ} \
+  --build-arg JRE_VERSION=${JRE_VERSION} \
+  --build-arg JRE_BUILD=${JRE_BUILD} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg OPENSSL_VER=${OPENSSL_111} \
   --build-arg PATCH_VIA_GERRIT_VER=${PATCH_VIA_GERRIT} \

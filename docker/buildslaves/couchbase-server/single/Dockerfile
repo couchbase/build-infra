@@ -212,7 +212,6 @@ RUN set -x \
                 ed \
                 glib2-devel \
                 glibc-devel \
-                java-11-openjdk-headless \
                 libarchive \
                 libyaml \
                 m4 \
@@ -220,6 +219,7 @@ RUN set -x \
                 man \
                 ninja-build \
                 ncurses-devel \
+                openssl-devel \
                 openssh-clients \
                 openssh-server \
                 patchelf \
@@ -232,19 +232,6 @@ RUN set -x \
                 which \
                 xfsprogs-devel \
     && ln -s $(which ninja-build) /usr/local/bin/ninja \
-    && yum clean all
-
-# Pyenv prereqs - for cbdep test suite
-RUN set -x \
-    && yum install --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 -y \
-                bzip2-devel \
-                libffi-devel \
-                openssl \
-                openssl-devel \
-                readline-devel \
-                uuid-devel \
-                tkinter \
-                sqlite-devel \
     && yum clean all
 
 # Set up for SSH daemon
@@ -382,12 +369,24 @@ COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Our tools
-ARG CBDEP_VER
 ARG PATCH_VIA_GERRIT_VER
-RUN curl -Lf https://packages.couchbase.com/cbdep/${CBDEP_VER}/cbdep-${CBDEP_VER}-linux-$(uname -m) -o /usr/local/bin/cbdep && \
-    chmod a+x /usr/local/bin/cbdep
 RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_VER}/patch_via_gerrit-${PATCH_VIA_GERRIT_VER}-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \
     chmod a+x /usr/local/bin/patch_via_gerrit
+# cbdep is a rolling PyPI release now, so we always just want "latest".
+# We use `uv` to install it, so install that first. All this is done as the `couchbase` user.
+USER couchbase
+ENV PATH=/home/couchbase/.local/bin:$PATH
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv tool install cbdep
+USER root
+# Remember this path for Jenkins agents (see entrypoint script)
+RUN echo "/home/couchbase/.local/bin" >> /etc/path
+
+# Use cbdep to install JVM for Jenkins
+ARG JRE_VERSION
+ARG JRE_BUILD
+RUN cbdep install -d /usr/local openjdk ${JRE_VERSION}+${JRE_BUILD} \
+    && ln -s /usr/local/openjdk-${JRE_VERSION}+${JRE_BUILD}/bin/java /usr/local/bin/java
 
 # Docker
 ARG DOCKER_VER
@@ -397,7 +396,7 @@ RUN set -x \
     && for gid in {990..997}; do groupadd -g ${gid} docker${gid}; usermod -a -G docker${gid} couchbase; done;
 RUN usermod -a -G 999 couchbase
 
-# Dev packages required for building cbdep
+# Dev packages required for building cbdep and other pyinstaller tools
 RUN yum install -y libxml2-devel libxslt-devel && yum clean all
 
 # Strace to help when debugging issues
@@ -431,7 +430,7 @@ RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /hom
 COPY bashrc /root/.bashrc
 COPY bashrc /home/couchbase/.bashrc
 
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/home/couchbase/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \

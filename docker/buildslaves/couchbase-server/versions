@@ -6,9 +6,9 @@
 # is available in their package manager, etc.
 
 # JRE - all
-JRE_MAJOR=17
-JRE_VERSION=17.0.5
-JRE_BUILD=8
+JRE_MAJOR=21
+JRE_VERSION=21.0.6
+JRE_BUILD=7
 
 # Cmake # amzn2, centos7, centos8, debian8, debian9, debian10, rhel8, suse12, suse15, ubuntu16, ubuntu18, ubuntu20
 CMAKE_MAJOR=3
@@ -61,5 +61,5 @@ JQ=1.7             # single
 YQ=4.31.1          # single
 
 # Ours
-CBDEP=1.1.6
+CBDEP=1.1.6        # older agents only; single-linux uses `uv` to install `cbdep`
 PATCH_VIA_GERRIT=1.1.2
