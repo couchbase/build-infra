@@ -51,12 +51,6 @@ services:
     deploy:
       replicas: 0
 
-  # Placeholder service for ubuntu18_docker
-  ubuntu18_docker:
-    image: couchbasebuild/server-ubuntu18-cv:20230524
-    deploy:
-      replicas: 0
-
   # Placeholder service for linux_docker.
   # Note: this should always have zero replicas. Its presence here is
   # required to allow EC2 instances to discover the correct image.
