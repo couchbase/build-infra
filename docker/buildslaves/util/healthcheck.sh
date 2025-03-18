@@ -73,10 +73,9 @@ function docker_prune {
     # If we got here we're still short on space, so try a prune
     # (if docker is present and working)
     if (command -v docker && sudo docker ps) &>/dev/null ; then
+        echo "Healthcheck: Running docker system prune"
         sudo docker system prune -a -f
     fi
-
-    return $(root_free_space_ok)
 }
 
 function remove_workspaces {
@@ -91,13 +90,12 @@ function remove_workspaces {
     while ! workspace_free_space_ok; do
         oldest=$(ls -1t | grep -v workspaces.txt | tail -n +2 | tail -n -1)
         if [[ -z "$oldest" ]]; then
-            return 1
+            break
         fi
-
+        echo "Healthcheck: Removing oldest workspace: ${oldest}"
         rm -rf "$oldest"
     done
     popd
-    return 0
 }
 
 # This isn't really a "healthcheck" as we'll shoot ourselves in the head
