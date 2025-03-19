@@ -32,7 +32,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20220708
+    image: couchbasebuild/zz-lightweight:20250111
     environment:
       - "JENKINS_SLAVE_NAME=cv-zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"
@@ -55,7 +55,7 @@ services:
   # Note: this should always have zero replicas. Its presence here is
   # required to allow EC2 instances to discover the correct image.
   linux_docker:
-    image: couchbasebuild/server-linux-cv:20250314
+    image: couchbasebuild/server-linux-cv:20250318
     deploy:
       replicas: 0
 
@@ -110,7 +110,7 @@ services:
         delay: 0s
 
   linux_small:
-    image: couchbasebuild/server-linux-cv:20250314
+    image: couchbasebuild/server-linux-cv:20250318
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-small"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux small"
@@ -137,7 +137,7 @@ services:
         delay: 0s
 
   linux_large:
-    image: couchbasebuild/server-linux-cv:20250314
+    image: couchbasebuild/server-linux-cv:20250318
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-large"
       - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus linux large"
