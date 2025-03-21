@@ -48,4 +48,11 @@ if [ ! -e ${BACKUP_ROOT}/DONT_DELETE_THIS.txt ]; then
     echo "NAS mountpoint not found, not syncing to S3!"
     exit 1
 fi
+
+# And if we ARE here, then update the modification date of the marker
+# file so we don't delete it after 60 days above.
+touch ${BACKUP_ROOT}/DONT_DELETE_THIS.txt
+
+# Finally, sync up to S3, deleting any files that are no longer present
+# on the NAS.
 aws s3 sync --delete ${BACKUP_ROOT}/ s3://cb-blackduck.backups/
