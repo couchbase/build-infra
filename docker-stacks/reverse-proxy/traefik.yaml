@@ -65,10 +65,10 @@ secrets:
     name: wildcard_build_couchbase_com_key_20240604
   wildcard_couchbase_com_cert:
     external: true
-    name: wildcard_couchbase_com_cert_20240425
+    name: wildcard_couchbase_com_cert_20250407
   wildcard_couchbase_com_key:
     external: true
-    name: wildcard_couchbase_com_key_20240425
+    name: wildcard_couchbase_com_key_20250407
 
 configs:
   traefik_config:
