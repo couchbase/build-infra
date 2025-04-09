@@ -1,12 +1,9 @@
 ---
-repo_version: 1.13.11
+openjdk_version: 17.0.12+7
 ruby_version: 2.6
 
-homebrew_cask_apps:
-   - homebrew/cask-versions/java11
-
 homebrew_installed_packages:
-   - autoconf@2.69
+   - autoconf
    - automake
    - bison
    - ccache
@@ -35,4 +32,5 @@ homebrew_installed_packages:
    - ruby-completion
    - sha2
    - unbound
+   - xcodesorg/made/xcodes
    - xz

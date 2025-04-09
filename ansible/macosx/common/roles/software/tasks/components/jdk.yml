@@ -1,17 +1,15 @@
-- name: Check if installed (brew)
+- name: Check if installed (openjdk)
   stat:
-    path: "/usr/local/{{ azul_jdk_name }}"
-  register: azul_jdk
+    path: "/usr/local/openjdk-{{ openjdk_version }}"
+  register: openjdk
 
 - name: Install jdk
   shell: |
-    cd /usr/local
-    curl -OL https://cdn.azul.com/zulu/bin/{{ azul_jdk_name }}.tar.gz
-    tar -xzf {{ azul_jdk_name }}.tar.gz
-    rm -rf {{ azul_jdk_name }}.tar.gz
+    export PATH=/Users/couchbase/.local/bin:$PATH
+    cbdep install openjdk {{ openjdk_version }} -d /usr/local
     rm -f /usr/local/bin/java
     rm -f /usr/local/bin/javac
-    ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
-    ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
+    ln -s /usr/local/openjdk-{{ openjdk_version }}/bin/java /usr/local/bin/java
+    ln -s /usr/local/openjdk-{{ openjdk_version }}/bin/javac /usr/local/bin/javac
   become: true
-  when: azul_jdk.stat.exists == False
+  when: openjdk.stat.exists == False

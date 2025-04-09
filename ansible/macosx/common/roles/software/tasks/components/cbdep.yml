@@ -1,0 +1,11 @@
+- name: Check if installed (cbdep)
+  stat:
+    path: "/Users/couchbase/.local/bin/cbdep"
+  register: cbdep
+
+- name: Install cbdep
+  shell: |
+    export PATH=/Users/couchbase/.local/bin:$PATH
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    uv tool install cbdep
+  when: cbdep.stat.exists == False
