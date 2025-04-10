@@ -41,5 +41,11 @@ locals {
             "default_sr" = "Local storage"
             "network"    = "Pool-wide network associated with eth2"
         }
+        "xcp-sf36" = {
+            "hostname"   = "172.23.124.101"
+            "username"   = "root"
+            "default_sr" = "Local storage"
+            "network"    = "Pool-wide network associated with eth2"
+        }
     }
 }

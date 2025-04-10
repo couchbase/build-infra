@@ -61,22 +61,13 @@ locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
 }
 
-# Pull checksums for Debian ISOs
-data "http" "debian_sha_and_release" {
-  url = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA256SUMS"
-}
-local "debian_sha256" {
-  expression = regex("([A-Za-z0-9]+)[\\s\\*]+debian-.*netinst", data.http.debian_sha_and_release.body)
-}
-
 source "xenserver-iso" "debian" {
-  iso_checksum    = "sha256:${local.debian_sha256.0}"
-  iso_url         = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-${var.debian_version}-amd64-netinst.iso"
-
+  iso_name        = "debian-${var.debian_version}-amd64-netinst.iso"
   sr_iso_name     = var.sr_iso_name
   sr_name         = local.sr_name
 
-  # We'll install the newer Rust-based guest tools via the preseed file
+  # We'll install the newer Rust-based guest tools via the preseed file,
+  # so don't want to use XCP's built-in tools.iso
   tools_iso_name  = ""
 
   remote_host     = local.xcp_hostname

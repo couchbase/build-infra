@@ -100,15 +100,8 @@ When we start working with Debian 13, we need to first create
 
 This script will look for the appropriate Debian .iso on the XCP SR
 named by `sr_iso_name` in `debian.pkr.hcl`, which is set to "NFS ISO
-library (Buildteam)". If it doesn't find the ISO in that SR, it will
-download it locally and then upload it to the SR.
-
-However, currently the XCP packer plugin has a bug whereby the uploaded
-`.iso` is given an opaque hash-based filename, meaning that the script
-won't find it when the script is re-run. So if you run this for the
-first time for a new Debian version, after running, go to the
-`/data/builds/iso` directory on the NAS and rename the wrongly-named
-`.iso` to `debian-X.Y.Z-amd64-netinst.iso`.
+library (Buildteam)". The .iso must be named
+`debian-X.Y.Z-amd64-netinst.iso`.
 
 If you are creating a template on a new Xen host which does not have the
 above NFS SR, here is how to create it using Xen Orchestra:
