@@ -9,7 +9,7 @@ services:
 
   # testing-cv.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.462.2
+    image: jenkins/jenkins:2.492.3
     deploy:
       resources:
         limits:
