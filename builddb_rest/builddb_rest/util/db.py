@@ -2,9 +2,6 @@
 Utility methods to access build database for REST API
 """
 
-from couchbase.n1ql import N1QLQuery
-
-
 class BuildInfo:
     """
     Common set of methods with access to database connection to acquire
@@ -54,9 +51,7 @@ class BuildInfo:
         if limit is not None:
             q_string += f' LIMIT {limit}'
 
-        query = N1QLQuery(q_string, **kwargs)
-
-        for row in self.db.bucket.n1ql_query(query):
+        for row in self.db.cluster.query(q_string, **kwargs):
             yield row
 
     def get_products(self):

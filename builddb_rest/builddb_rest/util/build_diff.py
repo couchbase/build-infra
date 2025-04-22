@@ -1,7 +1,7 @@
 import logging
 import pathlib
 
-import cbbuild.cbutil.git as cbutil_git
+import cbbuild.util.git as cbutil_git
 
 
 # Set up logging and handler

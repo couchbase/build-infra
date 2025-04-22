@@ -1,0 +1,23 @@
+[project]
+name = "builddb-rest"
+version = "0.1.0"
+description = "REST API for the Build Team database"
+authors = [
+    { name = "Couchbase Build Team", email = "build-team@couchbase.com" }
+]
+readme = "README.rst"
+requires-python = ">=3.13"
+dependencies = [
+    "pyramid",
+    "cornice",
+    "waitress",
+    "cbbuild-database",
+    "cbbuild-util"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.entry-points.'paste.app_factory']
+main = "builddb_rest:main"

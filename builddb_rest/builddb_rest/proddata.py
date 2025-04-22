@@ -64,9 +64,7 @@ def includeme(config):
     """
 
     settings = config.registry.settings
-    datadir = pathlib.Path(
-        os.path.expanduser(f'~couchbase/{settings["prod_metadata"]}')
-    )
+    datadir = pathlib.Path(settings["prod_metadata"])
 
     if not os.path.exists(datadir):
         raise RuntimeError(

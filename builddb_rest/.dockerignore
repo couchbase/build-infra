@@ -1,0 +1,5 @@
+builddb_rest.ini
+**/__pycache__/
+.venv
+dist
+.python-version

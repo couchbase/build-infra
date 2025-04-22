@@ -5,7 +5,7 @@ Module for metadata endpoints
 from cornice.resource import resource
 from pyramid.httpexceptions import HTTPNotFound
 
-import cbbuild.cbutil.db as cbutil_db
+import cbbuild.database.db as cbutil_db
 
 from .cors import CORS_POLICY
 from .urls import ALL_URLS

@@ -7,7 +7,7 @@ from pyramid.httpexceptions import (
     HTTPBadRequest, HTTPNotFound, HTTPMethodNotAllowed
 )
 
-import cbbuild.cbutil.db as cbutil_db
+import cbbuild.database.db as cbutil_db
 
 from .cors import CORS_POLICY
 from .urls import ALL_URLS
