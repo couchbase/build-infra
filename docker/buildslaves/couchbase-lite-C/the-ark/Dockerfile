@@ -27,14 +27,6 @@ RUN apt-get update && apt-get install -y \
     ninja-build \
 && rm -rf /var/lib/apt/lists
 
-# CMake
-ARG CMAKE_MAJOR=3
-ARG CMAKE_MINOR=20
-ARG CMAKE_PATCH=1
-RUN mkdir /tmp/deploy && \
-    curl -f https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}-linux-x86_64.sh -o /tmp/deploy/cmake.sh && \
-    (echo y; echo n) | sh /tmp/deploy/cmake.sh --prefix=/usr/local && rm -rf /tmp/deploy
-
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
 RUN useradd couchbase -G sudo -m -s /bin/bash && \
@@ -42,19 +34,27 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
-# JDK for Jenkins.
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -Lf https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.17%2B8/OpenJDK11U-jre_x64_linux_hotspot_11.0.17_8.tar.gz -o openjre.tar.gz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/openjre.tar.gz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
-
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
+# Install uv and cbdep for `couchbase` user
+ENV PATH="/home/couchbase/.local/bin:${PATH}"
+RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
+USER couchbase
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv tool install cbdep
+
+# Use cbdep to install JVM for Jenkins
+USER root
+ARG JDK_VERSION=17.0.15+6
+RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
+
+# Use cbdep to install cmake
+ARG CMAKE_VERSION=3.31.7
+RUN cbdep install -d /usr/local cmake ${CMAKE_VERSION} \
+    && ln -s /usr/local/cmake-${CMAKE_VERSION}/bin/cmake /usr/local/bin/cmake
 
 # Entrypoint script and swarm properties - keep this towards end of Dockerfile
 COPY build/couchbuilder_start.sh /usr/sbin/
