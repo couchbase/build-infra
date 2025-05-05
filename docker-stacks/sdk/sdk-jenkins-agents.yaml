@@ -100,22 +100,22 @@ x-default-jenkins-two-agent-environment:
 
 services:
 
-  alpine317:
-    image: couchbasebuild/sdk-alpine3.17-build:20231103
+  alpine320:
+    image: couchbasebuild/sdk-alpine3.20-build:20250505
     environment:
-      - "JENKINS_SLAVE_NAME=build-alpine317"
-      - "JENKINS_SLAVE_LABELS=sdk alpine3.17 alpine"
+      - "JENKINS_SLAVE_NAME=build-alpine320"
+      - "JENKINS_SLAVE_LABELS=sdk alpine3.20 alpine"
       - *default-jenkins-agent-environment-master
       - *default-jenkins-agent-environment-tunnel
       - *default-jenkins-agent-lang
       - *repo-url
     <<: *default-jenkins-two-agent
 
-  alpine318:
-    image: couchbasebuild/sdk-alpine3.18-build:20231103
+  alpine321:
+    image: couchbasebuild/sdk-alpine3.21-build:20250505
     environment:
-      - "JENKINS_SLAVE_NAME=build-alpine318"
-      - "JENKINS_SLAVE_LABELS=sdk alpine3.18 alpine"
+      - "JENKINS_SLAVE_NAME=build-alpine321"
+      - "JENKINS_SLAVE_LABELS=sdk alpine3.21 alpine"
       - *default-jenkins-agent-environment-master
       - *default-jenkins-agent-environment-tunnel
       - *default-jenkins-agent-lang

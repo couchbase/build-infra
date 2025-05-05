@@ -38,7 +38,7 @@ RUN apk add --no-cache \
         musl-locales \
         musl-locales-lang \
         oniguruma-dev \
-        openjdk11 \
+        openjdk17 \
         openssh-client \
         openssl-dev \
         perl \
@@ -125,7 +125,7 @@ ENV LANG=en_US.UTF-8
 
 # Temp install step for "cbdep" tool
 ARG CACHEBUST=1
-RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux-x64-musl -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/1.1.7/cbdep-1.1.7-linux-x64-musl -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/

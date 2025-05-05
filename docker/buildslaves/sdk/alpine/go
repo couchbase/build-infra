@@ -13,7 +13,7 @@ fi
 # cached the same
 CACHEBUST=$(date +%Y%m%d-%H%M%S)
 
-for ALPINE_VERSION in 3.17 3.18; do
+for ALPINE_VERSION in 3.20 3.21; do
     IMAGE=couchbasebuild/sdk-alpine${ALPINE_VERSION}-build
 
     mkdir -p build
