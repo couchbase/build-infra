@@ -123,9 +123,14 @@ RUN cd /tmp && \
 # Set LANG
 ENV LANG=en_US.UTF-8
 
-# Temp install step for "cbdep" tool
-ARG CACHEBUST=1
-RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/1.1.7/cbdep-1.1.7-linux-x64-musl -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+# Install "cbdep" for `couchbase` user
+RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
+ENV PATH="/home/couchbase/.local/bin:${PATH}"
+USER couchbase
+RUN set -x \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && uv tool install cbdep
+USER root
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
