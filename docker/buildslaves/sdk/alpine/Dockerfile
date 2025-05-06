@@ -132,6 +132,9 @@ RUN set -x \
     && uv tool install cbdep
 USER root
 
+# Add hook to update cbdep on each container start
+COPY update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
+
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]

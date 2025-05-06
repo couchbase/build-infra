@@ -101,7 +101,7 @@ x-default-jenkins-two-agent-environment:
 services:
 
   alpine320:
-    image: couchbasebuild/sdk-alpine3.20-build:20250505
+    image: couchbasebuild/sdk-alpine3.20-build:20250506
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine320"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.20 alpine"
@@ -112,7 +112,7 @@ services:
     <<: *default-jenkins-two-agent
 
   alpine321:
-    image: couchbasebuild/sdk-alpine3.21-build:20250505
+    image: couchbasebuild/sdk-alpine3.21-build:20250506
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine321"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.21 alpine"
