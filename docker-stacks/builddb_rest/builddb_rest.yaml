@@ -92,7 +92,7 @@ networks:
 secrets:
   wildcard_build_couchbase_com_cert:
     external: true
-    name: wildcard_build_couchbase_com_cert_20240604
+    name: wildcard_build_couchbase_com_cert_20250516
   wildcard_build_couchbase_com_key:
     external: true
     name: wildcard_build_couchbase_com_key_20240604
