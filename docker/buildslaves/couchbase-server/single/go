@@ -55,6 +55,7 @@ else
 fi
 
 docker ${BUILDX} build ${ACTION} \
+  --ulimit nofile=1024 \
   --platform ${PLATFORMS} \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \

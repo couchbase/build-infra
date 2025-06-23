@@ -42,9 +42,9 @@ RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
-RUN yum install -y --setopt=skip_missing_names_on_install=False curl deltarpm sudo
-RUN yum groupinstall -y "Development Tools"
-RUN yum install -y --setopt=skip_missing_names_on_install=False bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
+RUN ulimit -n 1024 && yum install -y --setopt=skip_missing_names_on_install=False curl deltarpm sudo
+RUN ulimit -n 1024 && yum groupinstall -y "Development Tools"
+RUN ulimit -n 1024 && yum install -y --setopt=skip_missing_names_on_install=False bzip2-devel libarchive-devel xz-devel libffi-devel ncurses-devel openssl-devel openssl-devel readline-devel zlib-devel
 
 # sed - the stock version doesn't support extended expressions
 FROM base-compile AS sed-compile
@@ -84,7 +84,7 @@ LABEL imagename=autoconf-compile
 ARG AUTOCONF_VER
 ARG AUTOMAKE_VER
 ARG LIBTOOL_VER
-RUN yum install -y --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 perl-Data-Dumper m4
+RUN ulimit -n 1024 && yum install -y --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 perl-Data-Dumper m4
 RUN cd /tmp && mkdir autoconf automake libtool
 RUN curl -Lf http://ftpmirror.gnu.org/autoconf/autoconf-${AUTOCONF_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/autoconf
 RUN curl -Lf http://ftpmirror.gnu.org/automake/automake-${AUTOMAKE_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/automake
@@ -102,23 +102,23 @@ LABEL imagename=ruby-compile
 ARG RUBY_INSTALL_MINOR
 ARG RUBY_INSTALL_MAJOR
 ARG RUBY_INSTALL_PATCH
+ARG RUBY_MAJOR
+ARG RUBY_MINOR
+ARG RUBY_PATCH
 ARG RUBY_INSTALL_VER="${RUBY_INSTALL_MAJOR}.${RUBY_INSTALL_MINOR}.${RUBY_INSTALL_PATCH}"
 RUN mkdir /tmp/ruby-install
 RUN curl -Lf /tmp/ruby-install-${RUBY_INSTALL_VER}.tar.gz https://github.com/postmodern/ruby-install/archive/v${RUBY_INSTALL_VER}.tar.gz -o - \
         | tar xz --strip-components=1 -C /tmp/ruby-install
 WORKDIR /tmp/ruby-install
-RUN sudo make -j install
+RUN sudo make -j8 install
 
 # Ruby itself
-ARG RUBY_MAJOR
-ARG RUBY_MINOR
-ARG RUBY_PATCH
-RUN ruby-install -c --prefix /usr/local -j -- ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH}
+RUN ulimit -n 1024 && ruby-install -c --prefix /usr/local -j8 ${RUBY_MAJOR}.${RUBY_MINOR}.${RUBY_PATCH} && ls -l /usr/local/bin/ruby
 
 # OpenSSL
 FROM base-compile AS openssl-compile
 ARG OPENSSL_VER
-RUN yum install -y perl-IPC-Cmd
+RUN ulimit -n 1024 && yum install -y perl-IPC-Cmd
 WORKDIR /tmp/openssl-1.1.1${OPENSSL_VER}
 ADD https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1${OPENSSL_VER}/openssl-1.1.1${OPENSSL_VER}.tar.gz /tmp
 RUN set -x \
@@ -138,6 +138,7 @@ ARG PYTHON3_MINOR
 ARG PYTHON3_PATCH
 WORKDIR /tmp/python
 RUN set -x \
+    && ulimit -n 1024 \
     && yum install -y --setopt=skip_missing_names_on_install=False \
         bzip2-devel \
         libpcap-devel \
@@ -171,8 +172,44 @@ ARG CCACHE_VER
 RUN mkdir /tmp/ccache
 RUN curl -Lf https://www.samba.org/ftp/ccache/ccache-${CCACHE_VER}.tar.bz2 -o - | tar xj --strip-components=1 -C /tmp/ccache
 WORKDIR /tmp/ccache
-RUN ./configure --prefix=/usr/local && make -j && make install
+RUN ./configure --prefix=/usr/local && make -j$(nproc) && make install
 
+# chroot for Debian installer - use debootstrap
+FROM debian:12 AS debian-chroot-compile
+
+ARG DEBIAN_CODENAME=buster \
+    TARGETARCH
+RUN apt-get update && apt-get install -y --no-install-recommends debootstrap
+RUN mkdir -p /opt/deb-chroot
+RUN set -x \
+    && ulimit -n 1024 \
+    && debootstrap --arch=${TARGETARCH} \
+         --variant=minbase \
+         --include dpkg-dev,debhelper,libtinfo5,fakeroot \
+         ${DEBIAN_CODENAME} /opt/deb-chroot http://deb.debian.org/debian
+RUN LC_ALL=C chroot /opt/deb-chroot /bin/bash -c \
+    'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
+
+# chroot for RPM installer - use rinse from Debian (weird, right?).
+FROM debian:12 AS rpm-chroot-compile
+
+ARG RPM_CODENAME=rocky-8 \
+    TARGETARCH
+
+RUN apt-get update && apt-get install -y --no-install-recommends rinse \
+    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /opt/rpm-chroot
+# 'rinse' doesn't seem to return a non-zero exit code if it fails, so we
+# stick the extra `ls -l` command in there to ensure that the build fails if
+# the chroot is not created correctly.
+RUN set -x \
+    && ulimit -n 1024 \
+    && if [ "${TARGETARCH}" = "arm64" ]; then TARGETARCH=aarch64; fi \
+    && rinse --arch=${TARGETARCH} --distribution=${RPM_CODENAME} --directory /opt/rpm-chroot \
+    && ls -l /opt/rpm-chroot/bin/bash
+RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c 'ulimit -n 1024 && yum install -y rpm-build && yum clean all'
+RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c \
+    'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
 
 # -----------------------------------------
 # This is the actual build agent base image
@@ -204,6 +241,7 @@ RUN chmod +x /tini
 ### Install Couchbase build dependencies ######################################
 # * Packages from the base CentOS repositories
 RUN set -x \
+    && ulimit -n 1024 \
     && yum install -y epel-release \
     && yum install --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 -y \
                 awscli \
@@ -288,13 +326,41 @@ RUN for clang in ${CLANG_9_VER} ${CLANG_15_VER} ${CLANG_18_VER}; do \
 # Git (needs to be built with newer gcc than is available in base builder)
 ARG GIT_VER
 RUN mkdir /tmp/git
-RUN yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel && yum clean all
+RUN ulimit -n 1024 && yum install -y --setopt=skip_missing_names_on_install=False curl-devel expat-devel gettext-devel perl-devel && yum clean all
 RUN set -x \
     && curl -Lf https://www.kernel.org/pub/software/scm/git/git-${GIT_VER}.tar.gz -o - \
         | tar xz --strip-components=1 -C /tmp/git \
     && cd /tmp/git \
-    && PATH=/opt/gcc-${GCC_13_VER}/bin:$PATH make -j prefix=/usr/local install \
+    && PATH=/opt/gcc-${GCC_13_VER}/bin:$PATH make -j4 prefix=/usr/local install \
     && rm -rf /tmp/git
+
+# Install the latest gdb and symlink in /usr/local/bin
+ARG GDB_VER
+RUN set -x \
+    && ulimit -n 1024 \
+    && yum install -y texinfo gmp-devel mpfr-devel && yum clean all \
+    && mkdir -p /opt/gdb-${GDB_VER} /tmp/gdb \
+    && cd /tmp/gdb \
+    && curl -Lf https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
+        | tar xz --strip-components=1 \
+    && ./configure --prefix=/opt/gdb-${GDB_VER} \
+    && make -j$(nproc) \
+    && make install \
+    && ln -sf /opt/gdb-${GDB_VER}/bin/gdb /usr/local/bin/gdb \
+    && rm -rf /tmp/gdb
+
+# Perl modules
+RUN ulimit -n 1024 && \
+    yum install -y  --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 \
+        perl-Data-Dumper \
+        perl-Digest-SHA \
+        perl-Digest-MD5 \
+        perl-IPC-Cmd \
+    && yum clean all
+
+# Installer chroots
+COPY --from=debian-chroot-compile /opt/deb-chroot /opt/deb-chroot
+COPY --from=rpm-chroot-compile /opt/rpm-chroot /opt/rpm-chroot
 
 # Autoconf and friends
 COPY --from=autoconf-compile /usr/local/ /usr/local/
@@ -317,7 +383,7 @@ RUN set -x \
 # sed
 COPY --from=sed-compile /out/usr/local/ /usr/local/
 
-# pixz
+# pixz - still needed for packaging .deb files in 7.x
 COPY --from=pixz-compile /out/usr/local/ /usr/local/
 
 # Python 3, OpenSSL 1.1.1, pip
@@ -345,14 +411,6 @@ RUN set -x \
     && chmod a+x /usr/local/bin/jq \
     && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_${TARGETARCH} \
     && chmod a+x /usr/local/bin/yq
-
-# Perl modules
-RUN yum install -y  --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 \
-        perl-Data-Dumper \
-        perl-Digest-SHA \
-        perl-Digest-MD5 \
-        perl-IPC-Cmd \
-    && yum clean all
 
 # JNLP agent (for use in EC2 agents)
 ARG JNLP_AGENT_VER
@@ -396,25 +454,11 @@ RUN set -x \
     && for gid in {990..997}; do groupadd -g ${gid} docker${gid}; usermod -a -G docker${gid} couchbase; done;
 RUN usermod -a -G 999 couchbase
 
-# Dev packages required for building cbdep and other pyinstaller tools
-RUN yum install -y libxml2-devel libxslt-devel && yum clean all
+# Dev packages required for building pyinstaller tools
+RUN ulimit -n 1024 && yum install -y libxml2-devel libxslt-devel && yum clean all
 
 # Strace to help when debugging issues
-RUN yum install -y strace && yum clean all
-
-# Install the latest gdb and symlink in /usr/local/bin
-ARG GDB_VER
-RUN set -x \
-    && yum install -y texinfo gmp-devel mpfr-devel && yum clean all \
-    && mkdir -p /opt/gdb-${GDB_VER} /tmp/gdb \
-    && cd /tmp/gdb \
-    && curl -Lf https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
-        | tar xz --strip-components=1 \
-    && ./configure --prefix=/opt/gdb-${GDB_VER} \
-    && make -j$(nproc) \
-    && make install \
-    && ln -sf /opt/gdb-${GDB_VER}/bin/gdb /usr/local/bin/gdb \
-    && rm -rf /tmp/gdb
+RUN ulimit -n 1024 && yum install -y strace && yum clean all
 
 # Truncate logfiles
 RUN find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
