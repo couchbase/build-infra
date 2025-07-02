@@ -86,13 +86,16 @@ RUN pip3 install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1
 RUN set -x \
     && yum install -y texinfo \
     && yum clean all \
-    && curl -Lf -o /tmp/gdb.tgz https://ftp.gnu.org/gnu/gdb/gdb-8.1.1.tar.gz \
+    && curl -Lf -o /tmp/gdb.tgz https://ftpmirror.gnu.org/gnu/gdb/gdb-8.1.1.tar.gz \
     && mkdir /tmp/gdb \
     && cd /tmp/gdb \
     && tar xf /tmp/gdb.tgz --strip-components=1 \
     && ./configure --prefix=/usr \
     && make && make install \
     && rm -rf /tmp/gdb*
+
+RUN set -x \
+    && pip install gcovr
 
 # lsof and netstat for debugging purposes
 RUN yum install -y lsof net-tools && yum clean all
