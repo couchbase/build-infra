@@ -154,7 +154,7 @@ services:
     image: couchbasebuild/server-linux-build:20250621
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
-      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher master x86_64"
+      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus totoro trinity cypher master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
