@@ -1,43 +1,39 @@
 Setup Mobile MACOS
 
 Prereq
+
 1. Setup a mac agent on mobile jenkins https://mobile.jenkins.couchbase.com using JNLP connection.
-   Make a note of the agent's name and jnlp secret.  These are required when running the ansible
+   Make a note of the agent's name and jnlp secret. These are required when running the ansible
    command at step 6 & 7.
 2. Create a new Mac VM and install appropriate version of xcode as needed. VM ova and iso might be
-    available on latestbuild.  If not, it will need to be downloaded from https://developer.apple.com
+   available on latestbuild. If not, it will need to be downloaded from https://developer.apple.com
 
 Deploy tools via ansible
+
 1. git clone https://github.com/couchbase/build.git
 2. cd build/ansible/macosx/couchbase-mobile
 3. Download MacOS codesign cert, from lastpass. unzip it to files directory so that it becomes
    files/Certificates.p12
 4. Ensure a copy of the following file in ssh directory
-       buildbot_id_dsa
-       config
-       id_ns-codereview
-       id_rsa
-       ns-buildbot.rsa
-       patch_via_gerrit.ini
+   buildbot_id_dsa
+   config
+   id_ns-codereview
+   id_rsa
+   ns-buildbot.rsa
+   patch_via_gerrit.ini
 5. Ensure a copy of jenkins-appledeveloper.developerprofile in files directory
-    info is in team's lastpass database
+   info is in team's lastpass database
 6. update inventory information
 7. Run the playbook and enter sudo password
-    % ansible-playbook -i inventory playbook.yml --ask-become-pass
-
+   % ansible-playbook -i inventory playbook.yml --ask-become-pass
 
 NOTES:
-   * Starting from bigsur, the agent should be launch using JNLP connection.
-   Based on observation, bigsur+ no longer allows tests to be run through ssh session.
-   Often tests are failed with errors such as "Underlying Error: Couldn’t communicate
-   with a helper application. ...The connection to service on pid 0 named
-   com.apple.testmanagerd.control was invalidated."
 
-   * After an agent is first created, the command to start the agent including jnlp secret
-   is displayed.  i.e.
+- Starting from xcode 16.3, Xcode Test Manager requires GUI access.
+  Jenkins agent must be launched from a GUI session:
+  - connect to VM via vnc
+  - open a terminal window
+  - cd ~/jenkins; ./jnlp.sh
 
-   echo <a long string of jnlp secret code> secret-file
-   java -jar agent.jar -jnlpUrl https://mobile.jenkins.couchbase.com/computer/
-   mobile-cbl-macosx-02/jenkins-agent.jnlp -secret @secret-file -workDir "/Users/couchbase/jenkins"
-
-   Agent name (mobile-cbl-macosx-02) and jnlp secret string are needed by the ansible-playbook
+  It is possible to automate this by adding jnlp.sh as a login item. However, performance
+  is noticeably degraded.

@@ -3,42 +3,43 @@
   user: "{{ ansible_ssh_user }}"
 
   vars:
-    azul_jdk_name: "{{ 'zulu16.30.15-ca-jdk16.0.1-macosx_aarch64' if ansible_architecture == 'arm64' else 'zulu16.30.15-ca-jdk16.0.1-macosx_x64' }}"
     homebrew_dir: "{{ '/usr/local' if ansible_architecture == 'x86_64' else '/opt/homebrew' }}"
 
   pre_tasks:
     - name: Add passwordless sudoer
-      copy:
-        src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
+      ansible.builtin.copy:
+        src: ./files/cbsudo
+        dest: /private/etc/sudoers.d/cbsudo
       become: true
 
   tasks:
-
     - name: Check jenkins_jnlp_secret
-      fail:
+      ansible.builtin.fail:
         msg: "'jenkins_jnlp_secret' is not defined or empty"
       when: (jenkins_jnlp_secret is not defined) or (jenkins_jnlp_secret|length == 0)
 
     - name: Check jenkins_node_name
-      fail:
+      ansible.builtin.fail:
         msg: "'jenkins_node_name' is not defined or empty"
       when: (jenkins_node_name is not defined) or (jenkins_node_name|length == 0)
 
-    - debug: msg="Installing homebrew.  This will take a while"
+    - ansible.builtin.debug:
+        msg: "Installing homebrew.  This will take a while"
 
     - name: Install homebrew
-      shell: |
+      ansible.builtin.shell: |
         yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     - name: Disable analytics
-      shell: ./brew analytics off
+      ansible.builtin.shell: ./brew analytics off
       args:
         chdir: "{{ homebrew_dir }}/bin"
 
-    - debug: msg="Installing homebrew packages "
+    - ansible.builtin.debug:
+        msg: "Installing homebrew packages.  This will take a while"
 
     - name: Install homebrew packages
-      community.general.homebrew: name={{ item }} state=latest
+      community.general.homebrew: name="{{ item }}" state=latest
       with_items:
           - bash-completion
           - carthage
@@ -48,9 +49,11 @@
           - doxygen
           - git
           - jq
+          - openjdk@21
           - openssl
           - pass
           - python
+          - pyinstaller
           - ssh-copy-id
           - wget
 
@@ -60,47 +63,56 @@
         dest: "{{ homebrew_dir }}/bin/python"
         state: link
 
-
     - name: Set energy saving to zero
-      shell: systemsetup -setcomputersleep Never
+      ansible.builtin.shell: systemsetup -setcomputersleep Never
       become: true
 
     - name: Set user screensaver
-      shell: defaults -currentHost write com.apple.screensaver idleTime 5
+      ansible.builtin.shell: defaults -currentHost write com.apple.screensaver idleTime 5
 
     - name: Disable logon screensaver
-      shell: defaults -currentHost write com.apple.screensaver loginWindowIdleTime 0
+      ansible.builtin.shell: defaults -currentHost write com.apple.screensaver loginWindowIdleTime 0
       become: true
 
     - name: Add .zshenv
-      copy:
-        src=./files/zshenv dest=/Users/{{ ansible_ssh_user }}/.zshenv owner={{ ansible_ssh_user }} group=staff mode=0644
+      ansible.builtin.copy:
+        src: ./files/zshenv
+        dest: "/Users/{{ ansible_ssh_user }}/.zshenv"
+        owner: "{{ ansible_ssh_user }}"
+        group: staff
+        mode: "0644"
 
-    # SGW require pkg
-    - name: Install pip
-      shell: "{{ homebrew_dir }}/bin/pip3 install pyinstaller"
-      ignore_errors: yes
-
-    # Required for CBL iOS doc generation
-    - name: Install gem packages
-      gem: name={{ item }} state=latest
-      with_items:
-          - jazzy
-          - xcpretty
-          - slather
-
-    # instlall xcversion, which can be used to manage xcode installation from command line
-    - name: Install xcversion
-      gem: name={{ item }} state=latest
-      with_items:
-          - xcode-install
+    # Required for CBL iOS unittest
+    # jazzy, xcpretty, and slather are required gems.
+    # The rest are dependent gems.
+    # Mac comes w/ an older ruby, which is not compatible with latest dependent gems.
+    - name: Install gems with specific versions
+      community.general.gem:
+        name: "{{ item.name }}"
+        version: "{{ item.version }}"
+      loop:
+        - { name: securerandom, version: "0.3.2" }
+        - { name: drb, version: "2.0.6" }
+        - { name: zeitwerk, version: "2.6.18" }
+        - { name: activesupport, version: " 6.1.7.10" }
+        - { name: jazzy, version: "0.14.0" }
+        - { name: xcpretty, version: "0.3.0" }
+        - { name: slather, version: "2.7.2" }
 
     - name: Create .ssh directory
-      file: path=/Users/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
+      ansible.builtin.file:
+        path: "/Users/{{ ansible_ssh_user }}/.ssh"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        mode: "0700"
 
     - name: Copy SSH config files
-      copy:
-        src=./ssh/{{ item }} dest=/Users/{{ ansible_ssh_user }}/.ssh/{{ item }} owner={{ ansible_ssh_user }} group=staff mode=0600
+      ansible.builtin.copy:
+        src: "./ssh/{{ item }}"
+        dest: "/Users/{{ ansible_ssh_user }}/.ssh/{{ item }}"
+        owner: "{{ ansible_ssh_user }}"
+        group: staff
+        mode: "0600"
       with_items:
         - authorized_keys
         - buildbot_id_dsa
@@ -110,70 +122,74 @@
         - patch_via_gerrit.ini
 
     - name: Copy .gitconfig file
-      copy:
-        src=./files/gitconfig
-        dest=/Users/{{ ansible_ssh_user }}/.gitconfig owner="{{ ansible_ssh_user }}" group=staff mode=0644
+      ansible.builtin.copy:
+        src: ./files/gitconfig
+        dest: "/Users/{{ ansible_ssh_user }}/.gitconfig"
+        owner: "{{ ansible_ssh_user }}"
+        group: staff
+        mode: "0644"
 
     - name: Copy Mobile jenkins's CB developer profile
-      copy:
-          src=./files/jenkins-appledeveloper.developerprofile  dest=/Users/{{ ansible_ssh_user }}/Downloads/jenkins-appledeveloper.developerprofile  owner="{{ ansible_ssh_user }}" group=staff mode=0644
+      ansible.builtin.copy:
+        src: ./files/jenkins-appledeveloper.developerprofile
+        dest: "/Users/{{ ansible_ssh_user }}/Downloads/jenkins-appledeveloper.developerprofile"
+        owner: "{{ ansible_ssh_user }}"
+        group: staff
+        mode: "0644"
 
     - name: Copy Codesign Cert
-      copy:
-        src=./files/{{ p12_cert_file }}
-        dest=/Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }}
+      ansible.builtin.copy:
+        src: "./files/{{ p12_cert_file }}"
+        dest: "/Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }}"
 
-    - name: Import certificate
-      shell: |
-        security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
-        security import /Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }} -k /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain -P {{ p12_cert_password }} -A
-        rm -f /Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }}
+    # Setup build.keychain for jenkins
+    - name: KeyChain Setup
+      ansible.builtin.shell: |
+        security create-keychain -p {{ ansible_ssh_pass }} build.keychain
+        security unlock-keychain -p {{ ansible_ssh_pass }} build.keychain
+        security import /Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }} \
+          -k build.keychain -P {{ p12_cert_password }} -A
+        security set-keychain-settings -t 0 build.keychain
+        security list-keychains -s build.keychain login.keychain
+        security find-identity -p codesigning
+        rm -f "/Users/{{ ansible_ssh_user }}/Downloads/{{ p12_cert_file }}"
       args:
         executable: /bin/bash
-
-    # Run command to enable xcode codesign to access keychain
-    - name: Enable keychain Acess
-      shell: |
-        security set-key-partition-list -S apple-tool:,apple: -s -k {{ ansible_ssh_user }}  ~/Library/Keychains/login.keychain-db
-      args:
-        executable: /bin/bash
-
-    - name: Install jdk
-      shell: |
-        cd /usr/local
-        curl -OL https://cdn.azul.com/zulu/bin/{{ azul_jdk_name }}.tar.gz
-        tar -xzf {{ azul_jdk_name }}.tar.gz
-        rm -rf {{ azul_jdk_name }}.tar.gz
-        ln -s /usr/local/{{ azul_jdk_name }}/bin/java /usr/local/bin/java
-        ln -s /usr/local/{{ azul_jdk_name }}/bin/javac /usr/local/bin/javac
-      become: true
 
     - name: Creates jenkins directory
-      file:
-        path: /Users/{{ ansible_ssh_user }}/jenkins
+      ansible.builtin.file:
+        path: "/Users/{{ ansible_ssh_user }}/jenkins"
         state: directory
 
     - name: Install jenkins startup script
-      template:
-        src=./files/jnlp.sh.j2 dest=/Users/{{ ansible_ssh_user }}/jenkins/jnlp.sh owner={{ ansible_ssh_user }} group=staff mode=0755
+      ansible.builtin.template:
+        src: ./files/jnlp.sh.j2
+        dest: "/Users/{{ ansible_ssh_user }}/jenkins/jnlp.sh"
+        owner: "{{ ansible_ssh_user }}"
+        group: staff
+        mode: "0755"
 
     - name: Write secret file
-      shell: echo {{ jenkins_jnlp_secret }} > /Users/{{ ansible_ssh_user }}/jenkins/secret-file
-
-    - name: Install jenkins autolaunch plist
-      copy:
-        src=./files/mobile.jenkins.plist dest=/Library/LaunchAgents/mobile.jenkins.plist
-      become: true
+      ansible.builtin.shell: "echo {{ jenkins_jnlp_secret }} > /Users/{{ ansible_ssh_user }}/jenkins/secret-file"
 
     - name: Enable autologin for couchbase user
-      script:
-        cmd: ./files/autologin.py --username {{ ansible_ssh_user }} --password {{ ansible_ssh_pass }}
-        executable: python3
-      become: true
-
-    - name: Create Keychain Profile for Notarization
-      shell: |
-             security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/login.keychain
-             xcrun notarytool store-credentials "COUCHBASE_AC_PASSWORD" --apple-id "build-apple@couchbase.com" --team-id {{ appstore_team_id }} --password {{ appstore_token }}
+      ansible.builtin.shell: |
+        sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser {{ ansible_ssh_user }}
       args:
         executable: /bin/bash
+
+    - name: Create Keychain Profile for Notarization
+      ansible.builtin.shell: |
+        security unlock-keychain -p {{ansible_ssh_pass }} /Users/{{ ansible_ssh_user }}/Library/Keychains/build.keychain
+        xcrun notarytool store-credentials "COUCHBASE_AC_PASSWORD" --apple-id "build-apple@couchbase.com" \
+          --team-id {{ appstore_team_id }} --password {{ appstore_token }} \
+          --keychain /Users/{{ ansible_ssh_user }}/Library/Keychains/build.keychain-db
+      args:
+        executable: /bin/bash
+
+    # Enable DevToolsSecurity
+    - name: Enable DevToolsSecurity
+      ansible.builtin.shell: |
+        /usr/sbin/DevToolsSecurity --enable
+        dseditgroup -o edit -a {{ ansible_ssh_user }} -t user _developer
+      become: true
