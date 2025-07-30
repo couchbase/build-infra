@@ -44,7 +44,7 @@ source "amazon-ebs" "cc" {
     creator     = "build-team"
     name        = "${var.ami_name}"
   }
-  ssh_username = "ec2-user"
+  ssh_username  = "ec2-user"
 }
 
 # a build block invokes sources and runs provisioning steps on them.
