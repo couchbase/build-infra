@@ -1,0 +1,22 @@
+# This file is sourced by each distro's `go` script.
+# Values are fed into container builds via build args passed to `docker run`
+#
+# Comments indicate which distros reference the values in this file as not all
+# are the same, e.g. some do not include all tooling, some install whatever
+# is available in their package manager, etc.
+
+# JDK
+JDK_VERSION=21.0.6+7
+
+# Build tooling
+CCACHE_VERSION=4.11.3
+CMAKE_VERSION=3.31.6
+
+# Other
+JQ_VERSION=1.7
+LIBXXHASH_VERSION=0.8.3
+RSYNC_VERSION=3.4.1
+YQ_VERSION=4.31.1
+
+# Ours
+PATCH_VIA_GERRIT_VERSION=1.1.2
