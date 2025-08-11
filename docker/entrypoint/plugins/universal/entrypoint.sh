@@ -131,6 +131,8 @@ function install_healthcheck() {
 function add_group() {
     local group=${1}
 
+    chk_cmd sg
+
     status "Adding unix group to entrypoint process: ${group}"
 
     # Fake the output from the end of invoke_plugin()

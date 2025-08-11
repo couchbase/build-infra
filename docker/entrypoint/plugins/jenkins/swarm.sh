@@ -6,6 +6,12 @@
 # script.
 #
 
+#
+# THIS PLUGINS INSTALLS A HEALTHCHECK. Ensure your container is run with
+# the healthcheck command set to `["CMD", "/tmp/healthcheck.sh"]` as
+# documented in the top-level README.
+#
+
 # It expects the following environment variables to be set:
 #
 #   JENKINS_URL (url of Jenkins)

@@ -1,12 +1,17 @@
 # Dynamic Universal build agent ENTRYPOINT script
 
 `universal-entrypoint.sh` is a script intended to be used as the
-entrypoint for all Couchbase build-agent containers. It intentionally
-does minimal processing itself. Instead, it will downloand source a
-series of plugin scripts from GitHub at container startup.
+entrypoint for all Couchbase build-agent containers. It should generally
+be included in a Docker image via the following Dockerfile directives:
 
-This allows the startup behaviour to be dynamic depending on the
-environment the container is launched in, and to be updated without
+    ADD --chmod=0755 https://cb-entry.s3.us-west-2.amazonaws.com/universal-entrypoint.sh /universal_entrypoint.sh
+    ENTRYPOINT ["/universal_entrypoint.sh"]
+    CMD []
+
+It intentionally does minimal processing itself. Instead, it will
+downloand and invoke a series of plugin scripts from S3 at container
+startup. This allows the startup behaviour to be dynamic depending on
+the environment the container is launched in, and to be updated without
 needing to rebuild the container image. Indeed, much of the
 functionality of the universal entrypoint script itself is implemented
 in plugins (under the `universal` directory), so that even this
@@ -35,14 +40,14 @@ generally NOT be baked into the container image itself, as the intent is
 for the startup behaviour to be configured at container launch time.
 
 * `CB_ENTRYPOINT_PLUGINS`: A space-separated list of plugin scripts to
-  download and invoke
+  download and invoke, in order.
 
 * `CB_ENTRYPOINT_BASE`: A base URL to load plugins from. This URL should
   have a `plugins` subdirectory, and optionally a `healthchecks`
   subdirectory. Defaults to https://cb-entry.s3.us-west-2.amazonaws.com
   . This variable should NOT have a trailing `/` character.
 
-* `CB_DEBUG_ENTRYPOINT`: If set, enable shell tracing (set -x).
+* `CB_DEBUG_ENTRYPOINT`: If set, enable shell tracing (`set -x`).
 
 * `CB_DEBUG_LOCAL_PLUGINS`: For use when developing new plugins; see
   [`plugins/README.md`](plugins/README.md).
