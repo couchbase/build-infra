@@ -8,7 +8,6 @@ TAG=$(date +%Y%m%d)
 
 . versions
 
-
 # Default values
 ACTION=--load
 case "$(uname -m)" in

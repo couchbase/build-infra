@@ -5,7 +5,7 @@
 
 # Note: these CB_ variables are used by the entrypoint plugin also, so
 # don't change the variable names.
-export CB_ENTRYPOINT_BASE=${CB_ENTRYPOINT_BASE:-https://raw.githubusercontent.com/couchbase/build-infra/refs/heads/master/docker/entrypoint}
+export CB_ENTRYPOINT_BASE=${CB_ENTRYPOINT_BASE:-https://cb-entry.s3.us-west-2.amazonaws.com}
 export CB_ENTRYPOINT_LOCAL_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export CB_ENTRYPOINT_PLUGIN_CACHE=/tmp/entrypoint-plugins
 

@@ -77,7 +77,7 @@ ARG tmpsrc=/tmp/deploy
 ARG LIBXXHASH_VERSION
 RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
     && curl -LsSf https://github.com/Cyan4973/xxHash/archive/refs/tags/v${LIBXXHASH_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
-    && make -C ${tmpsrc} -j${PARALLELISM} prefix=/usr mandir=${tmpsrc}man install
+    && make -C ${tmpsrc} -j${PARALLELISM} prefix=/usr mandir=${tmpsrc}/man install
 
 # rsync (required for profiledata)
 ARG RSYNC_VERSION
@@ -159,6 +159,6 @@ ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 
 COPY hostname /home/couchbase/.local/bin
 
-COPY universal_entrypoint.sh /universal_entrypoint.sh
+ADD --chmod=0755 https://cb-entry.s3.us-west-2.amazonaws.com/universal-entrypoint.sh /universal_entrypoint.sh
 ENTRYPOINT ["/universal_entrypoint.sh"]
 CMD []
