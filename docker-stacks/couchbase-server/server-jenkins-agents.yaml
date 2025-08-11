@@ -93,7 +93,7 @@ services:
     <<: *default-jenkins-one-agent
 
   zzz-lightweight:
-    image: couchbasebuild/zz-lightweight:20250111
+    image: couchbasebuild/zz-lightweight:20250810
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=zzz-lightweight"

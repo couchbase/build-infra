@@ -117,7 +117,7 @@ RUN set -x \
 # Install packer script, which is used for building AWS/Azure/GCP images
 RUN set -x \
     && cd /usr/local/bin \
-    && curl --fail https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip -o packer.zip \
+    && curl --fail https://releases.hashicorp.com/packer/1.14.1/packer_1.14.1_linux_amd64.zip -o packer.zip \
     && unzip packer.zip \
     && chmod +x packer \
     && rm packer.zip
