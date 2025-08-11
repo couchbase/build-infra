@@ -1,0 +1,52 @@
+#!/bin/bash
+
+IMAGE=couchbasebuild/dfs
+TAG=$(date +%Y%m%d)
+
+# Default values
+ACTION=--load
+case "$(uname -m)" in
+  x86_64)
+    PLATFORM=linux/amd64
+    ;;
+  aarch64|arm64)
+    PLATFORM=linux/arm64
+    ;;
+  *)
+    echo "Unsupported architecture: $(uname -m)"
+    exit 1
+    ;;
+esac
+
+# Parse command line arguments
+for arg in "$@"; do
+  case "${arg}" in
+    --publish)
+      ACTION=--push
+      PLATFORM="linux/amd64,linux/arm64"
+      ;;
+    --arm)
+      [ "${PLATFORM}" = "linux/amd64" ] && ACTION=""
+      PLATFORM=linux/arm64
+      ;;
+    --amd)
+      [ "${PLATFORM}" = "linux/arm64" ] && ACTION=""
+      PLATFORM=linux/amd64
+      ;;
+    --both)
+      PLATFORM="linux/amd64,linux/arm64"
+      ;;
+    *)
+      echo "Invalid flag: ${arg}"
+      exit 1
+      ;;
+  esac
+done
+
+echo "Building for platform(s): ${PLATFORM}"
+
+set -x
+docker buildx build ${ACTION} --platform ${PLATFORM} \
+  -t couchbasebuild/dfs:${TAG} \
+  -t couchbasebuild/dfs:latest \
+  .

@@ -1,0 +1,186 @@
+#!/usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = [
+#   "requests<3"
+# ]
+# ///
+
+import requests
+import os
+import sys
+import hashlib
+import argparse
+from urllib.parse import urlparse
+from pathlib import Path
+
+def calculate_checksum(filepath, algorithm='md5'):
+    """
+    Calculate checksum of a file.
+
+    Args:
+        filepath (str): Path to the file
+        algorithm (str): Either 'md5' or 'sha256'
+
+    Returns:
+        str: The hexadecimal checksum
+    """
+    hash_obj = hashlib.md5() if algorithm == 'md5' else hashlib.sha256()
+
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            hash_obj.update(chunk)
+
+    return hash_obj.hexdigest()
+
+def verify_checksum(filepath, expected_checksum, algorithm='md5'):
+    """
+    Verify file checksum against expected value.
+
+    Args:
+        filepath (str): Path to the file
+        expected_checksum (str): Expected checksum value
+        algorithm (str): Either 'md5' or 'sha256'
+
+    Returns:
+        bool: True if checksums match, False otherwise
+    """
+    calculated_checksum = calculate_checksum(filepath, algorithm)
+    return calculated_checksum.lower() == expected_checksum.lower()
+
+def download_file(url, chunk_size=8192, expected_checksum=None, checksum_algorithm='md5'):
+    """
+    Download a file from a URL using requests.
+
+    Args:
+        url (str): The URL to download from
+        chunk_size (int): Size of chunks to download at a time (default: 8192 bytes)
+        expected_checksum (str, optional): Expected checksum to verify against
+        checksum_algorithm (str): Algorithm to use for checksum verification ('md5' or 'sha256')
+
+    Returns:
+        str: Path to the downloaded file, or None if failed
+    """
+    try:
+        # Send GET request
+        print(f"Connecting to {url}...")
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Raise an exception for bad status codes
+
+        # Try to get filename from URL
+        parsed_url = urlparse(url)
+        filename = os.path.basename(parsed_url.path)
+
+        # If no filename in URL, use a default
+        if not filename:
+            filename = "downloaded_file"
+
+        # Try to get filename from Content-Disposition header
+        if 'content-disposition' in response.headers:
+            content_disp = response.headers['content-disposition']
+            if 'filename=' in content_disp:
+                filename = content_disp.split('filename=')[1].strip('"')
+
+        # Get file size if available
+        file_size = None
+        if 'content-length' in response.headers:
+            file_size = int(response.headers['content-length'])
+            print(f"File size: {file_size:,} bytes ({file_size / 1024 / 1024:.2f} MB)")
+
+        print(f"Downloading to: {filename}")
+
+        # Download the file
+        downloaded_bytes = 0
+        with open(filename, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=chunk_size):
+                if chunk:  # Filter out keep-alive chunks
+                    file.write(chunk)
+                    downloaded_bytes += len(chunk)
+
+                    # Show progress if file size is known
+                    if file_size:
+                        progress = (downloaded_bytes / file_size) * 100
+                        print(f"\rProgress: {progress:.1f}% ({downloaded_bytes:,}/{file_size:,} bytes)", end='', flush=True)
+                    else:
+                        print(f"\rDownloaded: {downloaded_bytes:,} bytes", end='', flush=True)
+
+        print(f"\n✓ Download completed: {filename}")
+
+        # Verify checksum if provided
+        if expected_checksum:
+            print(f"Verifying {checksum_algorithm.upper()} checksum...")
+            if verify_checksum(filename, expected_checksum, checksum_algorithm):
+                print(f"✓ Checksum verification passed")
+            else:
+                calculated = calculate_checksum(filename, checksum_algorithm)
+                print(f"✗ Checksum verification failed!")
+                print(f"Expected: {expected_checksum}")
+                print(f"Calculated: {calculated}")
+                # Remove the file with incorrect checksum
+                os.remove(filename)
+                print(f"Removed file with incorrect checksum: {filename}")
+                return None
+
+        return filename
+
+    except requests.exceptions.RequestException as e:
+        print(f"✗ Error downloading file: {e}")
+        return None
+    except IOError as e:
+        print(f"✗ Error saving file: {e}")
+        return None
+    except KeyboardInterrupt:
+        print(f"\n✗ Download cancelled by user")
+        # Clean up partial file
+        if filename and os.path.exists(filename):
+            os.remove(filename)
+            print(f"Removed partial file: {filename}")
+        return None
+
+def main():
+    """Main function to handle command line usage."""
+    parser = argparse.ArgumentParser(
+        description='Download files from URLs with optional checksum verification',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  dfs-downloader https://example.com/file.zip --md5 d41d8cd98f00b204e9800998ecf8427e
+  dfs-downloader https://example.com/file.zip --sha256 abc123def456...
+  dfs-downloader https://example.com/file.zip -m d41d8cd98f00b204e9800998ecf8427e
+  dfs-downloader https://example.com/file.zip -s abc123def456...
+        """
+    )
+
+    parser.add_argument('url', help='URL to download from')
+
+    # Create mutually exclusive group for checksum options
+    checksum_group = parser.add_mutually_exclusive_group(required=True)
+    checksum_group.add_argument('--sha256', '-s', type=str, help='Expected SHA256 checksum to verify against')
+    checksum_group.add_argument('--md5', '-m', type=str, help='Expected MD5 checksum to verify against')
+    checksum_group.add_argument('--skip-checksum', action='store_true', help='Skip checksum verification (danger!)')
+
+    args = parser.parse_args()
+
+    # Determine checksum algorithm and value
+    if args.skip_checksum:
+        checksum_algorithm = None
+        expected_checksum = None
+    elif args.sha256:
+        checksum_algorithm = 'sha256'
+        expected_checksum = args.sha256
+    else:
+        checksum_algorithm = 'md5'
+        expected_checksum = args.md5
+
+    result = download_file(args.url, expected_checksum=expected_checksum,
+                          checksum_algorithm=checksum_algorithm)
+    if result:
+        print(f"File saved as: {result}")
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
+# Example usage
+if __name__ == "__main__":
+    # You can either run this script from command line or use the function directly
+    main()
