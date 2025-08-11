@@ -33,6 +33,7 @@ mkdir -p ${SWARM_AGENT_DIR}
 # Plugins we depend on:
 invoke_plugin generic/agent_path
 
+# Assert our requirements:
 chk_set JENKINS_URL JENKINS_AGENT_NAME JENKINS_AGENT_LABELS
 chk_file /run/secrets/jenkins_username /run/secrets/jenkins_password
 
@@ -64,39 +65,30 @@ keepalive() {
 }
 trap keepalive TERM
 
-
-# We can sometimes get here before the logfile has been created,
-# which results in the tail failing and no logs being streamed.
-# We get around this by ensuring it's present before the tail
-touch ${SWARM_AGENT_DIR}/swarm-client.log
 status "Agent ${AGENT_NAME} starting up; logs follow..."
 
-# Execute swarm client. We use `sudo` here only to create a new
-# environment where the `couchbase` user is in the `cbdocker` group as
-# created by the docker/ensure_docker_group plugin, if it has been
-# called. We use `env` to erase some env vars introduced by the `sudo`
-# command as they occasionally cause problems (specifically with
-# PyInstaller, which we still occasionally use). We also use `env` to
-# set the PATH to `agent_path` as specified by the generic/agent_path
-# plugin.
-sudo -u couchbase --set-home --preserve-env \
-    env -u SUDO_UID -u SUDO_GID -u SUDO_USER -u SUDO_COMMAND PATH=${agent_path} \
-        java $JAVA_OPTS \
-            -jar /tmp/swarm-client.jar \
-            -fsroot /home/couchbase/jenkins \
-            -master "${JENKINS_URL}" \
-            ${TUNNEL_ARG} \
-            -mode exclusive \
-            -executors "${JENKINS_AGENT_EXECUTORS:-1}" \
-            -name "${AGENT_NAME}" \
-            -disableClientsUniqueId \
-            -deleteExistingClients \
-            -labels "${JENKINS_AGENT_LABELS} ${CONTAINER_TAG//\//_}" \
-            -retry 5 \
-            -noRetryAfterConnected \
-            -username "$(cat /run/secrets/jenkins_username)" \
-            -passwordFile /run/secrets/jenkins_password \
-            >& ${SWARM_AGENT_DIR}/swarm-client.log &
+# Pre-create the swarm agent logfile - this avoids issues with tail failing
+# if the file doesn't exist yet.
+touch ${SWARM_AGENT_DIR}/swarm-client.log
+
+# Execute swarm client. We use `env` to set the PATH to `agent_path` as
+# specified by the generic/agent_path plugin.
+env PATH=${agent_path} java $JAVA_OPTS \
+    -jar /tmp/swarm-client.jar \
+    -fsroot /home/couchbase/jenkins \
+    -master "${JENKINS_URL}" \
+    ${TUNNEL_ARG} \
+    -mode exclusive \
+    -executors "${JENKINS_AGENT_EXECUTORS:-1}" \
+    -name "${AGENT_NAME}" \
+    -disableClientsUniqueId \
+    -deleteExistingClients \
+    -labels "${JENKINS_AGENT_LABELS} ${CONTAINER_TAG//\//_}" \
+    -retry 5 \
+    -noRetryAfterConnected \
+    -username "$(cat /run/secrets/jenkins_username)" \
+    -passwordFile /run/secrets/jenkins_password \
+    >& ${SWARM_AGENT_DIR}/swarm-client.log &
 
 # Save PID of child for healthcheck/reaping
 PID=$!

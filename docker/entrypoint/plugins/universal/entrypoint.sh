@@ -27,8 +27,8 @@ function _get_script() {
     if [ ! -z "${CB_DEBUG_LOCAL_PLUGINS}" ]; then
 
         local local_file="${CB_ENTRYPOINT_LOCAL_ROOT}/${script}"
-        if [ ! -f "${script}" ]; then
-            abort "Local file not found: ${script}"
+        if [ ! -f "${local_file}" ]; then
+            abort "Local file not found: ${local_file}"
         fi
         status "Copying local ${script_type}: ${script_name}"
         cp "${local_file}" "${dest_file}"
@@ -55,13 +55,13 @@ function header() {
 }
 
 function status() {
-    # Print a series of dashes of length DEPTH
+    # Print message after a series of dashes of length DEPTH
     local DASHES=$(printf "%${DEPTH}s" | tr ' ' '-')
     echo "${DASHES} $@"
 }
 
 function abort() {
-    echo "CONTAINER ABORT: $@" 1>&2
+    echo "CONTAINER ABORT (${CB_CURRENT_PLUGIN:-entrypoint}): $@" 1>&2
     exit 1
 }
 
@@ -140,7 +140,7 @@ function add_group() {
     status "Plugin complete: ${CB_CURRENT_PLUGIN}"
 
     # Re-invoke this universal/entrypoint plugin script
-    exec sg ${group} "bash -e ${CB_ENTRYPOINT_PLUGIN_CACHE}/universal/entrypoint.sh $@"
+    exec sg ${group} "bash -e ${CB_ENTRYPOINT_PLUGIN_CACHE}/universal/entrypoint.sh"
 }
 
 #
