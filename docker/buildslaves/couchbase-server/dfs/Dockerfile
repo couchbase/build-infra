@@ -101,7 +101,7 @@ RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
     && mkdir build \
     && cd build \
     && cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr .. \
-    && make -j8 \
+    && make -j${PARALLELISM} \
     && make install
 
 # repo

@@ -9,7 +9,7 @@ be included in a Docker image via the following Dockerfile directives:
     CMD []
 
 It intentionally does minimal processing itself. Instead, it will
-downloand and invoke a series of plugin scripts from S3 at container
+download and invoke a series of plugin scripts from S3 at container
 startup. This allows the startup behaviour to be dynamic depending on
 the environment the container is launched in, and to be updated without
 needing to rebuild the container image. Indeed, much of the
@@ -70,7 +70,7 @@ The healthcheck command can be set at runtime using the `healthcheck`
 option in a Docker stack file or the `--health-cmd` option to `docker
 run`. (It can also be baked into to the image using the HEALTHCHECK
 instruction in the Dockerfile, but doing this goes against the dynamic
-nature of the Universal Entrypoint script and so is discouragd.) An
+nature of the Universal Entrypoint script and so is discouraged.) An
 example is shown below.
 
 # A complete Docker Swarm example
