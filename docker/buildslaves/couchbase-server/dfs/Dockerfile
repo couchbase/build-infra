@@ -157,6 +157,8 @@ ENV LANG=en_US.UTF-8 \
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 
+USER couchbase
+
 COPY hostname /home/couchbase/.local/bin
 
 ADD --chmod=0755 https://cb-entry.s3.us-west-2.amazonaws.com/universal-entrypoint.sh /universal_entrypoint.sh
