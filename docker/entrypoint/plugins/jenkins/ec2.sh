@@ -6,9 +6,6 @@
 # THIS IS A FINAL PLUGIN. It will start a long-running SSH daemon, and
 # not return control to the entrypoint script.
 
-# Ensure ephemeral-mounted `jenkins` dir is accessible
-sudo chown -R couchbase:couchbase /home/couchbase/jenkins
-
 if ! ls /etc/ssh/ssh_host_* &>/dev/null
 then
   sudo ssh-keygen -A

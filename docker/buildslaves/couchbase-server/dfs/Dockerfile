@@ -47,7 +47,7 @@ RUN set -x \
 RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c \
     'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
 
-FROM couchbasebuild/dfs:20250809
+FROM couchbasebuild/dfs:20250811
 LABEL maintainer="build-team@couchbase.com"
 
 ARG TARGETARCH

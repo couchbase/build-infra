@@ -200,7 +200,7 @@ function build_docker_run_args() {
     -v /etc/timezone:/etc/timezone:ro
     -v /etc/localtime:/etc/localtime:ro
     -v /tmp/aws:/aws
-    -v /var/lib/docker/cb-home:/home/couchbase:rw
+    -v /var/lib/docker/cb-home:/homesecrets
     -v /ephemeral/jenkins:/home/couchbase/jenkins
     -v /ephemeral/tmp:/tmp
     -d
@@ -350,6 +350,10 @@ ecr_login
 # Ensure ephemeral /tmp exists and is world-writable
 mkdir -p /ephemeral/tmp
 chmod 1777 /ephemeral/tmp
+
+# Ensure ephemeral Jenkins dir exists and is owned by 1000:1000
+mkdir -p /ephemeral/jenkins
+chown 1000:1000 /ephemeral/jenkins
 
 # Run build container
 get_stackfile

@@ -202,7 +202,7 @@ services:
     environment:
       # The _EC2 versions will be consumed by the `bootstrap` script on EC2 instances
       - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
-      - "CB_ENTRYPOINT_PLUGINS_EC2=jenkins/ec2"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
       - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
       - "JENKINS_AGENT_NAME=linux"
       - "JENKINS_AGENT_LABELS=server python3 linux linux-asan totoro x86_64"
