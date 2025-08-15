@@ -154,7 +154,7 @@ services:
     image: couchbasebuild/server-linux-build:20250621
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
-      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus totoro trinity cypher master x86_64"
+      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher master x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -189,12 +189,74 @@ services:
       placement:
         constraints:
           - node.labels.role==monster
-      replicas: 3
+      replicas: 2
       update_config:
         parallelism: 1000
     networks:
       - jenkins
     <<: *default-jenkins-secrets
+
+  # Newer "single linux" builder based on "Docker From Scratch", using glibc 2.28
+  linux-builder:
+    image: couchbasebuild/server-builder:20250814
+    environment:
+      # The _EC2 versions will be consumed by the `bootstrap` script on EC2 instances
+      - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
+      - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
+      - "JENKINS_AGENT_NAME=linux"
+      - "JENKINS_AGENT_LABELS=server python3 linux linux-asan totoro x86_64"
+      - "JENKINS_URL=http://server.jenkins.couchbase.com/"
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
+      - *server-jenkins-node-class
+      - *node-product
+      - *repo-url
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 30s
+      timeout: 90s
+      retries: 3
+    user: couchbase
+    volumes:
+      - type: volume
+        source: workspace
+        target: /home/couchbase/jenkins/workspace
+      - type: volume
+        source: cbdepscache
+        target: /home/couchbase/.cbdepscache
+      - type: volume
+        source: cbdepcache
+        target: /home/couchbase/.cbdepcache
+      - type: volume
+        source: ccache
+        target: /home/couchbase/.ccache
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /home/couchbase/.docker/config.json
+        target: /home/couchbase/.docker/config.json
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_username
+        mode: 0444
+    secrets:
+      - source: server_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profiledata_ssh_key
+    deploy:
+      resources:
+        reservations:
+          memory: 28GB
+      placement:
+        constraints:
+          - node.labels.role==dfs
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
 
   # This is identical to the normal centos7 agent except it has a memory
   # reservation of 16GB, to ensure it doesn't get co-located with any

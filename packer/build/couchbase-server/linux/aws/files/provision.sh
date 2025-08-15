@@ -29,7 +29,7 @@ aarch64)
   arch=arm64
   ;;
 esac
-sudo curl -fLo /usr/bin/yq "https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_${arch}"
+sudo curl -fLo /usr/bin/yq "https://github.com/mikefarah/yq/releases/download/v4.47.1/yq_linux_${arch}"
 sudo chmod a+x /usr/bin/yq
 
 # Enable IPv6 in docker daemon

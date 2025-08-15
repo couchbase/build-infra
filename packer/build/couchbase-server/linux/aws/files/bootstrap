@@ -191,29 +191,52 @@ function retrieve_secrets() {
   done
 }
 
-function docker_run_args() {
+function build_docker_run_args() {
   # Compile args we'll be passing to `docker run`
-  args="--rm --name worker --pull always -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -v /tmp/aws:/aws -v /var/lib/docker/cb-home:/home/couchbase:rw -v /ephemeral/jenkins:/home/couchbase/jenkins -v /ephemeral/tmp:/tmp -d -p 4000:22 "
+  DOCKER_RUN_ARGS=(
+    --rm
+    --name worker
+    --pull always
+    -v /etc/timezone:/etc/timezone:ro
+    -v /etc/localtime:/etc/localtime:ro
+    -v /tmp/aws:/aws
+    -v /var/lib/docker/cb-home:/homesecrets
+    -v /ephemeral/jenkins:/home/couchbase/jenkins
+    -v /ephemeral/tmp:/tmp
+    -d
+    -p 4000:22
+  )
 
   # CV PARALLELISM env var
   if [ ! -z "${parallelism}" ]
   then
-    args="${args}-e PARALLELISM=${parallelism} "
+    DOCKER_RUN_ARGS+=( -e "PARALLELISM=${parallelism}" )
+  fi
+
+  # CB_ENTRYPOINT_PLUGINS
+  if [ ! -z "${entrypoint_plugins}" ]
+  then
+    DOCKER_RUN_ARGS+=( -e "CB_ENTRYPOINT_PLUGINS=${entrypoint_plugins}" )
+  fi
+  # CB_ENTRYPOINT_BASE
+  if [ ! -z "${entrypoint_base}" ]
+  then
+    DOCKER_RUN_ARGS+=( -e "CB_ENTRYPOINT_BASE=${entrypoint_base}" )
   fi
 
   # Mount docker socket
   chown 1000:1000 /var/run/docker.sock
-  args="${args}-v /var/run/docker.sock:/var/run/docker.sock "
+  DOCKER_RUN_ARGS+=( -v /var/run/docker.sock:/var/run/docker.sock )
 
   # Mount special /opt/couchbase volume for server
   # to enable rpm/deb packaging in sidecar containers
   if [ "${environment}" = "server" ]; then
-    args="${args}-v serverbuild_optcouchbase:/opt/couchbase "
+    DOCKER_RUN_ARGS+=( -v serverbuild_optcouchbase:/opt/couchbase )
   fi
 
   # Mount CV hook script
   if [ "${environment}" = "cv" ]; then
-    args="${args}-v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh "
+    DOCKER_RUN_ARGS+=( -v /opt/buildteam/hooks/cv-hook.sh:/usr/sbin/couchhook.d/cv-hook.sh )
   fi
 
   # Overwrite buildx hook on docker cv workers since the buildx targets in the datacenter
@@ -223,10 +246,8 @@ function docker_run_args() {
     echo "#!/bin/bash" > /tmp/buildx.sh
     echo "echo 'Overriding buildx hook - arm workers not available in AWS'" >> /tmp/buildx.sh
     chmod +x /tmp/buildx.sh
-    args="${args}-v /tmp/buildx.sh:/usr/sbin/couchhook.d/buildx.sh "
+    DOCKER_RUN_ARGS+=( -v /tmp/buildx.sh:/usr/sbin/couchhook.d/buildx.sh )
   fi
-
-  echo "${args}"
 }
 
 function ecr_login() {
@@ -236,10 +257,48 @@ function ecr_login() {
 }
 
 function container_image() {
-  get_stackfile
   # Determine container image for specified service
   yq e ".services.${service}.image" /opt/buildteam/stackfile.yml
 }
+
+function get_env_from_stackfile() {
+  local env_key="$1"
+  local stackfile="$2"
+  local result
+
+  # List format (- KEY=value)
+  result=$(yq e -r ".services.${service}.environment[]? | select(test(\"^${env_key}=\")) | sub(\"^${env_key}=\",\"\")" "${stackfile}" 2>/dev/null || true)
+
+  # Map format (KEY: value)
+  if [ -z "${result}" ]; then
+    result=$(yq e -r ".services.${service}.environment.${env_key} // \"\"" "${stackfile}" 2>/dev/null || true)
+  fi
+
+  echo "${result}"
+}
+
+function populate_entrypoint_env_from_stackfile() {
+  # Populate CB_ENTRYPOINT_* defaults from stackfile for this service, unless
+  # explicit flags were provided to this script (flags take precedence).
+  local stackfile="/opt/buildteam/stackfile.yml"
+
+  local sf_plugins
+  # Use CB_ENTRYPOINT_PLUGINS_EC2 here so that EC2 instances can have
+  # different plugins than Docker Swarm-based ones
+  sf_plugins=$(get_env_from_stackfile "CB_ENTRYPOINT_PLUGINS_EC2" "${stackfile}")
+  if [ -n "${sf_plugins}" ] && [ "${sf_plugins}" != "null" ]
+  then
+    entrypoint_plugins="${sf_plugins}"
+  fi
+
+  local sf_base
+  sf_base=$(get_env_from_stackfile "CB_ENTRYPOINT_BASE" "${stackfile}")
+  if [ -n "${sf_base}" ] && [ "${sf_base}" != "null" ]
+  then
+    entrypoint_base="${sf_base}"
+  fi
+}
+
 
 # Configure timezone based on --timezone flag (or use America/Los_Angeles if not provided)
 set_timezone
@@ -292,11 +351,18 @@ ecr_login
 mkdir -p /ephemeral/tmp
 chmod 1777 /ephemeral/tmp
 
+# Ensure ephemeral Jenkins dir exists and is owned by 1000:1000
+mkdir -p /ephemeral/jenkins
+chown 1000:1000 /ephemeral/jenkins
+
 # Run build container
+get_stackfile
+populate_entrypoint_env_from_stackfile
 while ! docker ps --format '{{.Names}}' | grep -w worker &> /dev/null
 do
   echo "Attempting to start container..."
-  docker run $(docker_run_args) $(container_image) default
+  build_docker_run_args
+  docker run "${DOCKER_RUN_ARGS[@]}" $(container_image) default
   sleep 5
 done
 

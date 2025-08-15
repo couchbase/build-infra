@@ -37,7 +37,7 @@ source "amazon-ebs" "amzn2" {
   region        = var.region
   source_ami_filter {
     filters = {
-      name                = "amzn2-ami-minimal-hvm-*-${local.arch}-ebs"
+      name                = "al2023-ami-minimal-*-${local.arch}"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
