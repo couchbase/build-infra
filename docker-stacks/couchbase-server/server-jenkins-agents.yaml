@@ -154,7 +154,7 @@ services:
     image: couchbasebuild/server-linux-build:20250621
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
-      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher master x86_64"
+      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher x86_64"
       - *server-jenkins-master
       - *server-jenkins-tunnel
       - *server-jenkins-node-class
@@ -205,7 +205,7 @@ services:
       - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
       - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
       - "JENKINS_AGENT_NAME=linux"
-      - "JENKINS_AGENT_LABELS=server python3 linux linux-asan totoro x86_64"
+      - "JENKINS_AGENT_LABELS=server python3 linux linux-asan master totoro x86_64"
       - "JENKINS_URL=http://server.jenkins.couchbase.com/"
       - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
       - *server-jenkins-node-class
