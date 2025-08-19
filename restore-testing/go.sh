@@ -132,7 +132,7 @@ REGION="us-east-2"
 if [ "${SERVICE_TYPE}" = "build-db" ]; then
     INSTANCE_TYPE="c6g.4xlarge"
 elif [ "${SERVICE_TYPE}" = "gerrit" ]; then
-    DISK_SIZE=150
+    DISK_SIZE=200
 fi
 
 DISK_SIZE=${DISK_SIZE:-50}
