@@ -3,7 +3,7 @@ resource "aws_launch_template" "proget" {
   instance_type = "c5a.large"
   key_name      = "proget"
   network_interfaces {
-      associate_public_ip_address = false
+      associate_public_ip_address = true
       security_groups = [aws_security_group.proget.id]
   }
   monitoring {
