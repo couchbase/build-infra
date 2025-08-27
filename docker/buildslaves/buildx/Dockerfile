@@ -1,12 +1,12 @@
 # Jenkins buildslave container for building couchbase-operator
 
-FROM ubuntu:20.04 as skopeo
+FROM ubuntu:20.04 AS skopeo
 ENV GOPATH=/tmp/gopath
 ENV PATH=/usr/local/go/bin:$PATH
 RUN set -x \
   && apt update \
   && DEBIAN_FRONTEND=noninteractive apt install -y curl gcc git libgpgme-dev libassuan-dev libbtrfs-dev libdevmapper-dev make pkg-config \
-  && curl -Lf https://go.dev/dl/go1.20.1.linux-amd64.tar.gz > /tmp/go.tar.gz \
+  && curl -Lf https://go.dev/dl/go1.24.4.linux-amd64.tar.gz > /tmp/go.tar.gz \
   && tar -C /usr/local -xzf /tmp/go.tar.gz \
   && git clone https://github.com/containers/skopeo $GOPATH/src/github.com/containers/skopeo \
   && cd $GOPATH/src/github.com/containers/skopeo && make bin/skopeo

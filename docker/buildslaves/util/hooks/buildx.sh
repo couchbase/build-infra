@@ -11,11 +11,11 @@ sudo -u couchbase --set-home --preserve-env \
   test -d ~/.ssh || mkdir ~/.ssh;
   test -f "~/.ssh/known_hosts" && ssh-keygen -R buildx-arm64-01.build.couchbase.com;
   ssh-keyscan -H buildx-arm64-01.build.couchbase.com >> ~/.ssh/known_hosts;
-  if /usr/local/bin/docker buildx ls | awk "{print $1}" | tail -n +1 | grep cbmultiarch;
+  if docker buildx ls | awk "{print $1}" | tail -n +1 | grep cbmultiarch;
   then
-    /usr/local/bin/docker buildx rm cbmultiarch;
+    docker buildx rm cbmultiarch;
   fi;
-  /usr/local/bin/docker buildx create --name cbmultiarch --driver docker-container --use --platform linux/amd64;
-  /usr/local/bin/docker buildx create --name cbmultiarch --driver docker-container --use --append ssh://buildx-arm64-01 --platform linux/arm64;
-  /usr/local/bin/docker buildx inspect --bootstrap;
+  docker buildx create --name cbmultiarch --driver docker-container --use --platform linux/amd64;
+  docker buildx create --name cbmultiarch --driver docker-container --use --append ssh://buildx-arm64-01 --platform linux/arm64;
+  docker buildx inspect --bootstrap;
 '
