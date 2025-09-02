@@ -16,7 +16,7 @@ rootdir:
         ".*(tgz|md5)": 45
       REMOVE_EMPTY_DIRS: true
 
-    "couchbase-server|couchbase-columnar":
+    "couchbase-server|couchbase-columnar|enterprise-analytics":
       REMOVE:
         # All installers everywhere (with a few exceptions below)
         ".*(deb|rpm|dmg|msi)": 90
@@ -25,7 +25,9 @@ rootdir:
         ".*-PDB.zip": 60
         # All MacOS .orig/-unsigned files from codesigning
         ".*macos.*orig": 2
-        ".*macos.*-unsinged.zip": 2
+        ".*macos.*-unsigned.zip": 2
+        # All Windows -unsigned files from codesigning
+        ".*windows.*-unsigned.zip": 2
 
       SUBDIRS:
         "toybuilds":
