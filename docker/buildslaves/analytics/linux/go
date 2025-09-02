@@ -1,16 +1,26 @@
 #!/bin/sh
 
+mkdir -p build
+cp -a ../../util/healthcheck.sh build
+
 TAG=$(date "+%Y%m%d")
 IMAGE=couchbasebuild/analytics-linux-cv
 
-docker build \
+if [ "$1" = "--publish" ]; then
+  BUILDX=buildx
+  ACTION=--push
+  PLATFORMS=linux/amd64,linux/arm64
+else
+  if [ "$(uname -m)" = "arm64" -o "$(uname -m)" = "aarch64" ]; then
+    PLATFORMS=linux/arm64
+  else
+    PLATFORMS=linux/amd64
+  fi
+fi
+
+docker ${BUILDX} build ${ACTION} \
+  --platform ${PLATFORMS} \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   -t ${IMAGE}:${TAG} \
   -t ${IMAGE}:latest \
   .
-
-if [ "$1" = "--publish" ]
-then
-  docker push ${IMAGE}:${TAG}
-  docker push ${IMAGE}:latest
-fi

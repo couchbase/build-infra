@@ -16,6 +16,10 @@ RUN set -x \
         && curl -L https://packages.couchbase.com/patch_via_gerrit/1.1.1/patch_via_gerrit-1.1.1-linux -o /usr/local/bin/patch_via_gerrit \
         && chmod 755 /usr/local/bin/patch_via_gerrit
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Enable .gitconfig so repo doesn't get whiny
 COPY gitconfig /home/couchbase/.gitconfig
 RUN chown couchbase:couchbase /home/couchbase/.gitconfig
