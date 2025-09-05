@@ -2,6 +2,7 @@
 
 mkdir -p build
 cp -a ../../util/healthcheck.sh build
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 
 TAG=$(date "+%Y%m%d")
 IMAGE=couchbasebuild/analytics-linux-cv

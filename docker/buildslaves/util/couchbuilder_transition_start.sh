@@ -111,16 +111,19 @@ then
 
   # Ensure the host where the profile data lives is in our known_hosts before synchronisation. We also
   # have to set permissions on directories here as we can only specify perms on files in the profile container
-  start_cmd=" \
-    mkdir -p ~/.ssh \
-      && add_hostkeys \
-      && for node_class in ${NODE_CLASS}; do \
-           rsync --progress --archive --backup --executability --no-o --no-g \
-           -e \"ssh -p ${profile_port} -i /run/secrets/profile_sync -o StrictHostKeyChecking=no\" \
-           couchbase@${profile_host}:${NODE_PRODUCT}/\${node_class}/linux/ /home/couchbase/ ; \
-         done \
-      && (if [ -d ~/.ssh ]; then chmod 00700 ~/.ssh; fi) \
-      && (if [ -d ~/.gpg ]; then chmod 00700 ~/.gpg; fi)"
+  start_cmd="mkdir -p ~/.ssh && add_hostkeys"
+  for node_class in ${NODE_CLASS}; do
+    start_cmd+=" \
+      && rsync --progress --archive --backup --executability --no-o --no-g \
+         -e \"ssh -o ConnectTimeout=10 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
+         -p ${profile_port} -i /run/secrets/profile_sync -o StrictHostKeyChecking=no\" \
+         couchbase@${profile_host}:${NODE_PRODUCT}/${node_class}/linux/ /home/couchbase/ \
+    "
+  done
+  start_cmd+=" \
+    && (if [ -d ~/.ssh ]; then chmod 00700 ~/.ssh; fi) \
+    && (if [ -d ~/.gpg ]; then chmod 00700 ~/.gpg; fi) \
+  "
 
   # we could concievably be running the container as root or couchbase, let's try
   # to populate the profile data correctly either way

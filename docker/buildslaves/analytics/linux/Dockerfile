@@ -39,6 +39,9 @@ COPY workspace-hook.sh /usr/sbin/couchhook.d/
 # Enable additional hook for ccache
 COPY ccache-hook.sh /usr/sbin/couchhook.d/
 
+# Copy over the latest startup script
+COPY build/couchbuilder_start.sh /usr/sbin/
+
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
 ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
