@@ -11,13 +11,13 @@ resource "aws_lb_target_group" "proget" {
 
   health_check {
     enabled = true
-    path = "/"
+    path = "/maven2/dev//com.couchbase.lite/couchbase-lite-android-ee/maven-metadata.xml"
     protocol = "HTTP"
     interval = 60
     healthy_threshold = 2
     unhealthy_threshold = 10
     timeout = 30
-    matcher = "200,302"
+    matcher = "200"
   }
 }
 
