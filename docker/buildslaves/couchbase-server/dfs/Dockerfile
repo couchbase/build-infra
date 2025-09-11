@@ -1,61 +1,23 @@
-# chroot for Debian installer - use debootstrap
-FROM debian:12 AS debian-chroot-compile
-
-ARG DEBIAN_CODENAME=bullseye \
-    TARGETARCH
-# Need binutils for 'strip'
-RUN apt-get update && apt-get install -y --no-install-recommends debootstrap binutils
-RUN mkdir -p /opt/deb-chroot
-RUN set -x \
-    && ulimit -n 1024 \
-    && debootstrap --arch=${TARGETARCH} \
-         --variant=minbase \
-         --include dpkg-dev,debhelper,libtinfo5,fakeroot \
-         ${DEBIAN_CODENAME} /opt/deb-chroot http://deb.debian.org/debian
-RUN set -x \
-    && rm -rf /opt/deb-chroot/var/lib/apt \
-    && rm -rf /opt/deb-chroot/var/log/* \
-    && rm -rf /opt/deb-chroot/var/cache/{apt,man} \
-    && rm -rf /opt/deb-chroot/usr/share/{doc,info,man}
-RUN cd /opt/deb-chroot/usr/lib \
-    && find . -type f -print0 | xargs -0 -n 50 strip || true
-RUN LC_ALL=C chroot /opt/deb-chroot /bin/bash -c \
-    'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
-
-# chroot for RPM installer - use rinse from Debian (weird, right?).
-FROM debian:12 AS rpm-chroot-compile
-
-ARG RPM_CODENAME=rocky-8 \
-    TARGETARCH
-
-RUN apt-get update && apt-get install -y --no-install-recommends rinse \
-    && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /opt/rpm-chroot
-# 'rinse' doesn't seem to return a non-zero exit code if it fails, so we
-# stick the extra `ls -l` command in there to ensure that the build fails if
-# the chroot is not created correctly.
-RUN set -x \
-    && ulimit -n 1024 \
-    && if [ "${TARGETARCH}" = "arm64" ]; then TARGETARCH=aarch64; fi \
-    && rinse --arch=${TARGETARCH} --distribution=${RPM_CODENAME} --directory /opt/rpm-chroot \
-    && ls -l /opt/rpm-chroot/bin/bash
-RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c 'ulimit -n 1024 && yum install -y rpm-build && yum clean all'
-RUN set -x \
-    && rm -rf /opt/rpm-chroot/var/cache/dnf \
-    && rm -rf /opt/rpm-chroot/usr/share/{doc,info,man} \
-    && find /opt/rpm-chroot --name __pycache__ -print0 | xargs -0 rm -rf
-RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c \
-    'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
-
 FROM couchbasebuild/dfs:20250811
 LABEL maintainer="build-team@couchbase.com"
 
 ARG TARGETARCH
 USER root
 
-# Installer chroots
-COPY --from=debian-chroot-compile /opt/deb-chroot /opt/deb-chroot
-COPY --from=rpm-chroot-compile /opt/rpm-chroot /opt/rpm-chroot
+# Installer chroots - these are simple images that rarely change, so
+# just pull :latest
+COPY --from=couchbasebuild/deb-packager:latest / /opt/deb-chroot
+COPY --from=couchbasebuild/rpm-packager:latest / /opt/rpm-chroot
+
+# Since the couchbasebuild/xxx-packager images were built directly from
+# a Dockerfile, they don't have any /dev/ stuff since Docker generally
+# magicks those into existence when a container is started. They can't
+# explicitly create them, either, since they already exist during
+# "docker build". So, since we're copying them into a non-/ directory
+# here, we need to create any such files ourselves. Experimentally, it
+# seems like only /dev/null is really important.
+RUN mknod -m 666 /opt/deb-chroot/dev/null c 1 3
+RUN mknod -m 666 /opt/rpm-chroot/dev/null c 1 3
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase
