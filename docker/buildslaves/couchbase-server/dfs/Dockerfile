@@ -81,20 +81,41 @@ RUN set -x \
     && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH} \
     && chmod a+x /usr/local/bin/yq
 
+# xmllint (libxml2)
+ARG LIBXML2_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://download.gnome.org/sources/libxml2/2.14/libxml2-${LIBXML2_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --disable-static --without-python \
+    && make -j${PARALLELISM} \
+    && make install-strip
+
+# vim
+ARG VIM_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/vim/vim/archive/refs/tags/v${VIM_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --with-features=huge \
+            --enable-gui=no --without-x    \
+            --with-tlib=ncursesw  \
+    && make -j${PARALLELISM} \
+    && make install \
+    && ln -s /usr/bin/vim vi
+
 # Our tools
 ARG PATCH_VIA_GERRIT_VERSION
 RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_VERSION}/patch_via_gerrit-${PATCH_VIA_GERRIT_VERSION}-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \
     chmod a+x /usr/local/bin/patch_via_gerrit
+
 # cbdep is a rolling PyPI release now, so we always just want "latest".
-# We use `uv` to install it, so install that first. All this is done as the `couchbase` user.
+# We use `uv` to install it, so install that first. Also use `uv` to put
+# `python` on the PATH. All this is done as the `couchbase` user.
 USER couchbase
 ENV PATH=/home/couchbase/.local/bin:$PATH
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 RUN set -x \
-    && uv python install 3.11 \
-    && ln -s /home/couchbase/.local/bin/python3.11 /home/couchbase/.local/bin/python \
-    && ln -s /home/couchbase/.local/bin/python3.11 /home/couchbase/.local/bin/python3
-RUN uv tool install cbdep
+    && uv python install --default --preview-features python-install-default ${PYTHON_VERSION} \
+    && uv tool install cbdep
 
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permissions / ownership.
@@ -107,7 +128,9 @@ RUN echo "/home/couchbase/.local/bin" >> /etc/path
 
 # Use cbdep to install JVM for Jenkins
 ARG JDK_VERSION
-RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+RUN set -x \
+    && cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && rm -rf /root/.cbdepcache \
     && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8

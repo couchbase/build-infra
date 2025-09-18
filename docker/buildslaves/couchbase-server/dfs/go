@@ -48,7 +48,7 @@ for arg in "$@"; do
   esac
 done
 
-docker buildx build ${ACTION} \
+docker buildx build ${ACTION} --pull \
   --ulimit nofile=1024 \
   --platform ${PLATFORM} \
   --tag ${IMAGE}:${TAG} \
@@ -56,10 +56,13 @@ docker buildx build ${ACTION} \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
-  --build-arg JQ_VERSION=${JQ_VERSION} \
   --build-arg JDK_VERSION=${JDK_VERSION} \
   --build-arg PATCH_VIA_GERRIT_VERSION=${PATCH_VIA_GERRIT_VERSION} \
-  --build-arg RSYNC_VERSION=${RSYNC_VERSION} \
+  --build-arg JQ_VERSION=${JQ_VERSION} \
+  --build-arg LIBXML2_VERSION=${LIBXML2_VERSION} \
   --build-arg LIBXXHASH_VERSION=${LIBXXHASH_VERSION} \
+  --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
+  --build-arg RSYNC_VERSION=${RSYNC_VERSION} \
+  --build-arg VIM_VERSION=${VIM_VERSION} \
   --build-arg YQ_VERSION=${YQ_VERSION} \
   .
