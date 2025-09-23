@@ -126,12 +126,14 @@ USER root
 # Remember this path for Jenkins agents (see entrypoint script)
 RUN echo "/home/couchbase/.local/bin" >> /etc/path
 
-# Use cbdep to install JVM for Jenkins
+# Use cbdep to install JVM for Jenkins. Clean up __pycache__ directories
+# afterwards as they'll be owned by root, which can cause trouble.
 ARG JDK_VERSION
 RUN set -x \
     && cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java \
     && rm -rf /root/.cbdepcache \
-    && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
+    && find /home/couchbase/.local -type d -name __pycache__ -exec rm -rf {} +
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
@@ -144,7 +146,7 @@ ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 
 USER couchbase
 
-COPY hostname /home/couchbase/.local/bin
+COPY --chown=couchbase:couchbase hostname /home/couchbase/.local/bin
 
 ADD --chmod=0755 https://cb-entry.s3.us-west-2.amazonaws.com/universal-entrypoint.sh /universal_entrypoint.sh
 ENTRYPOINT ["/universal_entrypoint.sh"]
