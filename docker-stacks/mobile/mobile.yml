@@ -68,19 +68,52 @@ services:
       placement:
         constraints:
           - node.labels.role==build
-      replicas: 3
+      replicas: 2
       update_config:
         parallelism: 1000
     networks:
       - jenkins
 
   lite-android-ubuntu20:
-    image: couchbasebuild/ubuntu2004-mobile-lite-android:20241206
+    image: couchbasebuild/ubuntu2004-mobile-lite-android:20250814
     init: true
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=lite-android-ubuntu20"
       - "JENKINS_SLAVE_LABELS=mobile-lite-android20 cbl-android ubuntu20 cbl-java"
+      - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+    secrets:
+      - source: mobile_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_master_password
+        mode: 0444
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  lite-android-ubuntu24:
+    image: couchbasebuild/ubuntu2404-mobile-lite-android:20250814
+    init: true
+    user: couchbase
+    environment:
+      - "JENKINS_SLAVE_NAME=lite-android-ubuntu24"
+      - "JENKINS_SLAVE_LABELS=mobile-lite-android24 cbl-android ubuntu24 cbl-java"
       - "JENKINS_MASTER=http://mobile.jenkins.couchbase.com/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=mobile"
