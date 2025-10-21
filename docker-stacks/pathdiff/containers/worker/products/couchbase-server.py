@@ -41,6 +41,11 @@ distros = {
         "image": "ubuntu:20.04",
         "packager": "apt"
     },
+    "linux": {
+        "image": "debian:12",
+        "packager": "apt"
+    },
+
 }
 
 # We need to be able to handle pulling released versions from s3
@@ -49,7 +54,7 @@ urls = {
     "apt": {
         "paths": {
             "GA": "https://packages.couchbase.com/releases/__VERSION__/",
-            "unreleased": "http://latestbuilds.service.couchbase.com/builds/latestbuilds/__PRODUCT__/zz-versions/__VERSION__/__BUILD__/"
+            "unreleased": "https://latestbuilds.service.couchbase.com/builds/latestbuilds/__PRODUCT__/zz-versions/__VERSION__/__BUILD__/"
         },
         "files": {
             "GA": "__PRODUCT__-__EDITION_____VERSION__-__DISTRO___amd64.deb",
@@ -59,7 +64,7 @@ urls = {
     "yum": {
         "paths": {
             "GA": "https://packages.couchbase.com/releases/__VERSION__/",
-            "unreleased": "http://latestbuilds.service.couchbase.com/builds/latestbuilds/__PRODUCT__/zz-versions/__VERSION__/__BUILD__/"
+            "unreleased": "https://latestbuilds.service.couchbase.com/builds/latestbuilds/__PRODUCT__/zz-versions/__VERSION__/__BUILD__/"
         },
         "files": {
             "GA": "__PRODUCT__-__EDITION__-__VERSION__-__DISTRO__.x86_64.rpm",
@@ -69,7 +74,7 @@ urls = {
     "zypper": {
         "paths": {
             "GA": "https://packages.couchbase.com/releases/__VERSION__/",
-            "unreleased": "http://latestbuilds.service.couchbase.com/builds/latestbuilds/__PRODUCT__/zz-versions/__VERSION__/__BUILD__/"
+            "unreleased": "https://latestbuilds.service.couchbase.com/builds/latestbuilds/__PRODUCT__/zz-versions/__VERSION__/__BUILD__/"
         },
         "files": {
             "GA": "__PRODUCT__-__EDITION__-__VERSION__-__DISTRO__.x86_64.rpm",

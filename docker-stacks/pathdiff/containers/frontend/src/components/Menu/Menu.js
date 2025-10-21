@@ -2,7 +2,7 @@ import React from 'react';
 import { DistroField, VersionField } from './'
 import { Button, ButtonGroup, Collapse } from 'reactstrap';
 import { useApp } from '../../context/AppContext'
-import { useHistory, useLocation } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 export default function Menu(props) {
     const {
@@ -12,7 +12,7 @@ export default function Menu(props) {
         toVersion, setToVersion,
         toVisible, setToVisible
     } = useApp()
-    const history = useHistory()
+    const navigate = useNavigate()
     const location = useLocation()
 
     return <div>
@@ -28,13 +28,13 @@ export default function Menu(props) {
                         setToVersion(versions[versions.length-1])
                         const params = new URLSearchParams(location.search)
                         params.append("toVersion", versions[versions.length-1])
-                        history.push({ search: params.toString() })
+                        navigate.push({ search: params.toString() })
                     }
                 }
                 if (toVisible) {
                     const params = new URLSearchParams(location.search)
                     params.delete("toVersion")
-                    history.push({ search: params.toString() })
+                    navigate.push({ search: params.toString() })
                 }
                 setToVisible(!toVisible)
             }

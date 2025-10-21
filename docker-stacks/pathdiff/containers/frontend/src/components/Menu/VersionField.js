@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Label, Input, InputGroup } from 'reactstrap';
 import { useApp } from '../../context/AppContext'
-import { useHistory, useLocation } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 export default function MenuField(props) {
     const [updater] = useState(props?.updater)
-    const history = useHistory()
+    const navigate = useNavigate()
     const location = useLocation()
 
     const {
@@ -19,7 +19,7 @@ export default function MenuField(props) {
         const params = new URLSearchParams(location.search)
         params.delete(props.type)
         params.append(props.type, event.target.value)
-        history.push({ search: params.toString() })
+        navigate.push({ search: params.toString() })
         props.setter(event.target.value)
     };
 

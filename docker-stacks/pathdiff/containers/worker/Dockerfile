@@ -1,6 +1,6 @@
 FROM python:3-slim
 
-ARG DOCKER_VERSION=20.10.6
+ARG DOCKER_VERSION=27.5.1
 
 # ENV PATH=/home/couchbase/.local/bin/:$PATH
 

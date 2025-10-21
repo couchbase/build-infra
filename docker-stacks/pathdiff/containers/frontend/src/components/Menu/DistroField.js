@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Form, Label, Input, InputGroup } from 'reactstrap';
 import { useApp } from '../../context/AppContext'
-import { useHistory, useLocation } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 export default function MenuField(props) {
     const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
-    const history = useHistory()
+    const navigate = useNavigate()
     const location = useLocation()
 
     const {
@@ -18,7 +18,7 @@ export default function MenuField(props) {
         const params = new URLSearchParams(location.search)
         params.delete("distro")
         params.append("distro", event.target.value)
-        history.push({ search: params.toString() })
+        navigate.push({ search: params.toString() })
         setToVisible(false)
         setDistro(event.target.value)
     };

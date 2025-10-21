@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.14
+FROM node:lts-alpine3.19
 
 ENV REACT_APP_API=pathdiff.build.couchbase.com:5000
 

@@ -5,7 +5,7 @@ import { Queue } from './components/Queue/'
 import BinaryListing from './components/BinaryListing';
 import { AppProvider } from './context/AppContext'
 import Notifications from './components/Notifications'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 function Main() {
     return <>
@@ -28,9 +28,9 @@ function App() {
     return (
         <Router>
             <AppProvider>
-                <Switch>
+                <Routes>
                     <Route path='/' component={Main} />
-                </Switch>
+                </Routes>
             </AppProvider>
         </Router>
     );

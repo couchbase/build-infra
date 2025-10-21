@@ -1,10 +1,11 @@
-FROM python:3.9.7-buster
+FROM python:3-bookworm
 
-ARG DOCKER_VERSION=20.10.6
+ARG DOCKER_VERSION=27.5.1
 
 ENV PATH=/home/couchbase/.local/bin/:$PATH
 
-RUN apt update && apt install -y curl gcc libmariadb3 libmariadb-dev && apt clean
+RUN apt update && apt install -y curl gcc libmariadb3 libmariadb-dev libmariadb-dev-compat && apt clean
+RUN ln -s /usr/bin/mariadb_config /usr/local/bin/mariadb_config
 
 # Create couchbase user
 RUN set -x \
