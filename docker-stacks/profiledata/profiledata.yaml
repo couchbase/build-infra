@@ -652,6 +652,11 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
+      - source: profiledata.npmrc.20251021
+        target: /home/couchbase/mobile/build/linux/.npmrc
+        mode: 0600
+        uid: "901"
+        gid: "901"
 
 configs:
   #####################
@@ -813,4 +818,7 @@ secrets:
     external: true
   # pypirc
   profiledata.pypirc.20250924:
+    external: true
+  # npmrc
+  profiledata.npmrc.20251021:
     external: true
