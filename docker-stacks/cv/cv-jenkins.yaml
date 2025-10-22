@@ -9,7 +9,7 @@ services:
 
   # cv.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.516.2
+    image: jenkins/jenkins:2.528.1
     deploy:
       resources:
         limits:
