@@ -28,6 +28,8 @@ services:
       - 4000:4000
     configs:
 
+      # Blocks below are for specific NODE_PRODUCT/NODE_CLASS/PLATFORM combinations
+
       ################################
       # couchbase-server/build/linux #
       ################################
@@ -228,8 +230,21 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      ####################################
+      # couchbase-server/blackduck/linux #
+      ####################################
+      # This one overwrites the .m2/settings.xml from
+      # couchbase-server/build/linux. This is under `couchbase-server`
+      # because the current profiledata entrypoint scripts don't allow
+      # for multiple NODE_PRODUCT values, so we instead make it a
+      # different NODE_CLASS.
+      - source: blackduck_shared_m2_settings
+        target: /home/couchbase/couchbase-server/blackduck/linux/.m2/settings.xml
+        mode: 0644
+        uid: "901"
+        gid: "901"
       ###################################################################
-      # mobile/linux                                                    #
+      # mobile/build/linux                                              #
       # (used for zz, android, sgw; litecore doesn't need anything)     #
       ###################################################################
       - source: mobile_shared_ssh_known_hosts
@@ -709,6 +724,12 @@ configs:
     file: config/mobile/shared/.ssh/known_hosts
   mobile_shared_ssh_authorized_keys:
     file: config/mobile/shared/.ssh/authorized_keys
+  #####################
+  # blackduck         #
+  #####################
+  # shared
+  blackduck_shared_m2_settings:
+    file: config/blackduck/shared/.m2/settings.xml
 
 
 secrets:
