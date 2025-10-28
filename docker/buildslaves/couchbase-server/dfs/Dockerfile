@@ -102,6 +102,29 @@ RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
     && make install \
     && ln -s /usr/bin/vim vi
 
+# libyaml (required by Ruby psych gem - which is required by asciidoctor)
+ARG LIBYAML_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/yaml/libyaml/releases/download/${LIBYAML_VERSION}/yaml-${LIBYAML_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr \
+    && make -j${PARALLELISM} \
+    && make install
+
+# Ruby (required for asciidoctor)
+ARG RUBY_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && RUBY_MAJOR_MINOR=$(echo ${RUBY_VERSION} | cut -d. -f1-2) \
+    && curl -LsSf https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_MINOR}/ruby-${RUBY_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --disable-install-doc \
+    && make -j${PARALLELISM} \
+    && make install
+
+# asciidoctor
+ARG ASCIIDOCTOR_VERSION
+RUN gem install asciidoctor -v ${ASCIIDOCTOR_VERSION} --no-document
+
 # Our tools
 ARG PATCH_VIA_GERRIT_VERSION
 RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_VERSION}/patch_via_gerrit-${PATCH_VIA_GERRIT_VERSION}-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \

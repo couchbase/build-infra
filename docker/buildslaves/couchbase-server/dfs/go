@@ -54,15 +54,18 @@ docker buildx build ${ACTION} --pull \
   --tag ${IMAGE}:${TAG} \
   --tag ${IMAGE}:latest \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg ASCIIDOCTOR_VERSION=${ASCIIDOCTOR_VERSION} \
   --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg JDK_VERSION=${JDK_VERSION} \
   --build-arg PATCH_VIA_GERRIT_VERSION=${PATCH_VIA_GERRIT_VERSION} \
   --build-arg JQ_VERSION=${JQ_VERSION} \
   --build-arg LIBXML2_VERSION=${LIBXML2_VERSION} \
+  --build-arg LIBYAML_VERSION=${LIBYAML_VERSION} \
   --build-arg LIBXXHASH_VERSION=${LIBXXHASH_VERSION} \
   --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
   --build-arg RSYNC_VERSION=${RSYNC_VERSION} \
+  --build-arg RUBY_VERSION=${RUBY_VERSION} \
   --build-arg VIM_VERSION=${VIM_VERSION} \
   --build-arg YQ_VERSION=${YQ_VERSION} \
   .
