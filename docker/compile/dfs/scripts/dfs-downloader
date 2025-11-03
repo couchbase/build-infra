@@ -11,6 +11,7 @@ import os
 import sys
 import hashlib
 import argparse
+from email.message import EmailMessage
 from urllib.parse import urlparse
 from pathlib import Path
 
@@ -67,19 +68,21 @@ def download_file(url, chunk_size=8192, expected_checksum=None, checksum_algorit
         response = requests.get(url, stream=True)
         response.raise_for_status()  # Raise an exception for bad status codes
 
+        # Try to get filename from Content-Disposition header
+        filename = None
+        if 'content-disposition' in response.headers:
+            msg = EmailMessage()
+            msg["Content-Disposition"] = response.headers['content-disposition']
+            filename = msg.get_filename()
+
         # Try to get filename from URL
-        parsed_url = urlparse(url)
-        filename = os.path.basename(parsed_url.path)
+        if not filename:
+            parsed_url = urlparse(url)
+            filename = os.path.basename(parsed_url.path)
 
         # If no filename in URL, use a default
         if not filename:
             filename = "downloaded_file"
-
-        # Try to get filename from Content-Disposition header
-        if 'content-disposition' in response.headers:
-            content_disp = response.headers['content-disposition']
-            if 'filename=' in content_disp:
-                filename = content_disp.split('filename=')[1].strip('"')
 
         # Get file size if available
         file_size = None

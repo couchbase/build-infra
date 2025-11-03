@@ -4,9 +4,6 @@
 dfs-downloader ${GNU_MIRROR}/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz -m ${GCC_CHECKSUM}
 tar -xf gcc-${GCC_VERSION}.tar.xz
 cd gcc-${GCC_VERSION}
-dfs-downloader ${GNU_MIRROR}/gmp/gmp-${GMP_VERSION}.tar.xz -m ${GMP_CHECKSUM}
-tar -xf gmp-${GMP_VERSION}.tar.xz
-mv gmp-${GMP_VERSION} gmp
 dfs-downloader ${GNU_MIRROR}/mpfr/mpfr-${MPFR_VERSION}.tar.xz -m ${MPFR_CHECKSUM}
 tar -xf mpfr-${MPFR_VERSION}.tar.xz
 mv mpfr-${MPFR_VERSION} mpfr

@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
-# Get rid of UV and the download script; everything uv installed; all
-# the build scripts; and anything in /tmp.
+# Get rid of UV; everything uv installed; all the build scripts; and
+# anything in /tmp.
 rm -rf \
-    /usr/bin/dfs-downloader /usr/bin/uv \
+    /usr/bin/uv \
     /root/.local /root/.cache \
     ${LFS_SCRIPTS} ${LFS_SRC} \
     /tmp/*

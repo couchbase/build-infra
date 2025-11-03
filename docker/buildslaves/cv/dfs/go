@@ -1,0 +1,70 @@
+#!/bin/bash -ex
+
+# Things you might want to adjust:
+IMAGE=couchbasebuild/server-builder-cv
+# You can probably ignore the rest of this
+
+TAG=$(date +%Y%m%d)
+
+# Note: we use our own `versions` file here since the set of tools we
+# install are basically disjoint from other CV agents
+. ./versions
+
+# Default values
+ACTION=--load
+case "$(uname -m)" in
+  x86_64)
+    PLATFORM=linux/amd64
+    ;;
+  aarch64|arm64)
+    PLATFORM=linux/arm64
+    ;;
+  *)
+    echo "Unsupported architecture: $(uname -m)"
+    exit 1
+    ;;
+esac
+
+# Parse command line arguments
+for arg in "$@"; do
+  case "${arg}" in
+    --publish)
+      ACTION=--push
+      PLATFORM="linux/amd64,linux/arm64"
+      ;;
+    --arm)
+      [ "${PLATFORM}" = "linux/amd64" ] && ACTION=""
+      PLATFORM=linux/arm64
+      ;;
+    --amd)
+      [ "${PLATFORM}" = "linux/arm64" ] && ACTION=""
+      PLATFORM=linux/amd64
+      ;;
+    --both)
+      PLATFORM="linux/amd64,linux/arm64"
+      ;;
+    *)
+      echo "Invalid flag: ${arg}"
+      exit 1
+      ;;
+  esac
+done
+
+rm -rf build
+mkdir build
+cp ../gitconfig build/
+
+docker buildx build ${ACTION} --pull \
+  --ulimit nofile=1024 \
+  --platform ${PLATFORM} \
+  --tag ${IMAGE}:${TAG} \
+  --tag ${IMAGE}:latest \
+  --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg ASPELL_VERSION=${ASPELL_VERSION} \
+  --build-arg ASPELL_DICT_VERSION=${ASPELL_DICT_VERSION} \
+  --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg GDB_VERSION=${GDB_VERSION} \
+  --build-arg WGET_VERSION=${WGET_VERSION} \
+  --build-arg XMLSEC_VERSION=${XMLSEC_VERSION} \
+  .

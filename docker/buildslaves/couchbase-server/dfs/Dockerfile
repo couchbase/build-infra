@@ -1,4 +1,4 @@
-FROM couchbasebuild/dfs:20250811
+FROM couchbasebuild/dfs:20250925
 LABEL maintainer="build-team@couchbase.com"
 
 ARG TARGETARCH
@@ -147,7 +147,7 @@ RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /hom
 USER root
 
 # Remember this path for Jenkins agents (see entrypoint script)
-RUN echo "/home/couchbase/.local/bin" >> /etc/path
+RUN echo -n "/home/couchbase/.local/bin:/opt/gcc-13.2.0/bin" >> /etc/path
 
 # Use cbdep to install JVM for Jenkins. Clean up __pycache__ directories
 # afterwards as they'll be owned by root, which can cause trouble.

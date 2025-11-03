@@ -434,6 +434,27 @@ COPY scripts/8.20-binutils-pass3.sh ${LFS_SCRIPTS}/8.20-binutils-pass3.sh
 RUN --mount=type=tmpfs,target=${LFS_SRC} \
     ${LFS_SCRIPTS}/8.20-binutils-pass3.sh
 
+# 8.21 GMP
+ARG GMP_VERSION=6.3.0
+ARG GMP_CHECKSUM=956dc04e864001a9c22429f761f2c283
+COPY scripts/8.21-gmp.sh ${LFS_SCRIPTS}/8.21-gmp.sh
+RUN --mount=type=tmpfs,target=${LFS_SRC} \
+    ${LFS_SCRIPTS}/8.21-gmp.sh
+
+# 8.22 MPFR
+ARG MPFR_VERSION=4.2.1
+ARG MPFR_CHECKSUM=523c50c6318dde6f9dc523bc0244690a
+COPY scripts/8.22-mpfr.sh ${LFS_SCRIPTS}/8.22-mpfr.sh
+RUN --mount=type=tmpfs,target=${LFS_SRC} \
+    ${LFS_SCRIPTS}/8.22-mpfr.sh
+
+# 8.23 MPC
+ARG MPC_VERSION=1.3.1
+ARG MPC_CHECKSUM=5c9bc658c9fd0f940e8e3e0f09530c62
+COPY scripts/8.23-mpc.sh ${LFS_SCRIPTS}/8.23-mpc.sh
+RUN --mount=type=tmpfs,target=${LFS_SRC} \
+    ${LFS_SCRIPTS}/8.23-mpc.sh
+
 # 8.24 Attributes
 ARG ATTR_VERSION=2.5.2
 ARG ATTR_CHECKSUM=227043ec2f6ca03c0948df5517f9c927
@@ -456,16 +477,6 @@ RUN --mount=type=tmpfs,target=${LFS_SRC} \
     ${LFS_SCRIPTS}/8.28-shadow.sh
 
 # 8.29 GCC - pass 3
-# Note: LFS builds GMP, MPRF, and MPC separately, installing them into
-# /usr. Since we're installing gcc into /opt and may want to have
-# several versions of gcc installed, we integrate the build for those
-# libraries into the gcc build script.
-ARG GMP_VERSION=6.3.0
-ARG GMP_CHECKSUM=956dc04e864001a9c22429f761f2c283
-ARG MPFR_VERSION=4.2.1
-ARG MPFR_CHECKSUM=523c50c6318dde6f9dc523bc0244690a
-ARG MPC_VERSION=1.3.1
-ARG MPC_CHECKSUM=5c9bc658c9fd0f940e8e3e0f09530c62
 ARG GCC_VERSION=13.2.0
 ARG GCC_CHECKSUM=e0e48554cc6e4f261d55ddee9ab69075
 COPY scripts/8.29-gcc-pass3.sh ${LFS_SCRIPTS}/8.29-gcc-pass3.sh
@@ -766,6 +777,13 @@ RUN --mount=type=tmpfs,target=${LFS_SRC} \
 
 # Fake "which" from BLFS
 COPY scripts/which /usr/bin/which
+
+# chrpath
+ARG CHRPATH_VERSION=0.18
+ARG CHRPATH_CHECKSUM=3220be4f47361bfd0b76e2132c0219c0
+COPY scripts/blfs-chrpath.sh ${LFS_SCRIPTS}/blfs-chrpath.sh
+RUN --mount=type=tmpfs,target=${LFS_SRC} \
+    ${LFS_SCRIPTS}/blfs-chrpath.sh
 
 # Final strip. Re-use the script from step 8.84. Note: we do this before
 # compiling git, because git makes heavy use of hard-linked files -

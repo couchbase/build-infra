@@ -47,6 +47,6 @@ echo "Building for platform(s): ${PLATFORM}"
 
 set -x
 docker buildx build ${ACTION} --platform ${PLATFORM} \
-  -t couchbasebuild/dfs:${TAG} \
-  -t couchbasebuild/dfs:latest \
+  -t ${IMAGE}:${TAG} \
+  -t ${IMAGE}:latest \
   .
