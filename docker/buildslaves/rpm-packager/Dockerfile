@@ -1,5 +1,6 @@
 # Simple image that only knows how to package rpms
-FROM rockylinux:9 AS rpm-packager-compile
+ARG ROCKY_VERSION=9
+FROM rockylinux:${ROCKY_VERSION} AS rpm-packager-compile
 
 RUN set -x \
     && ulimit -n 1024 \

@@ -58,7 +58,6 @@ docker buildx build ${ACTION} --pull \
   --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg JDK_VERSION=${JDK_VERSION} \
-  --build-arg PATCH_VIA_GERRIT_VERSION=${PATCH_VIA_GERRIT_VERSION} \
   --build-arg JQ_VERSION=${JQ_VERSION} \
   --build-arg LIBXML2_VERSION=${LIBXML2_VERSION} \
   --build-arg LIBYAML_VERSION=${LIBYAML_VERSION} \

@@ -5,9 +5,9 @@ ARG TARGETARCH
 USER root
 
 # Installer chroots - these are simple images that rarely change, so
-# just pull :latest
-COPY --from=couchbasebuild/deb-packager:latest / /opt/deb-chroot
-COPY --from=couchbasebuild/rpm-packager:latest / /opt/rpm-chroot
+# just pull versioned :latest
+COPY --from=couchbasebuild/deb-packager:debian11-latest / /opt/deb-chroot
+COPY --from=couchbasebuild/rpm-packager:rocky9-latest / /opt/rpm-chroot
 
 # Since the couchbasebuild/xxx-packager images were built directly from
 # a Dockerfile, they don't have any /dev/ stuff since Docker generally
@@ -125,29 +125,36 @@ RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
 ARG ASCIIDOCTOR_VERSION
 RUN gem install asciidoctor -v ${ASCIIDOCTOR_VERSION} --no-document
 
-# Our tools
-ARG PATCH_VIA_GERRIT_VERSION
-RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_VERSION}/patch_via_gerrit-${PATCH_VIA_GERRIT_VERSION}-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \
-    chmod a+x /usr/local/bin/patch_via_gerrit
+# uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
-# cbdep is a rolling PyPI release now, so we always just want "latest".
-# We use `uv` to install it, so install that first. Also use `uv` to put
-# `python` on the PATH. All this is done as the `couchbase` user.
-USER couchbase
-ENV PATH=/home/couchbase/.local/bin:$PATH
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Python
+ARG PYTHON_VERSION
+RUN uv python install ${PYTHON_VERSION} --install-dir /usr/local
+
+# Symlink Python executables to /usr/local/bin
+# uv installs to /usr/local/cpython-X.Y.Z-linux-{aarch64,x86_64}-gnu/
 RUN set -x \
-    && uv python install --default --preview-features python-install-default ${PYTHON_VERSION} \
-    && uv tool install cbdep
+    && PYTHON_DIR=$(ls -d /usr/local/cpython-* | head -n1) \
+    && for exe in ${PYTHON_DIR}/bin/*; do \
+        ln -sf ${exe} /usr/local/bin/$(basename ${exe}); \
+    done
+
+# Our python tool wrappers
+RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/patch_via_gerrit-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \
+    chmod a+x /usr/local/bin/patch_via_gerrit
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
 
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permissions / ownership.
+USER couchbase
 RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /home/couchbase/.cbdepcache/ /home/couchbase/.ccache
 
 USER root
 
 # Remember this path for Jenkins agents (see entrypoint script)
-RUN echo -n "/home/couchbase/.local/bin:/opt/gcc-13.2.0/bin" >> /etc/path
+RUN echo "/usr/local/bin:/opt/gcc-13.2.0/bin" >> /etc/path
 
 # Use cbdep to install JVM for Jenkins. Clean up __pycache__ directories
 # afterwards as they'll be owned by root, which can cause trouble.
@@ -155,12 +162,13 @@ ARG JDK_VERSION
 RUN set -x \
     && cbdep install -d /usr/local openjdk ${JDK_VERSION} \
     && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java \
-    && rm -rf /root/.cbdepcache \
-    && find /home/couchbase/.local -type d -name __pycache__ -exec rm -rf {} +
+    && rm -rf /root/.cbdepcache /root/.local
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
+
+COPY hostname /usr/local/bin/
 
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching
@@ -168,8 +176,6 @@ ARG CONTAINER_TAG_ARG
 ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 
 USER couchbase
-
-COPY --chown=couchbase:couchbase hostname /home/couchbase/.local/bin
 
 ADD --chmod=0755 https://cb-entry.s3.us-west-2.amazonaws.com/universal-entrypoint.sh /universal_entrypoint.sh
 ENTRYPOINT ["/universal_entrypoint.sh"]

@@ -1,5 +1,6 @@
 # Simple image that only knows how to package debs
-FROM debian:11-slim AS debian-packager-compile
+ARG DEBIAN_VERSION=11
+FROM debian:${DEBIAN_VERSION}-slim AS debian-packager-compile
 
 RUN set -x \
     && apt-get update \

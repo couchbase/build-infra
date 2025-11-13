@@ -51,7 +51,7 @@ FROM base-compile AS sed-compile
 WORKDIR /tmp
 ARG SED_VERSION=4.9
 ARG SED_SHA=6aac9b2dbafcd5b7a67a8a9bcb8036c3
-ADD https://ftp.gnu.org/gnu/sed/sed-${SED_VERSION}.tar.xz /tmp/sed.tar.xz
+ADD https://ftpmirror.gnu.org/gnu/sed/sed-${SED_VERSION}.tar.xz /tmp/sed.tar.xz
 RUN set -x \
     && echo ${SED_SHA} /tmp/sed.tar.xz | md5sum -c - \
     && mkdir /tmp/sed && cd /tmp/sed \
@@ -173,43 +173,6 @@ RUN mkdir /tmp/ccache
 RUN curl -Lf https://www.samba.org/ftp/ccache/ccache-${CCACHE_VER}.tar.bz2 -o - | tar xj --strip-components=1 -C /tmp/ccache
 WORKDIR /tmp/ccache
 RUN ./configure --prefix=/usr/local && make -j$(nproc) && make install
-
-# chroot for Debian installer - use debootstrap
-FROM debian:12 AS debian-chroot-compile
-
-ARG DEBIAN_CODENAME=buster \
-    TARGETARCH
-RUN apt-get update && apt-get install -y --no-install-recommends debootstrap
-RUN mkdir -p /opt/deb-chroot
-RUN set -x \
-    && ulimit -n 1024 \
-    && debootstrap --arch=${TARGETARCH} \
-         --variant=minbase \
-         --include dpkg-dev,debhelper,libtinfo5,fakeroot \
-         ${DEBIAN_CODENAME} /opt/deb-chroot http://deb.debian.org/debian
-RUN LC_ALL=C chroot /opt/deb-chroot /bin/bash -c \
-    'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
-
-# chroot for RPM installer - use rinse from Debian (weird, right?).
-FROM debian:12 AS rpm-chroot-compile
-
-ARG RPM_CODENAME=rocky-8 \
-    TARGETARCH
-
-RUN apt-get update && apt-get install -y --no-install-recommends rinse \
-    && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /opt/rpm-chroot
-# 'rinse' doesn't seem to return a non-zero exit code if it fails, so we
-# stick the extra `ls -l` command in there to ensure that the build fails if
-# the chroot is not created correctly.
-RUN set -x \
-    && ulimit -n 1024 \
-    && if [ "${TARGETARCH}" = "arm64" ]; then TARGETARCH=aarch64; fi \
-    && rinse --arch=${TARGETARCH} --distribution=${RPM_CODENAME} --directory /opt/rpm-chroot \
-    && ls -l /opt/rpm-chroot/bin/bash
-RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c 'ulimit -n 1024 && yum install -y rpm-build && yum clean all'
-RUN LC_ALL=C chroot /opt/rpm-chroot /bin/bash -c \
-    'groupadd -g 1000 couchbase && useradd -g couchbase -u 1000 couchbase'
 
 # -----------------------------------------
 # This is the actual build agent base image
@@ -341,7 +304,7 @@ RUN set -x \
     && yum install -y texinfo gmp-devel mpfr-devel && yum clean all \
     && mkdir -p /opt/gdb-${GDB_VER} /tmp/gdb \
     && cd /tmp/gdb \
-    && curl -Lf https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
+    && curl -Lf https://ftpmirror.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
         | tar xz --strip-components=1 \
     && ./configure --prefix=/opt/gdb-${GDB_VER} \
     && make -j$(nproc) \
@@ -358,9 +321,20 @@ RUN ulimit -n 1024 && \
         perl-IPC-Cmd \
     && yum clean all
 
-# Installer chroots
-COPY --from=debian-chroot-compile /opt/deb-chroot /opt/deb-chroot
-COPY --from=rpm-chroot-compile /opt/rpm-chroot /opt/rpm-chroot
+# Installer chroots - these are simple images that rarely change, so
+# just pull versioned :latest tags
+COPY --from=couchbasebuild/deb-packager:debian11-latest / /opt/deb-chroot
+COPY --from=couchbasebuild/rpm-packager:rocky8-latest / /opt/rpm-chroot
+
+# Since the couchbasebuild/xxx-packager images were built directly from
+# a Dockerfile, they don't have any /dev/ stuff since Docker generally
+# magicks those into existence when a container is started. They can't
+# explicitly create them, either, since they already exist during
+# "docker build". So, since we're copying them into a non-/ directory
+# here, we need to create any such files ourselves. Experimentally, it
+# seems like only /dev/null is really important.
+RUN mknod -m 666 /opt/deb-chroot/dev/null c 1 3
+RUN mknod -m 666 /opt/rpm-chroot/dev/null c 1 3
 
 # Autoconf and friends
 COPY --from=autoconf-compile /usr/local/ /usr/local/
@@ -426,25 +400,24 @@ RUN mkdir /home/couchbase/.jenkins && mkdir -p ${AGENT_WORKDIR} \
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
-# Our tools
-ARG PATCH_VIA_GERRIT_VER
-RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/${PATCH_VIA_GERRIT_VER}/patch_via_gerrit-${PATCH_VIA_GERRIT_VER}-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \
+# uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+
+# Our python tool wrappers
+RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/patch_via_gerrit-linux-$(uname -m) -o /usr/local/bin/patch_via_gerrit && \
     chmod a+x /usr/local/bin/patch_via_gerrit
-# cbdep is a rolling PyPI release now, so we always just want "latest".
-# We use `uv` to install it, so install that first. All this is done as the `couchbase` user.
-USER couchbase
-ENV PATH=/home/couchbase/.local/bin:$PATH
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-RUN uv tool install cbdep
-USER root
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
+
 # Remember this path for Jenkins agents (see entrypoint script)
-RUN echo "/home/couchbase/.local/bin" >> /etc/path
+RUN echo "/usr/local/bin" >> /etc/path
 
 # Use cbdep to install JVM for Jenkins
 ARG JRE_VERSION
 ARG JRE_BUILD
 RUN cbdep install -d /usr/local openjdk ${JRE_VERSION}+${JRE_BUILD} \
-    && ln -s /usr/local/openjdk-${JRE_VERSION}+${JRE_BUILD}/bin/java /usr/local/bin/java
+    && ln -s /usr/local/openjdk-${JRE_VERSION}+${JRE_BUILD}/bin/java /usr/local/bin/java \
+    && rm -rf /root/.cbdepcache /root/.local
 
 # Docker
 ARG DOCKER_VER
@@ -468,13 +441,13 @@ RUN rm -rf /tmp/* /var/cache/yum
 
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permissions / ownership.
-RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /home/couchbase/.cbdepcache/ /home/couchbase/.ccache \
-    && chown -R couchbase:couchbase /home/couchbase
+USER couchbase
+RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /home/couchbase/.cbdepcache/ /home/couchbase/.ccache
 
-COPY bashrc /root/.bashrc
-COPY bashrc /home/couchbase/.bashrc
+USER root
+COPY bashrc /etc/bashrc
 
-ENV PATH=/home/couchbase/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \

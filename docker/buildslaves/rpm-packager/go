@@ -2,9 +2,10 @@
 
 # Things you might want to adjust:
 IMAGE=couchbasebuild/rpm-packager
+ROCKY_VERSION=${ROCKY_VERSION:-9}
 # You can probably ignore the rest of this
 
-TAG=$(date +%Y%m%d)
+TAG="rocky${ROCKY_VERSION}-$(date +%Y%m%d)"
 
 # Default values
 ACTION=--load
@@ -41,6 +42,7 @@ for arg in "$@"; do
       ;;
     *)
       echo "Invalid flag: ${arg}"
+      echo "Usage: $0 [--publish] [--arm|--amd|--both]"
       exit 1
       ;;
   esac
@@ -50,6 +52,7 @@ docker buildx build ${ACTION} \
   --ulimit nofile=1024 \
   --platform ${PLATFORM} \
   --tag ${IMAGE}:${TAG} \
-  --tag ${IMAGE}:latest \
+  --tag ${IMAGE}:rocky${ROCKY_VERSION}-latest \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+  --build-arg ROCKY_VERSION=${ROCKY_VERSION} \
   .

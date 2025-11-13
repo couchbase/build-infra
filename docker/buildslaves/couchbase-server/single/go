@@ -88,7 +88,6 @@ docker ${BUILDX} build ${ACTION} \
   --build-arg JRE_BUILD=${JRE_BUILD} \
   --build-arg LIBTOOL_VER=${LIBTOOL} \
   --build-arg OPENSSL_VER=${OPENSSL_111} \
-  --build-arg PATCH_VIA_GERRIT_VER=${PATCH_VIA_GERRIT} \
   --build-arg PYTHON3_MAJOR=${PYTHON3_MAJOR} \
   --build-arg PYTHON3_MINOR=${PYTHON3_MINOR} \
   --build-arg PYTHON3_PATCH=${PYTHON3_PATCH} \
