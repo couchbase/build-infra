@@ -838,7 +838,7 @@ secrets:
   profiledata.blackduck.api_token.20230116:
     external: true
   # pypirc
-  profiledata.pypirc.20250924:
+  profiledata.pypirc.20251125:
     external: true
   # npmrc
   profiledata.npmrc.20251021:
