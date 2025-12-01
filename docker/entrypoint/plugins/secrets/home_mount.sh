@@ -7,4 +7,5 @@ then
     shopt -s dotglob
     umask 0077
     cp -r ${secrets_mount}/* /home/couchbase
+    umask 0022
 fi
