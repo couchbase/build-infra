@@ -440,7 +440,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.pypirc.20250924
+      - source: profiledata.pypirc.20251125
         target: /home/couchbase/couchbase-server/zz/linux/.pypirc
         mode: 0600
         uid: "901"
