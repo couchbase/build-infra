@@ -136,6 +136,12 @@ RUN set -x \
     && chmod +x packer \
     && rm packer.zip
 
+# Install envsubst, used in ECR build
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y gettext-base \
+    && apt-get clean
+
 # Install rclone, createrepo, rpm, and aptly for managing yum/apt repos
 RUN set -x \
     && curl --fail "https://downloads.rclone.org/v1.61.1/rclone-v1.61.1-linux-amd64.deb" -o /tmp/rclone.deb \
@@ -176,7 +182,7 @@ CMD ["swarm"]
 # Avoid having to rebuild image chain for simple start script modifications
 COPY build/couchbuilder_start.sh /usr/sbin/
 COPY build/swarm*.properties /
-COPY buildx.sh /usr/sbin/couchhook.d/
+COPY build/buildx.sh /usr/sbin/couchhook.d/
 
 # Hack because build-from-manifest script (and possibly others) hardcodes
 # python3.6

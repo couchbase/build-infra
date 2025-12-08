@@ -8,8 +8,10 @@ IMAGE=couchbasebuild/zz-lightweight
 mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
+cp -a ../../util/hooks/buildx.sh build
 
 docker build --pull \
+  --platform linux/amd64 \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   -t ${IMAGE}:${TAG} \
   -t ${IMAGE}:latest \
