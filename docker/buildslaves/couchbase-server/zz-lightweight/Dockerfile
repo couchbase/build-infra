@@ -131,7 +131,7 @@ RUN set -x \
 # Install packer script, which is used for building AWS/Azure/GCP images
 RUN set -x \
     && cd /usr/local/bin \
-    && curl --fail https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip -o packer.zip \
+    && curl --fail https://releases.hashicorp.com/packer/1.14.1/packer_1.14.1_linux_amd64.zip -o packer.zip \
     && unzip packer.zip \
     && chmod +x packer \
     && rm packer.zip
@@ -165,6 +165,18 @@ RUN addgroup --gid 999 docker && \
 RUN set -x \
     && mkdir -p /home/couchbase/.docker \
     && chown couchbase:couchbase /home/couchbase/.docker
+
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
+
+# Install "uv" for `couchbase` user
+RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
+ENV PATH="/home/couchbase/.local/bin:${PATH}"
+USER couchbase
+RUN set -x \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh
+
+USER root
 
 # Set LANG
 ENV LANG=en_US.UTF-8
