@@ -51,7 +51,7 @@ FROM base-compile AS sed-compile
 WORKDIR /tmp
 ARG SED_VERSION=4.9
 ARG SED_SHA=6aac9b2dbafcd5b7a67a8a9bcb8036c3
-ADD https://ftpmirror.gnu.org/gnu/sed/sed-${SED_VERSION}.tar.xz /tmp/sed.tar.xz
+ADD https://ftp.gnu.org/gnu/sed/sed-${SED_VERSION}.tar.xz /tmp/sed.tar.xz
 RUN set -x \
     && echo ${SED_SHA} /tmp/sed.tar.xz | md5sum -c - \
     && mkdir /tmp/sed && cd /tmp/sed \
@@ -86,9 +86,9 @@ ARG AUTOMAKE_VER
 ARG LIBTOOL_VER
 RUN ulimit -n 1024 && yum install -y --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 perl-Data-Dumper m4
 RUN cd /tmp && mkdir autoconf automake libtool
-RUN curl -Lf http://ftpmirror.gnu.org/autoconf/autoconf-${AUTOCONF_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/autoconf
-RUN curl -Lf http://ftpmirror.gnu.org/automake/automake-${AUTOMAKE_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/automake
-RUN curl -Lf http://ftpmirror.gnu.org/libtool/libtool-${LIBTOOL_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/libtool
+RUN curl -Lf http://ftp.gnu.org/gnu/autoconf/autoconf-${AUTOCONF_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/autoconf
+RUN curl -Lf http://ftp.gnu.org/gnu/automake/automake-${AUTOMAKE_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/automake
+RUN curl -Lf http://ftp.gnu.org/gnu/libtool/libtool-${LIBTOOL_VER}.tar.gz | tar xz --strip-components=1 -C /tmp/libtool
 RUN cd /tmp/autoconf && ./configure --prefix=/usr/local && make -j && make install
 RUN cd /tmp/automake && ./configure --prefix=/usr/local && make -j && make install
 RUN cd /tmp/libtool && ./configure --prefix=/usr/local && make -j && make install
@@ -304,7 +304,7 @@ RUN set -x \
     && yum install -y texinfo gmp-devel mpfr-devel && yum clean all \
     && mkdir -p /opt/gdb-${GDB_VER} /tmp/gdb \
     && cd /tmp/gdb \
-    && curl -Lf https://ftpmirror.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
+    && curl -Lf https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VER}.tar.gz -o - \
         | tar xz --strip-components=1 \
     && ./configure --prefix=/opt/gdb-${GDB_VER} \
     && make -j$(nproc) \
@@ -315,6 +315,7 @@ RUN set -x \
 # Perl modules
 RUN ulimit -n 1024 && \
     yum install -y  --setopt=skip_missing_names_on_install=False --setopt=keepcache=0 \
+        perl-core \
         perl-Data-Dumper \
         perl-Digest-SHA \
         perl-Digest-MD5 \
