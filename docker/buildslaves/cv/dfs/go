@@ -62,7 +62,8 @@ docker buildx build ${ACTION} --pull \
   --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   --build-arg ASPELL_VERSION=${ASPELL_VERSION} \
   --build-arg ASPELL_DICT_VERSION=${ASPELL_DICT_VERSION} \
-  --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg CLANG_18_VERSION=${CLANG_18_VERSION} \
+  --build-arg CLANG_19_VERSION=${CLANG_19_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg GDB_VERSION=${GDB_VERSION} \
   --build-arg WGET_VERSION=${WGET_VERSION} \

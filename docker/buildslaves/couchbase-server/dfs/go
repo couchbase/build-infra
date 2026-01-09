@@ -57,6 +57,8 @@ docker buildx build ${ACTION} --pull \
   --build-arg ASCIIDOCTOR_VERSION=${ASCIIDOCTOR_VERSION} \
   --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg GCC_15_VERSION=${GCC_15_VERSION} \
+  --build-arg GCC_15_TAG=${GCC_15_TAG} \
   --build-arg JDK_VERSION=${JDK_VERSION} \
   --build-arg JQ_VERSION=${JQ_VERSION} \
   --build-arg LIBXML2_VERSION=${LIBXML2_VERSION} \

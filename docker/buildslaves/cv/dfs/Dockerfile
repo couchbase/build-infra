@@ -1,6 +1,6 @@
 # CV container based on linux-dfs
 
-FROM couchbasebuild/server-builder:20251106 AS base
+FROM couchbasebuild/server-builder:20251211 AS base
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
@@ -26,27 +26,42 @@ RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
     && make install
 
 FROM base AS clang_build
-ARG CLANG_VERSION
+ARG CLANG_18_VERSION
+ARG CLANG_19_VERSION
 
 # Clang is used by a variety of KV and Magma tests.
+# don't use tmpfs as it's too big.
 
-# Don't use tmpfs for this - it's too big. Use regular disk space.
-RUN set -x \
-    && curl -L https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${CLANG_VERSION}.tar.gz | tar -xzf - --strip-components=1 \
-    && cmake -S llvm -B build -G Ninja \
-        -DLLVM_ENABLE_PROJECTS="clang" \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/opt/clang-${CLANG_VERSION} \
-        -DLLVM_PARALLEL_LINK_JOBS=3 \
-        -DLLVM_INCLUDE_TESTS=Off \
-        -DCLANG_INCLUDE_TESTS=Off \
-        -DLLVM_INCLUDE_EXAMPLES=Off \
-        -DCLANG_BUILD_EXAMPLES=Off \
-        -DCLANG_INCLUDE_DOCS=Off \
-        -DLLVM_BUILD_DOCS=Off \
-    && cmake --build build -j${PARALLELISM} \
-    && cmake --install build \
-    && rm -rf /tmp/deploy
+COPY <<'EOF' /tmp/build-clang.sh
+#!/bin/bash -ex
+VERSION=$1
+GCC_VERSION=$2
+GCC_DIR="gcc-${GCC_VERSION}"
+curl -L https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${VERSION}.tar.gz | tar -xzf - --strip-components=1
+cmake -S llvm -B build -G Ninja \
+    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/opt/clang-${VERSION} \
+    -DLLVM_PARALLEL_LINK_JOBS=3 \
+    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
+    -DLLVM_INCLUDE_TESTS=Off \
+    -DCLANG_INCLUDE_TESTS=Off \
+    -DLLVM_INCLUDE_EXAMPLES=Off \
+    -DCLANG_BUILD_EXAMPLES=Off \
+    -DCLANG_INCLUDE_DOCS=Off \
+    -DLLVM_BUILD_DOCS=Off
+cmake --build build -j${PARALLELISM}
+cmake --install build
+rm -rf ${tmpsrc}/*
+ln -s /opt/clang-${VERSION}/bin/clang++ /opt/clang-${VERSION}/bin/clang++-$(echo $VERSION | cut -d. -f1)
+printf '%s\n' "--gcc-toolchain=/opt/${GCC_DIR}" "-L/opt/${GCC_DIR}/lib" "-L/opt/${GCC_DIR}/lib64" "-Wl,-rpath,/opt/${GCC_DIR}/lib" "-Wl,-rpath,/opt/${GCC_DIR}/lib64" > /opt/clang-${VERSION}/bin/clang.cfg
+ln -s clang.cfg /opt/clang-${VERSION}/bin/clang++.cfg
+EOF
+
+RUN chmod +x /tmp/build-clang.sh \
+    && /tmp/build-clang.sh ${CLANG_18_VERSION} 13.2.0 \
+    && /tmp/build-clang.sh ${CLANG_19_VERSION} 15.2.0 \
+    && rm /tmp/build-clang.sh
 
 FROM base AS final
 
@@ -88,10 +103,12 @@ COPY --from=gdb_build /opt/gdb /opt/gdb
 ENV PATH=/opt/gdb/bin:$PATH
 RUN echo -n ":/opt/gdb/bin" >> /etc/path
 
-ARG CLANG_VERSION
-COPY --from=clang_build /opt/clang-${CLANG_VERSION} /opt/clang-${CLANG_VERSION}
-ENV PATH=/opt/clang-${CLANG_VERSION}/bin:$PATH
-RUN echo -n ":/opt/clang-${CLANG_VERSION}/bin" >> /etc/path
+ARG CLANG_18_VERSION
+ARG CLANG_19_VERSION
+COPY --from=clang_build /opt/clang-${CLANG_18_VERSION} /opt/clang-${CLANG_18_VERSION}
+COPY --from=clang_build /opt/clang-${CLANG_19_VERSION} /opt/clang-${CLANG_19_VERSION}
+ENV PATH=/opt/clang-${CLANG_19_VERSION}/bin:/opt/clang-${CLANG_18_VERSION}/bin:$PATH
+RUN echo -n ":/opt/clang-${CLANG_18_VERSION}/bin:/opt/clang-${CLANG_19_VERSION}/bin" >> /etc/path
 
 USER couchbase
 WORKDIR /home/couchbase

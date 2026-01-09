@@ -1,8 +1,16 @@
+ARG GCC_15_VERSION=${GCC_15_VERSION:-15.2.0}
+ARG GCC_15_TAG=${GCC_15_TAG:-20251210}
+
+FROM couchbasebuild/dfs-gcc:${GCC_15_VERSION}-${GCC_15_TAG} AS gcc15
+
 FROM couchbasebuild/dfs:20250925
 LABEL maintainer="build-team@couchbase.com"
 
 ARG TARGETARCH
 USER root
+
+# GCC15
+COPY --from=gcc15 /opt/gcc-15.2.0 /opt/gcc-15.2.0
 
 # Installer chroots - these are simple images that rarely change, so
 # just pull versioned :latest
