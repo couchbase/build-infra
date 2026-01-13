@@ -50,7 +50,7 @@ services:
       replicas: 1
 
   linux:
-    image: couchbasebuild/analytics-linux-cv:20250905
+    image: couchbasebuild/analytics-linux-cv:20260109
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

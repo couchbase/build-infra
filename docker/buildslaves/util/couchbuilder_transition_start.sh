@@ -49,6 +49,16 @@ then
     cp -a /ssh/* /home/couchbase/.ssh
 fi
 
+ec2_secrets_mount=/homesecrets
+if [ -d ${ec2_secrets_mount} ] && [ "$(ls -A ${ec2_secrets_mount})" ]
+then
+    shopt -s dotglob
+    umask 0077
+    cp -r ${ec2_secrets_mount}/* /home/couchbase
+    umask 0022
+    shopt -u dotglob
+fi
+
 active_user=$(whoami)
 
 # We need to let these fall through to a noop in case we hit mounts

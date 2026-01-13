@@ -35,6 +35,12 @@ source "amazon-ebs" "amzn2" {
   ami_name      = "jenkins-host-amzn2-${var.arch}-${formatdate("YYYY-MM-DD-HH-mm", timestamp())}${local.test}"
   instance_type = local.instance_type
   region        = var.region
+  launch_block_device_mappings {
+    device_name           = "/dev/xvda"
+    volume_size           = 16
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
   source_ami_filter {
     filters = {
       name                = "al2023-ami-minimal-*-${local.arch}"
