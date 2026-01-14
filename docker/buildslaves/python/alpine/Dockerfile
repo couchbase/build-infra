@@ -10,10 +10,19 @@ RUN apk add --no-cache \
             curl \
             git \
             gnupg \
-            openjdk11 \
             openssh-client \
             rsync \
             sudo
+
+# JDK for Jenkins
+RUN mkdir /tmp/deploy && \
+cd /tmp/deploy && \
+curl --fail -L https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.5_11.tar.gz -o openjre.tar.gz && \
+cd /usr/local && \
+tar xvzf /tmp/deploy/openjre.tar.gz && \
+ln -s jdk* java && \
+for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+rm -rf /tmp/deploy
 
 # cbdep build dependencies
 RUN apk add --no-cache \

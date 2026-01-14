@@ -7,13 +7,14 @@ mkdir -p build
 cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp -a ../../util/swarm*.properties build
 
-docker build --pull . \
+if [ "$1" = "--publish" ]
+then
+  ACTION="--push"
+else
+  ACTION="--load"
+fi
+
+docker buildx build --platform linux/amd64 --pull ${ACTION} . \
     -t ${IMAGE}:${TAG} \
     -t ${IMAGE}:latest \
     --build-arg SWARM_CLIENT_VERSION=3.24
-
-if [ "$1" = "--publish" ]
-then
-  docker push ${IMAGE}:$TAG
-  docker push ${IMAGE}:latest
-fi

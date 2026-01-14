@@ -36,7 +36,7 @@ x-default-jenkins-environment:
 services:
 
   alpine:
-    image: couchbasebuild/python-alpine-build:20220717
+    image: couchbasebuild/python-alpine-build:20260114
     environment:
       - "JENKINS_SLAVE_NAME=python-alpine"
       - "JENKINS_SLAVE_LABELS=linux python3 x64-musl"

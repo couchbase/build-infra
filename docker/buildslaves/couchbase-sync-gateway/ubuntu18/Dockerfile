@@ -53,14 +53,19 @@ RUN pip3 install -Iv PyInstaller==3.1
 # golang (install a current default, specific version should be in Jenkins's job)
 RUN set -x \
     && mkdir -p /usr/local/go/1.19 && cd /usr/local/go/1.19 \
-    && curl -fL -o go.tar.gz https://storage.googleapis.com/golang/go1.19.linux-$([ "$(uname -m)" == "x86_64" ] && printf amd64 || printf arm64).tar.gz \
+    && curl -fL -o go.tar.gz https://go.dev/dl/go1.19.linux-$([ "$(uname -m)" == "x86_64" ] && printf amd64 || printf arm64).tar.gz \
     && tar xf go.tar.gz \
     && rm go.tar.gz
 
 # JDK for Jenkins.
-RUN set -x \
-    && apt install -y openjdk-11-jre-headless \
-    && apt clean
+RUN mkdir /tmp/deploy && \
+    cd /tmp/deploy && \
+    curl --fail -L https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz -o openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Update locale
 RUN set -x \

@@ -2,16 +2,21 @@
 
 TAG=$(date +%Y%m%d)
 
-if [ "$1" = "--publish" ]
-then
-  PUSH="--push"
-fi
-
 . ../versions
 
 # Do this outside the loop so all load/push builds get
 # cached the same
 CACHEBUST=$(date +%Y%m%d-%H%M%S)
+
+if [ "$1" = "--publish" ]
+then
+  ACTION="--push"
+  PLATFORMS="linux/arm64,linux/amd64"
+else
+  ACTION="--load"
+  # --load only supports single-arch images, so use local machine arch
+  PLATFORMS="linux/$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"
+fi
 
 for NODE_VERSION in 18 20 22; do
     IMAGE=couchbasebuild/sdk-alpine-nodejs-${NODE_VERSION}-build
@@ -20,18 +25,15 @@ for NODE_VERSION in 18 20 22; do
     INFRADIR=$(git rev-parse --show-toplevel)
     cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 
-    for action in "--load" ${PUSH}; do
-        docker buildx build --platform linux/arm64,linux/amd64 --pull \
-            ${action} --progress plain \
-            --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
-            --build-arg CACHEBUST=${CACHEBUST} \
-            --build-arg ALPINE_IMAGE=${ALPINE_IMAGE} \
-            --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
-            --build-arg GRADLE_VERSION=${GRADLE_VERSION} \
-            --build-arg MAVEN_VERSION=${MAVEN_VERSION} \
-            --build-arg SBT_VERSION=${SBT_VERSION} \
-            -t ${IMAGE}:${TAG} \
-            -t ${IMAGE}:latest \
-            .
-    done
+    docker buildx build --platform ${PLATFORMS} --pull ${ACTION} --progress plain \
+        --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
+        --build-arg CACHEBUST=${CACHEBUST} \
+        --build-arg ALPINE_IMAGE=${ALPINE_IMAGE} \
+        --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+        --build-arg GRADLE_VERSION=${GRADLE_VERSION} \
+        --build-arg MAVEN_VERSION=${MAVEN_VERSION} \
+        --build-arg SBT_VERSION=${SBT_VERSION} \
+        -t ${IMAGE}:${TAG} \
+        -t ${IMAGE}:latest \
+        .
 done

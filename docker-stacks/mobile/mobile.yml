@@ -141,7 +141,7 @@ services:
       - jenkins
 
   sgw-centos7:
-    image: couchbasebuild/centos7-sgw-build:20230414
+    image: couchbasebuild/centos7-sgw-build:20260114
     init: true
     user: couchbase
     environment:
@@ -174,7 +174,7 @@ services:
       - jenkins
 
   sgw-ubuntu18:
-    image: couchbasebuild/ubuntu1804-sgw-build:20230621
+    image: couchbasebuild/ubuntu1804-sgw-build:20260114
     init: true
     user: couchbase
     environment:

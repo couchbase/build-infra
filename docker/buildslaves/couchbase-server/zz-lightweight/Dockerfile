@@ -42,10 +42,13 @@ RUN set -x \
     && sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # JDK for Jenkins
-RUN set -x \
-    && apt-get update \
-    && apt-get install -y openjdk-11-jre-headless \
-    && apt-get clean
+RUN mkdir /tmp/deploy && \
+    curl --fail -L "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz" -o /tmp/deploy/openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Install python3-dev and python3-apt, and python3-venv for blackduck
 RUN set -x \

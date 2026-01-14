@@ -64,16 +64,19 @@ RUN set -x \
 # Dev basic tools
 RUN dnf groupinstall -y "Development Tools" && dnf clean all
 
-# Initial install of cbdep for installing JDK, etc
+# JDK for Jenkins
+RUN mkdir /tmp/deploy && \
+    curl --fail -L "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz" -o /tmp/deploy/openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
+
+# Initial install of cbdep for installing CMake, etc
 RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
-# Use cbdep to install Java, CMake
-RUN set -x \
-    && cbdep install -d /opt openjdk 11.0.16+8 \
-    && cd /usr/local \
-    && ln -s /opt/openjdk* java \
-    && for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done \
-    && rm -rf /root/.cbdepcache
+# Use cbdep to install CMake
 RUN set -x \
     && cbdep install -d /opt cmake 3.24.2 \
     && ln -s /opt/cmake-3.24.2/bin/cmake /usr/local/bin \
@@ -97,7 +100,7 @@ RUN set -x \
 RUN set -x \
     && mkdir /tmp/deploy \
     && curl -L -o /tmp/deploy/gradle.zip https://services.gradle.org/distributions/gradle-4.10-bin.zip \
-    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.9.5/binaries/apache-maven-3.9.5-bin.zip  \
+    && curl -L -o /tmp/deploy/maven.zip https://dlcdn.apache.org/maven/maven-3/3.9.12/binaries/apache-maven-3.9.12-bin.zip  \
     && cd /usr/local \
     && unzip /tmp/deploy/gradle.zip \
     && unzip /tmp/deploy/maven.zip \

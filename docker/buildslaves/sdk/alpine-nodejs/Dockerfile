@@ -39,7 +39,6 @@ RUN apk add --no-cache \
         musl-locales \
         musl-locales-lang \
         oniguruma-dev \
-        openjdk11 \
         openssh \
         openssl-dev \
         perl \
@@ -50,6 +49,21 @@ RUN apk add --no-cache \
         sudo \
         tar \
         unzip
+
+# JDK for Jenkins
+RUN mkdir /tmp/deploy && \
+cd /tmp/deploy && \
+case "$(uname -m)" in \
+    x86_64) JDK_ARCH="x64" ;; \
+    aarch64) JDK_ARCH="aarch64" ;; \
+    *) echo "Unsupported architecture: $(uname -m)" && exit 1 ;; \
+esac && \
+curl --fail -L "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_${JDK_ARCH}_alpine-linux_hotspot_21.0.5_11.tar.gz" -o openjre.tar.gz && \
+cd /usr/local && \
+tar xvzf /tmp/deploy/openjre.tar.gz && \
+ln -s jdk* java && \
+for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+rm -rf /tmp/deploy
 
 # Create couchbase user with password-less sudo privs, and give
 # ownership of /opt/couchbase

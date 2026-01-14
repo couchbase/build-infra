@@ -47,11 +47,10 @@ RUN dnf install --setopt=keepcache=0 -y \
                 git \
                 git-clang-format \
                 glibc-langpack-en \
-                java-11-openjdk \
+                java-21-openjdk \
                 java-latest-openjdk-devel \
                 jsoncpp-devel \
                 libasan \
-                libev-devel \
                 libevent-devel \
                 libffi-devel \
                 libicu-devel \

@@ -5,6 +5,11 @@ LABEL maintainer="build-team@couchbase.com"
 
 USER root
 
+# Debian 10 is EOL - use archive repositories
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list && \
+    echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+
 # Install Couchbase signing dependencies
 RUN set -x \
     && apt-get update \
@@ -39,10 +44,9 @@ RUN set -x \
     && make install \
     && rm -rf /tmp/reprepro
 
-# JDK for Jenkins.
+# JDK for Jenkins
 RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
+    curl --fail -L "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz" -o /tmp/deploy/openjre.tar.gz && \
     cd /usr/local && \
     tar xvzf /tmp/deploy/openjre.tar.gz && \
     ln -s jdk* java && \

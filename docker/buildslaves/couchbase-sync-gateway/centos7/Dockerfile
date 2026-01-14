@@ -1,9 +1,14 @@
-# Docker container for Centos 7.0
+# Docker container for Centos 7
 
-FROM centos:7.0.1406
+FROM centos:7
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
+
+# Use vault for package installation - CentOS 7 is now EOL, so the original
+# mirrors are no longer available.
+RUN sed -i -e '/^mirrorlist/d;/^#baseurl=/{s,^#,,;s,http://mirror,https://vault,;}' /etc/yum.repos.d/CentOS*.repo
+
 RUN yum clean all && yum swap -y fakesystemd systemd
 RUN yum install --setopt=keepcache=0 -y yum-plugin-ovl && yum clean all
 RUN yum install --setopt=keepcache=0 -y sudo deltarpm
@@ -67,25 +72,25 @@ RUN mkdir /tmp/deploy && \
 
 # * golang
 RUN mkdir -p /usr/local/go/1.4.1 && cd /usr/local/go/1.4.1 && \
-    curl --fail https://storage.googleapis.com/golang/go1.4.1.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.4.1.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.5.2 && cd /usr/local/go/1.5.2 && \
-    curl --fail https://storage.googleapis.com/golang/go1.5.2.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.5.2.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.5.3 && cd /usr/local/go/1.5.3 && \
-    curl --fail https://storage.googleapis.com/golang/go1.5.3.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.5.3.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.7.1 && cd /usr/local/go/1.7.1 && \
-    curl --fail https://storage.googleapis.com/golang/go1.7.1.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.7.1.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.7.4 && cd /usr/local/go/1.7.4 && \
-    curl --fail https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.7.4.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.8.5 && cd /usr/local/go/1.8.5 && \
-    curl --fail https://storage.googleapis.com/golang/go1.8.5.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.8.5.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     mkdir /usr/local/go/1.9 && cd /usr/local/go/1.9 && \
-    curl --fail https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz -o go.tar.gz && \
+    curl --fail -L https://go.dev/dl/go1.9.linux-amd64.tar.gz -o go.tar.gz && \
     tar xzf go.tar.gz && \
     rm go.tar.gz
 
@@ -99,7 +104,7 @@ RUN yum install -y --setopt=keepcache=0 m4 file
 # JDK for Jenkins.
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
-    curl --fail -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
+    curl --fail -L https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz -o openjre.tar.gz && \
     cd /usr/local && \
     tar xvzf /tmp/deploy/openjre.tar.gz && \
     ln -s jdk* java && \

@@ -3,6 +3,10 @@
 FROM centos:centos7.4.1708
 LABEL maintainer="build-team@couchbase.com"
 
+# Use vault for package installation - CentOS 7 is now EOL, so the original
+# mirrors are no longer available
+RUN sed -i -e '/^mirrorlist/d;/^#baseurl=/{s,^#,,;s,/mirror,/vault,;}' /etc/yum.repos.d/CentOS*.repo
+
 USER root
 RUN yum install --setopt=keepcache=0 -y sudo deltarpm && \
     yum clean all
@@ -25,6 +29,11 @@ RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
 # * CentOS SCLs for devtoolset-8 (devtoolset-9-gcc-c++),
 #   more info at https://www.softwarecollections.org/en/scls/rhscl/devtoolset-8/
 RUN yum install --setopt=keepcache=0 -y epel-release centos-release-scl && \
+    sed -i \
+        -e '/^mirrorlist/s/^/#/' \
+        -e '/^#.*baseurl/s/^# *//' \
+        -e 's|mirror\.centos\.org|vault.centos.org|g' \
+        /etc/yum.repos.d/CentOS-SCLo-*.repo && \
     yum install --setopt=keepcache=0 -y \
                 bzip2-devel \
                 cmake \
@@ -71,8 +80,13 @@ RUN yum groupinstall -y --setopt=keepcache=0 "Development Tools" && \
     yum clean all
 
 # JDK for Jenkins
-RUN yum install -y --setopt=keepcache=0 java-11-openjdk && \
-    yum clean all
+RUN mkdir /tmp/deploy && \
+    curl --fail -L "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz" -o /tmp/deploy/openjre.tar.gz && \
+    cd /usr/local && \
+    tar xvzf /tmp/deploy/openjre.tar.gz && \
+    ln -s jdk* java && \
+    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+    rm -rf /tmp/deploy
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \

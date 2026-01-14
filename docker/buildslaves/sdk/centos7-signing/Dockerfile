@@ -30,7 +30,7 @@ RUN yum install --setopt=keepcache=0 -y \
 # JDK for Jenkins.
 RUN mkdir /tmp/deploy && \
     cd /tmp/deploy && \
-    curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz -o openjre.tar.gz && \
+    curl -L https://github.com/AdoptOpenJDK/openjdk17-binaries/releases/download/jdk-2021-05-07-13-31/OpenJDK-jre_x64_linux_hotspot_2021-05-06-23-30.tar.gz -o openjre.tar.gz && \
     cd /usr/local && \
     tar xvzf /tmp/deploy/openjre.tar.gz && \
     ln -s jdk* java && \
