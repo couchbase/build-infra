@@ -16,6 +16,13 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
     echo 'couchbase:couchbase' | chpasswd && \
     sed -ri 's/ALL\) ALL/ALL) NOPASSWD:ALL/' /etc/sudoers
 
+# Add git-core PPA for newer git
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y software-properties-common \
+    && add-apt-repository -y ppa:git-core/ppa \
+    && apt-get clean
+
 # Install Couchbase build dependencies
 RUN set -x \
     && apt update \
@@ -27,7 +34,7 @@ RUN set -x \
         devscripts \
         ed \
         g++ \
-        git-core \
+        git \
         libssl-dev \
         man \
         ncurses-dev \
