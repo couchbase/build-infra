@@ -141,7 +141,7 @@ services:
       - jenkins
 
   sgw-centos7:
-    image: couchbasebuild/centos7-sgw-build:20260114
+    image: couchbasebuild/centos7-sgw-build:20260120
     init: true
     user: couchbase
     environment:

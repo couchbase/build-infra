@@ -31,10 +31,12 @@ RUN groupadd -g1000 couchbase && \
 RUN yum install --setopt=keepcache=0 -y \
                 binutils \
                 curl \
+                curl-devel \
                 ed \
+                expat-devel \
                 gcc \
                 gcc-c++ \
-                git \
+                gettext-devel \
                 glibc.i686 \
                 make \
                 man \
@@ -42,6 +44,7 @@ RUN yum install --setopt=keepcache=0 -y \
                 nss \
                 numactl-devel \
                 openssh-clients openssl-devel \
+                perl-ExtUtils-MakeMaker \
                 python-devel \
                 redhat-lsb-core \
                 rpm-build \
@@ -49,8 +52,20 @@ RUN yum install --setopt=keepcache=0 -y \
                 ruby rubygems rubygem-rake \
                 tar \
                 unzip \
-                which && \
+                which \
+                zlib-devel && \
     ln -s /usr/bin/python2.7 /usr/bin/python2.6
+
+# * git
+ARG GIT_VERSION=2.30.9
+RUN mkdir /tmp/deploy && \
+    curl --fail -L https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz \
+        -o /tmp/deploy/git.tar.gz && \
+    cd /tmp/deploy && tar -xzf git.tar.gz && \
+    cd git-${GIT_VERSION} && \
+    make prefix=/usr/local all -j$(nproc) && \
+    make prefix=/usr/local install && \
+    rm -rf /tmp/deploy
 
 # * Required for sgcollect_info
 RUN mkdir /tmp/deploy && \
