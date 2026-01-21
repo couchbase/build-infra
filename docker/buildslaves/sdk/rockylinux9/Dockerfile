@@ -108,10 +108,19 @@ RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
     chmod 755 /opt/cbdeps
 
-# Temp install step for "cbdep" tool
-ARG CACHEBUST=1
-RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
-ENV PATH=$PATH:/usr/local/bin
+# Install "cbdep" for `couchbase` user
+# CBD-6552, cbdep symbolic link in /home/couchbase/.local/bin often goes missing.
+# Ensure cbdep is on PATH by add "/home/couchbase/.local/share/uv/tools/cbdep/bin" to PATH.
+RUN echo -n ":/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin" >> /etc/path
+ENV PATH="/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin:${PATH}"
+USER couchbase
+RUN set -x \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && uv tool install cbdep
+USER root
+
+# Add hook to update cbdep on each container start
+COPY build/update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
 
 # Enable disk/memory healthchecks
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

@@ -19,6 +19,8 @@ for ALPINE_VERSION in 3.20 3.21; do
     mkdir -p build
     INFRADIR=$(git rev-parse --show-toplevel)
     cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+    cp -a ${INFRADIR}/docker/buildslaves/util/hooks/update-cbdep.sh build/update-cbdep.sh
+    cp -a ${INFRADIR}/docker/buildslaves/util/healthcheck.sh build/healthcheck.sh
 
     for action in "--load" ${PUSH}; do
         docker buildx build --platform linux/amd64 --pull \

@@ -24,6 +24,8 @@ for NODE_VERSION in 18 20 22; do
     mkdir -p build
     INFRADIR=$(git rev-parse --show-toplevel)
     cp -a ${INFRADIR}/docker/buildslaves/util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+    cp -a ${INFRADIR}/docker/buildslaves/util/hooks/update-cbdep.sh build/update-cbdep.sh
+    cp -a ${INFRADIR}/docker/buildslaves/util/healthcheck.sh build/healthcheck.sh
 
     docker buildx build --platform ${PLATFORMS} --pull ${ACTION} --progress plain \
         --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \

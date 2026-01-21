@@ -69,6 +69,10 @@ RUN mkdir /tmp/deploy && \
 ARG CACHEBUST=1
 RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
+# Enable disk/memory healthchecks
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
 ENTRYPOINT [ "/usr/sbin/couchbuilder_start.sh" ]

@@ -124,8 +124,8 @@ RUN cd /tmp && \
 ENV LANG=en_US.UTF-8
 
 # Install "cbdep" for `couchbase` user
-RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
-ENV PATH="/home/couchbase/.local/bin:${PATH}"
+RUN echo -n ":/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin" >> /etc/path
+ENV PATH="/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin:${PATH}"
 USER couchbase
 RUN set -x \
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
@@ -133,7 +133,11 @@ RUN set -x \
 USER root
 
 # Add hook to update cbdep on each container start
-COPY update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
+COPY build/update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
+
+# Enable disk/memory healthchecks
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Run our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/

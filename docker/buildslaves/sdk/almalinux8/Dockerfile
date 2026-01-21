@@ -73,8 +73,19 @@ RUN mkdir /tmp/deploy && \
     for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
     rm -rf /tmp/deploy
 
-# Initial install of cbdep for installing CMake, etc
-RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+# Install "cbdep" for `couchbase` user
+# CBD-6552, cbdep symbolic link in /home/couchbase/.local/bin often goes missing.
+# Ensure cbdep is on PATH by add "/home/couchbase/.local/share/uv/tools/cbdep/bin" to PATH.
+RUN echo -n ":/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin" >> /etc/path
+ENV PATH="/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin:${PATH}"
+USER couchbase
+RUN set -x \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && uv tool install cbdep
+USER root
+
+# Add hook to update cbdep on each container start
+COPY build/update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
 
 # Use cbdep to install CMake
 RUN set -x \
@@ -106,6 +117,10 @@ RUN set -x \
     && unzip /tmp/deploy/maven.zip \
     && ln -s /usr/local/apache-maven-*/bin/mvn /usr/local/gradle-*/bin/gradle /usr/local/bin \
     && rm -rf /tmp/deploy
+
+# Enable disk/memory healthchecks
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
 # Add our builder startup script
 COPY build/couchbuilder_start.sh /usr/sbin/
