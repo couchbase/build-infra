@@ -11,4 +11,5 @@
     longpaths = true
         pager = cat
      symlinks = true
-
+     autocrlf = false
+          eol = lf
