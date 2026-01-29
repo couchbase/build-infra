@@ -101,7 +101,7 @@ x-default-jenkins-two-agent-environment:
 services:
 
   alpine320:
-    image: couchbasebuild/sdk-alpine3.20-build:20260120
+    image: couchbasebuild/sdk-alpine3.20-build:20250506
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine320"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.20 alpine"
@@ -112,7 +112,7 @@ services:
     <<: *default-jenkins-two-agent
 
   alpine321:
-    image: couchbasebuild/sdk-alpine3.21-build:20260120
+    image: couchbasebuild/sdk-alpine3.21-build:20250506
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine321"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.21 alpine"
@@ -126,22 +126,22 @@ services:
   # Note: this should always have zero replicas. Its presence here is
   # required to allow EC2 instances to discover the correct image.
   alpine-node-18-arm64:
-    image: couchbasebuild/sdk-alpine-nodejs-18-build:20260121
+    image: couchbasebuild/sdk-alpine-nodejs-18-build:20260114
     deploy:
       replicas: 0
 
   alpine-node-20-arm64:
-    image: couchbasebuild/sdk-alpine-nodejs-20-build:20260121
+    image: couchbasebuild/sdk-alpine-nodejs-20-build:20260114
     deploy:
       replicas: 0
 
   alpine-node-22-arm64:
-    image: couchbasebuild/sdk-alpine-nodejs-22-build:20260121
+    image: couchbasebuild/sdk-alpine-nodejs-22-build:20260114
     deploy:
       replicas: 0
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20260120
+    image: couchbasebuild/sdk-amzn2-build:20230419
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
@@ -152,7 +152,7 @@ services:
     <<: *default-jenkins-two-agent
 
   centos7:
-    image: couchbasebuild/sdk-centos7-build:20260120
+    image: couchbasebuild/sdk-centos7-build:20260114
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7"
       - "JENKINS_SLAVE_LABELS=sdk centos7"
@@ -163,7 +163,7 @@ services:
     <<: *default-jenkins-one-agent
 
   almalinux8:
-    image: couchbasebuild/sdk-almalinux8-build:20260121
+    image: couchbasebuild/sdk-almalinux8-build:20260114
     environment:
       - "JENKINS_SLAVE_NAME=build-almalinux8"
       - "JENKINS_SLAVE_LABELS=sdk centos8 almalinux8"
@@ -174,7 +174,7 @@ services:
     <<: *default-jenkins-one-agent
 
   rockylinux9:
-    image: couchbasebuild/sdk-rockylinux9-build:20260121
+    image: couchbasebuild/sdk-rockylinux9-build:20260114
     environment:
       - "JENKINS_SLAVE_NAME=build-rockylinux9"
       - "JENKINS_SLAVE_LABELS=sdk rockylinux9"
@@ -196,7 +196,7 @@ services:
     <<: *default-jenkins-two-agent
 
   ubuntu20:
-    image: couchbasebuild/sdk-ubuntu20-build:20260120
+    image: couchbasebuild/sdk-ubuntu20-build:20230607
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
@@ -207,7 +207,7 @@ services:
     <<: *default-jenkins-two-agent
 
   centos7-signing:
-    image: couchbasebuild/sdk-centos7-signing:20260121
+    image: couchbasebuild/sdk-centos7-signing:20241204
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"
@@ -252,7 +252,7 @@ services:
         mode: 0644
 
   debian10-signing:
-    image: couchbasebuild/sdk-debian10-signing:20260121
+    image: couchbasebuild/sdk-debian10-signing:20260114
     environment:
       - "JENKINS_SLAVE_NAME=build-debian10-signing"
       - "JENKINS_SLAVE_LABELS=debian10-signing docker"
