@@ -62,10 +62,10 @@ if [[ -n "$FULL_BACKUP_DIR" && ! -d "$FULL_BACKUP_DIR" ]]; then
 fi
 
 # Remove any old temporary backup tarball dumps
-/bin/rm -f jenkins_backup*tar.gz
+/bin/rm -f ${INSTANCE_NAME}_backup*tar.gz
 
 DAYOFWEEK=$(/bin/date +%a)
-DUMP=jenkins_backup.${DAYOFWEEK}.tar.gz
+DUMP=${INSTANCE_NAME}_backup.${DAYOFWEEK}.tar.gz
 
 # Temporarily turn off error mode as tar will nearly always return
 # a non-zero failure since the Jenkins must remain live during the
