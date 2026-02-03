@@ -184,11 +184,11 @@ services:
       - *repo-url
     <<: *default-jenkins-two-agent
 
-  debian9:
-    image: couchbasebuild/sdk-debian9-build:20230419
+  debian12:
+    image: couchbasebuild/sdk-debian12-build:20260202
     environment:
-      - "JENKINS_SLAVE_NAME=build-debian9"
-      - "JENKINS_SLAVE_LABELS=sdk debian9"
+      - "JENKINS_SLAVE_NAME=build-debian12"
+      - "JENKINS_SLAVE_LABELS=sdk linux debian debian12"
       - *default-jenkins-agent-environment-master
       - *default-jenkins-agent-environment-tunnel
       - *default-jenkins-agent-lang
@@ -251,11 +251,11 @@ services:
         gid: '1000'
         mode: 0644
 
-  debian10-signing:
-    image: couchbasebuild/sdk-debian10-signing:20260114
+  debian12-signing:
+    image: couchbasebuild/sdk-debian12-signing:20260202
     environment:
-      - "JENKINS_SLAVE_NAME=build-debian10-signing"
-      - "JENKINS_SLAVE_LABELS=debian10-signing docker"
+      - "JENKINS_SLAVE_NAME=build-debian12-signing"
+      - "JENKINS_SLAVE_LABELS=debian-signing debian12-signing docker"
       - *default-jenkins-agent-environment-master
       - *default-jenkins-agent-environment-tunnel
       - *repo-url
