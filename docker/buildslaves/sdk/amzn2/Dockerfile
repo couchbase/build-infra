@@ -120,19 +120,12 @@ COPY --from=gcc /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH} /opt
 RUN ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/gcc /usr/local/bin/gcc${GCC_VER_MAJOR} && \
     ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/g++ /usr/local/bin/g++${GCC_VER_MAJOR}
 
-# Install "cbdep" for `couchbase` user
-# CBD-6552, cbdep symbolic link in /home/couchbase/.local/bin often goes missing.
-# Ensure cbdep is on PATH by add "/home/couchbase/.local/share/uv/tools/cbdep/bin" to PATH.
-RUN echo -n ":/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin" >> /etc/path
-ENV PATH="/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin:${PATH}"
-USER couchbase
-RUN set -x \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && uv tool install cbdep
-USER root
-
-# Add hook to update cbdep on each container start
-COPY build/update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
+# Install uv and cbdep to /usr/local/bin
+# And add /usr/local/bin/ to PATH
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep \
+    && chmod a+x /usr/local/bin/cbdep
+RUN echo "/usr/local/bin" >> /etc/path
 
 # Enable disk/memory healthchecks
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

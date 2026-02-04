@@ -35,7 +35,8 @@ function node_busy {
 
 function workspace_free_space_ok {
     test -d "${WORKSPACE}" || return 0
-    local free_kb=$(df -k --output=avail "${WORKSPACE}" | tail -1)
+    # 4th field is "Available"
+    local free_kb=$(df -kP "${WORKSPACE}" | tail -1 | awk '{print $4}')
     local min_free_kb=$((MIN_FREE_GB*1024*1024))
 
     if [ $free_kb -gt $min_free_kb ]; then
@@ -46,7 +47,8 @@ function workspace_free_space_ok {
 }
 
 function root_free_space_ok {
-    local free_kb=$(df -k --output=avail / | tail -1)
+    # 4th field is "Available"
+    local free_kb=$(df -kP / | tail -1 | awk '{print $4}')
     local min_free_kb=$((MIN_FREE_GB*1024*1024))
 
     if [ $free_kb -gt $min_free_kb ]; then

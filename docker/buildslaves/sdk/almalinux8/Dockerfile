@@ -73,19 +73,12 @@ RUN mkdir /tmp/deploy && \
     for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
     rm -rf /tmp/deploy
 
-# Install "cbdep" for `couchbase` user
-# CBD-6552, cbdep symbolic link in /home/couchbase/.local/bin often goes missing.
-# Ensure cbdep is on PATH by add "/home/couchbase/.local/share/uv/tools/cbdep/bin" to PATH.
-RUN echo -n ":/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin" >> /etc/path
-ENV PATH="/home/couchbase/.local/bin:/home/couchbase/.local/share/uv/tools/cbdep/bin:${PATH}"
-USER couchbase
-RUN set -x \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && uv tool install cbdep
-USER root
-
-# Add hook to update cbdep on each container start
-COPY build/update-cbdep.sh /usr/sbin/couchhook.d/update-cbdep.sh
+# Install uv and cbdep to /usr/local/bin
+# And add /usr/local/bin/ to PATH
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep \
+    && chmod a+x /usr/local/bin/cbdep
+RUN echo "/usr/local/bin" >> /etc/path
 
 # Use cbdep to install CMake
 RUN set -x \
@@ -129,10 +122,6 @@ CMD [ "swarm" ]
 
 # Ensure appropriate directories exist and are owned by 'couchbase'
 RUN mkdir /home/couchbase/.ssh && chown couchbase:couchbase /home/couchbase/.ssh
-
-# Temp install step for "cbdep" tool
-ARG CACHEBUST=1
-RUN curl https://s3.amazonaws.com/packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 USER couchbase
 
 # Keep this stuff at the end, because the ARG declaration breaks Docker build caching
