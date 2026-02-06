@@ -107,47 +107,112 @@ function get_stackfile() {
   curl -fLo /opt/buildteam/stackfile.yml "https://raw.githubusercontent.com/couchbase/build-infra/${branch}/docker-stacks/${stackfiles[${environment}]}"
 }
 
-function provision_disk() {
-  if lsblk -o NAME,FSTYPE -dsn | grep ${1}n1
-  then
-    if nvme list | grep ${1} | grep "Elastic Block Store"
-    then
-      name=persistent # EBS volume
-    else
-      name=ephemeral  # Instance volume
-    fi
+function get_disk_type() {
+  # Determine disk type by checking the NVMe model string
+  # Returns: "ephemeral", "ebs", or "unknown"
+  local device=$1
+  local nvme_line
 
-    # We need to ensure the ephemeral storage is configured at each boot, we'll
-    # skip persistent vol if it already exists though
-    if ! lvs | grep ${name}
-    then
-      DISKSIZE_STRING=$(lsblk | grep "${1}n1" | awk '{print $4}')
-      case $DISKSIZE_STRING in
-        *G)
-          DISK_UNIT=G
-          ;;
-        *T)
-          DISK_UNIT=T
-          ;;
-      esac
-      DISKSIZE_RAW=$(echo $DISKSIZE_STRING | cut -f1 -d$DISK_UNIT)
+  nvme_line=$(nvme list 2>/dev/null | grep "/dev/${device}")
 
-      if [ $DISK_UNIT = "G" ]
-      then
-        DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.1" | bc)
-      else
-        DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.001" | bc)
-      fi
-
-      pvcreate /dev/${1}n1
-      vgcreate ${name} /dev/${1}n1
-      # lvcreate seems to exit a split second before the disk is ready sometimes,
-      # we need to create the filesystem after a short delay to work around this.
-      lvcreate --name disk1 --size ${DISKSIZE_RAW}${DISK_UNIT} ${name}
-      sleep 2
-      mkfs.ext4 /dev/${name}/disk1
-    fi
+  if echo "${nvme_line}" | grep -q "Instance Storage"; then
+    echo "ephemeral"
+  elif echo "${nvme_line}" | grep -q "Elastic Block Store"; then
+    echo "ebs"
+  else
+    echo "unknown"
   fi
+}
+
+function get_disk_size_gb() {
+  # Get disk size in GB (returns integer)
+  local device=$1
+  local size_bytes
+
+  size_bytes=$(lsblk -b -d -n -o SIZE "/dev/${device}" 2>/dev/null)
+  if [ -n "${size_bytes}" ]; then
+    echo $((size_bytes / 1024 / 1024 / 1024))
+  else
+    echo "0"
+  fi
+}
+
+function provision_disk() {
+  local device="${1}n1"
+
+  # Check if device exists
+  if ! lsblk -o NAME,FSTYPE -dsn | grep -q "${device}"; then
+    echo "Device ${device} not found, skipping"
+    return
+  fi
+
+  # Determine disk type using positive identification
+  local disk_type
+  disk_type=$(get_disk_type "${device}")
+
+  # Get disk size for validation and logging
+  local size_gb
+  size_gb=$(get_disk_size_gb "${device}")
+
+  echo "Examining ${device}: type=${disk_type}, size=${size_gb}GB"
+
+  local name
+  if [ "${disk_type}" = "ephemeral" ]; then
+    # Require minimum 50GB for ephemeral to avoid accidentally using small disks
+    if [ "${size_gb}" -lt 50 ]; then
+      echo "WARNING: ${device} identified as Instance Storage but only ${size_gb}GB - skipping (minimum 50GB required)"
+      return
+    fi
+    name=ephemeral
+  elif [ "${disk_type}" = "ebs" ]; then
+    # Skip small EBS volumes (likely root volume)
+    if [ "${size_gb}" -lt 50 ]; then
+      echo "Skipping small EBS volume ${device} (${size_gb}GB)"
+      return
+    fi
+    name=persistent
+  else
+    echo "WARNING: Could not identify disk type for ${device}, skipping"
+    echo "nvme list output for debugging:"
+    nvme list 2>/dev/null | grep "/dev/${device}" || echo "(no nvme list entry found)"
+    return
+  fi
+
+  # We need to ensure the ephemeral storage is configured at each boot, we'll
+  # skip persistent vol if it already exists though
+  if lvs | grep -q "${name}"; then
+    echo "LVM volume group '${name}' already exists, skipping ${device}"
+    return
+  fi
+
+  echo "Provisioning ${device} as ${name} (${size_gb}GB)"
+
+  DISKSIZE_STRING=$(lsblk | grep "${device}" | awk '{print $4}')
+  case $DISKSIZE_STRING in
+    *G)
+      DISK_UNIT=G
+      ;;
+    *T)
+      DISK_UNIT=T
+      ;;
+  esac
+  DISKSIZE_RAW=$(echo $DISKSIZE_STRING | cut -f1 -d$DISK_UNIT)
+
+  if [ $DISK_UNIT = "G" ]
+  then
+    DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.1" | bc)
+  else
+    DISKSIZE_RAW=$(echo "scale=4; $DISKSIZE_RAW-0.001" | bc)
+  fi
+
+  pvcreate /dev/${device}
+  vgcreate ${name} /dev/${device}
+  # lvcreate seems to exit a split second before the disk is ready sometimes,
+  # we need to create the filesystem after a short delay to work around this.
+  lvcreate --name disk1 --size ${DISKSIZE_RAW}${DISK_UNIT} ${name}
+  sleep 2
+  mkfs.ext4 /dev/${name}/disk1
+  echo "Successfully provisioned ${device} as ${name}"
 }
 
 function retrieve_secrets() {
@@ -304,14 +369,25 @@ function populate_entrypoint_env_from_stackfile() {
 set_timezone
 
 # Provision disks...
-# I don't know if the EBS/persistent devices can be different from one
-# instance to the next. We just call with the device names here and
-# figure out what they are via `nvme list` in provision_disk()
-#
-# Note: there's an assumption here that we're on a <= 8xlarge instance type
-# with a single (non-OS) EBS volume, and thus only have 2 disks to consider.
-provision_disk nvme1
-provision_disk nvme2
+# NVMe device ordering is non-deterministic and can vary between instance types
+# and boots. We scan nvme0 through nvme7 to handle various configurations.
+# The provision_disk function uses positive identification (checking for
+# "Instance Storage" in the NVMe model string) rather than assuming anything
+# that isn't EBS is ephemeral. It also enforces a minimum size of 50GB to
+# avoid accidentally using small volumes.
+echo "=== Starting disk provisioning ==="
+echo "Available NVMe devices:"
+nvme list 2>/dev/null || echo "nvme list command failed"
+echo ""
+
+for nvme_idx in {0..7}; do
+  provision_disk "nvme${nvme_idx}"
+done
+
+echo "=== Disk provisioning complete ==="
+echo "LVM volumes:"
+lvs 2>/dev/null || echo "No LVM volumes found"
+echo ""
 
 # More basic disk stuff
 update_fstab
