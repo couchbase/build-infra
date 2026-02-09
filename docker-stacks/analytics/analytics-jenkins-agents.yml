@@ -30,7 +30,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20220708
+    image: couchbasebuild/zz-lightweight:20260114
     environment:
       - "JENKINS_SLAVE_NAME=zz-analytics-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"

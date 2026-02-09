@@ -8,7 +8,7 @@ version: "3.8"
 
 services:
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20230607
+    image: couchbasebuild/zz-lightweight:20260114
     environment:
       - "JENKINS_SLAVE_NAME=zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"

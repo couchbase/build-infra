@@ -4,7 +4,7 @@
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/clamav-agent
 
-docker build -t ${IMAGE}:${TAG} .
+docker build --platform linux/amd64 -t ${IMAGE}:${TAG} .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then

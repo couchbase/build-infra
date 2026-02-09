@@ -7,7 +7,7 @@ popd > /dev/null
 # Agents for server.jenkins running on mega3
 
 # server.jenkins agent for running Ansible playbooks
-${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/ansible-agent:20221204 ansible-agent-server 2999 server.jenkins.couchbase.com
+${SCRIPTPATH}/../restart_jenkinsdocker.py --no-std-mounts couchbasebuild/ansible-agent:20260116 ansible-agent-server 2999 server.jenkins.couchbase.com
 
 # This recreates server.jenkins' "docker-slave-server", a slave
 # which exists only to launch one-off Docker commands. Some of

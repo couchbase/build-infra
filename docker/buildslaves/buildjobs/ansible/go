@@ -6,7 +6,7 @@ IMAGE=couchbasebuild/ansible-agent
 
 cp ../../util/couchbuilder_transition_start.sh ./couchbuilder_start.sh
 
-docker build -t ${IMAGE}:$TAG .
+docker build --platform linux/amd64 -t ${IMAGE}:$TAG .
 docker tag ${IMAGE}:$TAG ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then

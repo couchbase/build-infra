@@ -8,7 +8,7 @@ version: '3.8'
 services:
 
   clamav:
-    image: couchbasebuild/clamav-agent:20220801
+    image: couchbasebuild/clamav-agent:20260116
     environment:
       - "JENKINS_SLAVE_NAME=clamav"
       - "JENKINS_SLAVE_LABELS=clamav"

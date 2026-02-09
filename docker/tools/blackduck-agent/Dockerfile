@@ -35,9 +35,9 @@ RUN set -x \
         git-lfs \
         jq \
         libxml2-utils \
-        openjdk-17-jre-headless \
-        openjdk-17-jdk \
-        openjdk-17-jdk-headless \
+        openjdk-21-jre-headless \
+        openjdk-21-jdk \
+        openjdk-21-jdk-headless \
         python3 \
         python3-pip \
         python3-venv \

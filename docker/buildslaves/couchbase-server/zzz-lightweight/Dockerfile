@@ -57,7 +57,7 @@ RUN set -x \
 # JDK for Jenkins
 RUN set -x \
     && apt-get update \
-    && apt-get install -y openjdk-17-jre-headless \
+    && apt-get install -y openjdk-21-jre-headless \
     && apt-get clean
 
 # Utilities that are handy for zz-lightweight jobs and occasional interactive use

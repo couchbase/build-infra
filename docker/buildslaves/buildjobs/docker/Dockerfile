@@ -9,12 +9,22 @@ USER root
 # doesn't persist into the image)
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install SSH server and sudo, as well as git and a JRE for Jenkins
+# Install SSH server and sudo, as well as git
 RUN apt-get update && \
     apt-get install -y openssh-server sudo apt-transport-https \
-        ca-certificates curl git openjdk-11-jre-headless unzip && \
+        ca-certificates curl git unzip && \
     apt-get clean && \
     mkdir /var/run/sshd
+
+# JDK for Jenkins
+RUN mkdir /tmp/deploy && \
+curl --fail -L "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jre_x64_linux_hotspot_21.0.5_11.tar.gz" -o /tmp/deploy/openjre.tar.gz && \
+cd /usr/local && \
+tar xvzf /tmp/deploy/openjre.tar.gz && \
+ln -s jdk* java && \
+for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
+rm -rf /tmp/deploy
+ENV JAVA_HOME=/usr/local/java
 
 # Repo
 RUN curl https://raw.githubusercontent.com/couchbasedeps/git-repo/repo-1-couchbase/repo -o /usr/local/bin/repo && \
