@@ -126,17 +126,17 @@ services:
   # Note: this should always have zero replicas. Its presence here is
   # required to allow EC2 instances to discover the correct image.
   alpine-node-18-arm64:
-    image: couchbasebuild/sdk-alpine-nodejs-18-build:20260203
+    image: couchbasebuild/sdk-alpine-nodejs-18-build:20240724
     deploy:
       replicas: 0
 
   alpine-node-20-arm64:
-    image: couchbasebuild/sdk-alpine-nodejs-20-build:20260203
+    image: couchbasebuild/sdk-alpine-nodejs-20-build:20240724
     deploy:
       replicas: 0
 
   alpine-node-22-arm64:
-    image: couchbasebuild/sdk-alpine-nodejs-22-build:20260203
+    image: couchbasebuild/sdk-alpine-nodejs-22-build:20240724
     deploy:
       replicas: 0
 
