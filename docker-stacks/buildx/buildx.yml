@@ -7,7 +7,7 @@ services:
     # Historically, this was the agent used for
     # couchbase-k8s-microservice builds, so it still has
     # operator-specific Jenkins labels.
-    image: couchbasebuild/buildx:20260209
+    image: couchbasebuild/buildx:20260212
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=buildx"

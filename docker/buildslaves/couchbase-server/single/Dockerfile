@@ -194,6 +194,7 @@ USER root
 ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib64/pkgconfig:/usr/share/pkgconfig"
 
 # Buildx
+ENV DOCKER_API_VERSION=1.41
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # tini, to avoid zombie issues when running with Swarm jar

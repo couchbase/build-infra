@@ -18,7 +18,9 @@ LABEL maintainer=build-team@couchbase.com
 
 COPY --from=skopeo /tmp/gopath/src/github.com/containers/skopeo/bin/skopeo /usr/local/bin/skopeo
 COPY --from=skopeo /tmp/gopath/src/github.com/containers/skopeo/default-policy.json /etc/containers/policy.json
-COPY --from=docker/buildx-bin:0.27.0 /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+
+ENV DOCKER_API_VERSION=1.41
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # xmllint (used for parsing manifest); jq (used for parsing
 # output from builddb REST API)

@@ -131,6 +131,7 @@ RUN set -x \
     && rm /tmp/rclone.deb
 
 # Docker CLI, buildx, and skopeo
+ENV DOCKER_API_VERSION=1.41
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 RUN set -x \
     && apt-get update \

@@ -71,7 +71,7 @@ x-repo-url:
  - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
 services:
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20260114
+    image: couchbasebuild/zz-lightweight:20260212
     environment:
       - "JENKINS_SLAVE_NAME=zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"
@@ -93,7 +93,7 @@ services:
     <<: *default-jenkins-one-agent
 
   zzz-lightweight:
-    image: couchbasebuild/zzz-lightweight:20260116
+    image: couchbasebuild/zzz-lightweight:20260212
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=zzz-lightweight"
@@ -151,7 +151,7 @@ services:
     <<: *default-jenkins-one-agent
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20260109
+    image: couchbasebuild/server-linux-build:20260212
     environment:
       - "JENKINS_SLAVE_NAME=server-linux"
       - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher x86_64"

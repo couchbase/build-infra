@@ -30,7 +30,7 @@ x-default-jenkins-agent: &default-jenkins-agent
 services:
 
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20260114
+    image: couchbasebuild/zz-lightweight:20260212
     environment:
       - "JENKINS_SLAVE_NAME=zz-analytics-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"
@@ -50,7 +50,7 @@ services:
       replicas: 1
 
   linux:
-    image: couchbasebuild/analytics-linux-cv:20260109
+    image: couchbasebuild/analytics-linux-cv:20260212
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

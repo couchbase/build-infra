@@ -1,12 +1,13 @@
 # Docker container for Single Linux
 
-FROM couchbasebuild/server-linux-build:20260109
+FROM couchbasebuild/server-linux-build:20260212
 LABEL maintainer="build-team@couchbase.com"
 
 ARG DOCKER_VERSION
 ARG VALGRIND_VERSION
 ARG JYTHON_VERSION
 
+ENV DOCKER_API_VERSION=1.41
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # ENV vars for profile data retrieval
