@@ -1,0 +1,29 @@
+#!/bin/sh -e
+
+TAG=`date +%Y%m%d`
+IMAGE=couchbasebuild/mobile-debian11-build
+
+JDK_VERSION=21.0.6+7
+CMAKE_VERSION=4.2.3
+
+mkdir -p build
+cp -a ../../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
+cp -a ../../util/swarm*.properties build
+cp -a ../../util/healthcheck.sh build
+
+if [ "$1" = "--publish" ]
+then
+  ACTION=--push
+  PLATFORMS="linux/arm64,linux/amd64"
+else
+  ACTION=--load
+  # --load only supports single-arch images, so use local machine arch
+  PLATFORMS="linux/$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"
+fi
+
+docker buildx build --platform ${PLATFORMS} --pull ${ACTION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg JDK_VERSION=${JDK_VERSION} \
+  --tag ${IMAGE}:${TAG} \
+  --tag ${IMAGE}:latest \
+  .

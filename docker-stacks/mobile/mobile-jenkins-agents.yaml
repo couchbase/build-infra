@@ -1,7 +1,7 @@
 version: "3.8"
 
 # Suggested deployment command:
-#   docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c mobile.yml mobile
+#   docker -H mega4.build.couchbase.com stack deploy --with-registry-auth -c mobile-jenkins-agents.yaml mobile
 # All services, networks, etc. will then get an "mobile_" prefix,
 # eg. "mobile_zz-lightweight"
 #
@@ -340,6 +340,56 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role==build
+      replicas: 1
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+
+  debian11-builder:
+    image: couchbasebuild/mobile-debian11-build:20260214
+    environment:
+      - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
+      - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
+      - "JENKINS_AGENT_NAME=mobile-debian11-builder"
+      - "JENKINS_AGENT_LABELS=debian11 amd64 linux cbdeps"
+      - "JENKINS_URL=http://mobile.jenkins.couchbase.com/"
+      - "NODE_CLASS=build"
+      - "NODE_PRODUCT=mobile"
+    volumes:
+      - type: volume
+        source: workspace
+        target: /home/couchbase/jenkins/workspace
+      - type: volume
+        source: cbdepscache
+        target: /home/couchbase/.cbdepscache
+      - type: volume
+        source: cbdepcache
+        target: /home/couchbase/.cbdepcache
+      - type: volume
+        source: ccache
+        target: /home/couchbase/.ccache
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /home/couchbase/.docker/config.json
+        target: /home/couchbase/.docker/config.json
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_username
+        mode: 0444
+    secrets:
+      - source: mobile_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_password
+        mode: 0444
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profiledata_ssh_key
     deploy:
       placement:
         constraints:

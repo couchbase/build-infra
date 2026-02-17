@@ -12,6 +12,7 @@ variable "environments" {
         "cv",
         "server",
         "sdk",
+        "mobile",
         "test"
     ]
 }
