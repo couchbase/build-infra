@@ -2,6 +2,13 @@ resource "aws_launch_template" "proget" {
   image_id      = local.ami_id
   instance_type = "c5a.large"
   key_name      = "proget"
+  block_device_mappings {
+      device_name = "/dev/xvda"
+      ebs {
+          volume_size           = 20
+          volume_type           = "gp3"
+      }
+  }
   network_interfaces {
       associate_public_ip_address = true
       security_groups = [aws_security_group.proget.id]
