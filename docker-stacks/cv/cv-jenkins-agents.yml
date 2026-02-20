@@ -18,11 +18,18 @@ x-default-jenkins-agent: &default-jenkins-agent
     - source: jenkins_master_username
       target: /run/secrets/jenkins_master_username
       mode: 0444
+    - source: jenkins_master_username
+      target: /run/secrets/jenkins_username
+      mode: 0444
   secrets:
     - source: cv_jenkins_ns-buildbot_api_key.20220510
       target: /run/secrets/jenkins_master_password
+    - source: cv_jenkins_ns-buildbot_api_key.20220510
+      target: /run/secrets/jenkins_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
+    - source: profiledata.ssh_privkey.profile_sync.20200423
+      target: /run/secrets/profiledata_ssh_key
     - source: dockerhub_nsbuildbot_password
       target: /tmp/dockerhub_nsbuildbot_password
   cap_add:
@@ -109,11 +116,11 @@ services:
         parallelism: 1000
         delay: 0s
 
-  linux_small:
+  small_glibc217:
     image: couchbasebuild/server-linux-cv:20260212
     environment:
-      - "JENKINS_SLAVE_NAME=cv-linux-small"
-      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus totoro linux small"
+      - "JENKINS_SLAVE_NAME=cv-linux-glibc217-small"
+      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} neo trinity morpheus linux small"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -131,16 +138,69 @@ services:
         constraints:
           - "node.labels.cvtype==linux-small"
         max_replicas_per_node: 1
-      replicas: 9
+      replicas: 2
       update_config:
         parallelism: 100
         delay: 0s
 
-  linux_large:
+  small_glibc228:
+    image: couchbasebuild/server-builder-cv:20260219
+    init: true
+    environment:
+      - "JENKINS_AGENT_NAME=cv-linux-glibc228-small"
+      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} totoro master linux small"
+      - "JENKINS_URL=http://cv.jenkins.couchbase.com/"
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:50002"
+      - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
+      - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=3"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
+    secrets:
+      - source: cv_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profiledata_ssh_key
+      - source: dockerhub_nsbuildbot_password
+        target: /tmp/dockerhub_nsbuildbot_password
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 30s
+      timeout: 90s
+      retries: 3
+    user: couchbase
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /proc
+        target: /opt/rpm-chroot/proc
+      - type: bind
+        source: /proc
+        target: /opt/deb-chroot/proc
+    <<: *default-jenkins-agent
+    deploy:
+      resources:
+        reservations:
+          # Small nodes have 16GB RAM
+          memory: 12G
+      placement:
+        constraints:
+          - "node.labels.cvtype==linux-small"
+        max_replicas_per_node: 1
+      replicas: 2
+      update_config:
+        parallelism: 100
+        delay: 0s
+
+  large_glibc217:
     image: couchbasebuild/server-linux-cv:20260212
     environment:
-      - "JENKINS_SLAVE_NAME=cv-linux-large"
-      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} master neo trinity cypher morpheus totoro linux large"
+      - "JENKINS_SLAVE_NAME=cv-linux-glibc217-large"
+      - "JENKINS_SLAVE_LABELS={{.Node.Hostname}} neo trinity morpheus linux large"
       - "JENKINS_MASTER=http://cv.jenkins.couchbase.com/"
       - "NODE_CLASS=cv-docker"
       - "NODE_PRODUCT=couchbase-server"
@@ -156,7 +216,60 @@ services:
         constraints:
           - "node.labels.cvtype==linux-large"
         max_replicas_per_node: 1
-      replicas: 20
+      replicas: 7
+      update_config:
+        parallelism: 1000
+        delay: 0s
+
+  large_glibc228:
+    image: couchbasebuild/server-builder-cv:20260219
+    init: true
+    environment:
+      - "JENKINS_AGENT_NAME=cv-linux-glibc228-large"
+      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} totoro master linux large"
+      - "JENKINS_URL=http://cv.jenkins.couchbase.com/"
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:50002"
+      - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
+      - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "PARALLELISM=16"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
+    secrets:
+      - source: cv_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profiledata_ssh_key
+      - source: dockerhub_nsbuildbot_password
+        target: /tmp/dockerhub_nsbuildbot_password
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 30s
+      timeout: 90s
+      retries: 3
+    user: couchbase
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /proc
+        target: /opt/rpm-chroot/proc
+      - type: bind
+        source: /proc
+        target: /opt/deb-chroot/proc
+    <<: *default-jenkins-agent
+    deploy:
+      resources:
+        reservations:
+          # Large nodes have 24GB RAM§
+          memory: 20G
+      placement:
+        constraints:
+          - "node.labels.cvtype==linux-large"
+        max_replicas_per_node: 1
+      replicas: 7
       update_config:
         parallelism: 1000
         delay: 0s

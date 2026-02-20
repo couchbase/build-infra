@@ -162,7 +162,7 @@ RUN mkdir -p /home/couchbase/jenkins/workspace /home/couchbase/.cbdepscache /hom
 USER root
 
 # Remember this path for Jenkins agents (see entrypoint script)
-RUN echo "/usr/local/bin:/opt/gcc-13.2.0/bin" >> /etc/path
+RUN printf "/usr/local/bin:/opt/gcc-13.2.0/bin:" >> /etc/path
 
 # Use cbdep to install JVM for Jenkins. Clean up __pycache__ directories
 # afterwards as they'll be owned by root, which can cause trouble.
