@@ -357,7 +357,7 @@ services:
       - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
       - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
       - "JENKINS_AGENT_NAME=mobile-debian11-builder"
-      - "JENKINS_AGENT_LABELS=debian11 amd64 linux cbdeps"
+      - "JENKINS_AGENT_LABELS=debian11 amd64 x86_64 linux cbdeps"
       - "JENKINS_URL=http://mobile.jenkins.couchbase.com/"
       - "NODE_CLASS=build"
       - "NODE_PRODUCT=mobile"
