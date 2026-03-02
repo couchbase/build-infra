@@ -185,6 +185,8 @@ ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 
 USER couchbase
 
+ENV PATH=/opt/gcc-13.2.0/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin
+
 ADD --chmod=0755 https://cb-entry.s3.us-west-2.amazonaws.com/universal-entrypoint.sh /universal_entrypoint.sh
 ENTRYPOINT ["/universal_entrypoint.sh"]
 CMD []

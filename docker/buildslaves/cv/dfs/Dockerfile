@@ -1,6 +1,6 @@
 # CV container based on linux-dfs
 
-FROM couchbasebuild/server-builder:20260219 AS base
+FROM couchbasebuild/server-builder:20260302 AS base
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
