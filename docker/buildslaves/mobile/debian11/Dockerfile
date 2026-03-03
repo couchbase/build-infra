@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     git \
     jq \
     make \
+    ninja-build \
     openssh-client \
     openssh-server \
     patchelf \
