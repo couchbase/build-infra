@@ -430,7 +430,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.cloud_jira_creds.20240418
+      - source: profiledata.cloud_jira_creds.20260302
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/cloud-jira-creds.json
         mode: 0600
         uid: "901"
@@ -662,7 +662,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.cloud_jira_creds.20240418
+      - source: profiledata.cloud_jira_creds.20260302
         target: /home/couchbase/mobile/build/linux/.ssh/cloud-jira-creds.json
         mode: 0600
         uid: "901"
@@ -817,7 +817,7 @@ secrets:
   profiledata.issues_jira_creds.20240722:
     external: true
   # cloud jira credentials
-  profiledata.cloud_jira_creds.20240418:
+  profiledata.cloud_jira_creds.20260302:
     external: true
   # build database loader configuration
   profiledata.ini_file.build_db_load_conf.20240711:
