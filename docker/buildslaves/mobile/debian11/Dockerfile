@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     jq \
+    lld-19 \
     make \
     ninja-build \
     openssh-client \
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     sudo \
     wget \
     zlib1g-dev \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir /var/run/sshd
 
