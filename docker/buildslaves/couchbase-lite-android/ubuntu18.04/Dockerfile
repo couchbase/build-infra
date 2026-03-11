@@ -19,13 +19,8 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 
 # Install Couchbase Lite Android toolchain requirements
 RUN apt-get update && \
-    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 openjdk-17-jdk gnupg2 zip rsync wget && \
+    apt-get install -y git-core tar curl unzip gcc-multilib g++-multilib lib32z1 lib32stdc++6 gnupg2 zip rsync wget && \
     apt-get clean
-
-# Swarm client jar - only needed until CBD-4101 is resolved
-RUN curl --fail \
-    https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.25/swarm-client-3.25.jar \
-    -o /usr/local/lib/swarm-client.jar
 
 # Update locale
 RUN apt-get update && \
@@ -46,6 +41,19 @@ RUN rm -f /usr/bin/python3 \
 # Set LANG
 ENV LANG=en_US.UTF-8
 
+# Install uv and cbdep for `couchbase` user
+ENV PATH="/home/couchbase/.local/bin:${PATH}"
+RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
+USER couchbase
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv tool install cbdep
+
+# Use cbdep to install JVM for Jenkins
+USER root
+ARG JDK_VERSION=21.0.6+7
+RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
+
 # Android SDK
 USER couchbase
 
@@ -64,9 +72,9 @@ RUN mkdir -p /home/couchbase/jenkins/tools/android-sdk && \
     chmod 755 /home/couchbase/jenkins/tools/android-sdk
 
 # Set environment variable
-ENV ANDROID_HOME /home/couchbase/jenkins/tools/android-sdk
-ENV PATH ${ANDROID_HOME}/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:${ANDROID_HOME}/tools/bin:$PATH
-ENV SDK_CMD $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+ENV ANDROID_HOME=/home/couchbase/jenkins/tools/android-sdk
+ENV PATH=${ANDROID_HOME}/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:${ANDROID_HOME}/tools/bin:$PATH
+ENV SDK_CMD=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 
 # Android SDK License
 RUN yes 'y' | sdkmanager --licenses >/dev/null
@@ -93,12 +101,6 @@ RUN cd /home/couchbase/jenkins/tools && \
 
 # Revert so CMD will run as root.
 USER root
-
-# CBD-4280: set openjdk-17-jdk as default
-RUN update-java-alternatives -s java-1.17.0-openjdk-amd64
-
-# Add cbdep tool
-RUN curl --fail http://packages.couchbase.com/cbdep/cbdep-linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
 
 # Enable disk-checking healthcheck
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

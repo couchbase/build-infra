@@ -9,6 +9,10 @@ FROM centos:7.3.1611
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
+
+# CentOS 7 EOL: mirrorlist.centos.org is gone, use vault
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo
 RUN yum clean all && yum swap -y fakesystemd systemd
 
 RUN yum install --setopt=keepcache=0 -y \
@@ -45,7 +49,9 @@ RUN curl --fail https://storage.googleapis.com/git-repo-downloads/repo -o /usr/l
 # Need to lock some versions because newer ones require higher versions of ruby
 RUN yum install -y ruby-devel gcc make rpm-build rubygems
 
-RUN gem install ffi:1.12.2 && \
+# Install io-like first with old version; newer io-like requires Ruby 2.7+ but CentOS 7 has older Ruby
+RUN gem install io-like:0.3.1 && \
+    gem install ffi:1.12.2 && \
     gem install fpm:1.11.0
 
 # GCC - need to redundantly declare GCC_ARG here
@@ -59,7 +65,7 @@ RUN  (echo "/usr/local/lib64"; cat /etc/ld.so.conf) > /tmp/ld.so.conf && \
 
 # Install Couchbase Lite Core toolchain requirements,
 # including updated binutils for vector search build
-RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip java-11-openjdk-devel binutils
+RUN yum install -y --setopt=keepcache=0 tar openssl-devel make redhat-lsb-core wget unzip zip binutils
 
 # * ccache (from source)
 RUN mkdir /tmp/deploy && \
@@ -80,10 +86,20 @@ RUN sudo localedef -v -c -i fr_FR -f UTF-8 fr_FR || true
 # Add "shasum" command (use by cbl-java build, at least)
 RUN yum install -y --setopt=keepcache=0 perl-Digest-SHA
 
-# Add cbdep tool (used by cbl-java build, at least)
-RUN curl --fail http://downloads.build.couchbase.com/cbdep/cbdep.linux -o /usr/local/bin/cbdep && chmod 755 /usr/local/bin/cbdep
+# Install uv and cbdep for `couchbase` user
+ENV PATH="/home/couchbase/.local/bin:${PATH}"
+RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
+USER couchbase
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv tool install cbdep
 
-# Python 3 & pip
+# Use cbdep to install JVM for Jenkins
+USER root
+ARG JDK_VERSION=21.0.6+7
+RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
+
+# Python 3.7 & pip (use versioned pip URL since generic get-pip.py dropped Python 3.7 support)
 RUN set -x \
     && yum groupinstall -y "Development Tools" \
     && yum install -y openssl-devel libffi-devel bzip2-devel \
@@ -93,7 +109,7 @@ RUN set -x \
     && ./configure --enable-optimizations \
     && make altinstall \
     && update-alternatives --install /usr/local/bin/python3 python3 /usr/local/bin/python3.7 1 \
-    && curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
+    && curl https://bootstrap.pypa.io/pip/3.7/get-pip.py -o /tmp/get-pip.py \
     && /usr/local/bin/python3 /tmp/get-pip.py \
     && rm -rf /tmp/get-pip.py /usr/src/Python-3.7.7 \
     && yum clean all

@@ -47,7 +47,7 @@ RUN uv tool install cbdep
 
 # Use cbdep to install JVM for Jenkins
 USER root
-ARG JDK_VERSION=17.0.15+6
+ARG JDK_VERSION=21.0.6+7
 RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
     && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
 

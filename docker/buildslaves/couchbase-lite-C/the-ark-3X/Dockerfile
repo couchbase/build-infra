@@ -3,6 +3,9 @@
 FROM debian:buster
 LABEL maintainer="build-team@couchbase.com"
 
+RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://archive.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list
+
 # The cross compilers installed here are used for generic OS (like Ubuntu Core)
 # Model specific cross compilation toolchains, such as Raspberry Pi, will be
 # acquired dynamically in a running container.
@@ -38,16 +41,16 @@ RUN useradd couchbase -G sudo -m -s /bin/bash && \
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
 
-# Install uv and cbdep for `couchbase` user
+# Install uv and install cbdep for `couchbase` user
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 ENV PATH="/home/couchbase/.local/bin:${PATH}"
 RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
 USER couchbase
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 RUN uv tool install cbdep
 
 # Use cbdep to install JVM for Jenkins
 USER root
-ARG JDK_VERSION=17.0.15+6
+ARG JDK_VERSION=21.0.6+7
 RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
     && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
 

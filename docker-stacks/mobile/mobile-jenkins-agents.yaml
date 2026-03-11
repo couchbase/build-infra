@@ -42,7 +42,7 @@ services:
       - nfs
 
   lite-android-ubuntu18:
-    image: couchbasebuild/ubuntu1804-mobile-lite-android:20240809
+    image: couchbasebuild/ubuntu1804-mobile-lite-android:20260311
     init: true
     user: couchbase
     environment:
@@ -75,7 +75,7 @@ services:
       - jenkins
 
   lite-android-ubuntu20:
-    image: couchbasebuild/ubuntu2004-mobile-lite-android:20250814
+    image: couchbasebuild/ubuntu2004-mobile-lite-android:20260311
     init: true
     user: couchbase
     environment:
@@ -108,7 +108,7 @@ services:
       - jenkins
 
   lite-android-ubuntu24:
-    image: couchbasebuild/ubuntu2404-mobile-lite-android:20250814
+    image: couchbasebuild/ubuntu2404-mobile-lite-android:20260311
     init: true
     user: couchbase
     environment:
@@ -207,7 +207,7 @@ services:
       - jenkins
 
   litecore-centos73:
-    image: couchbasebuild/centos-73-litecore-build:20240206
+    image: couchbasebuild/centos-73-litecore-build:20260313
     init: true
     user: couchbase
     environment:
@@ -236,7 +236,7 @@ services:
       - jenkins
 
   litec-the-ark:
-    image: couchbasebuild/litec-the-ark:20250501
+    image: couchbasebuild/litec-the-ark:20260311
     init: true
     user: couchbase
     environment:
@@ -270,7 +270,7 @@ services:
       - jenkins
 
   litec-the-ark-3X:
-    image: couchbasebuild/litec-the-ark-3x:20250501
+    image: couchbasebuild/litec-the-ark-3x:20260312
     init: true
     user: couchbase
     environment:
@@ -304,7 +304,7 @@ services:
       - jenkins
 
   linux-single:
-    image: couchbasebuild/server-linux-build:20241205
+    image: couchbasebuild/server-linux-build:20260212
     environment:
       - "JENKINS_SLAVE_NAME=mobile-linux"
       - "JENKINS_SLAVE_LABELS=mobile-single-linux x86_64"

@@ -12,6 +12,7 @@ cp -a ../../util/swarm*.properties build
 cp -a ../../util/healthcheck.sh build
 
 docker build \
+  --platform linux/amd64 \
   --build-arg GCC_VER=${GCC_VER} \
   -t ${IMAGE}:$TAG -t ${IMAGE}:latest .
 
