@@ -101,7 +101,7 @@ x-default-jenkins-two-agent-environment:
 services:
 
   alpine320:
-    image: couchbasebuild/sdk-alpine3.20-build:20260202
+    image: couchbasebuild/sdk-alpine3.20-build:20260313
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine320"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.20 alpine"
@@ -112,7 +112,7 @@ services:
     <<: *default-jenkins-two-agent
 
   alpine321:
-    image: couchbasebuild/sdk-alpine3.21-build:20260202
+    image: couchbasebuild/sdk-alpine3.21-build:20260313
     environment:
       - "JENKINS_SLAVE_NAME=build-alpine321"
       - "JENKINS_SLAVE_LABELS=sdk alpine3.21 alpine"
@@ -141,7 +141,7 @@ services:
       replicas: 0
 
   amzn2:
-    image: couchbasebuild/sdk-amzn2-build:20260202
+    image: couchbasebuild/sdk-amzn2-build:20260316
     environment:
       - "JENKINS_SLAVE_NAME=build-amzn2"
       - "JENKINS_SLAVE_LABELS=sdk amzn2"
@@ -174,7 +174,7 @@ services:
     <<: *default-jenkins-one-agent
 
   rockylinux9:
-    image: couchbasebuild/sdk-rockylinux9-build:20260202
+    image: couchbasebuild/sdk-rockylinux9-build:20260316
     environment:
       - "JENKINS_SLAVE_NAME=build-rockylinux9"
       - "JENKINS_SLAVE_LABELS=sdk rockylinux9"
@@ -196,7 +196,7 @@ services:
     <<: *default-jenkins-two-agent
 
   ubuntu20:
-    image: couchbasebuild/sdk-ubuntu20-build:20260202
+    image: couchbasebuild/sdk-ubuntu20-build:20260316
     environment:
       - "JENKINS_SLAVE_NAME=build-ubuntu20"
       - "JENKINS_SLAVE_LABELS=sdk ubuntu20 ubuntu20.04"
@@ -207,7 +207,7 @@ services:
     <<: *default-jenkins-two-agent
 
   centos7-signing:
-    image: couchbasebuild/sdk-centos7-signing:20260202
+    image: couchbasebuild/sdk-centos7-signing:20260316
     environment:
       - "JENKINS_SLAVE_NAME=build-centos7-signing"
       - "JENKINS_SLAVE_LABELS=centos7-signing"

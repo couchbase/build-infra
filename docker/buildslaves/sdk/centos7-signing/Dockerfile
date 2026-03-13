@@ -27,15 +27,17 @@ RUN sed -ri 's/^hosts.*/hosts:      files dns/' /etc/nsswitch.conf
 RUN yum install --setopt=keepcache=0 -y \
                 git rpm-sign createrepo expect
 
-# JDK for Jenkins.
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -L https://github.com/AdoptOpenJDK/openjdk17-binaries/releases/download/jdk-2021-05-07-13-31/OpenJDK-jre_x64_linux_hotspot_2021-05-06-23-30.tar.gz -o openjre.tar.gz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/openjre.tar.gz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
+# Install uv and cbdep to /usr/local/bin
+# And add /usr/local/bin/ to PATH
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep \
+    && chmod a+x /usr/local/bin/cbdep
+RUN echo -n ":/usr/local/bin" >> /etc/path
+
+# Use cbdep to install jdk for Jenkins
+ARG JDK_VERSION=21.0.6+7
+RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
@@ -46,13 +48,6 @@ RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
 RUN mkdir /opt/cbdeps && \
     chown couchbase:couchbase /opt/cbdeps && \
     chmod 755 /opt/cbdeps
-
-# Install uv and cbdep to /usr/local/bin
-# And add /usr/local/bin/ to PATH
-RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
-RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep \
-    && chmod a+x /usr/local/bin/cbdep
-RUN echo "/usr/local/bin" >> /etc/path
 
 # Enable disk/memory healthchecks
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

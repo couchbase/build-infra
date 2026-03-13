@@ -63,15 +63,17 @@ RUN groupadd -g1000 couchbase && \
 # Dev basic tools
 RUN yum groupinstall -y "Development Tools"
 
-# JRE for Jenkins.
-RUN mkdir /tmp/deploy && \
-    cd /tmp/deploy && \
-    curl -Lf https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.5%2B8/OpenJDK17U-jre_x64_linux_hotspot_17.0.5_8.tar.gz -o openjre.tar.gz && \
-    cd /usr/local && \
-    tar xvzf /tmp/deploy/openjre.tar.gz && \
-    ln -s jdk* java && \
-    for file in /usr/local/java/bin/*; do ln -s $file /usr/local/bin; done && \
-    rm -rf /tmp/deploy
+# Install uv and cbdep to /usr/local/bin
+# And add /usr/local/bin/ to PATH
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep \
+    && chmod a+x /usr/local/bin/cbdep
+RUN echo -n ":/usr/local/bin" >> /etc/path
+
+# Install JDK for Jenkins using cbdep
+ARG JDK_VERSION=21.0.6+7
+RUN cbdep install -d /usr/local openjdk ${JDK_VERSION} \
+    && for file in /usr/local/openjdk-${JDK_VERSION}/bin/*; do ln -s $file /usr/local/bin; done
 
 # Repo
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo \
@@ -119,13 +121,6 @@ ARG GCC_VER_PATCH
 COPY --from=gcc /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH} /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}
 RUN ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/gcc /usr/local/bin/gcc${GCC_VER_MAJOR} && \
     ln -sf /opt/gcc-${GCC_VER_MAJOR}.${GCC_VER_MINOR}.${GCC_VER_PATCH}/bin/g++ /usr/local/bin/g++${GCC_VER_MAJOR}
-
-# Install uv and cbdep to /usr/local/bin
-# And add /usr/local/bin/ to PATH
-RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
-RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep \
-    && chmod a+x /usr/local/bin/cbdep
-RUN echo "/usr/local/bin" >> /etc/path
 
 # Enable disk/memory healthchecks
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh

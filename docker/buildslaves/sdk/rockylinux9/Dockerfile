@@ -115,6 +115,10 @@ RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /us
     && chmod a+x /usr/local/bin/cbdep
 RUN echo "/usr/local/bin" >> /etc/path
 
+# Set Java 21 as the default java version
+RUN alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-21*/bin/java 2000
+RUN alternatives --set java /usr/lib/jvm/java-21-openjdk-21*/bin/java
+
 # Enable disk/memory healthchecks
 COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
 HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh

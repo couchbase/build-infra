@@ -26,7 +26,7 @@ RUN set -x \
                               devscripts \
                               git \
                               lsb-release \
-                              openjdk-17-jre-headless \
+                              openjdk-21-jre-headless \
                               reprepro \
                               sudo \
                               tar \

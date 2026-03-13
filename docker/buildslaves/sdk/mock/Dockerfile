@@ -1,6 +1,6 @@
 # Docker container for Centos8
 
-FROM couchbasebuild/sdk-almalinux8-build:20230726
+FROM couchbasebuild/sdk-almalinux8-build:20260203
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
