@@ -54,6 +54,7 @@
           - pass
           - python
           - pyinstaller
+          - ruby@3.4
           - ssh-copy-id
           - wget
 
@@ -63,15 +64,13 @@
         dest: "{{ homebrew_dir }}/bin/python"
         state: link
 
-    - name: Set energy saving to zero
-      ansible.builtin.shell: systemsetup -setcomputersleep Never
-      become: true
-
-    - name: Set user screensaver
-      ansible.builtin.shell: defaults -currentHost write com.apple.screensaver idleTime 5
-
-    - name: Disable logon screensaver
-      ansible.builtin.shell: defaults -currentHost write com.apple.screensaver loginWindowIdleTime 0
+    - name: Disable all sleep and screensaver timeouts
+      ansible.builtin.shell: |
+        systemsetup -setcomputersleep Never
+        systemsetup -setdisplaysleep Never
+        systemsetup -setharddisksleep Never
+        defaults -currentHost write com.apple.screensaver idleTime -int 0
+        defaults write /Library/Preferences/com.apple.screensaver loginWindowIdleTime -int 0
       become: true
 
     - name: Add .zshenv
@@ -82,22 +81,15 @@
         group: staff
         mode: "0644"
 
-    # Required for CBL iOS unittest
-    # jazzy, xcpretty, and slather are required gems.
-    # The rest are dependent gems.
-    # Mac comes w/ an older ruby, which is not compatible with latest dependent gems.
-    - name: Install gems with specific versions
-      community.general.gem:
-        name: "{{ item.name }}"
-        version: "{{ item.version }}"
+    # Required for CBL iOS
+    - name: Install latest stable gems
+      ansible.builtin.shell: "{{ homebrew_dir }}/bin/gem install {{ item }} --no-document"
+      args:
+        executable: /bin/bash
       loop:
-        - { name: securerandom, version: "0.3.2" }
-        - { name: drb, version: "2.0.6" }
-        - { name: zeitwerk, version: "2.6.18" }
-        - { name: activesupport, version: " 6.1.7.10" }
-        - { name: jazzy, version: "0.14.0" }
-        - { name: xcpretty, version: "0.3.0" }
-        - { name: slather, version: "2.7.2" }
+        - jazzy
+        - xcpretty
+        - slather
 
     - name: Create .ssh directory
       ansible.builtin.file:
@@ -160,14 +152,6 @@
       ansible.builtin.file:
         path: "/Users/{{ ansible_ssh_user }}/jenkins"
         state: directory
-
-    - name: Install jenkins startup script
-      ansible.builtin.template:
-        src: ./files/jnlp.sh.j2
-        dest: "/Users/{{ ansible_ssh_user }}/jenkins/jnlp.sh"
-        owner: "{{ ansible_ssh_user }}"
-        group: staff
-        mode: "0755"
 
     - name: Write secret file
       ansible.builtin.shell: "echo {{ jenkins_jnlp_secret }} > /Users/{{ ansible_ssh_user }}/jenkins/secret-file"
