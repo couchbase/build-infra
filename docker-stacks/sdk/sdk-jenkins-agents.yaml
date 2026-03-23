@@ -11,7 +11,11 @@ version: '3.8'
 # https://medium.com/@kinghuang/docker-compose-anchors-aliases-extensions-a1e4105d70bd
 x-default-jenkins-two-agent: &default-jenkins-two-agent
   init: true
+  stop_grace_period: 60m
   deploy:
+    resources:
+      reservations:
+        memory: 8G
     placement:
       constraints:
         - node.labels.role==build
@@ -49,7 +53,11 @@ x-default-jenkins-two-agent: &default-jenkins-two-agent
 # Single-replica agent configuration.
 x-default-jenkins-one-agent: &default-jenkins-one-agent
   init: true
+  stop_grace_period: 60m
   deploy:
+    resources:
+      reservations:
+        memory: 16G
     placement:
       constraints:
         - node.labels.role==build

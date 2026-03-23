@@ -13,7 +13,12 @@ services:
       - "JENKINS_SLAVE_NAME=clamav"
       - "JENKINS_SLAVE_LABELS=clamav"
       - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
+    stop_grace_period: 60m
     deploy:
+      resources:
+        reservations:
+          # Nodes have 20GB RAM
+          memory: 8G
       placement:
         constraints:
           - node.labels.role==build

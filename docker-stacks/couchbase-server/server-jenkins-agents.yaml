@@ -23,6 +23,7 @@ x-default-jenkins-secrets: &default-jenkins-secrets
 # Use this one for an agent with one replica - any of the agents only
 # servicing cheshire-cat and earlier builds
 x-default-jenkins-one-agent: &default-jenkins-one-agent
+  stop_grace_period: 60m
   deploy:
     resources:
       limits:
@@ -42,6 +43,7 @@ x-default-jenkins-one-agent: &default-jenkins-one-agent
 # Use this one for an agent with *zero* replicas - any of the agents
 # only servicing mad-hatter or older builds
 x-default-jenkins-zero-agent: &default-jenkins-zero-agent
+  stop_grace_period: 60m
   deploy:
     resources:
       limits:
@@ -182,10 +184,11 @@ services:
       - type: bind
         source: /home/couchbase/.docker/config.json
         target: /home/couchbase/.docker/config.json
+    stop_grace_period: 60m
     deploy:
       resources:
         reservations:
-          memory: 28GB
+          memory: 12G
       placement:
         constraints:
           - node.labels.role==monster
@@ -251,6 +254,7 @@ services:
         target: /run/secrets/jenkins_password
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profiledata_ssh_key
+    stop_grace_period: 60m
     deploy:
       resources:
         reservations:
@@ -277,6 +281,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
+    stop_grace_period: 60m
     deploy:
       resources:
         reservations:

@@ -15,6 +15,7 @@ x-default-jenkins-agent: &default-jenkins-agent
     - "host.docker.internal:host-gateway"
   sysctls:
     net.ipv6.conf.lo.disable_ipv6: 0
+  stop_grace_period: 60m
 
   configs:
     - source: jenkins_master_username
@@ -69,11 +70,14 @@ services:
 
     <<: *default-jenkins-agent
     deploy:
+      resources:
+        reservations:
+          memory: 8G
       placement:
         constraints:
           - "node.labels.cvtype==ubuntu18"
         max_replicas_per_node: 1
-      replicas: 15
+      replicas: 6
       update_config:
         parallelism: 100
 

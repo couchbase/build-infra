@@ -80,12 +80,15 @@ function remove_workspaces {
 }
 
 # This isn't really a "healthcheck" as we'll shoot ourselves in the head
-# if it fails twice in a row.
-if node_online; then
-    rm -f ${SWARM_AGENT_DIR}/node-offline
-else
-    test -e ${SWARM_AGENT_DIR}/node-offline && sudo kill -9 1
-    touch ${SWARM_AGENT_DIR}/node-offline
+# if it fails twice in a row. Skip this check if we're draining, since
+# we intentionally marked the node offline.
+if [ ! -f ${SWARM_AGENT_DIR}/jenkins_agent_stop_requested ]; then
+    if node_online; then
+        rm -f ${SWARM_AGENT_DIR}/node-offline
+    else
+        test -e ${SWARM_AGENT_DIR}/node-offline && sudo kill -9 1
+        touch ${SWARM_AGENT_DIR}/node-offline
+    fi
 fi
 
 # Likewise, not a healthcheck. Shoot the agent in the head if we've been

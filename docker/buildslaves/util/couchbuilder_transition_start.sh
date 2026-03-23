@@ -206,6 +206,14 @@ command -v gpg >/dev/null 2>&1 && {
     keepalive() {
       echo "Agent ${AGENT_NAME} stop requested!"
       sudo touch /var/run/jenkins_agent_stop_requested
+
+      # Mark the agent temporarily offline in Jenkins to prevent new jobs
+      # from being scheduled while we wait for current jobs to finish
+      curl --silent --fail -X POST \
+          -u "${jenkins_user}:$(cat /run/secrets/jenkins_master_password)" \
+          -d "offlineMessage=Agent+draining+for+update" \
+          "${JENKINS_MASTER}/computer/${AGENT_NAME}/toggleOffline" || true
+
       /usr/sbin/healthcheck.sh
     }
     trap keepalive TERM
