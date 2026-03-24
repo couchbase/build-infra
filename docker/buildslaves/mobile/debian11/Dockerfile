@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     git \
     jq \
     lld-19 \
+    locales \
     make \
     ninja-build \
     openssh-client \
