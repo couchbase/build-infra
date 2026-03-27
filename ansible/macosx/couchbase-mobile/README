@@ -5,8 +5,9 @@ Prereq
 1. Setup a mac agent on mobile jenkins https://mobile.jenkins.couchbase.com using JNLP connection.
    Make a note of the agent's name and jnlp secret. These are required when running the ansible
    command at step 6 & 7.
-2. Create a new Mac VM and install appropriate version of xcode as needed. VM ova and iso might be
-   available on latestbuild. If not, it will need to be downloaded from https://developer.apple.com
+
+2. Create a new Mac VM and install appropriate version of XCode as needed. Xcode and IPSW may be
+   available on https://latestbuilds.service.couchbase.com/buildteam/downloads.
 
 Deploy tools via ansible
 
@@ -29,11 +30,11 @@ Deploy tools via ansible
 
 NOTES:
 
-- Starting from xcode 16.3, Xcode Test Manager requires GUI access.
-  Jenkins agent must be launched from a GUI session:
+- Xcode Test Manager and full keychain access requires GUI session
+  Jenkins agent must be launched from a GUI shell:
   - connect to VM via vnc
   - open a terminal window
   - cd ~/jenkins; ./jnlp.sh
 
-  It is possible to automate this by adding jnlp.sh as a login item. However, performance
+  It is possible to automate this by launching jnlp.sh as a LaunchAgent plist. However, performance
   is noticeably degraded.

@@ -81,6 +81,24 @@
         group: staff
         mode: "0644"
 
+    - name: Symlink .zshenv as .bashrc/.zshrc/.bash_profile
+      file:
+        src: "/Users/{{ ansible_ssh_user }}/.zshenv"
+        dest: "/Users/{{ ansible_ssh_user }}/{{ item }}"
+        state: link
+      with_items:
+        - .zshrc
+        - .bashrc
+        - .bash_profile
+
+    - name: Install jenkins startup script
+      ansible.builtin.template:
+        src: ./files/jnlp.sh.j2
+        dest: "/Users/{{ ansible_ssh_user }}/jenkins/jnlp.sh"
+        owner: "{{ ansible_ssh_user }}"
+        group: staff
+        mode: "0755"
+
     # Required for CBL iOS
     - name: Install latest stable gems
       ansible.builtin.shell: "{{ homebrew_dir }}/bin/gem install {{ item }} --no-document"
@@ -157,10 +175,16 @@
       ansible.builtin.shell: "echo {{ jenkins_jnlp_secret }} > /Users/{{ ansible_ssh_user }}/jenkins/secret-file"
 
     - name: Enable autologin for couchbase user
+      become: yes
       ansible.builtin.shell: |
-        sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser {{ ansible_ssh_user }}
+        defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "{{ ansible_ssh_user }}"
       args:
         executable: /bin/bash
+
+    - name: Run autologin setup script
+      become: yes
+      ansible.builtin.script:
+        cmd: "./files/autologin.py --username {{ ansible_ssh_user }} --password {{ ansible_ssh_pass }}"
 
     - name: Create Keychain Profile for Notarization
       ansible.builtin.shell: |
