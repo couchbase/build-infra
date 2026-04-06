@@ -32,6 +32,7 @@ mega4-34   ansible_host=172.23.97.147  labels=role=docker-buildx
 monster-01 ansible_host=172.23.113.9   labels=role=monster
 monster-02 ansible_host=172.23.113.29  labels=role=monster
 monster-03 ansible_host=172.23.112.4   labels=role=monster
+monster-04 ansible_host=172.23.113.31  labels=role=monster
 mega4-35   ansible_host=172.23.105.183 labels=role=build manager=true
 mega4-36   ansible_host=172.23.106.70  labels=role=build
 mega4-37   ansible_host=172.23.106.117 labels=role=build
