@@ -3,7 +3,7 @@
 # under /opt/homebrew on M1
 export PATH=/usr/local/bin:$PATH
 if [ -d "/opt/homebrew" ]; then
-  export PATH=/opt/homebrew/bin:$PATH
+  export PATH=/opt/homebrew/bin:/opt/homebrew/lib/ruby/gems/3.4.0/bin:$PATH
 fi
 
 # Make Homebrew’s completions available in zsh
