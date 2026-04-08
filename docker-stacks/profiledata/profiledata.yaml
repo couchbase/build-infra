@@ -362,7 +362,7 @@ services:
       #################################
       # couchbase-server/buildx/linux #
       #################################
-      - source: profiledata.docker_config.dockerio_ghcrio_rhcc.20230828
+      - source: profiledata.docker_config.dhiio_dockerio_ghcrio_rhcc.20260408
         target: /home/couchbase/couchbase-server/buildx/linux/.docker/config.json
         mode: 0600
         uid: "901"
@@ -370,7 +370,7 @@ services:
       ################################
       # couchbase-server/zz/linux    #
       ################################
-      - source: profiledata.docker_config.dockerio_ghcrio_rhcc.20230828
+      - source: profiledata.docker_config.dhiio_dockerio_ghcrio_rhcc.20260408
         target: /home/couchbase/couchbase-server/zz/linux/.docker/config.json
         mode: 0600
         uid: "901"
@@ -519,6 +519,11 @@ services:
       #############################
       # couchbase-server/cv/linux #
       #############################
+      - source: profiledata.docker_config.dhiio_dockerio_ghcrio_rhcc.20260408
+        target: /home/couchbase/couchbase-server/cv/linux/.docker/config.json
+        mode: 0600
+        uid: "901"
+        gid: "901"
       - source: profiledata.ssh_privkey.buildbot_id_dsa.20220225
         target: /home/couchbase/couchbase-server/cv/linux/.ssh/buildbot_id_dsa
         mode: 0600
@@ -792,6 +797,8 @@ secrets:
   profiledata.ssh_host_pubkey.ssh_host_rsa_key.20200417:
     external: true
   # docker configs
+  profiledata.docker_config.dhiio_dockerio_ghcrio_rhcc.20260408:
+    external: true
   profiledata.docker_config.dockerio_ghcrio_rhcc.20230828:
     external: true
   profiledata.docker_config.dockerio.20230828:

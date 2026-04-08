@@ -177,6 +177,17 @@ resource "aws_ssm_parameter" "couchbase_server_cv_linux_ssh_config" {
     Encoding = "none"
   }
 }
+resource "aws_ssm_parameter" "couchbase_server_cv_linux_docker_config" {
+  name  = "jenkins-worker__cv__.docker__config.json"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/cv/linux/.docker/config.json")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "cv"
+    Encoding = "none"
+  }
+}
 
 ##########
 # Server #
