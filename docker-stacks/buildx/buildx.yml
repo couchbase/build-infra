@@ -37,12 +37,7 @@ services:
         mode: 0600
         uid: "1000"
         gid: "1000"
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          # Nodes have 16GB RAM
-          memory: 4G
       placement:
         constraints:
           - node.labels.role==docker-buildx

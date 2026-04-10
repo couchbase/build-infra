@@ -61,14 +61,6 @@ install_healthcheck swarm
 keepalive() {
     echo "Agent ${AGENT_NAME} stop requested!"
     sudo touch ${SWARM_AGENT_DIR}/jenkins_agent_stop_requested
-
-    # Mark the agent temporarily offline in Jenkins to prevent new jobs
-    # from being scheduled while we wait for current jobs to finish
-    curl --silent --fail -X POST \
-        -u "$(cat /run/secrets/jenkins_username):$(cat /run/secrets/jenkins_password)" \
-        -d "offlineMessage=Agent+draining+for+update" \
-        "${JENKINS_URL}/computer/${AGENT_NAME}/toggleOffline" || true
-
     /tmp/healthcheck.sh
 }
 trap keepalive TERM

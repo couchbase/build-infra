@@ -31,7 +31,6 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
       placement:
         constraints:
@@ -65,11 +64,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -102,11 +97,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -139,11 +130,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -176,11 +163,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -213,11 +196,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -246,11 +225,7 @@ services:
       - source: mobile_jenkins_ns-buildbot_api_key.20220510
         target: /run/secrets/jenkins_master_password
         mode: 0444
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -284,11 +259,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -322,11 +293,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -373,11 +340,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profile_sync
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -427,11 +390,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profiledata_ssh_key
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 8G
       placement:
         constraints:
           - node.labels.role==build
@@ -481,11 +440,7 @@ services:
         mode: 0444
       - source: profiledata.ssh_privkey.profile_sync.20200423
         target: /run/secrets/profiledata_ssh_key
-    stop_grace_period: 60m
     deploy:
-      resources:
-        reservations:
-          memory: 12G
       placement:
         constraints:
           - node.labels.role==dfs

@@ -101,15 +101,12 @@ function remove_workspaces {
 }
 
 # This isn't really a "healthcheck" as we'll shoot ourselves in the head
-# if it fails twice in a row. Skip this check if we're draining, since
-# we intentionally marked the node offline.
-if [ ! -f /var/run/jenkins_agent_stop_requested ]; then
-    if node_online; then
-        rm -f /var/run/node-offline
-    else
-        test -e /var/run/node-offline && sudo kill -9 1
-        touch /var/run/node-offline
-    fi
+# if it fails twice in a row.
+if node_online; then
+    rm -f /var/run/node-offline
+else
+    test -e /var/run/node-offline && sudo kill -9 1
+    touch /var/run/node-offline
 fi
 
 # Likewise, not a healthcheck. Shoot the agent in the head if we've been
