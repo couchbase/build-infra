@@ -37,6 +37,11 @@ RUN set -x \
     && apt-get -y install python3 python3-dev python3-venv python3-pip \
     && apt-get clean
 
+# Install yq
+RUN ARCH=$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/') \
+    && curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH} -o /usr/local/bin/yq \
+    && chmod +x /usr/local/bin/yq
+
 # Set LANG
 ENV LANG=en_US.UTF-8
 

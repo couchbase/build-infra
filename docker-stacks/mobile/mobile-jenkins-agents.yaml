@@ -68,7 +68,7 @@ services:
       placement:
         constraints:
           - node.labels.role==build
-      replicas: 2
+      replicas: 1
       update_config:
         parallelism: 1000
     networks:
@@ -108,7 +108,7 @@ services:
       - jenkins
 
   lite-android-ubuntu24:
-    image: couchbasebuild/ubuntu2404-mobile-lite-android:20260311
+    image: couchbasebuild/ubuntu2404-mobile-lite-android:20260410
     init: true
     user: couchbase
     environment:
@@ -134,7 +134,7 @@ services:
       placement:
         constraints:
           - node.labels.role==build
-      replicas: 1
+      replicas: 2
       update_config:
         parallelism: 1000
     networks:
