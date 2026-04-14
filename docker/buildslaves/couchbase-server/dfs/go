@@ -57,16 +57,24 @@ docker buildx build ${ACTION} --pull \
   --build-arg ASCIIDOCTOR_VERSION=${ASCIIDOCTOR_VERSION} \
   --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg DOCKER_VERSION=${DOCKER_VERSION} \
   --build-arg GCC_15_VERSION=${GCC_15_VERSION} \
   --build-arg GCC_15_TAG=${GCC_15_TAG} \
+  --build-arg GDB_VERSION=${GDB_VERSION} \
   --build-arg JDK_VERSION=${JDK_VERSION} \
   --build-arg JQ_VERSION=${JQ_VERSION} \
+  --build-arg LIBARCHIVE_VERSION=${LIBARCHIVE_VERSION} \
   --build-arg LIBXML2_VERSION=${LIBXML2_VERSION} \
+  --build-arg LIBXSLT_VERSION=${LIBXSLT_VERSION} \
   --build-arg LIBYAML_VERSION=${LIBYAML_VERSION} \
   --build-arg LIBXXHASH_VERSION=${LIBXXHASH_VERSION} \
+  --build-arg PATCHELF_VERSION=${PATCHELF_VERSION} \
+  --build-arg PIXZ_VERSION=${PIXZ_VERSION} \
   --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
   --build-arg RSYNC_VERSION=${RSYNC_VERSION} \
   --build-arg RUBY_VERSION=${RUBY_VERSION} \
+  --build-arg STRACE_VERSION=${STRACE_VERSION} \
+  --build-arg UNZIP_VERSION=${UNZIP_VERSION} \
   --build-arg VIM_VERSION=${VIM_VERSION} \
   --build-arg YQ_VERSION=${YQ_VERSION} \
   .

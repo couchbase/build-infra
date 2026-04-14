@@ -1,6 +1,12 @@
 # CV container based on linux-dfs
 
-FROM couchbasebuild/server-builder:20260302 AS base
+ARG CLANG_18_VERSION
+ARG CLANG_19_VERSION
+ARG CLANG_TAG
+FROM couchbasebuild/dfs-clang:${CLANG_18_VERSION}-${CLANG_TAG} AS clang18
+FROM couchbasebuild/dfs-clang:${CLANG_19_VERSION}-${CLANG_TAG} AS clang19
+
+FROM couchbasebuild/server-builder:20260413 AS base
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
@@ -10,58 +16,6 @@ ARG GNU_MIRROR=https://mirrors.ocf.berkeley.edu/gnu
 ARG tmpsrc=/tmp/deploy
 ARG PARALLELISM=8
 WORKDIR ${tmpsrc}
-
-FROM base AS gdb_build
-ARG GDB_VERSION
-
-# GDB is required, amongst other things, for tests that ensure that
-# crash minidump files are readable. It would be quite bad to discover
-# that we were unable to load a crash minidump file from a customer.
-
-RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
-    && curl -L ${GNU_MIRROR}/gdb/gdb-${GDB_VERSION}.tar.xz | tar -xJf - --strip-components=1 \
-    && cd ${tmpsrc} \
-    && ./configure --prefix=/opt/gdb --with-system-readline --with-system-zlib \
-    && make -j${PARALLELISM} \
-    && make install
-
-FROM base AS clang_build
-ARG CLANG_18_VERSION
-ARG CLANG_19_VERSION
-
-# Clang is used by a variety of KV and Magma tests.
-# don't use tmpfs as it's too big.
-
-COPY <<'EOF' /tmp/build-clang.sh
-#!/bin/bash -ex
-VERSION=$1
-GCC_VERSION=$2
-GCC_DIR="gcc-${GCC_VERSION}"
-curl -L https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${VERSION}.tar.gz | tar -xzf - --strip-components=1
-cmake -S llvm -B build -G Ninja \
-    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/opt/clang-${VERSION} \
-    -DLLVM_PARALLEL_LINK_JOBS=3 \
-    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
-    -DLLVM_INCLUDE_TESTS=Off \
-    -DCLANG_INCLUDE_TESTS=Off \
-    -DLLVM_INCLUDE_EXAMPLES=Off \
-    -DCLANG_BUILD_EXAMPLES=Off \
-    -DCLANG_INCLUDE_DOCS=Off \
-    -DLLVM_BUILD_DOCS=Off
-cmake --build build -j${PARALLELISM}
-cmake --install build
-rm -rf ${tmpsrc}/*
-ln -s /opt/clang-${VERSION}/bin/clang++ /opt/clang-${VERSION}/bin/clang++-$(echo $VERSION | cut -d. -f1)
-printf '%s\n' "--gcc-toolchain=/opt/${GCC_DIR}" "-L/opt/${GCC_DIR}/lib" "-L/opt/${GCC_DIR}/lib64" "-Wl,-rpath,/opt/${GCC_DIR}/lib" "-Wl,-rpath,/opt/${GCC_DIR}/lib64" > /opt/clang-${VERSION}/bin/clang.cfg
-ln -s clang.cfg /opt/clang-${VERSION}/bin/clang++.cfg
-EOF
-
-RUN chmod +x /tmp/build-clang.sh \
-    && /tmp/build-clang.sh ${CLANG_18_VERSION} 13.2.0 \
-    && /tmp/build-clang.sh ${CLANG_19_VERSION} 15.2.0 \
-    && rm /tmp/build-clang.sh
 
 FROM base AS final
 
@@ -95,20 +49,28 @@ RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
 ARG XMLSEC_VERSION
 RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
     && curl -L https://github.com/lsh123/xmlsec/releases/download/${XMLSEC_VERSION}/xmlsec1-${XMLSEC_VERSION}.tar.gz | tar -xzf - --strip-components=1 \
-    && ./configure --prefix=/usr \
+    && CFLAGS="-Wno-error=discarded-qualifiers" ./configure --prefix=/usr \
     && make -j${PARALLELISM} \
     && make install
 
-COPY --from=gdb_build /opt/gdb /opt/gdb
+# gdb is built here to avoid bundling it with dfs-clang images.
+ARG GDB_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -L ${GNU_MIRROR}/gdb/gdb-${GDB_VERSION}.tar.xz | tar -xJf - --strip-components=1 \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/opt/gdb --with-system-readline --with-system-zlib \
+    && make -j${PARALLELISM} \
+    && make install
+
 ENV PATH=/opt/gdb/bin:$PATH
 RUN echo -n ":/opt/gdb/bin" >> /etc/path
 
 ARG CLANG_18_VERSION
 ARG CLANG_19_VERSION
-COPY --from=clang_build /opt/clang-${CLANG_18_VERSION} /opt/clang-${CLANG_18_VERSION}
-COPY --from=clang_build /opt/clang-${CLANG_19_VERSION} /opt/clang-${CLANG_19_VERSION}
+COPY --from=clang18 /opt/clang-${CLANG_18_VERSION} /opt/clang-${CLANG_18_VERSION}
+COPY --from=clang19 /opt/clang-${CLANG_19_VERSION} /opt/clang-${CLANG_19_VERSION}
 ENV PATH=/opt/clang-${CLANG_19_VERSION}/bin:/opt/clang-${CLANG_18_VERSION}/bin:$PATH
-RUN echo -n ":/opt/clang-${CLANG_18_VERSION}/bin:/opt/clang-${CLANG_19_VERSION}/bin" >> /etc/path
+RUN echo -n ":/opt/clang-${CLANG_19_VERSION}/bin:/opt/clang-${CLANG_18_VERSION}/bin" >> /etc/path
 
 USER couchbase
 WORKDIR /home/couchbase

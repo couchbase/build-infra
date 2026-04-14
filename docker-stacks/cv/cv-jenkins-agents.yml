@@ -116,7 +116,7 @@ services:
         parallelism: 1000
         delay: 0s
 
-  small_glibc217:
+  glibc217_small:
     image: couchbasebuild/server-linux-cv:20260212
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-glibc217-small"
@@ -143,8 +143,8 @@ services:
         parallelism: 100
         delay: 0s
 
-  small_glibc228:
-    image: couchbasebuild/server-builder-cv:20260302
+  glibc228_small:
+    image: couchbasebuild/server-builder-cv:20260413
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-small"
@@ -196,7 +196,7 @@ services:
         parallelism: 100
         delay: 0s
 
-  large_glibc217:
+  glibc217_large:
     image: couchbasebuild/server-linux-cv:20260212
     environment:
       - "JENKINS_SLAVE_NAME=cv-linux-glibc217-large"
@@ -221,8 +221,8 @@ services:
         parallelism: 1000
         delay: 0s
 
-  large_glibc228:
-    image: couchbasebuild/server-builder-cv:20260302
+  glibc228_large:
+    image: couchbasebuild/server-builder-cv:20260413
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-large"

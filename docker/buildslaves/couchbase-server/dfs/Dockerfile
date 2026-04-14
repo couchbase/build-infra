@@ -3,7 +3,7 @@ ARG GCC_15_TAG=${GCC_15_TAG:-20251210}
 
 FROM couchbasebuild/dfs-gcc:${GCC_15_VERSION}-${GCC_15_TAG} AS gcc15
 
-FROM couchbasebuild/dfs:20250925
+FROM couchbasebuild/dfs:20260413
 LABEL maintainer="build-team@couchbase.com"
 
 ARG TARGETARCH
@@ -89,14 +89,49 @@ RUN set -x \
     && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH} \
     && chmod a+x /usr/local/bin/yq
 
+# unzip
+ARG UNZIP_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://downloads.sourceforge.net/infozip/unzip${UNZIP_VERSION//./}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && make -f unix/Makefile generic -j${PARALLELISM} \
+    && install -m 0755 unzip /usr/bin/unzip
+
 # xmllint (libxml2)
 ARG LIBXML2_VERSION
 RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
-    && curl -LsSf https://download.gnome.org/sources/libxml2/2.14/libxml2-${LIBXML2_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
+    && curl -LsSf https://download.gnome.org/sources/libxml2/${LIBXML2_VERSION%.*}/libxml2-${LIBXML2_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
     && cd ${tmpsrc} \
     && ./configure --prefix=/usr --disable-static --without-python \
     && make -j${PARALLELISM} \
     && make install-strip
+
+# libxslt (depends on libxml2, required for building pyinstaller tools)
+ARG LIBXSLT_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://download.gnome.org/sources/libxslt/${LIBXSLT_VERSION%.*}/libxslt-${LIBXSLT_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --disable-static --without-python --with-libxml-prefix=/usr \
+    && make -j${PARALLELISM} \
+    && make install-strip
+
+# libarchive
+ARG LIBARCHIVE_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/libarchive/libarchive/releases/download/v${LIBARCHIVE_VERSION}/libarchive-${LIBARCHIVE_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --disable-static \
+    && make -j${PARALLELISM} \
+    && make install-strip
+
+# pixz (parallel xz compressor, needed for packaging)
+ARG PIXZ_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/vasi/pixz/releases/download/v${PIXZ_VERSION}/pixz-${PIXZ_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr \
+    && make -j${PARALLELISM} \
+    && make install
 
 # vim
 ARG VIM_VERSION
@@ -109,6 +144,34 @@ RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
     && make -j${PARALLELISM} \
     && make install \
     && ln -s /usr/bin/vim vi
+
+# patchelf
+ARG PATCHELF_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/NixOS/patchelf/archive/refs/tags/${PATCHELF_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./bootstrap.sh \
+    && ./configure --prefix=/usr \
+    && make -j${PARALLELISM} \
+    && make install
+
+# GDB
+ARG GDB_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --with-system-readline --with-system-zlib \
+    && make -j${PARALLELISM} \
+    && make install
+
+# strace
+ARG STRACE_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/strace/strace/releases/download/v${STRACE_VERSION}/strace-${STRACE_VERSION}.tar.xz | tar -xJ --strip-components=1 -C ${tmpsrc} \
+    && cd ${tmpsrc} \
+    && ./configure --prefix=/usr --disable-mpers \
+    && make -j${PARALLELISM} \
+    && make install
 
 # libyaml (required by Ruby psych gem - which is required by asciidoctor)
 ARG LIBYAML_VERSION
@@ -154,6 +217,13 @@ RUN curl -Lf https://packages.couchbase.com/patch_via_gerrit/patch_via_gerrit-li
 RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep && \
     chmod a+x /usr/local/bin/cbdep
 
+# awscli
+RUN set -x \
+    && curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf ./aws awscliv2.zip
+
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permissions / ownership.
 USER couchbase
@@ -171,6 +241,16 @@ RUN set -x \
     && cbdep install -d /usr/local openjdk ${JDK_VERSION} \
     && ln -s /usr/local/openjdk-${JDK_VERSION}/bin/java /usr/local/bin/java \
     && rm -rf /root/.cbdepcache /root/.local
+
+# Docker
+ENV DOCKER_API_VERSION=1.41
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+ARG DOCKER_VERSION
+RUN set -x \
+    && curl -Lf https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz \
+       | tar xz --strip-components=1 -C /usr/local/bin \
+    && for gid in {990..997}; do groupadd -g ${gid} docker${gid}; usermod -a -G docker${gid} couchbase; done
+RUN usermod -a -G 999 couchbase
 
 RUN localedef -c -i en_US -f UTF-8 en_US.UTF-8
 ENV LANG=en_US.UTF-8 \

@@ -357,8 +357,8 @@ RUN --mount=type=tmpfs,target=${LFS_SRC} \
     ${LFS_SCRIPTS}/8.5-glibc-pass3.sh
 
 # 8.6 zlib
-ARG ZLIB_VERSION=1.3.1
-ARG ZLIB_CHECKSUM=5e6af153311327e516690d300527ec9e
+ARG ZLIB_VERSION=1.3.2
+ARG ZLIB_CHECKSUM=be8a129ec5d60c5084911fd7ea16d84e
 COPY scripts/8.6-zlib.sh ${LFS_SCRIPTS}/8.6-zlib.sh
 RUN --mount=type=tmpfs,target=${LFS_SRC} \
     ${LFS_SCRIPTS}/8.6-zlib.sh

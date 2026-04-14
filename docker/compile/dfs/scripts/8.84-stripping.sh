@@ -21,6 +21,10 @@ for LIB in $debuglibs; do
     rm /tmp/$libname
 done
 
+# Libraries under /opt/gcc-* that we want to keep unstripped so that
+# we can get debug stack traces in production (see 8.29-gcc-pass3.sh).
+gcc_preserve="libstdc++ libgcc_s libgomp"
+
 # Blindly strip everything else
 for i in $(find /usr /opt -type f \! -name "*.dbg"); do
     case "$debuglibs" in
@@ -28,7 +32,14 @@ for i in $(find /usr /opt -type f \! -name "*.dbg"); do
             continue
             ;;
         *)
-            strip --strip-unneeded $i || true
+            # Don't strip preserved GCC runtime libraries
+            skip=false
+            case "$i" in /opt/gcc-*/lib/*)
+                for lib in $gcc_preserve; do
+                    case "$i" in */${lib}.so*) skip=true ;; esac
+                done
+            esac
+            $skip || strip --strip-unneeded $i || true
             ;;
     esac
 done
