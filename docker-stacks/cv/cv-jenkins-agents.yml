@@ -144,7 +144,7 @@ services:
         delay: 0s
 
   glibc228_small:
-    image: couchbasebuild/server-builder-cv:20260413
+    image: couchbasebuild/server-builder-cv:20260420
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-small"
@@ -216,13 +216,13 @@ services:
         constraints:
           - "node.labels.cvtype==linux-large"
         max_replicas_per_node: 1
-      replicas: 7
+      replicas: 4
       update_config:
         parallelism: 1000
         delay: 0s
 
   glibc228_large:
-    image: couchbasebuild/server-builder-cv:20260413
+    image: couchbasebuild/server-builder-cv:20260420
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-large"
@@ -269,7 +269,7 @@ services:
         constraints:
           - "node.labels.cvtype==linux-large"
         max_replicas_per_node: 1
-      replicas: 7
+      replicas: 10
       update_config:
         parallelism: 1000
         delay: 0s

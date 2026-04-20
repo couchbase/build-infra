@@ -3,7 +3,7 @@ ARG GCC_15_TAG=${GCC_15_TAG:-20251210}
 
 FROM couchbasebuild/dfs-gcc:${GCC_15_VERSION}-${GCC_15_TAG} AS gcc15
 
-FROM couchbasebuild/dfs:20260413
+FROM couchbasebuild/dfs:20260420
 LABEL maintainer="build-team@couchbase.com"
 
 ARG TARGETARCH

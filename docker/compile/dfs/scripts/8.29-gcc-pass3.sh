@@ -40,7 +40,9 @@ cd build
              --disable-multilib       \
              --disable-bootstrap      \
              --disable-fixincludes    \
-             --with-system-zlib
+             --with-system-zlib       \
+             LDFLAGS='-Wl,--build-id' \
+             LDFLAGS_FOR_TARGET='-Wl,--build-id'
 
 make -j${PARALLELISM}
 
