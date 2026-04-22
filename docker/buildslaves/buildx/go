@@ -3,13 +3,20 @@
 TAG=$(date +%Y%m%d)
 IMAGE=couchbasebuild/buildx
 
+CMAKE_VERSION=4.2.3
+
 mkdir -p build
 
 cp ../util/couchbuilder_transition_start.sh build/couchbuilder_start.sh
 cp ../util/hooks/buildx.sh build/buildx.sh
 cp ../util/swarm*.properties build
 
-docker build --platform linux/amd64 --progress=plain --pull -t ${IMAGE}:${TAG} .
+docker build \
+  --platform linux/amd64 \
+  --progress=plain \
+  --pull -t ${IMAGE}:${TAG} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
 then

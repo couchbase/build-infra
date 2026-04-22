@@ -7,7 +7,7 @@ services:
     # Historically, this was the agent used for
     # couchbase-k8s-microservice builds, so it still has
     # operator-specific Jenkins labels.
-    image: couchbasebuild/buildx:20260212
+    image: couchbasebuild/buildx:20260421
     user: couchbase
     environment:
       - "JENKINS_SLAVE_NAME=buildx"
@@ -41,7 +41,7 @@ services:
       placement:
         constraints:
           - node.labels.role==docker-buildx
-      replicas: 2
+      replicas: 3
       update_config:
         parallelism: 1000
 
@@ -58,6 +58,7 @@ secrets:
     external: true
 
 volumes:
+  workspace:
   latestbuilds:
     driver: local
     driver_opts:
