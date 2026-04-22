@@ -14,11 +14,11 @@ useradd  -c 'sshd PrivSep' \
          -u 50 sshd
 mkdir /run
 
-./configure --prefix=/usr                            \
-            --sysconfdir=/etc/ssh                    \
-            --with-privsep-path=/var/lib/sshd        \
-            --with-default-path=/usr/bin             \
-            --with-superuser-path=/usr/sbin:/usr/bin \
+./configure --prefix=/usr                               \
+            --sysconfdir=/etc/ssh                       \
+            --with-privsep-path=/var/lib/sshd           \
+            --with-default-path=/usr/local/bin:/usr/bin \
+            --with-superuser-path=/usr/sbin:/usr/bin    \
             --with-pid-dir=/run
 make -j${PARALLELISM}
 make install

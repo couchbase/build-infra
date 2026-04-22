@@ -6,7 +6,7 @@ ARG CLANG_TAG
 FROM couchbasebuild/dfs-clang:${CLANG_18_VERSION}-${CLANG_TAG} AS clang18
 FROM couchbasebuild/dfs-clang:${CLANG_19_VERSION}-${CLANG_TAG} AS clang19
 
-FROM couchbasebuild/server-builder:20260420 AS base
+FROM couchbasebuild/server-builder:20260421 AS base
 LABEL maintainer="build-team@couchbase.com"
 
 USER root
