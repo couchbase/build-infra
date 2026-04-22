@@ -144,7 +144,7 @@ services:
         delay: 0s
 
   glibc228_small:
-    image: couchbasebuild/server-builder-cv:20260420
+    image: couchbasebuild/server-builder-cv:20260422
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-small"
@@ -222,7 +222,7 @@ services:
         delay: 0s
 
   glibc228_large:
-    image: couchbasebuild/server-builder-cv:20260420
+    image: couchbasebuild/server-builder-cv:20260422
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-large"
