@@ -13,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     patchelf \
     rsync \
     sudo \
+    unzip \
     wget \
+    zip \
     zlib1g-dev \
     xz-utils \
     && rm -rf /var/lib/apt/lists/* \
