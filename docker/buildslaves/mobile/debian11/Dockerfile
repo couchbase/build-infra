@@ -24,6 +24,14 @@ RUN apt-get update && apt-get install -y \
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-19 100 && \
     update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-19 100
 
+# Install packages necessary to generate cbl-log rpm/deb
+RUN apt-get update && apt-get install -y \
+    rpm \
+    ruby-dev \
+    ruby-rubygems \
+    && apt-get clean
+RUN gem install fpm
+
 # Install repo command
 RUN curl -f https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo && \
     chmod a+x /usr/local/bin/repo
