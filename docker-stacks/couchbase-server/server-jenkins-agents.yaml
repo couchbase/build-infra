@@ -70,132 +70,6 @@ x-node-product:
 x-repo-url:
  - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
 services:
-  zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20260212
-    environment:
-      - "JENKINS_SLAVE_NAME=zz-lightweight"
-      - "JENKINS_SLAVE_LABELS=zz-lightweight"
-      - "JENKINS_SLAVE_EXECUTORS=10"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - "NODE_CLASS=build zz"
-      - *node-product
-      - *repo-url
-    volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "/etc/timezone:/etc/timezone"
-      - "latestbuilds:/latestbuilds"
-      - "releases:/releases"
-      - "buildteam:/buildteam"
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-    <<: *default-jenkins-one-agent
-
-  zzz-lightweight:
-    image: couchbasebuild/zzz-lightweight:20260212
-    init: true
-    environment:
-      - "JENKINS_SLAVE_NAME=zzz-lightweight"
-      - "JENKINS_SLAVE_LABELS=zzz-lightweight"
-      - "JENKINS_SLAVE_EXECUTORS=10"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - "NODE_CLASS=build zz"
-      - *node-product
-      - *repo-url
-    volumes:
-      - "latestbuilds:/latestbuilds"
-      - "releases:/releases"
-      - "buildteam:/buildteam"
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-    <<: *default-jenkins-one-agent
-
-  amzn2:
-    image: couchbasebuild/server-amzn2-build:20230317
-    environment:
-      - "JENKINS_SLAVE_NAME=server-amzn2"
-      - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat x86_64"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - *server-jenkins-node-class
-      - *node-product
-      - *repo-url
-    <<: *default-jenkins-one-agent
-
-  centos6:
-    image: couchbasebuild/server-centos6-build:20221204
-    environment:
-      - "JENKINS_SLAVE_NAME=server-centos6"
-      - "JENKINS_SLAVE_LABELS=server centos6 vulcan alice x86_64"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - *server-jenkins-node-class
-      - *node-product
-      - *repo-url
-      - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
-    <<: *default-jenkins-zero-agent
-
-  centos7:
-    image: couchbasebuild/server-centos7-build:20230214
-    environment:
-      - "JENKINS_SLAVE_NAME=server-centos7"
-      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat x86_64"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - *server-jenkins-node-class
-      - *node-product
-      - *repo-url
-    <<: *default-jenkins-one-agent
-
-  linux-single:
-    image: couchbasebuild/server-linux-build:20260212
-    environment:
-      - "JENKINS_SLAVE_NAME=server-linux"
-      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher x86_64"
-      - *server-jenkins-master
-      - *server-jenkins-tunnel
-      - *server-jenkins-node-class
-      - *node-product
-      - *repo-url
-    volumes:
-      - type: volume
-        source: serverbuild_optcouchbase
-        target: /opt/couchbase
-      - type: volume
-        source: workspace
-        target: /home/couchbase/jenkins/workspace
-      - type: volume
-        source: cbdepscache
-        target: /home/couchbase/.cbdepscache
-      - type: volume
-        source: cbdepcache
-        target: /home/couchbase/.cbdepcache
-      - type: volume
-        source: ccache
-        target: /home/couchbase/.ccache
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-      - type: bind
-        source: /home/couchbase/.docker/config.json
-        target: /home/couchbase/.docker/config.json
-    deploy:
-      resources:
-        reservations:
-          memory: 28GB
-      placement:
-        constraints:
-          - node.labels.role==monster
-      replicas: 2
-      update_config:
-        parallelism: 1000
-    networks:
-      - jenkins
-    <<: *default-jenkins-secrets
-
   # Newer "single linux" builder based on "Docker From Scratch", using glibc 2.28
   linux-builder:
     image: couchbasebuild/server-builder:20260421
@@ -264,6 +138,132 @@ services:
     networks:
       - jenkins
 
+  linux-single:
+    image: couchbasebuild/server-linux-build:20260212
+    environment:
+      - "JENKINS_SLAVE_NAME=server-linux"
+      - "JENKINS_SLAVE_LABELS=server python3 linux linux-asan all monster neo elixir morpheus trinity cypher x86_64"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - *server-jenkins-node-class
+      - *node-product
+      - *repo-url
+    volumes:
+      - type: volume
+        source: serverbuild_optcouchbase
+        target: /opt/couchbase
+      - type: volume
+        source: workspace
+        target: /home/couchbase/jenkins/workspace
+      - type: volume
+        source: cbdepscache
+        target: /home/couchbase/.cbdepscache
+      - type: volume
+        source: cbdepcache
+        target: /home/couchbase/.cbdepcache
+      - type: volume
+        source: ccache
+        target: /home/couchbase/.ccache
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /home/couchbase/.docker/config.json
+        target: /home/couchbase/.docker/config.json
+    deploy:
+      resources:
+        reservations:
+          memory: 28GB
+      placement:
+        constraints:
+          - node.labels.role==monster
+      replicas: 2
+      update_config:
+        parallelism: 1000
+    networks:
+      - jenkins
+    <<: *default-jenkins-secrets
+
+  zz-lightweight:
+    image: couchbasebuild/zz-lightweight:20260212
+    environment:
+      - "JENKINS_SLAVE_NAME=zz-lightweight"
+      - "JENKINS_SLAVE_LABELS=zz-lightweight"
+      - "JENKINS_SLAVE_EXECUTORS=10"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - "NODE_CLASS=build zz"
+      - *node-product
+      - *repo-url
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "/etc/timezone:/etc/timezone"
+      - "latestbuilds:/latestbuilds"
+      - "releases:/releases"
+      - "buildteam:/buildteam"
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    <<: *default-jenkins-one-agent
+
+  zzz-lightweight:
+    image: couchbasebuild/zzz-lightweight:20260212
+    init: true
+    environment:
+      - "JENKINS_SLAVE_NAME=zzz-lightweight"
+      - "JENKINS_SLAVE_LABELS=zzz-lightweight"
+      - "JENKINS_SLAVE_EXECUTORS=10"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - "NODE_CLASS=build zz"
+      - *node-product
+      - *repo-url
+    volumes:
+      - "latestbuilds:/latestbuilds"
+      - "releases:/releases"
+      - "buildteam:/buildteam"
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    <<: *default-jenkins-one-agent
+
+  amzn2:
+    image: couchbasebuild/server-amzn2-build:20230317
+    environment:
+      - "JENKINS_SLAVE_NAME=server-amzn2"
+      - "JENKINS_SLAVE_LABELS=server amzn2 alice mad-hatter cheshire-cat x86_64"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - *server-jenkins-node-class
+      - *node-product
+      - *repo-url
+    <<: *default-jenkins-zero-agent
+
+  centos6:
+    image: couchbasebuild/server-centos6-build:20221204
+    environment:
+      - "JENKINS_SLAVE_NAME=server-centos6"
+      - "JENKINS_SLAVE_LABELS=server centos6 vulcan alice x86_64"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - *server-jenkins-node-class
+      - *node-product
+      - *repo-url
+      - "JAVA_OPTS=-Djava.util.logging.config.file=/swarm-logging.properties"
+    <<: *default-jenkins-zero-agent
+
+  centos7:
+    image: couchbasebuild/server-centos7-build:20230214
+    environment:
+      - "JENKINS_SLAVE_NAME=server-centos7"
+      - "JENKINS_SLAVE_LABELS=server centos7 all vulcan alice mad-hatter cheshire-cat x86_64"
+      - *server-jenkins-master
+      - *server-jenkins-tunnel
+      - *server-jenkins-node-class
+      - *node-product
+      - *repo-url
+    <<: *default-jenkins-zero-agent
+
   # This is identical to the normal centos7 agent except it has a memory
   # reservation of 16GB, to ensure it doesn't get co-located with any
   # other server containers.
@@ -284,7 +284,7 @@ services:
       placement:
         constraints:
           - node.labels.role==build
-      replicas: 1
+      replicas: 0
       update_config:
         parallelism: 1000
     networks:
@@ -337,7 +337,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   debian10:
     image: couchbasebuild/server-debian10-build:20220114
@@ -349,7 +349,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   rhel8-alice:
     image: build-docker.couchbase.com/couchbasebuild/server-rhel8-build:20221204
@@ -386,7 +386,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   suse15-mad-hatter:
     image: couchbasebuild/server-suse15-mad-hatter-build:20221204
@@ -446,7 +446,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   ubuntu18-clang9:
     image: couchbasebuild/server-ubuntu18-clang9-build:20230524
@@ -458,7 +458,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   ubuntu20-clang9:
     image: couchbasebuild/server-ubuntu20-clang9-build:20220111
@@ -470,7 +470,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   ubuntu20:
     image: couchbasebuild/server-ubuntu20-build:20220527
@@ -483,7 +483,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
 configs:
   jenkins_master_username:
