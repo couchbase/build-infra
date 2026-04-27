@@ -119,7 +119,7 @@ Confirm the new expiry date and subject match expectations.
 Once all stacks are redeployed and verified, remove the old secrets:
 
 ```sh
-docker -H mega4.build.couchbase.com secret rm wildcard_build_couchbase_com_cert_20250516
+docker -H mega4.build.couchbase.com secret rm wildcard_build_couchbase_com_cert_20260427
 ```
 
 Old secrets cannot be removed while any service still references them.
