@@ -2,6 +2,7 @@ FROM couchbasebuild/zzz-lightweight:20260212
 LABEL maintainer=build-team@couchbase.com
 
 RUN apt-get update && apt-get install -y \
+    gettext-base \
     python3 \
     libxml2-utils \
     && apt-get clean \
@@ -22,6 +23,9 @@ USER root
 ARG CMAKE_VERSION
 RUN cbdep install -d /usr/local cmake ${CMAKE_VERSION} \
     && ln -s /usr/local/cmake-${CMAKE_VERSION}/bin/cmake /usr/local/bin/cmake
+
+ARG CONTAINER_TAG_ARG
+ENV CONTAINER_TAG=${CONTAINER_TAG_ARG}
 
 COPY build/couchbuilder_start.sh /usr/sbin/
 COPY build/swarm*.properties /

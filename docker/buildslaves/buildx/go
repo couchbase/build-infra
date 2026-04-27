@@ -16,6 +16,7 @@ docker build \
   --progress=plain \
   --pull -t ${IMAGE}:${TAG} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg CONTAINER_TAG_ARG=${IMAGE}:${TAG} \
   .
 docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
 if [ "$1" = "--publish" ]
