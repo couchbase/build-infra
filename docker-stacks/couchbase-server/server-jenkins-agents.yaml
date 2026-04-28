@@ -410,7 +410,7 @@ services:
       - *server-jenkins-node-class
       - *node-product
       - *repo-url
-    <<: *default-jenkins-one-agent
+    <<: *default-jenkins-zero-agent
 
   ubuntu16:
     image: couchbasebuild/server-ubuntu16-build:20221204
