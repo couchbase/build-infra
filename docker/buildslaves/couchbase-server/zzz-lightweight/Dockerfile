@@ -180,6 +180,10 @@ CMD ["swarm"]
 COPY build/couchbuilder_start.sh /usr/sbin/
 COPY build/swarm*.properties /
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Keep this stuff at the end, because the ARG declaration breaks
 # Docker build caching
 ARG CONTAINER_TAG_ARG

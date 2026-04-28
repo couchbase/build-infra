@@ -185,7 +185,7 @@ services:
     <<: *default-jenkins-secrets
 
   zz-lightweight:
-    image: couchbasebuild/zz-lightweight:20260212
+    image: couchbasebuild/zz-lightweight:20260428
     environment:
       - "JENKINS_SLAVE_NAME=zz-lightweight"
       - "JENKINS_SLAVE_LABELS=zz-lightweight"
@@ -207,7 +207,7 @@ services:
     <<: *default-jenkins-one-agent
 
   zzz-lightweight:
-    image: couchbasebuild/zzz-lightweight:20260212
+    image: couchbasebuild/zzz-lightweight:20260428
     init: true
     environment:
       - "JENKINS_SLAVE_NAME=zzz-lightweight"

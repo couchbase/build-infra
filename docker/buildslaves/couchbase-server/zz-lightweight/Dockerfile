@@ -200,6 +200,10 @@ COPY build/couchbuilder_start.sh /usr/sbin/
 COPY build/swarm*.properties /
 COPY build/buildx.sh /usr/sbin/couchhook.d/
 
+# Enable disk-checking healthcheck
+COPY build/healthcheck.sh /usr/sbin/healthcheck.sh
+HEALTHCHECK --interval=30s --retries=3 --timeout=90s --start-period=5s CMD /usr/sbin/healthcheck.sh
+
 # Hack because build-from-manifest script (and possibly others) hardcodes
 # python3.6
 RUN ln -s python3 /usr/bin/python3.6
