@@ -1,7 +1,7 @@
 Setup Server MACOS
 
 Prereq
-1. IP address of a runnjing macOS target with XCode which has been baselined with build-infra/ansible/macosx/base
+1. IP address of a running macOS target with XCode which has been baselined with build-infra/ansible/macosx/base
 2. profile_sync ssh key (see lastpass)
 3. Code signing certificate password (see lastpass)
 

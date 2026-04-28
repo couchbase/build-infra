@@ -14,23 +14,54 @@
 
     #Command Line Tools are likely installed by homebrew already
     #Leave this task here just in case.
-  - name: Install Commmand Line Tools
+  - name: Install Command Line Tools
     shell: /tmp/install_command_line_tools.sh
     become: true
 
     # Install XCode from dmg
   - name: Install Xcode Xip
     shell: |
-      if [ `xcodebuild -version | grep {{ XCODE_VERSION }}`  ]; then
+      if xcodebuild -version 2>/dev/null | grep -q "{{ XCODE_VERSION }}"; then
         echo "INFO: XCode {{ XCODE_VERSION }} is already installed!"
       else
-        echo "INFO: XCode.app not found. Installing XCode..."
-        curl -L -O "http://downloads.build.couchbase.com/xcode/Xcode_{{ XCODE_VERSION }}.xip"
-        xip -x "Xcode_{{ XCODE_VERSION }}.xip"
-        #remove old Xcode in case if there is one.
-        [ -d /Applications/Xcode.app ] && rm -rf /Applications/Xcode.app
-        mv Xcode.app /Applications/.
-        rm -f "Xcode_{{ XCODE_VERSION }}.xip"
+        echo "INFO: XCode.app not found or wrong version. Installing XCode {{ XCODE_VERSION }}..."
+
+        # Try Universal xip first
+        XIP_FILE=""
+        if curl -fsSL --head "http://downloads.build.couchbase.com/xcode/Xcode_{{ XCODE_VERSION }}_Universal.xip" | grep -q "200 OK"; then
+          XIP_FILE="Xcode_{{ XCODE_VERSION }}_Universal.xip"
+          echo "INFO: Downloading Universal XIP..."
+        elif curl -fsSL --head "http://downloads.build.couchbase.com/xcode/Xcode_{{ XCODE_VERSION }}.xip" | grep -q "200 OK"; then
+          XIP_FILE="Xcode_{{ XCODE_VERSION }}.xip"
+          echo "INFO: Downloading standard XIP..."
+        else
+          echo "ERROR: Could not find Xcode {{ XCODE_VERSION }} XIP file (tried both Universal and standard)"
+          exit 1
+        fi
+
+        curl -L -O "http://downloads.build.couchbase.com/xcode/${XIP_FILE}"
+        echo "INFO: Extracting ${XIP_FILE}..."
+        xip -x "${XIP_FILE}"
+
+        # Only remove old Xcode if new one was successfully extracted
+        if [ -d "Xcode.app" ]; then
+          if [ -d /Applications/Xcode.app ]; then
+            echo "INFO: New Xcode.app extracted successfully, removing old version..."
+            rm -rf /Applications/Xcode.app
+          fi
+          mv Xcode.app /Applications/.
+
+          # Accept license immediately to prevent system Python from breaking
+          echo "INFO: Accepting Xcode license..."
+          xcodebuild -license accept
+
+          echo "INFO: Xcode {{ XCODE_VERSION }} installed successfully"
+        else
+          echo "ERROR: Failed to extract Xcode.app from xip file!"
+          exit 1
+        fi
+
+        rm -f "${XIP_FILE}"
       fi
     become: true
 
@@ -42,7 +73,12 @@
     shell: xcode-select -r
     become: true
 
-  - name: Accept license (xcode)
-    shell: xcodebuild -license accept
-    become: true
+  # We can't disable brew analytics until xcode is present and
+  # the license has been accepted (license is accepted in the
+  # Install Xcode Xip task)
+  - name: Disable brew analytics
+    command: "{{ homebrew_dir }}/bin/brew analytics off"
+    environment:
+      PATH: "{{ homebrew_dir }}/bin:{{ ansible_env.PATH }}"
+
   tags: xcode

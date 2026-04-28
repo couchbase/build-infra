@@ -1,8 +1,17 @@
 ---
 - hosts: all
 
+  vars:
+    merge_modules:
+      - Microsoft_VC100_CRT_x64.msm
+      - Microsoft_VC120_CRT_x64.msm
+      - Microsoft_VC140_CRT_x64.msm
+      - Microsoft_VC142_CRT_x64.msm
+      - Microsoft_VC143_CRT_x64.msm
+      - Microsoft_VC143_OpenMP_x64.msm
+
   tasks:
-    - name: Copy patch_via_gerrit
+    - name: Install patch_via_gerrit
       include_role:
         name: ../../../common/roles/patch_via_gerrit
 
@@ -17,27 +26,6 @@
         name: "NET-Framework-Core"
         state: present
 
-    - name: "Install Python 3"
-      win_chocolatey:
-        name: python310
-        force: yes
-      tags:
-      - python
-
-    - name: "Provide python3 alias"
-      win_shell: copy C:\Python310\python.exe C:\Python310\python3.exe
-      args:
-        creates: C:\Python310\python3.exe
-      tags:
-      - python
-
-    - name: "Provide python3.10 alias"
-      win_shell: copy C:\Python310\python.exe C:\Python310\python3.10.exe
-      args:
-        creates: C:\Python37\python3.10.exe
-      tags:
-      - python
-
     - name: "Install tools"
       win_chocolatey:
         name: "{{ item }}"
@@ -46,8 +34,8 @@
         - 7zip.commandline
         - cmake
         - curl
+        - firefox
         - git
-        - googlechrome
         - insted
         - jq
         - MinGW
@@ -58,6 +46,69 @@
         - vcredist140
         - vscode
         - wixtoolset
+
+    # Note: vscode associates itself with .py files, so python is installed
+    # after to ensure scripts still actually start when called directly
+    - name: "Install uv"
+      win_shell: |
+        powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+      args:
+        creates: C:\Users\Administrator\.local\bin\uv.exe
+      tags:
+      - python
+      - uv
+
+    - name: "Add uv to PATH (machine)"
+      win_path:
+        elements: C:\Users\Administrator\.local\bin
+        scope: machine
+        state: present
+      tags:
+      - python
+      - uv
+
+    - name: "Check if Python {{ python_version }} is installed (uv)"
+      win_shell: |
+        C:\Users\Administrator\.local\bin\uv.exe python find {{ python_version }}
+      register: python310_find
+      ignore_errors: true
+      changed_when: false
+      tags:
+      - python
+
+    - name: "Install Python {{ python_version }} using uv"
+      win_shell: C:\Users\Administrator\.local\bin\uv.exe python install {{ python_version }}
+      when: python310_find.rc != 0
+      tags:
+      - python
+
+    - name: "Determine Python {{ python_version }} directory (uv)"
+      win_shell: |
+        $env:PATH = "C:\Users\Administrator\.local\bin;$env:PATH"
+        $py = uv python find {{ python_version }}
+        Split-Path -Parent $py
+      register: python310_dir
+      changed_when: false
+      tags:
+      - python
+
+    - name: "Add uv-managed Python {{ python_version }} to PATH (machine)"
+      win_path:
+        elements: "{{ python310_dir.stdout | trim }}"
+        scope: machine
+        state: present
+      tags:
+      - python
+
+    - name: "Ensure python3.exe alongside python.exe"
+      win_shell: |
+        $dir = "{{ python310_dir.stdout | trim }}"
+        if ($dir -and (Test-Path "$dir\\python.exe")) {
+          if (-not (Test-Path "$dir\\python3.exe")) { Copy-Item "$dir\\python.exe" "$dir\\python3.exe" }
+        }
+      changed_when: false
+      tags:
+      - python
 
     - name: "Install Ruby"
       win_chocolatey:
@@ -115,29 +166,63 @@
       tags:
         - setup
 
-    - name: Create required "[vol]:\\Program Files (x86)\\Common Files\\Merge Modules" directory
-      win_file:
-          path: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules"
-          state: directory
+    - name: Install VS CRT Merge Modules
+      block:
+        - name: Check if latestbuilds is reachable from target
+          win_uri:
+            url: http://latestbuilds.service.couchbase.com
+            method: HEAD
+            timeout: 5
+          register: latestbuilds_check
+          failed_when: false
+          changed_when: false
 
-    - name: Download older VS CRT Merge Modules
-      win_get_url:
-          url: "{{ item.url }}"
-          dest: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item.filename }}"
-          force: no
-      with_items:
-        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC100_CRT_x64.msm
-          filename: Microsoft_VC100_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC120_CRT_x64.msm
-          filename: Microsoft_VC120_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC140_CRT_x64.msm
-          filename: Microsoft_VC140_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC142_CRT_x64.msm
-          filename: Microsoft_VC142_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC143_CRT_x64.msm
-          filename: Microsoft_VC143_CRT_x64.msm
-        - url: http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/Microsoft_VC143_OpenMP_x64.msm
-          filename: Microsoft_VC143_OpenMP_x64.msm
+        - name: Set latestbuilds reachability fact
+          set_fact:
+            latestbuilds_reachable: "{{ latestbuilds_check.status_code is defined and latestbuilds_check.status_code == 200 }}"
+
+        - name: Create required "[vol]:\\Program Files (x86)\\Common Files\\Merge Modules" directory
+          win_file:
+            path: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules"
+            state: directory
+
+        - name: Download older VS CRT Merge Modules (latestbuilds reachable from target, direct download)
+          win_get_url:
+            url: "http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/{{ item }}"
+            dest: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item }}"
+            force: no
+            timeout: 600
+          with_items: "{{ merge_modules }}"
+          when: latestbuilds_reachable
+
+        - name: Create local temp directory for winbits
+          delegate_to: localhost
+          become: no
+          file:
+            path: "/tmp/winbits"
+            state: directory
+            mode: '0755'
+          run_once: true
+          when: not latestbuilds_reachable
+
+        - name: Download merge modules to local machine (latestbuilds not reachable from target)
+          delegate_to: localhost
+          become: no
+          get_url:
+            url: "http://latestbuilds.service.couchbase.com/buildteam/downloads/winbits/{{ item }}"
+            dest: "/tmp/winbits/{{ item }}"
+            mode: '0644'
+            timeout: 600
+          with_items: "{{ merge_modules }}"
+          run_once: true
+          when: not latestbuilds_reachable
+
+        - name: Copy merge modules from local machine to target
+          win_copy:
+            src: "/tmp/winbits/{{ item }}"
+            dest: "{{ targetvolume | default('c') }}:\\Program Files (x86)\\Common Files\\Merge Modules\\{{ item }}"
+          with_items: "{{ merge_modules }}"
+          when: not latestbuilds_reachable
       tags:
         - mergemodules
 
@@ -209,21 +294,28 @@
       tags:
         - repo
 
-    - name: Get Current PATH
-      raw: $ENV:PATH
-      register: path_out
+    - name: Find WiX Toolset directory
+      win_find:
+        paths: C:\PROGRA~2
+        patterns: 'WiX*'
+        file_type: directory
+      register: wix_dirs
+      tags:
+        - path
 
-    - debug: var=path_out.stdout_lines
-
-    - name: Add tools to PATH.
+    - name: Add tools to PATH
       win_path:
-          elements:
+        elements:
           - "{{ targetvolume | default('c') }}:\\bin"
-          - C:\Program Files\CMake\bin
-          - C:\Program Files\git\cmd
-          - C:\Program Files\NASM
-          - C:\Program Files\OpenSSH-Win64
-          - C:\Program Files (x86)\WiX Toolset v3.11\bin
+          - C:\PROGRA~1\CMake\bin
+          - C:\PROGRA~1\git\cmd
+          - C:\PROGRA~1\NASM
+          - C:\PROGRA~1\OpenSSH-Win64
+          - "{{ (wix_dirs.files | sort(attribute='path') | last).path }}\\bin"
+        state: present
+        scope: machine
+      tags:
+        - path
 
     - name: "Enable Remote Desktop"
       win_regedit:
@@ -254,21 +346,17 @@
         name: "../../roles/vs2022"
         apply:
           tags:
-            - never
             - visualstudio
       vars:
         PRODUCT: "{{ NODE_PRODUCT }}"
       tags:
-        - never
         - visualstudio
 
     # bcrypt is installed in this step, and needs visual studio to be present
     - name: "Install python3 modules for testrunner"
-      win_command: >-
-        C:\Python310\Scripts\pip.exe install sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1
-        beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2
-        pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3
-        docker==4.2.0 decorator==4.4.2
+      win_shell: |
+        $env:PATH = "C:\Users\Administrator\.local\bin;$env:PATH"
+        uv pip install --python {{ python_version }} sgmllib3k==1.0.0 paramiko==2.7.1 httplib2==0.17.1 pyyaml==5.3.1 beautifulsoup4==4.8.2 Geohash==1.0 python-geohash==0.8.5 deepdiff==4.3.2 pyes==0.99.6 pytz==2019.3 requests==2.23.0 jsonpickle==1.3 docker==4.2.0 decorator==4.4.2
       environment:
         LIB: C:\Program Files\OpenSSL-Win64\lib
         INCLUDE: C:\Program Files\OpenSSL-Win64\include
@@ -306,31 +394,104 @@
       args:
         executable: cmd
 
-    - name: Install OpenSSH
+    - name: Check if OpenSSH is already installed
+      win_stat:
+        path: C:\Windows\System32\OpenSSH\sshd.exe
+      register: builtin_openssh
+      tags:
+        - openssh
+
+    - name: Install OpenSSH via Chocolatey
       win_chocolatey:
         name: openssh
         params: /SSHServerFeature
         state: latest
+      when: not builtin_openssh.stat.exists
       tags:
         - openssh
 
-    - name: Ensure OpenSSH executables are pathed (machine)
+    - name: Ensure OpenSSH service is configured (built-in)
+      win_service:
+        name: sshd
+        start_mode: auto
+        state: started
+      when: builtin_openssh.stat.exists
+      tags:
+        - openssh
+
+    - name: Ensure OpenSSH executables are pathed (machine) - Chocolatey install
       win_path:
         name: PATH
         elements: C:\Program Files\OpenSSH-Win64
         scope: machine
         state: present
+      when: not builtin_openssh.stat.exists
       tags:
         - openssh
 
-    - name: Ensure OpenSSH executables are pathed (user)
+    - name: Ensure OpenSSH executables are pathed (user) - Chocolatey install
       win_path:
         name: PATH
         elements: C:\Program Files\OpenSSH-Win64
         scope: user
         state: present
+      when: not builtin_openssh.stat.exists
       tags:
         - openssh
+
+    - name: Ensure OpenSSH executables are pathed (machine) - Built-in
+      win_path:
+        name: PATH
+        elements: C:\Windows\System32\OpenSSH
+        scope: machine
+        state: present
+      when: builtin_openssh.stat.exists
+      tags:
+        - openssh
+
+    - name: Ensure OpenSSH executables are pathed (user) - Built-in
+      win_path:
+        name: PATH
+        elements: C:\Windows\System32\OpenSSH
+        scope: user
+        state: present
+      when: builtin_openssh.stat.exists
+      tags:
+        - openssh
+
+    - name: Create .ssh directory if it doesn't exist
+      win_file:
+        path: C:\Users\Administrator\.ssh
+        state: directory
+      tags:
+        - openssh
+
+    - name: Configure SSH to allow legacy key exchange algorithms
+      win_copy:
+        dest: C:\Users\Administrator\.ssh\config
+        content: |
+          Host *
+              PubkeyAcceptedAlgorithms +ssh-rsa
+              HostkeyAlgorithms +ssh-rsa
+      tags:
+        - openssh
+
+    - name: Enable long path support in Windows
+      win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem
+        name: LongPathsEnabled
+        data: 1
+        type: dword
+        state: present
+      tags:
+        - longpaths
+
+    - name: Configure Git to use long paths
+      win_shell: git config --system core.longpaths true
+      args:
+        executable: cmd
+      tags:
+        - longpaths
 
     - name: Configure ephemeral ports
       win_shell: netsh int {{ item[0] }} set dynamicport {{ item[1] }} start=1025 num=64511

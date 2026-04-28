@@ -23,6 +23,14 @@ fi
 gem_paths=$(gem env | grep "INSTALLATION DIRECTORY" | sed 's/.*: //g'  | sed 's/$/\/bin/g' | paste -sd ":" -)
 export PATH="${gem_paths}:$PATH"
 
+# Initialize pyenv if installed (for testrunner Python 3.9.2)
+if [ -d "$HOME/.pyenv" ]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
+fi
+
 # Make Homebrew’s completions available in zsh
 # When getting “zsh compinit: insecure directories”, enable the chmod below.
 # chmod -R go-w "$(brew --prefix)/share"

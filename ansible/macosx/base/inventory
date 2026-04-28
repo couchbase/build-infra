@@ -1,8 +1,9 @@
 [all]
-test  ansible_host=x.x.x.x NODE_CLASS=build NODE_PRODUCT=couchbase-server XCODE_VERSION=12.5.1
+test  ansible_host=x.x.x.x NODE_CLASS=build NODE_PRODUCT=couchbase-server
 
 [all:vars]
 ansible_connection=ssh
 ansible_ssh_user=couchbase
 dns_suffix=sc.couchbase.com
-ruby_version=2.6
+ruby_version=3.3
+XCODE_VERSION=15.2

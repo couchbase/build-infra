@@ -3,8 +3,8 @@
     src=./files/cbsudo dest=/private/etc/sudoers.d/cbsudo
   become: true
 - include_vars: vars/main.yml
-- include: components/cbdep.yml
-- include: components/brew.yml
-- include: components/repo.yml
-- include: components/jdk.yml
-- include: components/xcode.yml
+- include_tasks: components/cbdep.yml
+- include_tasks: components/brew.yml
+- include_tasks: components/repo.yml
+- include_tasks: components/jdk.yml
+- include_tasks: components/xcode.yml

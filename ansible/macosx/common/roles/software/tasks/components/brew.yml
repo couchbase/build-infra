@@ -1,41 +1,23 @@
 - name: Install brew
   block:
   - name: Check if installed (brew)
-    command: brew --version
-    register: brew_version
-    ignore_errors: yes
+    stat:
+      path: "{{ homebrew_dir }}/bin/brew"
+    register: brew_stat
 
   - debug: msg="Installing homebrew.  This will take a while"
+    when: not brew_stat.stat.exists
 
   - name: install homebrew
     shell: |
       yes| /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    when: brew_version.rc != 0
-
-  ### begin check license acceptance
-  # We can potentially end up in a situation where we can't disable brew analytics because
-  # the xcode license hasn't been accepted
-  - name: Check if full XCode is present (brew)
-    stat:
-      path: /Applications/Xcode.app
-    register: xcode
-
-  - name: Reset to default CLI tools path (brew)
-    shell: |
-      xcode-select -r
-      xcodebuild -license accept
-    become: true
-    when: xcode.stat.exists == true
-  ### end check license acceptance ###
-
-  - name: Disable analytics (brew)
-    shell: brew analytics off
-    args:
-      chdir: "{{ homebrew_dir }}/bin"
+    when: not brew_stat.stat.exists
 
   - name: Add formulae (brew)
     homebrew:
       name: "{{ homebrew_installed_packages }}"
+    environment:
+      PATH: "{{ homebrew_dir }}/bin:{{ ansible_env.PATH }}"
 
   # after first installing formulae, /usr/local/zsh gets weird permissions and
   # errors start happening when you run /bin/zsh

@@ -1,26 +1,33 @@
 ---
-- name: "Ensure bin directory present"
+# Set up OS-specific variables for patch_via_gerrit installation
+- name: "Set binary name and destination based on OS"
+  set_fact:
+    s3_binary_name: "{{ 'patch_via_gerrit-windows-x86_64.exe' if ansible_os_family == 'Windows' else ('patch_via_gerrit-darwin' if ansible_os_family == 'Darwin' else 'patch_via_gerrit-linux') }}"
+    dest_path: "{{ 'C:\\bin\\patch_via_gerrit.exe' if ansible_os_family == 'Windows' else '/usr/local/bin/patch_via_gerrit' }}"
+
+- name: "Set download URL"
+  set_fact:
+    download_url: "https://packages.couchbase.com/patch_via_gerrit/{{ s3_binary_name }}"
+
+- name: "Ensure bin directory present (Windows)"
   win_file:
     path: C:\bin
     state: directory
-
-- name: "Download patch_via_gerrit (Windows)"
-  win_get_url:
-    url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/windows-x86_64/patch_via_gerrit.exe
-    dest: 'C:\bin\patch_via_gerrit.exe'
   when: ansible_os_family == "Windows"
 
-- name: "Download patch_via_gerrit (Linux)"
-  get_url:
-    url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/centos6/patch_via_gerrit
-    dest: /usr/local/bin/patch_via_gerrit
-  become: true
-  when: ansible_os_family == "Debian" or ansible_os_family == "CentOS" or ansible_os_family == "RedHat"
+- name: "Download patch_via_gerrit from S3 (Windows)"
+  win_get_url:
+    url: "{{ download_url }}"
+    dest: "{{ dest_path }}"
+    timeout: 600
+  when: ansible_os_family == "Windows"
 
-- name: "Download patch_via_gerrit (Mac)"
+- name: "Download patch_via_gerrit from S3 (Unix)"
   get_url:
-    url: http://latestbuilds.service.couchbase.com/builds/latestbuilds/python_tools/patch_via_gerrit/{{ version }}/{{ build }}/macos/patch_via_gerrit
-    dest: /usr/local/bin/patch_via_gerrit
+    url: "{{ download_url }}"
+    dest: "{{ dest_path }}"
+    mode: '0755'
+    timeout: 600
   become: true
-  when: ansible_os_family == "Darwin"
+  when: ansible_os_family != "Windows"
 

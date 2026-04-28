@@ -32,5 +32,5 @@ homebrew_installed_packages:
    - ruby-completion
    - sha2
    - unbound
-   - xcodesorg/made/xcodes
+   - xcodes
    - xz

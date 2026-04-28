@@ -9,5 +9,5 @@
     msg: "Variable NODE_PRODUCT is required (e.g. couchbase-server)"
   when: "NODE_PRODUCT is not defined"
 
-- include: components/shell_env.yml
-- include: components/profile_sync.yml
+- include_tasks: components/shell_env.yml
+- include_tasks: components/profile_sync.yml

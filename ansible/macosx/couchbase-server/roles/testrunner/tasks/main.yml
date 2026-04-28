@@ -1,7 +1,7 @@
 ---
-- name: Install python 3.7.7
+- name: Install python 3.9.2
   homebrew:
-    name: https://raw.githubusercontent.com/Homebrew/homebrew-core/6949fc6f36de1261dffbe37f3b2216cf903431ed/Formula/python.rb
+    name: https://raw.githubusercontent.com/Homebrew/homebrew-core/0a0b8fedc36019ea2fb15605e605a56a772f2f79/Formula/python%403.9.rb
   tags: python3
   when: NODE_CLASS == "cv"
 

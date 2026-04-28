@@ -1,12 +1,5 @@
 [server]
-172.23.113.13 hostname=server-windows-vs2022-01
-172.23.96.229 hostname=server-windows-vs2022-02
-172.23.97.115 hostname=server-windows-vs2022-03
-
-[cv]
-172.23.113.22 hostname=cv-windows-msvc2022-01
-172.23.113.0  hostname=cv-windows-msvc2022-02
-172.23.113.19 hostname=cv-windows-msvc2022-03
+x.x.x.x hostname=test
 
 [all:vars]
 ansible_user=Administrator
@@ -14,3 +7,4 @@ ansible_password=password
 ansible_winrm_server_cert_validation=ignore
 ansible_connection=winrm
 ansible_winrm_read_timeout_sec=90
+python_version=3.10
