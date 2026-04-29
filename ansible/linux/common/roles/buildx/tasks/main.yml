@@ -13,6 +13,7 @@
 
       [Install]
       WantedBy=multi-user.target
+  become: true
 
 - name: Reload systemd
   systemd:
@@ -23,3 +24,5 @@
   systemd:
     name: binfmt.service
     enabled: yes
+    state: started
+  become: true

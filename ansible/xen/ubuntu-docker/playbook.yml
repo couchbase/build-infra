@@ -85,6 +85,10 @@
         name: "{{ vmip.stdout }}"
         groups: newvms
 
+    - name: Remove stale SSH host key for new VM
+      local_action: command ssh-keygen -R {{ vmip.stdout }}
+      ignore_errors: true
+
     - name: Eject CD
       shell: "xe vm-cd-eject uuid={{ vmuuid.stdout }} || true"
 
