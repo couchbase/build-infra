@@ -18,14 +18,14 @@ rootdir:
 
     "couchbase-server|couchbase-columnar|enterprise-analytics":
       REMOVE:
-        # Perf requests keeping EE amd64 deb until a release is GA.
+        # Perf requests keeping EE deb until a release is GA.
         # Major releases(morpheus or totoro) have longer runway.
         # 730 days is more than enough for this requirment
         # All other installers everywhere for 90 days
-        ".*enterprise.*linux.*amd64.deb": 730
-        "^(?!.*enterprise.*linux.*amd64.deb).*(deb|rpm|dmg|msi)": 90
-        # All debug files other than *amd64.deb
-        "^(?!.*enterprise.*linux.*amd64.deb).*(debug|dbg).*": 60
+        ".*enterprise.*linux.*.deb": 730
+        "^(?!.*enterprise.*linux.*.deb).*(deb|rpm|dmg|msi)": 90
+        # All debug files other than *.deb
+        "^(?!.*enterprise.*linux.*.deb).*(debug|dbg).*": 60
         ".*-PDB.zip": 60
         # All MacOS .orig/-unsigned files from codesigning
         ".*macos.*orig": 2
@@ -47,7 +47,7 @@ rootdir:
           # This can be removed after neo reaches EOL
           KEEP:
             - ".*enterprise.*centos7.x86_64.rpm"
-            - ".*enterprise.*linux.*amd64.deb"
+            - ".*enterprise.*linux.*.deb"
 
         # For "master", we don't want to pick up the linux EE .deb "KEEP"
         # rule under ".*" below. So just put an empty entry here, which
