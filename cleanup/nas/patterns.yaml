@@ -18,16 +18,23 @@ rootdir:
 
     "couchbase-server|couchbase-columnar|enterprise-analytics":
       REMOVE:
-        # All installers everywhere (with a few exceptions below)
-        ".*(deb|rpm|dmg|msi)": 90
-        # All debug files
-        ".*(debug|dbg).*": 60
+        # Perf requests keeping EE amd64 deb until a release is GA.
+        # Major releases(morpheus or totoro) have longer runway.
+        # 730 days is more than enough for this requirment
+        # All other installers everywhere for 90 days
+        ".*enterprise.*linux.*amd64.deb": 730
+        "^(?!.*enterprise.*linux.*amd64.deb).*(deb|rpm|dmg|msi)": 90
+        # All debug files other than *amd64.deb
+        "^(?!.*enterprise.*linux.*amd64.deb).*(debug|dbg).*": 60
         ".*-PDB.zip": 60
         # All MacOS .orig/-unsigned files from codesigning
         ".*macos.*orig": 2
         ".*macos.*-unsigned.zip": 2
         # All Windows -unsigned files from codesigning
         ".*windows.*-unsigned.zip": 2
+        # All tools packages
+        ".*tools.*.zip": 90
+        ".*tools.*.tar.gz": 90
 
       SUBDIRS:
         "toybuilds":
@@ -36,22 +43,16 @@ rootdir:
             ".*": 30
           REMOVE_EMPTY_DIRS: true
 
-        "cheshire-cat|mad-hatter|neo":
-          # Leave centos7 and linux EE .deb files around
+        "neo":
+          # This can be removed after neo reaches EOL
           KEEP:
-            - ".*centos7.*"
-            - ".*enterprise.*linux_.*deb"
+            - ".*enterprise.*centos7.x86_64.rpm"
+            - ".*enterprise.*linux.*amd64.deb"
 
         # For "master", we don't want to pick up the linux EE .deb "KEEP"
         # rule under ".*" below. So just put an empty entry here, which
         # says "the master subdirectory has no additional rules".
         "master": {}
-
-        ".*":
-          # Leave linux EE .deb files around. The _ keeps normal linux
-          # .deb files around but allows purging linux-asan .deb files.
-          KEEP:
-            - ".*enterprise.*linux_.*deb"
 
     # Catch-all for subdirectories not mentioned above
     ".*":

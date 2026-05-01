@@ -161,11 +161,15 @@ class PurgeRules:
                 # st_mtime_ns rather than floating-point st_mtime.
                 stats = file.stat()
                 mtime = stats.st_mtime_ns
+                mtime_str = time.strftime(
+                    '%Y-%m-%d %H:%M:%S %Z', time.localtime(mtime / 1000000000)
+                )
                 if (current_time - mtime) > (age * 24 * 3600 * 1000000000):
                     if self._dryrun:
-                        logging.info(f"NOT purging {file} due to {re._regex} (--dry-run)")
+                        logging.info(f"NOT purging {file}, mtime={mtime_str}, "
+                            f"due to {re._regex} (--dry-run)")
                     else:
-                        logging.info(f"Purging {file}")
+                        logging.info(f"Purging {file}, mtime={mtime_str}")
                         file.unlink()
                     global bytes_purged
                     bytes_purged += stats.st_size
