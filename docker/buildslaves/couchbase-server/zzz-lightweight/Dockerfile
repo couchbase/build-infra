@@ -1,5 +1,16 @@
 # Docker container for zz-lightweight
 
+# Build skopeo from source
+FROM golang:1.26 AS skopeo-build
+ARG SKOPEO_VERSION=1.22.2
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y libgpgme-dev libassuan-dev libbtrfs-dev \
+       libdevmapper-dev pkg-config \
+    && git clone --branch v${SKOPEO_VERSION} https://github.com/containers/skopeo.git /tmp/skopeo \
+    && cd /tmp/skopeo \
+    && CGO_ENABLED=1 go build -ldflags="-s -w" -o bin/skopeo ./cmd/skopeo
+
 FROM ubuntu:24.04
 LABEL maintainer="build-team@couchbase.com"
 
@@ -133,13 +144,14 @@ RUN set -x \
 # Docker CLI, buildx, and skopeo
 ENV DOCKER_API_VERSION=1.41
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+COPY --from=skopeo-build /tmp/skopeo/bin/skopeo /usr/bin/skopeo
 RUN set -x \
     && apt-get update \
-    && apt-get install -y apt-transport-https \
+    && apt-get install -y apt-transport-https libgpgme11t64 libdevmapper1.02.1 \
     && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
     && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list \
     && apt-get update \
-    && apt-get install -y docker-ce-cli skopeo \
+    && apt-get install -y docker-ce-cli \
     && apt-get clean
 RUN set -x \
     && mkdir -p /home/couchbase/.docker \

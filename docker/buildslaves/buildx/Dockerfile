@@ -1,4 +1,4 @@
-FROM couchbasebuild/zzz-lightweight:20260212
+FROM couchbasebuild/zzz-lightweight:20260506
 LABEL maintainer=build-team@couchbase.com
 
 RUN apt-get update && apt-get install -y \
