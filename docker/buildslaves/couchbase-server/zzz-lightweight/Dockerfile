@@ -145,6 +145,7 @@ RUN set -x \
 ENV DOCKER_API_VERSION=1.41
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 COPY --from=skopeo-build /tmp/skopeo/bin/skopeo /usr/bin/skopeo
+COPY --from=skopeo-build /tmp/skopeo/default-policy.json /etc/containers/policy.json
 RUN set -x \
     && apt-get update \
     && apt-get install -y apt-transport-https libgpgme11t64 libdevmapper1.02.1 \
