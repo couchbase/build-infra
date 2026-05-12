@@ -114,6 +114,8 @@ autoinstall:
     - rm -f /target/etc/apt/preferences.d/90curtin.pref
     - curtin in-target --target /target -- timedatectl set-timezone America/Los_Angeles
     - curtin in-target --target /target -- apt-mark hold xe-guest-utilities
+    - curtin in-target --target /target -- sed -i 's|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"|' /etc/default/grub
+    - curtin in-target --target /target -- update-grub
     - 'sed -i -e "s,^\(\s*bind\),#\1," /target/etc/netdata/netdata.conf'
     - mkdir -p /target/etc/systemd/system/docker.service.d /target/etc/docker
     - cp /cdrom/docker-service.conf /target/etc/systemd/system/docker.service.d

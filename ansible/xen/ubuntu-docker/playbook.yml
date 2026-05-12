@@ -77,7 +77,13 @@
       poll: 15
 
     - name: Wait for IP address of new VM
-      shell: export ip=""; while [[ $ip != 172* ]]; do sleep 2; ip=`xe vm-param-get uuid={{ vmuuid.stdout }} param-name=networks param-key=0/ip`; done; echo $ip
+      shell: |
+        while :; do
+          domid=$(xe vm-param-get uuid={{ vmuuid.stdout }} param-name=dom-id)
+          ip=$(xenstore-read /local/domain/$domid/attr/vif/0/ipv4/0 2>/dev/null || true)
+          [[ "$ip" == 172* ]] && { echo "$ip"; break; }
+          sleep 2
+        done
       register: vmip
 
     - name: Add new VM to Ansible group
@@ -101,6 +107,7 @@
     ansible_password: couchbase
     ansible_become_password: couchbase
     ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_common_args: '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
 
   tasks:
 
@@ -133,6 +140,32 @@
       become: true
       tags: core
       changed_when: true
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+        state: present
+        update_cache: yes
+      become: true
+
+    - name: Create docker.service.d directory
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: 0755
+      become: true
+
+    # Workaround for gRPC ALPN enforcement breaking some Docker clients
+    - name: Disable GRPC ALPN enforcement for dockerd
+      copy:
+        dest: /etc/systemd/system/docker.service.d/override.conf
+        content: |
+          [Service]
+          Environment="GRPC_ENFORCE_ALPN_ENABLED=false"
+        mode: 0644
+      become: true
 
     - name: Perform system upgrades and clean unused packages (will take several minutes)
       apt:
