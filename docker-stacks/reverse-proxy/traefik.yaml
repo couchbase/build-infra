@@ -7,7 +7,7 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:v2.3.7
+    image: traefik:v2.11
     secrets:
       - source: wildcard_build_couchbase_com_cert
         target: /certs/wildcard.build.couchbase.com.crt
