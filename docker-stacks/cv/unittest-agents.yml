@@ -3,7 +3,7 @@ version: '3.8'
 # Suggested deployment command:
 #  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c unittest-agents.yml unittest
 # All services, networks, etc. will then get an "unittest_" prefix,
-# eg. "unittest_ubuntu20"
+# eg. "unittest_glibc217"
 
 # Default slave configurations. This is written using YAML anchors so
 # it can be substituted into all the slave declarations later. See
@@ -20,41 +20,27 @@ x-default-jenkins-secrets: &default-jenkins-secrets
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
 
-# Use this one for an agent with one replica and IPv6 enabled.
-# Previously only CV unit tests agents had this, so to be
-# overly cautious, we'll continue only using this for CV.
-x-default-jenkins-one-agent-with-ipv6: &default-jenkins-one-agent-with-ipv6
+# Decommissioned services are retained but have zero replicas.
+x-default-jenkins-zero-agent: &default-jenkins-zero-agent
   deploy:
-    resources:
-      limits:
-        memory: 9G
-      reservations:
-        memory: 9G
-    placement:
-      constraints:
-        - node.labels.role==build
-    replicas: 1
-    update_config:
-      parallelism: 1000
-  networks:
-    - jenkins
-  <<: *default-jenkins-secrets
-  sysctls:
-    net.ipv6.conf.lo.disable_ipv6: 0
+    replicas: 0
 
-x-default-jenkins-two-agent-with-ipv6: &default-jenkins-two-agent-with-ipv6
-  deploy:
-    resources:
-      limits:
-        memory: 9G
-      reservations:
-        memory: 9G
-    placement:
-      constraints:
-        - node.labels.role==build
-    replicas: 2
-    update_config:
-      parallelism: 1000
+# Default deploy block — services merge this and override `replicas`.
+x-default-deploy: &default-deploy
+  resources:
+    limits:
+      memory: 9G
+    reservations:
+      memory: 9G
+  placement:
+    constraints:
+      - node.labels.role==build
+  update_config:
+    parallelism: 1000
+
+# Use this for an agent with IPv6 enabled; pair with a `deploy:` block
+# that merges *default-deploy and sets `replicas`.
+x-default-jenkins-agent-with-ipv6: &default-jenkins-agent-with-ipv6
   networks:
     - jenkins
   <<: *default-jenkins-secrets
@@ -72,23 +58,69 @@ services:
 
   centos7:
     image: couchbasebuild/server-centos7-build:20230524
-    environment:
-      - "JENKINS_SLAVE_NAME=unit-centos7"
-      - "JENKINS_SLAVE_LABELS=centos7 unit-simple-test"
-      - *cv-jenkins-master
-      - *cv-jenkins-node-class
-      - *node-product
-    <<: *default-jenkins-one-agent-with-ipv6
+    <<: *default-jenkins-zero-agent
 
-  linux:
+  glibc217:
     image: couchbasebuild/server-linux-cv:20260212
     environment:
-      - "JENKINS_SLAVE_NAME=unit-linux"
-      - "JENKINS_SLAVE_LABELS=linux unit-simple-test"
+      - "JENKINS_SLAVE_NAME=unit-linux-glibc217"
+      - "JENKINS_SLAVE_LABELS=linux unit-simple-test glibc217"
       - *cv-jenkins-master
       - *cv-jenkins-node-class
       - *node-product
-    <<: *default-jenkins-two-agent-with-ipv6
+    <<: *default-jenkins-agent-with-ipv6
+    deploy:
+      <<: *default-deploy
+      replicas: 1
+
+  glibc228:
+    image: couchbasebuild/server-builder-cv:20260422
+    init: true
+    environment:
+      - "JENKINS_AGENT_NAME=unit-linux-glibc228"
+      - "JENKINS_AGENT_LABELS=linux unit-simple-test glibc228"
+      - "JENKINS_URL=http://cv.jenkins.couchbase.com/"
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:50002"
+      - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
+      - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
+      - *cv-jenkins-node-class
+      - *node-product
+    configs:
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_master_username
+        mode: 0444
+      - source: jenkins_master_username
+        target: /run/secrets/jenkins_username
+        mode: 0444
+    secrets:
+      - source: cv_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profiledata_ssh_key
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 30s
+      timeout: 90s
+      retries: 3
+    user: couchbase
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /proc
+        target: /opt/rpm-chroot/proc
+      - type: bind
+        source: /proc
+        target: /opt/deb-chroot/proc
+    cap_add:
+      - ALL
+    stop_grace_period: 60m
+    <<: *default-jenkins-agent-with-ipv6
+    deploy:
+      <<: *default-deploy
+      replicas: 2
 
 configs:
   jenkins_master_username:
