@@ -2,6 +2,42 @@ version: "3.8"
 
 # Stack for general-purpose agent capable of running "docker buildx build".
 
+# Shared environment lines
+x-jenkins-environment:
+  - &jenkins-master "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
+  - &node-product "NODE_PRODUCT=couchbase-server"
+  - &repo-url "REPO_URL=https://github.com/couchbasedeps/git-repo"
+
+# Shared configs + secrets
+x-shared-refs:
+  - &cfg-jenkins-master-username
+    source: jenkins_master_username
+    target: /run/secrets/jenkins_master_username
+    mode: 0444
+  - &sec-jenkins-master-password
+    source: server_jenkins_ns-buildbot_api_key.20220510
+    target: /run/secrets/jenkins_master_password
+  - &sec-profile-sync
+    source: profiledata.ssh_privkey.profile_sync.20200423
+    target: /run/secrets/profile_sync
+
+# Shared deploy bits for buildx-family agents; replicas overridden per-service
+x-default-buildx-deploy: &default-buildx-deploy
+  placement:
+    constraints:
+      - node.labels.role==docker-buildx
+  update_config:
+    parallelism: 1000
+
+# Shared volumes for buildx-family agents
+x-default-buildx-volumes: &default-buildx-volumes
+  - "/var/run/docker.sock:/var/run/docker.sock:rw"
+  - "/etc/localtime:/etc/localtime"
+  - "/etc/timezone:/etc/timezone"
+  - "latestbuilds:/latestbuilds"
+  - "releases:/releases"
+  - "buildteam:/buildteam"
+
 services:
   buildx:
     # Historically, this was the agent used for
@@ -12,38 +48,40 @@ services:
     environment:
       - "JENKINS_SLAVE_NAME=buildx"
       - "JENKINS_SLAVE_LABELS=couchbase-k8s-microservices couchbase-operator master buildx"
-      - "JENKINS_MASTER=http://server.jenkins.couchbase.com/"
+      - *jenkins-master
       - "NODE_CLASS=build buildx"
-      - "NODE_PRODUCT=couchbase-server"
-      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:rw"
-      - "/etc/localtime:/etc/localtime"
-      - "/etc/timezone:/etc/timezone"
-      - "latestbuilds:/latestbuilds"
-      - "releases:/releases"
-      - "buildteam:/buildteam"
+      - *node-product
+      - *repo-url
+    volumes: *default-buildx-volumes
     configs:
-      - source: jenkins_master_username
-        target: /run/secrets/jenkins_master_username
-        mode: 0444
+      - *cfg-jenkins-master-username
     secrets:
-      - source: server_jenkins_ns-buildbot_api_key.20220510
-        target: /run/secrets/jenkins_master_password
-      - source: profiledata.ssh_privkey.profile_sync.20200423
-        target: /run/secrets/profile_sync
-      - source: buildx.config.rhcc_metadata.20240425
-        target: /home/couchbase/.docker/rhcc-metadata.json
-        mode: 0600
-        uid: "1000"
-        gid: "1000"
+      - *sec-jenkins-master-password
+      - *sec-profile-sync
     deploy:
-      placement:
-        constraints:
-          - node.labels.role==docker-buildx
+      <<: *default-buildx-deploy
       replicas: 3
-      update_config:
-        parallelism: 1000
+
+  zzz-buildx:
+    image: couchbasebuild/zzz-lightweight:20260506
+    init: true
+    environment:
+      - "JENKINS_SLAVE_NAME=zzz-buildx"
+      - "JENKINS_SLAVE_LABELS=zzz-buildx"
+      - "JENKINS_SLAVE_EXECUTORS=10"
+      - *jenkins-master
+      - "NODE_CLASS=build buildx"
+      - *node-product
+      - *repo-url
+    volumes: *default-buildx-volumes
+    configs:
+      - *cfg-jenkins-master-username
+    secrets:
+      - *sec-jenkins-master-password
+      - *sec-profile-sync
+    deploy:
+      <<: *default-buildx-deploy
+      replicas: 1
 
 configs:
   jenkins_master_username:
@@ -51,8 +89,6 @@ configs:
 
 secrets:
   server_jenkins_ns-buildbot_api_key.20220510:
-    external: true
-  buildx.config.rhcc_metadata.20240425:
     external: true
   profiledata.ssh_privkey.profile_sync.20200423:
     external: true
