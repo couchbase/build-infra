@@ -30,7 +30,9 @@ services:
       - "--providers.file.watch=true"
 
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.transport.respondingTimeouts.readTimeout=10m"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=10m"
 
       - "--api.insecure=true"
     init: true
