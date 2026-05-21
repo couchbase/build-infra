@@ -1,4 +1,4 @@
 #!/bin/bash -ex
 
-LEADER=172.23.108.43
+LEADER=172.23.104.169
 docker --host ${LEADER} stack deploy --detach=true --with-registry-auth -c cv-jenkins-agents.yml cv
