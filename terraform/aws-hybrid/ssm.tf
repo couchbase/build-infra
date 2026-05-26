@@ -50,6 +50,18 @@ resource "aws_ssm_parameter" "shared_ssh_patch_via_gerrit_ini" {
   }
 }
 
+resource "aws_ssm_parameter" "shared_ssh_patch_via_github_ini" {
+  name  = "jenkins-worker__shared__.ssh__patch_via_github.ini"
+  type  = "SecureString"
+  value = file("~/aws-ssh/couchbase-server/build/linux/.ssh/patch_via_github.ini")
+  tags = {
+    Owner = "build-team"
+    Consumer = "jenkins-worker"
+    Environment = "shared"
+    Encoding = "none"
+  }
+}
+
 resource "aws_ssm_parameter" "shared_ssh_ns_buildbot_rsa" {
   name  = "jenkins-worker__shared__.ssh__ns-buildbot.rsa"
   type  = "SecureString"
