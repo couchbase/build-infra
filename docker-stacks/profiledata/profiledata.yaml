@@ -354,6 +354,16 @@ services:
         mode: 0644
         uid: "901"
         gid: "901"
+      - source: profiledata.digicert_sm_config.20260701
+        target: /home/couchbase/couchbase-server/build/linux/.signingmanager/ssm-config
+        mode: 0644
+        uid: "901"
+        gid: "901"
+      - source: profiledata.digicert_certificate_pkcs12.20260701
+        target: /home/couchbase/couchbase-server/build/linux/.signingmanager/Certificate_pkcs12.p12
+        mode: 0644
+        uid: "901"
+        gid: "901"
       - source: profiledata.aws_credentials.server.20240418
         target: /home/couchbase/couchbase-server/build/linux/.aws/credentials
         mode: 0444
@@ -855,6 +865,10 @@ secrets:
     external: true
   # jarsigning cert from digicert
   profiledata.digicert_jks.20230504:
+    external: true
+  profiledata.digicert_sm_config.20260701:
+    external: true
+  profiledata.digicert_certificate_pkcs12.20260701:
     external: true
   # jira auth
   profiledata.build_jira_json.20220213:
