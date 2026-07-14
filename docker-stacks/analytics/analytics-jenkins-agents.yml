@@ -20,12 +20,17 @@ x-default-jenkins-agent: &default-jenkins-agent
     - source: jenkins_master_username
       target: /run/secrets/jenkins_master_username
       mode: 0444
+    - source: jenkins_master_username
+      target: /run/secrets/jenkins_username
+      mode: 0444
 
   secrets:
     - source: analytics_jenkins_ns-buildbot_api_key.20220510
       target: /run/secrets/jenkins_master_password
     - source: profiledata.ssh_privkey.profile_sync.20200423
       target: /run/secrets/profile_sync
+    - source: profiledata.ssh_privkey.profile_sync.20200423
+      target: /run/secrets/profiledata_ssh_key
 
 services:
 
@@ -76,6 +81,53 @@ services:
       replicas: 15
       update_config:
         parallelism: 100
+
+  dfs:
+    image: couchbasebuild/analytics-dfs-cv:20260701
+    init: true
+    environment:
+      - "JENKINS_AGENT_NAME=analytics-dfs"
+      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} dfs"
+      - "JENKINS_URL=http://analytics.jenkins.couchbase.com/"
+      - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
+      - "CB_ENTRYPOINT_PLUGINS=docker/ensure_docker_group secrets/profiledata jenkins/swarm"
+      - "CB_ENTRYPOINT_PLUGINS_EC2=docker/ensure_docker_group secrets/home_mount jenkins/ec2"
+      - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
+      - "NODE_CLASS=cv-docker"
+      - "NODE_PRODUCT=couchbase-server"
+      - "REPO_URL=https://github.com/couchbasedeps/git-repo"
+    secrets:
+      - source: analytics_jenkins_ns-buildbot_api_key.20220510
+        target: /run/secrets/jenkins_password
+      - source: profiledata.ssh_privkey.profile_sync.20200423
+        target: /run/secrets/profiledata_ssh_key
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 30s
+      timeout: 90s
+      retries: 3
+    user: couchbase
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /proc
+        target: /opt/rpm-chroot/proc
+      - type: bind
+        source: /proc
+        target: /opt/deb-chroot/proc
+
+    <<: *default-jenkins-agent
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.cvtype==ubuntu24"
+        max_replicas_per_node: 1
+      replicas: 1
+      update_config:
+        parallelism: 100
+        delay: 0s
 
 secrets:
   analytics_jenkins_ns-buildbot_api_key.20220510:
