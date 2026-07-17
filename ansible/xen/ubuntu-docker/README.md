@@ -10,7 +10,7 @@ This Ansible playbook will deploy a fresh Ubuntu 24.04.1 VM configured with:
  - optionally with Docker Swarm node labels set
  - `/home/couchbase/jenkins` directory created (facilitates adding
    directly to a Jenkins Docker Swarm)
- - netdata installed and configured
+ - netdata installed and configured (with option to disable)
 
 # Requirements
 
@@ -78,7 +78,7 @@ to use this playbook.
     Usage: create-ubuntu-agent -n NAME -x XEN_HOST -p XEN_PASSWORD
         [-m MEMORY] [-c CPUS] [-d DISKSPACE]
         [-r ROLES] [-e ROLE_ARG=VALUE]
-        [-s SWARM_MANAGER] [-l SWARM_LABELS]
+        [-s SWARM_MANAGER] [-l SWARM_LABELS] [-N]
     Defaults: memory 20GB; cpus 8; diskpace 200GB; no Swarm
 
 The options are:
@@ -98,6 +98,7 @@ The options are:
  - `-s` - IP address of a Docker Swarm manager to join (optional)
  - `-l` - Docker Swarm labels to apply to this new node (optional; if this
    is specified, swarm_manager must be as well)
+ - `-N` - Disable netdata service after installation (optional)
 
 The argument to `-l` must be a comma-separated list of key=value pairs,
 with NO spaces anywhere. For instance, `-l "cvtype=ubuntu18,cvsize=large"`.
@@ -131,3 +132,4 @@ inventory, and are generally what you would want, which is why the
  the .iso here
  - `network_name` - Use a different ethernet port on your Xen host
  - `sr_name` - create the VM on a different Storage Repository on the Xen host
+ - `disable_netdata` - set to `true` to disable netdata service after installation

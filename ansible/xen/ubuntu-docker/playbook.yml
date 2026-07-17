@@ -248,6 +248,14 @@
         purge: yes
       become: true
 
+    - name: Stop and disable netdata when requested
+      when: disable_netdata | default(false) | bool
+      service:
+        name: netdata
+        state: stopped
+        enabled: false
+      become: true
+
     - name: Reboot to be sure
       reboot:
       become: true

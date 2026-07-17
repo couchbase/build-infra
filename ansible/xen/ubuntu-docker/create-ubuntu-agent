@@ -4,14 +4,14 @@ usage() {
     echo "Usage: $(basename $0) -n NAME -x XEN_HOST -p XEN_PASSWORD"
     echo "    [-m MEMORY] [-c CPUS] [-d DISKSPACE]"
     echo "    [-r ROLES] [-e ROLE_ARG=VALUE]"
-    echo "    [-s SWARM_MANAGER] [-l SWARM_LABELS]"
+    echo "    [-s SWARM_MANAGER] [-l SWARM_LABELS] [-N]"
     echo "Defaults: memory 20GB; cpus 8; diskpace 200GB; no Swarm"
     exit 1
 }
 
 
 ARGS=()
-while getopts ":n:x:p:m:c:d:s:l:r:e:" opt; do
+while getopts ":n:x:p:m:c:d:s:l:r:e:N" opt; do
     case ${opt} in
         n)
             NAME=${OPTARG}
@@ -45,6 +45,9 @@ while getopts ":n:x:p:m:c:d:s:l:r:e:" opt; do
             ;;
         l)
             ARGS+=(-e "swarm_labels=${OPTARG}")
+            ;;
+        N)
+            ARGS+=(-e "disable_netdata=true")
             ;;
         \?)
             usage
