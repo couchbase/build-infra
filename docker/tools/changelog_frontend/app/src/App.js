@@ -172,7 +172,7 @@ function App() {
   }, [toVersion]);
 
   useEffect(() => {
-    if (toVersion === fromVersion && toBuild < fromBuild) {
+    if (toVersion === fromVersion && parseFloat(toBuild) < parseFloat(fromBuild)) {
       setFromBuild(toBuild)
     } else {
       getChangeLog()
@@ -181,7 +181,7 @@ function App() {
 
   useEffect(() => {
     if (optionsChanged) {
-      if(fromVersion !== toVersion || fromBuild >= toBuild){
+      if(fromVersion !== toVersion || parseFloat(fromBuild) >= parseFloat(toBuild)){
         setToBuild(heading['toBuild'])
       } else {
         getChangeLog()
