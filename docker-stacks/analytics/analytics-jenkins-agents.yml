@@ -55,7 +55,7 @@ services:
       replicas: 1
 
   linux:
-    image: couchbasebuild/analytics-linux-cv:20260212
+    image: couchbasebuild/analytics-linux-cv:20260818
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -83,7 +83,7 @@ services:
         parallelism: 100
 
   dfs:
-    image: couchbasebuild/analytics-dfs-cv:20260701
+    image: couchbasebuild/analytics-dfs-cv:20260818
     init: true
     environment:
       - "JENKINS_AGENT_NAME=analytics-dfs"
