@@ -48,9 +48,8 @@ ENV LANG=en_US.UTF-8
 # Install uv and cbdep for `couchbase` user
 ENV PATH="/home/couchbase/.local/bin:${PATH}"
 RUN echo -n ":/home/couchbase/.local/bin" >> /etc/path
-USER couchbase
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-RUN uv tool install cbdep
+RUN curl -Lf https://packages.couchbase.com/cbdep/cbdep-linux-$(uname -m) -o /usr/local/bin/cbdep && \
+    chmod a+x /usr/local/bin/cbdep
 
 # Use cbdep to install JVM for Jenkins
 USER root

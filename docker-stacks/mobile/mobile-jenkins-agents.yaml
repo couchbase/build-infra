@@ -108,7 +108,7 @@ services:
       - jenkins
 
   lite-android-ubuntu24:
-    image: couchbasebuild/ubuntu2404-mobile-lite-android:20260410
+    image: couchbasebuild/ubuntu2404-mobile-lite-android:20260821
     init: true
     user: couchbase
     environment:
