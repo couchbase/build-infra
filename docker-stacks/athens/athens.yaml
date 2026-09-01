@@ -23,6 +23,15 @@ services:
       - ATHENS_LOG_LEVEL=info
       - ATHENS_STORAGE_TYPE=disk
       - ATHENS_DISK_STORAGE_ROOT=/var/lib/athens
+      # Athens' own internal `go mod download`/`go list` calls default to
+      # GOPROXY=direct, ie. they clone straight from the VCS origin rather
+      # than going through proxy.golang.org first. That means a module
+      # whose origin tag changed after release (eg. a force-push) fails
+      # Athens' own internal checksum-DB verification, even though the
+      # original release content is still available, unmodified, from
+      # proxy.golang.org's permanent cache. Routing through it first fixes
+      # that without needing to disable verification.
+      - ATHENS_GO_BINARY_ENV_VARS=GOPROXY=https://proxy.golang.org,direct
     volumes:
       - type: bind
         source: /buildteam/athens
