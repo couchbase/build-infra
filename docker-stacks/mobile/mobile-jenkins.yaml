@@ -9,7 +9,7 @@ services:
 
   # mobile.jenkins.couchbase.com
   jenkins:
-    image: jenkins/jenkins:2.462.2
+    image: jenkins/jenkins:2.555.3-lts
     deploy:
       resources:
         limits:
