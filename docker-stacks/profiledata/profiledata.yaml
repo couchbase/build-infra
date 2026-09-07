@@ -301,6 +301,14 @@ services:
       - source: profiledata.ssh_host_privkey.ssh_host_rsa_key.20200417
         target: /etc/ssh/ssh_host_rsa_key
         mode: 0600
+      ####################################
+      # couchbase-server/blackduck/linux #
+      ####################################
+      - source: profiledata.blackduck.cloud_package_read.20260904
+        target: /home/couchbase/couchbase-server/zz/linux/.ssh/blackduck-cloud-package-read
+        mode: 0600
+        uid: "901"
+        gid: "901"
       ################################
       # couchbase-server/build/linux #
       ################################
@@ -924,6 +932,8 @@ secrets:
   profiledata.blackduck.credentials_json.20240511:
     external: true
   profiledata.blackduck.api_token.20230116:
+    external: true
+  profiledata.blackduck.cloud_package_read.20260904:
     external: true
   # pypirc
   profiledata.pypirc.20251125:
