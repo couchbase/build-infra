@@ -4,7 +4,7 @@ FROM rockylinux:${ROCKY_VERSION} AS rpm-packager-compile
 
 RUN set -x \
     && ulimit -n 1024 \
-    && dnf install -y --setopt=install_weak_deps=False rpm-build \
+    && dnf install -y --setopt=install_weak_deps=False rpm-build systemd-rpm-macros \
     && dnf clean all
 RUN set -x \
     && rm -rf /var/cache/dnf \
