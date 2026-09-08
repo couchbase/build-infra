@@ -1,14 +1,32 @@
 ---
 - hosts: all
 
+  environment:
+    chocolateyVersion: '1.4.0'
+    chocolateyUseWindowsCompression: 'true'
+
   pre_tasks:
+    # Don't whitelist all of C:\ -- Defender's AMSI flags an exclusion of the
+    # whole system drive as malicious (ScriptContainedMaliciousContent) and
+    # blocks the very command meant to disable it. Turn off real-time
+    # monitoring instead; it's re-enabled in post_tasks.
     - name: Disable Windows antivirus during setup
-      win_shell: "Add-MpPreference -ExclusionPath C:\\"
+      win_shell: "Set-MpPreference -DisableRealtimeMonitoring $true"
 
     # Needed for WiX Toolset
     - name: "Enable .NET Framework 3.5"
       win_feature:
         name: "NET-Framework-Core"
+        state: present
+
+    # Chocolatey 2.x requires .NET Framework 4.8, which isn't present on a
+    # stock Windows Server 2016 (we install it further down, via choco itself).
+    # The play-level chocolateyVersion env var is not enough: win_chocolatey
+    # gates the bootstrap on the module's own "version" parameter.
+    - name: Bootstrap Chocolatey (1.x engine — see play-level chocolateyVersion)
+      win_chocolatey:
+        name: chocolatey
+        version: '1.4.0'
         state: present
 
     - name: "Install tools"
@@ -24,15 +42,19 @@
         - ninja
         - wixtoolset
         - 7zip.commandline
-        - jdk8
         - maven
         - gradle
         - sbt
-        - insted
         - python2
         - curl
         - strawberryperl
         - nasm
+
+    - name: "Install OpenJDK 21"
+      win_chocolatey:
+        name: openjdk
+        version: 21.0.2
+      tags: openjdk
 
     - name: "Install Python 3"
       win_chocolatey:
@@ -135,8 +157,6 @@
   # Should be done last as it requires choco kbxxx pkg to install first
   # Selectively install MSVC based on product key(s) provided.
   roles:
-    - role: vs2015
-      when: vs2015_key is defined and vs2015_key != "PLEASE_REPLACE_FROM_COMMAND_LINE"
     - role: vs2017
       when: vs2017_key is defined and vs2017_key != "PLEASE_REPLACE_FROM_COMMAND_LINE"
     - role: vs2019
@@ -146,7 +166,7 @@
 
   post_tasks:
     - name: Restore basic Windows antivirus
-      win_shell: "Remove-MpPreference -ExclusionPath C:\\"
+      win_shell: "Set-MpPreference -DisableRealtimeMonitoring $false"
 
     - name: Exclude Jenkins and cbdep from Windows antivirus
       win_shell: Add-MpPreference -ExclusionPath "C:\Jenkins" -ExclusionExtension "exe"

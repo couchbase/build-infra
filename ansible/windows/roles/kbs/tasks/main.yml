@@ -1,6 +1,6 @@
 ---
 - name: Install pre-req Windows updates
-  include: install-kb.yml
+  include_tasks: install-kb.yml
   with_items: "{{ kbs }}"
   tags: kbs
   when: ansible_distribution  != 'windowserver2016' and ansible_distribution != 'Microsoft Windows 10 Pro'

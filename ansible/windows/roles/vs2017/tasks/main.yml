@@ -5,7 +5,7 @@
     state: directory
 
 - name: Add bin to PATH.
-  include: extend-path.yml
+  include_tasks: extend-path.yml
   with_items:
     - "{{ targetvolume | default('c') }}:\\vs2017"
 
