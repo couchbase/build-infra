@@ -11,6 +11,7 @@ USER root
 RUN set -x \
     && yum install -y \
         python3 \
+        python3-pip \
     && yum clean all
 
 COPY requirements.txt /tmp/requirements.txt

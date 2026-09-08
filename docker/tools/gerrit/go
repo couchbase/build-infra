@@ -1,15 +1,17 @@
 #!/bin/sh -e
 
-IMAGE=couchbasebuild/gerrit
-GERRIT_VER=3.7.4
-mkdir -p build
+if [ "${VERSION}" == "" ]; then
+  echo "Usage: VERSION=3.14.3 ./go [--publish]"
+  exit 1
+fi
 
-PUBLISH=false
+IMAGE=couchbasebuild/gerrit
+mkdir -p build
 
 for arg in "$@"; do
   case "${arg}" in
     --publish)
-      PUBLISH=true
+      PUBLISH=--push
       ;;
     *)
       echo "Invalid flag: ${arg}"
@@ -18,15 +20,8 @@ for arg in "$@"; do
   esac
 done
 
-docker buildx build \
+docker buildx build ${PUBLISH} \
   --platform linux/amd64 \
-  --tag ${IMAGE}:${GERRIT_VER} \
-  --tag ${IMAGE}:latest \
-  --build-arg GERRIT_VER=${GERRIT_VER} \
+  --tag ${IMAGE}:${VERSION} \
+  --build-arg GERRIT_VER=${VERSION} \
   .
-
-
-if ${PUBLISH}; then
-  docker push ${IMAGE}:${GERRIT_VER}
-  docker push ${IMAGE}:latest
-fi
