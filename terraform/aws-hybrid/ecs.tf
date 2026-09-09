@@ -1,5 +1,10 @@
 resource "aws_ecs_cluster" "main" {
   name = "jenkins-ecs"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 
@@ -69,6 +74,16 @@ resource "aws_ecs_service" "maven-cache" {
     subnets          = module.vpc.private_subnets
     assign_public_ip = false
     security_groups  = [aws_security_group.maven-cache.id]
+  }
+
+  # Nexus/OrientDB cannot share one EFS volume, so the old task must stop
+  # before the replacement starts.
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 100
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
   }
 }
 

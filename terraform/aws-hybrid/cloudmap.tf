@@ -18,6 +18,10 @@ resource "aws_service_discovery_service" "go_proxy" {
 
     routing_policy = "MULTIVALUE"
   }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
 }
 
 resource "aws_service_discovery_service" "maven-cache" {
@@ -33,5 +37,9 @@ resource "aws_service_discovery_service" "maven-cache" {
     }
 
     routing_policy = "MULTIVALUE"
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
   }
 }

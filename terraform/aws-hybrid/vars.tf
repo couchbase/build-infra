@@ -22,5 +22,5 @@ variable "goproxy_memory" { default = 4096 }
 variable "goproxy_cpu" { default = 1024}
 
 variable "maven-cache_image" { default = "sonatype/nexus3:3.37.3" }
-variable "maven-cache_memory" { default = 4096 }
-variable "maven-cache_cpu" { default = 1024}
+variable "maven-cache_memory" { default = 8192 }
+variable "maven-cache_cpu" { default = 2048}
