@@ -401,7 +401,7 @@ services:
       - jenkins
 
   linux-builder:
-    image: couchbasebuild/server-builder:20251106
+    image: couchbasebuild/server-builder:20260914
     environment:
       - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
       - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"

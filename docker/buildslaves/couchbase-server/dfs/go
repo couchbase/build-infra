@@ -61,6 +61,7 @@ docker buildx build ${ACTION} --pull \
   --build-arg GCC_15_VERSION=${GCC_15_VERSION} \
   --build-arg GCC_15_TAG=${GCC_15_TAG} \
   --build-arg GDB_VERSION=${GDB_VERSION} \
+  --build-arg GIT_LFS_VERSION=${GIT_LFS_VERSION} \
   --build-arg JDK_VERSION=${JDK_VERSION} \
   --build-arg JQ_VERSION=${JQ_VERSION} \
   --build-arg LIBARCHIVE_VERSION=${LIBARCHIVE_VERSION} \

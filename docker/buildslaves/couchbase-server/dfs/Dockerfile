@@ -89,6 +89,13 @@ RUN set -x \
     && curl -L --fail -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH} \
     && chmod a+x /usr/local/bin/yq
 
+# git-lfs
+ARG GIT_LFS_VERSION
+RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
+    && curl -LsSf https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-${TARGETARCH}-v${GIT_LFS_VERSION}.tar.gz | tar -xz --strip-components=1 -C ${tmpsrc} \
+    && install -m 0755 ${tmpsrc}/git-lfs /usr/local/bin/git-lfs \
+    && git lfs install --system --skip-repo
+
 # unzip
 ARG UNZIP_VERSION
 RUN --mount=type=tmpfs,target=${tmpsrc} set -x \
