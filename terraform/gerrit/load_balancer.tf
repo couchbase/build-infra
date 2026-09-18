@@ -52,7 +52,7 @@ module "alb" {
     https = {
       port               = 443
       protocol           = "TLS"
-      certificate_arn    = "arn:aws:acm:us-east-2:284614897128:certificate/afcf4539-c260-4fa4-8a80-02a7a50d2ed9"
+      certificate_arn    = "arn:aws:acm:us-east-2:284614897128:certificate/33166033-7a47-4568-9a08-4cc7b2e48ae6"
       ssl_policy         = "ELBSecurityPolicy-TLS13-1-2-2021-06"
       forward = {
         target_group_key = "gerrit-https"
