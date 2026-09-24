@@ -438,7 +438,7 @@ services:
         mode: 0444
         uid: "901"
         gid: "901"
-      - source: profiledata.blackduck.credentials_json.20240511
+      - source: profiledata.blackduck.credentials_json.20260924
         target: /home/couchbase/couchbase-server/zz/linux/.ssh/blackduck-creds.json
         mode: 0444
         uid: "901"
@@ -929,7 +929,7 @@ secrets:
   profiledata.jenkins_api_token.cb-robot-bsl.20250111:
     external: true
   # black duck
-  profiledata.blackduck.credentials_json.20240511:
+  profiledata.blackduck.credentials_json.20260924:
     external: true
   profiledata.blackduck.api_token.20230116:
     external: true
