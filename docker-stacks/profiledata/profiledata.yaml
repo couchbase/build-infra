@@ -920,7 +920,7 @@ secrets:
     external: true
   # config file for update_build_system_inventory job
   profiledata.update_system_info_yaml:
-    name: profiledata.update_system_info_yaml.20250714
+    name: profiledata.update_system_info_yaml.20260930
     external: true
   # jenkins tokens (for user ns-buildbot)
   profiledata.jenkins_api_token.server_job_automation.20220708:
