@@ -107,6 +107,9 @@ services:
       - type: volume
         source: workspace
         target: /opt/rpm-chroot/home/couchbase/jenkins/workspace
+      - type: volume
+        source: workspace
+        target: /opt/deb-chroot/home/couchbase/jenkins/workspace
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
