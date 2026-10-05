@@ -98,7 +98,7 @@ services:
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-small"
-      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} totoro master linux small"
+      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} totoro ponyo master linux small"
       - "JENKINS_URL=http://cv.jenkins.couchbase.com/"
       - "JENKINS_TUNNEL=mega4.build.couchbase.com:50002"
       - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"
@@ -176,7 +176,7 @@ services:
     init: true
     environment:
       - "JENKINS_AGENT_NAME=cv-linux-glibc228-large"
-      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} totoro master linux large"
+      - "JENKINS_AGENT_LABELS={{.Node.Hostname}} totoro ponyo master linux large"
       - "JENKINS_URL=http://cv.jenkins.couchbase.com/"
       - "JENKINS_TUNNEL=mega4.build.couchbase.com:50002"
       - "CB_ENTRYPOINT_PLUGINS=secrets/profiledata jenkins/swarm"

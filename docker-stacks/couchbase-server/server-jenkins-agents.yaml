@@ -79,7 +79,7 @@ services:
       - "CB_ENTRYPOINT_PLUGINS_EC2=secrets/home_mount jenkins/ec2"
       - "CB_ENTRYPOINT_BASE=https://cb-entry.s3.us-west-2.amazonaws.com"
       - "JENKINS_AGENT_NAME=linux"
-      - "JENKINS_AGENT_LABELS=server python3 linux linux-asan master totoro x86_64"
+      - "JENKINS_AGENT_LABELS=server python3 linux linux-asan master ponyo totoro x86_64"
       - "JENKINS_URL=http://server.jenkins.couchbase.com/"
       - "JENKINS_TUNNEL=mega4.build.couchbase.com:"
       - *server-jenkins-node-class
