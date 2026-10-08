@@ -231,6 +231,14 @@ RUN set -x \
     && ./aws/install \
     && rm -rf ./aws awscliv2.zip
 
+# DigiCert Software Trust Manager JCE provider for jarsigner (the jars are
+# arch-independent; the arm64 bundle is just the smaller download)
+ENV DIGICERT_JCE_DIR=/opt/smtools
+RUN set -x \
+    && mkdir -p ${DIGICERT_JCE_DIR} \
+    && curl -LsSf https://one.digicert.com/signingmanager/api-ui/v1/releases/noauth/smtools-linux-arm64.tar.gz/download \
+       | tar -xz --strip-components=1 -C ${DIGICERT_JCE_DIR} --wildcards '*.jar'
+
 # Need to create some directories so that the swarm stackfile can mount
 # on top of them without messing up permissions / ownership.
 USER couchbase
