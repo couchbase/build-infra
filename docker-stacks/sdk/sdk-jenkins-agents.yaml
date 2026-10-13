@@ -16,6 +16,13 @@ x-default-jenkins-two-agent: &default-jenkins-two-agent
       constraints:
         - node.labels.role==build
     replicas: 2
+    # Cap restart churn when an agent can't connect (e.g. the master is
+    # down or out of heap), instead of restart-looping every ~5s and
+    # registering a new node under a new container ID each time.
+    restart_policy: &default-restart-policy
+      delay: 60s
+      max_attempts: 5
+      window: 300s
   networks:
     - jenkins
   secrets:
@@ -54,6 +61,7 @@ x-default-jenkins-one-agent: &default-jenkins-one-agent
       constraints:
         - node.labels.role==build
     replicas: 1
+    restart_policy: *default-restart-policy
   networks:
     - jenkins
   secrets:
@@ -220,6 +228,7 @@ services:
       placement:
         constraints:
           - node.labels.role==build
+      restart_policy: *default-restart-policy
     secrets:
       - source: sdk_signing_private_key.gpgkey
         uid: '1000'
@@ -265,6 +274,7 @@ services:
       placement:
         constraints:
           - node.labels.role==build
+      restart_policy: *default-restart-policy
     secrets:
       - source: sdk_signing_private_key.gpgkey
         uid: '1000'

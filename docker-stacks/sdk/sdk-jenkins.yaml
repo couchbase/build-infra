@@ -1,9 +1,9 @@
 version: '3.5'
 
 # Suggested deployment command:
-#  docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c sdk-jenkins.yaml sdk
-# All services, networks, etc. will then get an "sdk_" prefix,
-# eg. "sdk_jenkins"
+# docker --host mega4.build.couchbase.com stack deploy --with-registry-auth -c sdk-jenkins.yaml sdkjenkins
+# All services, networks, etc. will then get an "sdkjenkins_" prefix,
+# eg. "sdkjenkins_jenkins"
 
 services:
 
@@ -41,8 +41,13 @@ services:
 # See http://www.technowise.in/2016/10/fix-no-valid-crumb-was-included-in.html
 # and https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Nginx
 # for the reason behind -Dhudson.security.csrf.requestfield
+# -XX:MaxRAMPercentage=60: without it the JVM caps heap at 25% of the
+# container's 7G limit (~1.75G); this container runs only Jenkins, so give
+# the heap ~4.2G and leave the rest for metaspace, thread stacks, etc.
+# -XX:+HeapDumpOnOutOfMemoryError: leave a dump in /var/jenkins_home
+# showing what filled the heap (roughly heap-sized; delete once reviewed).
     environment:
-      - "JAVA_OPTS=-Dhudson.security.csrf.requestfield=Jenkins-Crumb"
+      - "JAVA_OPTS=-Dhudson.model.ParametersAction.keepUndefinedParameters=true -Dhudson.security.csrf.requestfield=Jenkins-Crumb -Dhudson.TcpSlaveAgentListener.hostName=mega4.build.couchbase.com -XX:MaxRAMPercentage=60 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/jenkins_home"
       - "JENKINS_OPTS=--sessionTimeout=1440 --sessionEviction=14400"
 
 networks:
