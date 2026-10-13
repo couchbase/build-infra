@@ -478,7 +478,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: profiledata.pypirc.20251125
+      - source: profiledata.pypirc.20261012
         target: /home/couchbase/couchbase-server/zz/linux/.pypirc
         mode: 0600
         uid: "901"
@@ -937,6 +937,9 @@ secrets:
     external: true
   # pypirc
   profiledata.pypirc.20251125:
+    external: true
+  # pypirc
+  profiledata.pypirc.20261012:
     external: true
   # npmrc
   profiledata.npmrc.20251021:
