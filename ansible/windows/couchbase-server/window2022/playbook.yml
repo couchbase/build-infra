@@ -10,6 +10,9 @@
       - Microsoft_VC143_CRT_x64.msm
       - Microsoft_VC143_OpenMP_x64.msm
 
+    # Power BI connector build (MakePQX). 2.152+ crashes after compile; keep pinned.
+    pq_sdktools_version: "2.114.4"
+
   tasks:
     - name: Install patch_via_gerrit
       include_role:
@@ -46,6 +49,25 @@
         - vcredist140
         - vscode
         - wixtoolset
+
+    # couchbase-powerbi-connector's build_connector.bat searches
+    # ~\.vscode\extensions for MakePQX.exe
+    - name: Install Power Query SDK tools (MakePQX) for Power BI connector
+      block:
+        - name: Download Microsoft.PowerQuery.SdkTools {{ pq_sdktools_version }}
+          win_get_url:
+            url: "https://api.nuget.org/v3-flatcontainer/microsoft.powerquery.sdktools/{{ pq_sdktools_version }}/microsoft.powerquery.sdktools.{{ pq_sdktools_version }}.nupkg"
+            dest: C:\Temp\sdktools-{{ pq_sdktools_version }}.zip
+            force: no
+
+        - name: Extract Microsoft.PowerQuery.SdkTools {{ pq_sdktools_version }}
+          win_shell: |
+            Expand-Archive C:\Temp\sdktools-{{ pq_sdktools_version }}.zip `
+              C:\Users\Administrator\.vscode\extensions\pqsdktools-{{ pq_sdktools_version }} -Force
+          args:
+            creates: C:\Users\Administrator\.vscode\extensions\pqsdktools-{{ pq_sdktools_version }}\tools\MakePQX.exe
+      tags:
+      - powerbi
 
     # Note: vscode associates itself with .py files, so python is installed
     # after to ensure scripts still actually start when called directly
