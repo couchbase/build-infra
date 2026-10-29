@@ -443,7 +443,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.role==dfs
+          - node.labels.role==build
       replicas: 1
       update_config:
         parallelism: 1000
