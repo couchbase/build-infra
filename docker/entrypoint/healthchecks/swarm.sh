@@ -43,9 +43,12 @@ function free_space_ok {
 }
 
 function memory_ok {
-    if [ -f "/home/couchbase/jenkins/remoting/logs/remoting.log.0" ]; then
-        grep 'unable to create native thread: possibly out of memory or process/resource limits reached' ${SWARM_AGENT_DIR}/swarm-client.log && return 1
+    local error_pattern='unable to create native thread: possibly out of memory or process/resource limits reached'
+
+    if [ -f "${SWARM_AGENT_DIR}/swarm-client.log" ]; then
+        grep "${error_pattern}" "${SWARM_AGENT_DIR}/swarm-client.log" && return 1
     fi
+
     return 0
 }
 
