@@ -1,5 +1,21 @@
 ---
 version: '3.8'
+
+x-dd-secrets-env: &dd-secrets-env
+  DD_SECRET_KEY_FILE: /run/secrets/defectdojo_secret_key
+  DD_CREDENTIAL_AES_256_KEY_FILE: /run/secrets/defectdojo_credential_aes_256_key
+  DD_DATABASE_URL_FILE: /run/secrets/defectdojo_database_url
+
+x-dd-secrets: &dd-secrets
+  - source: defectdojo_credential_aes_256_key
+  - source: defectdojo_database_url
+  - source: defectdojo_secret_key
+
+x-placement: &placement
+  placement:
+    constraints:
+      - "node.labels.role==infrastructure"
+
 services:
 
   nginx:
@@ -8,17 +24,23 @@ services:
       - uwsgi
     environment:
       NGINX_METRICS_ENABLED: "${NGINX_METRICS_ENABLED}"
+      DD_UWSGI_HOST: "${DD_UWSGI_HOST}"
+      DD_UWSGI_PORT: "${DD_UWSGI_PORT}"
     volumes:
-      - /buildteam/defectdojo/nginx:/usr/share/nginx/html/media
+      - /buildteam/defectdojo/media:/usr/share/nginx/html/media
     deploy:
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+      <<: *placement
       replicas: 1
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_reverse-proxy"
-        - "traefik.http.routers.defectdojo.rule=Host(`${DD_HOSTNAME}`)"
+        - "traefik.http.routers.defectdojo_http.entrypoints=web"
+        - "traefik.http.routers.defectdojo_http.rule=Host(`${DD_HOSTNAME}`)"
+        - "traefik.http.routers.defectdojo_http.service=defectdojo"
+        - "traefik.http.routers.defectdojo_https.entrypoints=websecure"
+        - "traefik.http.routers.defectdojo_https.tls=true"
+        - "traefik.http.routers.defectdojo_https.rule=Host(`${DD_HOSTNAME}`)"
+        - "traefik.http.routers.defectdojo_https.service=defectdojo"
         - "traefik.http.services.defectdojo.loadbalancer.server.port=${DD_WEB_PORT}"
     networks:
       - default
@@ -27,143 +49,107 @@ services:
   uwsgi:
     image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
     depends_on:
-      - mysql
-    entrypoint: ['bash', '-c',
-                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} -t 30 &&
-                 export DD_SECRET_KEY="$$(cat /run/secrets/defectdojo_secret_key)" &&
-                 export DD_CREDENTIAL_AES_256_KEY="$$(cat /run/secrets/defectdojo_credential_aes_256_key)" &&
-                 export DD_DATABASE_PASSWORD="$$(cat /run/secrets/defectdojo_database_password)" &&
-                 export DD_DATABASE_URL="$$(cat /run/secrets/defectdojo_database_url)" &&
-                 /entrypoint-uwsgi.sh']
+      - postgres
+      - valkey
+    entrypoint: ['/wait-for-it.sh', '${DD_DATABASE_HOST}:${DD_DATABASE_PORT}', '-t', '30', '--', '/entrypoint-uwsgi.sh']
     environment:
+      <<: *dd-secrets-env
       DD_DEBUG: 'False'
       DD_DJANGO_METRICS_ENABLED: "${DD_DJANGO_METRICS_ENABLED}"
       DD_ALLOWED_HOSTS: "${DD_ALLOWED_HOSTS}"
-      DD_CELERY_BROKER_URL: ${DD_CELERY_BROKER_URL}
+      DD_CELERY_BROKER_URL: "${DD_CELERY_BROKER_URL}"
+      DD_CACHE_URL: "${DD_CACHE_URL}"
     volumes:
-        - "/buildteam/defectdojo/uwsgi:${DD_MEDIA_ROOT}"
-    secrets:
-      - source: defectdojo_credential_aes_256_key
-      - source: defectdojo_database_password
-      - source: defectdojo_database_url
-      - source: defectdojo_secret_key
+      - "/buildteam/defectdojo/media:${DD_MEDIA_ROOT}"
+    secrets: *dd-secrets
     deploy:
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+      <<: *placement
 
   celerybeat:
     image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
     depends_on:
-      - mysql
-    entrypoint: ['bash', '-c',
-                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} -t 30 &&
-                 export DD_SECRET_KEY="$$(cat /run/secrets/defectdojo_secret_key)" &&
-                 export DD_CREDENTIAL_AES_256_KEY="$$(cat /run/secrets/defectdojo_credential_aes_256_key)" &&
-                 export DD_DATABASE_PASSWORD="$$(cat /run/secrets/defectdojo_database_password)" &&
-                 export DD_DATABASE_URL="$$(cat /run/secrets/defectdojo_database_url)" &&
-                 /entrypoint-celery-beat.sh']
+      - postgres
+      - valkey
+    entrypoint: ['/wait-for-it.sh', '${DD_DATABASE_HOST}:${DD_DATABASE_PORT}', '-t', '30', '--', '/entrypoint-celery-beat.sh']
     environment:
-      DD_CELERY_BROKER_URL: ${DD_CELERY_BROKER_URL}
-    secrets:
-      - source: defectdojo_credential_aes_256_key
-      - source: defectdojo_database_password
-      - source: defectdojo_database_url
-      - source: defectdojo_secret_key
+      <<: *dd-secrets-env
+      DD_CELERY_BROKER_URL: "${DD_CELERY_BROKER_URL}"
+      DD_CACHE_URL: "${DD_CACHE_URL}"
+    secrets: *dd-secrets
     deploy:
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+      <<: *placement
 
   celeryworker:
     image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
     depends_on:
-      - mysql
-      - redis
-    entrypoint: ['bash', '-c',
-                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} -t 30 &&
-                 export DD_SECRET_KEY="$$(cat /run/secrets/defectdojo_secret_key)" &&
-                 export DD_CREDENTIAL_AES_256_KEY="$$(cat /run/secrets/defectdojo_credential_aes_256_key)" &&
-                 export DD_DATABASE_PASSWORD="$$(cat /run/secrets/defectdojo_database_password)" &&
-                 export DD_DATABASE_URL="$$(cat /run/secrets/defectdojo_database_url)" &&
-                 /entrypoint-celery-worker.sh']
+      - postgres
+      - valkey
+    entrypoint: ['/wait-for-it.sh', '${DD_DATABASE_HOST}:${DD_DATABASE_PORT}', '-t', '30', '--', '/entrypoint-celery-worker.sh']
     environment:
-      DD_CELERY_BROKER_URL: ${DD_CELERY_BROKER_URL}
+      <<: *dd-secrets-env
+      DD_CELERY_BROKER_URL: "${DD_CELERY_BROKER_URL}"
+      DD_CACHE_URL: "${DD_CACHE_URL}"
     volumes:
-        - "/buildteam/defectdojo/celeryworker:${DD_MEDIA_ROOT}"
-    secrets:
-      - source: defectdojo_credential_aes_256_key
-      - source: defectdojo_database_password
-      - source: defectdojo_database_url
-      - source: defectdojo_secret_key
+      - "/buildteam/defectdojo/media:${DD_MEDIA_ROOT}"
+    secrets: *dd-secrets
     deploy:
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+      <<: *placement
 
   initializer:
     image: "defectdojo/defectdojo-django:${DJANGO_VERSION}"
     depends_on:
-      - mysql
-    entrypoint: ['bash', '-c',
-                '/wait-for-it.sh ${DD_DATABASE_HOST}:${DD_DATABASE_PORT} &&
-                 export DD_SECRET_KEY=$$(cat /run/secrets/defectdojo_secret_key) &&
-                 export DD_CREDENTIAL_AES_256_KEY=$$(cat /run/secrets/defectdojo_credential_aes_256_key) &&
-                 export DD_DATABASE_URL=$$(cat /run/secrets/defectdojo_database_url) &&
-                 /entrypoint-initializer.sh']
+      - postgres
+    entrypoint: ['/wait-for-it.sh', '${DD_DATABASE_HOST}:${DD_DATABASE_PORT}', '--', '/entrypoint-initializer.sh']
     environment:
+      <<: *dd-secrets-env
       DD_ADMIN_USER: "${DD_ADMIN_USER}"
       DD_ADMIN_MAIL: "${DD_ADMIN_USER}"
       DD_ADMIN_FIRST_NAME: "${DD_ADMIN_FIRST_NAME}"
       DD_ADMIN_LAST_NAME: "${DD_ADMIN_LAST_NAME}"
       DD_INITIALIZE: "${DD_INITIALIZE}"
-    secrets:
-      - source: defectdojo_credential_aes_256_key
-      - source: defectdojo_database_url
-      - source: defectdojo_secret_key
+    secrets: *dd-secrets
     deploy:
+      <<: *placement
+      # Retry if PostgreSQL isn't ready yet; don't restart once it's done
       restart_policy:
-          condition: none
-          max_attempts: 0
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
 
-  mysql:
-    image: mysql:${MYSQL_VERSION}
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
     user: 1000:1000
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_DATABASE: ${DD_DATABASE_NAME}
-      MYSQL_USER: ${DD_DATABASE_USER}
-      MYSQL_PASSWORD_FILE: /run/secrets/defectdojo_database_password
-    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: ${DD_DATABASE_NAME}
+      POSTGRES_USER: ${DD_DATABASE_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/defectdojo_database_password
     volumes:
-      - /buildteam/defectdojo/mysql:/var/lib/mysql
+      - /buildteam/defectdojo/postgres:/var/lib/postgresql/data
     secrets:
       - source: defectdojo_database_password
     deploy:
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+      <<: *placement
 
-  redis:
-    image: redis:${REDIS_VERSION}
+  valkey:
+    image: valkey/valkey:${VALKEY_VERSION}
     user: 1000:1000
     volumes:
-      - /buildteam/defectdojo/redis:/data
+      - /buildteam/defectdojo/valkey:/data
     deploy:
-      placement:
-        constraints:
-          - "node.labels.role==infrastructure"
+      <<: *placement
 
+# Swarm secrets can't be changed, so the database ones get a date suffix
+# each time they're replaced; see README.md
 secrets:
   defectdojo_credential_aes_256_key:
     external: true
   defectdojo_database_password:
     external: true
+    name: defectdojo_database_password_20261113
   defectdojo_database_url:
     external: true
+    name: defectdojo_database_url_20261113
   defectdojo_secret_key:
     external: true
 
