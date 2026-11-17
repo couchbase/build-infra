@@ -1,8 +1,35 @@
 Terraform for proget on couchbase-prod AWS account
-1. This script automically pick aws credentials from ~/.aws/credentials.  If your credentials are stored differently, you will need to update variables.tf
+1. This script automically pick aws credentials from ~/.aws/credentials or from environment variables.
+   If your credentials are stored differently, you will need to update variables.tf
 2. terraform state is stored as couchbase-terraform-states/proget/terraform.tfstate on S3
 
 To modify existing configurations or recreate the AWS infrastructure:
 terraform init
 terraform plan
 terraform apply
+
+Instance bootstrap
+The launch template uses the latest Amazon Linux 2023 AMI (SSM parameter) and
+files/proget_userdata.sh.tftpl, which on first boot installs docker and amazon-efs-utils,
+mounts EFS and installs proget.service (/usr/local/bin/proget-start.sh).
+Logs: /var/log/proget-userdata.log, journalctl -u proget.
+The ProGet version is local.proget_version in variables.tf (pin an exact tag).
+
+The database and package data live on EFS, so only ONE instance may ever run against
+it at a time. This is what allows the ASG to replace a failed instance and resume from
+whatever state was already written to EFS.
+
+Upgrading ProGet / OS
+ProGet upgrades the DB schema on first start (no downgrade without a DB backup).
+1. Back up: ProGet database backup and/or an AWS Backup snapshot of the proget EFS.
+2. Bump local.proget_version; terraform plan; terraform apply
+3. Maintenance window: terminate the running proget instance; the ASG launches a new one
+   (first boot takes several minutes: dnf install + image pulls).
+4. Verify the UI version and LB health check. Rollback: restore the DB backup, revert
+   proget_version, terminate the instance again.
+
+Embedded PostgreSQL data/backups live on EFS at /opt/proget-pgsql/{database,backups}
+(using the externally managed proget-pgsql access point configured in variables.tf,
+with uid:gid 101:103 = postgres in the image).
+Package data also lives on EFS at /opt/proget/packages, so ASG replacement resumes with the
+same artifact set instead of losing Docker-named-volume state.

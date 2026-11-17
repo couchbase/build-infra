@@ -1,0 +1,80 @@
+#!/bin/bash
+# ProGet instance bootstrap (Amazon Linux 2023). Rendered by terraform/proget/ec2.tf.
+#
+# Runs once on first boot. Installs docker + EFS utils, mounts EFS and installs
+# proget.service, which (re)creates the containers on every boot.
+#
+# ProGet runs against its built-in embedded PostgreSQL on EFS.
+set -euxo pipefail
+exec > >(tee -a /var/log/proget-userdata.log) 2>&1
+
+dnf install -y docker amazon-efs-utils
+systemctl enable --now docker
+
+# EFS mounts
+#   /opt/proget        - original access point (uid 1000): packages, mssql data, mssql-pass.txt
+#   /opt/proget-pgsql  - embedded PostgreSQL data + backups (uid:gid ${pg_uid}:${pg_gid} = postgres in the image)
+mkdir -p /opt/proget /opt/proget-pgsql /opt/proget/packages
+cat >>/etc/fstab <<'EOF'
+${efs_id} /opt/proget efs _netdev,tls,accesspoint=${efs_ap} 0 0
+${efs_id} /opt/proget-pgsql efs _netdev,tls,accesspoint=${efs_ap_pgsql} 0 0
+EOF
+systemctl daemon-reload
+mount -a
+
+cat >/usr/local/bin/proget-start.sh <<'EOF'
+#!/bin/bash
+set -euo pipefail
+PROGET_IMAGE="${proget_image}"
+EXPECTED_PG_IDS="${pg_uid}:${pg_gid}"
+PGSQL_DIR=/opt/proget-pgsql
+
+docker pull "$PROGET_IMAGE"
+
+# Embedded PostgreSQL refuses to start unless its data dir is owned by the
+# container's postgres user; the pgsql EFS access point forces that identity.
+actual=$(docker run --rm --entrypoint sh "$PROGET_IMAGE" -c 'echo "$(id -u postgres):$(id -g postgres)"')
+if [ "$actual" != "$EXPECTED_PG_IDS" ]; then
+  echo "postgres uid:gid in $PROGET_IMAGE is $actual, expected $EXPECTED_PG_IDS; update the pgsql EFS access point" >&2
+  exit 1
+fi
+install -d -m 0700 "$PGSQL_DIR/database" "$PGSQL_DIR/backups"
+install -d -m 0775 /opt/proget/packages
+
+docker network inspect proget >/dev/null 2>&1 || docker network create proget
+docker rm -f proget >/dev/null 2>&1 || true
+
+docker run -d \
+  --name=proget \
+  --net=proget \
+  --restart=unless-stopped \
+  -p 80:80 \
+  -v /opt/proget/packages:/var/proget/packages:Z \
+  -v "$PGSQL_DIR/database:/var/proget/database" \
+  -v "$PGSQL_DIR/backups:/var/proget/backups" \
+  -v /opt:/buildteam:Z \
+  "$PROGET_IMAGE"
+EOF
+chmod 0755 /usr/local/bin/proget-start.sh
+
+cat >/etc/systemd/system/proget.service <<'EOF'
+[Unit]
+Description=ProGet
+Requires=docker.service
+After=docker.service network-online.target remote-fs.target
+Wants=network-online.target
+RequiresMountsFor=/opt/proget /opt/proget-pgsql
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=900
+ExecStart=/usr/local/bin/proget-start.sh
+# give ProGet time to shut down its embedded PostgreSQL cleanly
+ExecStop=/bin/sh -c '/usr/bin/docker stop -t 120 proget'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable --now proget.service
