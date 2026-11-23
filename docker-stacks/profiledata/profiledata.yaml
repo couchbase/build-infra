@@ -395,7 +395,7 @@ services:
         mode: 0600
         uid: "901"
         gid: "901"
-      - source: buildx.config.rhcc_metadata.20240425
+      - source: buildx.config.rhcc_metadata.20261123
         target: /home/couchbase/couchbase-server/buildx/linux/.docker/rhcc-metadata.json
         mode: 0600
         uid: "901"
@@ -886,7 +886,7 @@ secrets:
   profiledata.docker_config.dockerio.20230828:
     external: true
   # rhcc metadata
-  buildx.config.rhcc_metadata.20240425:
+  buildx.config.rhcc_metadata.20261123:
     external: true
   # aws credentials
   profiledata.aws_credentials.mobile.20210512:
